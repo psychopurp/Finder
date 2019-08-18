@@ -1,6 +1,6 @@
-# finder 前端flutter部分
+# Finder 前端flutter部分
 
-A new Flutter project.
+Finder 前端
 
 ## Getting Started
 
