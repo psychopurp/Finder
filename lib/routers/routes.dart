@@ -19,6 +19,9 @@ class Routes {
     router.notFoundHandler = Handler(
         handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       print("ROUTE WAS NOT FOUND !!!");
+      return Center(
+        child: Text("ROUTE WAS NOT FOUND !!!"),
+      );
     });
     router.define(root, handler: rootHandler);
 

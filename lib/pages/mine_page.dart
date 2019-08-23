@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:finder/provider/test.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -15,8 +17,17 @@ class _MinePageState extends State<MinePage> {
           centerTitle: true,
         ),
         backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-        body: Center(
-          child: Text('find page'),
+        body: Consumer<Counter>(
+          builder: (context, counter, child) {
+            return ListView(
+              children: <Widget>[
+                Text(counter.count.toString()),
+                RaisedButton(
+                  onPressed: counter.increment,
+                )
+              ],
+            );
+          },
         ));
   }
 }

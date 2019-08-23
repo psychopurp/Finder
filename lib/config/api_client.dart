@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 class ApiClient {
@@ -8,7 +10,23 @@ class ApiClient {
 
   //获得首页轮播图
   Future getHomePageBanner() async {
-    Response response = await dio.get('get_recommend');
+    Response response = await dio.get('get_recommend/');
+    return response.data;
+  }
+
+  //登陆
+  Future logIn(String phone, String password) async {
+    var formData = {'phone': phone, 'password': password};
+    var data = jsonEncode(formData);
+    Response response = await dio.post('login/', data: data);
+    print(response.data);
+    return response.data;
+  }
+
+  //获取用户信息
+  Future getUserProfile(token) async {
+    Response response = await dio.get('get_user_profile/',
+        options: Options(headers: {"token": token}));
     return response.data;
   }
 
