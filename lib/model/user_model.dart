@@ -16,23 +16,24 @@ class UserModel {
       this.phone,
       this.school});
   UserModel.fromJson(Map<String, dynamic> json) {
-    nickname = json['data']['nickname'];
-    phone = json['data']['phone'];
-    avatar = json['data']['avatar'];
-    introduction = json['data']['introduction'];
-    birthday = json['data']["birthday"];
-    major = json['data']['major'];
-    school = json['data']['school'];
+    nickname = json['nickname'];
+    phone = json['phone'];
+    avatar = json['avatar'];
+    introduction = json['introduction'];
+    birthday = json["birthday"];
+    major = json['major'];
+    school = json['school'];
   }
 
-  UserModel.toJson() {
+  Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = new Map<String, dynamic>();
-    json['data']['nickname'] = this.nickname;
-    json['data']['phone'] = this.phone;
-    json['data']['avatar'] = this.avatar;
-    json['data']['introduction'] = this.introduction;
-    json['data']["birthday"] = this.birthday;
-    json['data']['major'] = this.major;
-    json['data']['school'] = this.school;
+    json['nickname'] = this.nickname;
+    json['phone'] = this.phone;
+    json['avatar'] = this.avatar;
+    json['introduction'] = this.introduction;
+    json["birthday"] = this.birthday;
+    json['major'] = this.major;
+    json['school'] = this.school;
+    return json;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:finder/model/user_model.dart';
 import 'package:finder/config/api_client.dart';
@@ -13,12 +15,12 @@ class UserProvider with ChangeNotifier {
       {@required String phone, @required String password}) async {
     var data = await apiClient.logIn(phone, password);
     if (data['status'] == true) {
-      print(data);
-      token = data['token'].toString();
-      isLogIn = true;
-      var userData = await apiClient.getUserProfile(token);
-      userInfo = UserModel.fromJson(userData);
-      print(userData);
+      // print(data);
+      this.token = data['token'];
+      this.isLogIn = true;
+      var userData = await apiClient.getUserProfile(this.token);
+      this.userInfo = UserModel.fromJson(userData['data']);
+      print(userData['data']);
       print(userInfo.nickname);
       notifyListeners();
       return true;
@@ -27,8 +29,23 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  //修改用户信息
+  Future upLoadUserProfile(UserModel userINfo) async {
+    await apiClient.upLoadUserProfile(userINfo, this.token);
+    this.userInfo = userINfo;
+    notifyListeners();
+  }
+
   //获取用户信息
-  // Future getUserProfile() async {
-  //   notifyListeners();
-  // }
+  Future getUserProfile() async {
+    var userData = await apiClient.getUserProfile(this.token);
+    this.userInfo = UserModel.fromJson(userData['data']);
+    notifyListeners();
+  }
+
+  //上传图片
+  Future uploadImage(File image) async {
+    String imagePath = await apiClient.uploadImage(image, this.token);
+    return imagePath;
+  }
 }

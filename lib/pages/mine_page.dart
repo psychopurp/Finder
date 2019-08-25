@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+
+import 'package:finder/provider/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:finder/provider/test.dart';
+import 'package:finder/pages/mine_page/mine_page_top.dart';
+import 'package:finder/pages/mine_page/mine_page_bottom.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -17,17 +20,19 @@ class _MinePageState extends State<MinePage> {
           centerTitle: true,
         ),
         backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-        body: Consumer<Counter>(
-          builder: (context, counter, child) {
-            return ListView(
-              children: <Widget>[
-                Text(counter.count.toString()),
-                RaisedButton(
-                  onPressed: counter.increment,
-                )
-              ],
-            );
-          },
+        body: ListView(
+          children: <Widget>[
+            topPart,
+            MinePageBottom(),
+            // topPart,
+            // MinePageBottom(),
+            // topPart,
+            // MinePageBottom()
+          ],
         ));
   }
+
+  var topPart = Consumer<UserProvider>(builder: (context, user, child) {
+    return MinePageTop(user.userInfo);
+  });
 }

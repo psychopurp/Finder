@@ -1,8 +1,12 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
+import 'package:finder/pages/home_page/home_page_topics.dart';
+
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:flutter/cupertino.dart';
+//data model
 import 'package:finder/model/banner_model.dart';
+import 'package:finder/model/topic_model.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -24,7 +28,10 @@ class _HomePageState extends State<HomePage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ListView(
-                  children: <Widget>[HomePageBanner(snapshot.data['banner'])],
+                  children: <Widget>[
+                    HomePageBanner(snapshot.data['banner']),
+                    HomePageTopics(snapshot.data['topics'])
+                  ],
                 );
               } else {
                 return Center(child: CupertinoActivityIndicator());
@@ -34,9 +41,14 @@ class _HomePageState extends State<HomePage> {
 
   //获取首页数据并解析
   Future _getHomePageData() async {
-    var data = await apiClient.getHomePageBanner();
-    BannerModel banner = BannerModel.fromJson(data);
-    var formData = {'banner': banner};
+    var bannerData = await apiClient.getHomePageBanner();
+    print(bannerData);
+    var topicsData = await apiClient.getTopics();
+    print(topicsData);
+    BannerModel banner = BannerModel.fromJson(bannerData);
+    TopicModel topics = TopicModel.fromJson(topicsData);
+    var formData = {'banner': banner, 'topics': topics};
+
     return formData;
   }
 }

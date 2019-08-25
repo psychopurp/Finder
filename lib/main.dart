@@ -7,7 +7,6 @@ import 'routers/application.dart';
 import 'package:fluro/fluro.dart';
 import 'routers/routes.dart';
 //状态管理
-import 'package:finder/provider/test.dart';
 import 'package:finder/provider/user_provider.dart';
 
 void main() {
@@ -26,9 +25,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       //全局状态管理
       providers: [
-        ChangeNotifierProvider(
-          builder: (_) => Counter(),
-        ),
         ChangeNotifierProvider(
           builder: (_) => UserProvider(),
         )
