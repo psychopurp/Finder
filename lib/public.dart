@@ -1,15 +1,14 @@
-// library public;
+library public;
 
-// //config
-// export 'package:movie_pro/config/api_client.dart';
+//util
+export 'package:flutter_screenutil/flutter_screenutil.dart';
+export 'package:cached_network_image/cached_network_image.dart';
+export 'package:image_picker/image_picker.dart';
 
-// //model
-// export 'package:movie_pro/model/movie_news.dart';
-// export 'package:movie_pro/model/now_playing_movie_list.dart';
-
-// //util
-// export 'package:provide/provide.dart'; //provide包
-// export 'package:flutter_screenutil/flutter_screenutil.dart';
-
-// //provide
-// export 'package:movie_pro/provide/movie_provide.dart';
+//日期转化成时间戳工具
+String getTime({int year, int month, int day}) {
+  double time = DateTime(year, month, day).millisecondsSinceEpoch.toDouble();
+  time = time.toDouble() / 1000;
+  var date = time.toInt().toString();
+  return date;
+}

@@ -1,3 +1,5 @@
+import 'package:finder/config/api_client.dart';
+
 class TopicModel {
   List<TopicModelData> data;
   int totalPage;
@@ -34,18 +36,20 @@ class TopicModelData {
   int id;
   String title;
   String image;
-  String createTime;
-  int schoolId;
+  double time;
+  School school;
 
-  TopicModelData(
-      {this.id, this.title, this.image, this.createTime, this.schoolId});
+  TopicModelData({this.id, this.title, this.image, this.time, this.school});
 
   TopicModelData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
-    image = json['image'];
-    createTime = json['create_time'];
-    schoolId = json['school_id'];
+    image = (json['image'][0] == '/')
+        ? ApiClient.host + json['image']
+        : ApiClient.host + '/' + json['image'];
+    time = json['time'];
+    school =
+        json['school'] != null ? new School.fromJson(json['school']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -53,8 +57,29 @@ class TopicModelData {
     data['id'] = this.id;
     data['title'] = this.title;
     data['image'] = this.image;
-    data['create_time'] = this.createTime;
-    data['school_id'] = this.schoolId;
+    data['time'] = this.time;
+    if (this.school != null) {
+      data['school'] = this.school.toJson();
+    }
+    return data;
+  }
+}
+
+class School {
+  int id;
+  String name;
+
+  School({this.id, this.name});
+
+  School.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
     return data;
   }
 }

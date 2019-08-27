@@ -15,7 +15,11 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('招募'),
+          title: Consumer<UserProvider>(
+            builder: (context, user, child) {
+              return Text(user.userInfo.nickname);
+            },
+          ),
           elevation: 0,
           centerTitle: true,
         ),
@@ -33,6 +37,9 @@ class _MinePageState extends State<MinePage> {
   }
 
   var topPart = Consumer<UserProvider>(builder: (context, user, child) {
-    return MinePageTop(user.userInfo);
+    return MinePageTop(
+      user.userInfo,
+      isLogIn: user.isLogIn,
+    );
   });
 }

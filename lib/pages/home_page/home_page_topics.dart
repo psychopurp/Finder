@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:finder/model/topic_model.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:finder/public.dart';
 
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
@@ -11,7 +11,7 @@ class HomePageTopics extends StatelessWidget {
       height: ScreenUtil().setHeight(400),
       width: ScreenUtil().setWidth(750),
       color: Colors.cyan,
-      child: Text(topics.data[1].title),
+      child: Image.network(topics.data[0].image),
     );
   }
 }

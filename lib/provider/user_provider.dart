@@ -5,7 +5,10 @@ import 'package:finder/model/user_model.dart';
 import 'package:finder/config/api_client.dart';
 
 class UserProvider with ChangeNotifier {
-  UserModel userInfo;
+  UserModel userInfo = new UserModel(
+      nickname: '未登录',
+      avatar:
+          'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=883611357,2149035107&fm=26&gp=0.jpg');
   String token;
   int tokenExpireIn = 0;
   bool isLogIn = false;
@@ -32,8 +35,7 @@ class UserProvider with ChangeNotifier {
   //修改用户信息
   Future upLoadUserProfile(UserModel userINfo) async {
     await apiClient.upLoadUserProfile(userINfo, this.token);
-    this.userInfo = userINfo;
-    notifyListeners();
+    getUserProfile();
   }
 
   //获取用户信息

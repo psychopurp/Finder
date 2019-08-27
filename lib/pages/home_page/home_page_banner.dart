@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:finder/model/banner_model.dart';
+import 'package:finder/public.dart';
+import 'package:flutter/cupertino.dart';
 
 class HomePageBanner extends StatelessWidget {
   final BannerModel banner;
@@ -11,13 +12,15 @@ class HomePageBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 0),
-      height: ScreenUtil().setHeight(400),
+      padding: EdgeInsets.symmetric(vertical: 20.0),
+      height: ScreenUtil().setHeight(300),
       width: ScreenUtil().setWidth(750),
       color: Colors.white,
       child: Swiper(
+        // autoplayDelay: 100,
         onTap: (index) {},
-        viewportFraction: 0.8,
-        scale: 0.8,
+        viewportFraction: 0.65,
+        scale: 0.6,
         autoplay: true,
         itemCount: banner.data.length,
         itemBuilder: (context, index) {
@@ -28,11 +31,24 @@ class HomePageBanner extends StatelessWidget {
   }
 
   _singleItem(BuildContext context, BannerModelData item) {
-    return Container(
-      decoration: BoxDecoration(
+    return CachedNetworkImage(
+      imageUrl: item.image,
+      imageBuilder: (context, imageProvider) => Container(
+        decoration: BoxDecoration(
+          // color: Colors.green,
+          borderRadius: BorderRadius.all(Radius.circular(3)),
+          border: Border.all(color: Colors.black, width: 2),
           image: DecorationImage(
-              image: NetworkImage(item.image), fit: BoxFit.fill),
-          borderRadius: BorderRadius.all(Radius.circular(3))),
+            image: imageProvider,
+            fit: BoxFit.fill,
+            // colorFilter: ColorFilter.mode(Colors.red, BlendMode.colorBurn)
+          ),
+        ),
+      ),
+      // placeholder: (context, url) => CupertinoActivityIndicator(),
+      errorWidget: (context, url, error) => Icon(Icons.error),
+      // fadeOutDuration: new Duration(seconds: 1),
+      // fadeInDuration: new Duration(seconds: 3),
     );
   }
 }

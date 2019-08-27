@@ -31,12 +31,16 @@ class BannerModelData {
   int id;
   String image;
   String location;
+  String type;
 
-  BannerModelData({this.id, this.image, this.location});
+  BannerModelData({this.id, this.image, this.location, this.type});
 
   BannerModelData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    image = ApiClient.host + json['image'];
+    image = (json['image'][0] == '/')
+        ? ApiClient.host + json['image']
+        : ApiClient.host + '/' + json['image'];
+    type = json['type'];
     location = json['location'];
   }
 
@@ -44,6 +48,7 @@ class BannerModelData {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['image'] = this.image;
+    data['type'] = this.type;
     data['location'] = this.location;
     return data;
   }
