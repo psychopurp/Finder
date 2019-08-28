@@ -40,15 +40,15 @@ class _FindPageState extends State<FindPage> {
                         onPressed: () async {
                           var image = await getImage();
                           var imagePath = await user.uploadImage(image);
-                          user.upLoadUserProfile(new UserModel(
-                            nickname: 'Elyar',
-                            school: '南开大学',
-                            major: '计算机',
-                            birthday: getTime(year: 2019, month: 8, day: 5),
-                            phone: '15522005019',
-                            introduction: 'this is elyar',
-                            avatar: imagePath,
-                          ));
+                          // user.upLoadUserProfile(new UserModel(
+                          //   nickname: 'Elyar',
+                          //   school: '南开大学',
+                          //   major: '计算机',
+                          //   birthday: getTime(year: 2019, month: 8, day: 5),
+                          //   phone: '15522005019',
+                          //   introduction: 'this is elyar',
+                          //   avatar: imagePath,
+                          // ));
                         })
                   ],
                 );

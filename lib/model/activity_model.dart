@@ -1,3 +1,5 @@
+import 'package:finder/config/api_client.dart';
+
 class ActivityModel {
   List<ActivityModelData> data;
   int totalPage;
@@ -62,7 +64,9 @@ class ActivityModelData {
     startTime = json['start_time'];
     endTime = json['end_time'];
     place = json['place'];
-    poster = json['poster'];
+    poster = (json['poster'][0] == '/')
+        ? ApiClient.host + json['poster']
+        : ApiClient.host + '/' + json['poster'];
     description = json['description'];
     position = json['position'];
   }
