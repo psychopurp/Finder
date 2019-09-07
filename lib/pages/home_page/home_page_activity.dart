@@ -8,9 +8,16 @@ class HomePageActivities extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(400),
-      width: ScreenUtil().setWidth(750),
-      color: Colors.cyan,
+      height: ScreenUtil().setHeight(500),
+      width: ScreenUtil().setWidth(710),
+      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10))),
       child: Column(
         children: <Widget>[_title(), _activityPart()],
       ),
@@ -21,37 +28,36 @@ class HomePageActivities extends StatelessWidget {
     return Container(
       height: ScreenUtil().setHeight(80),
       width: ScreenUtil().setWidth(750),
-      color: Colors.white,
+      // color: Colors.amber,
       child: Row(
         children: <Widget>[
           Container(
             width: ScreenUtil().setWidth(500),
             height: ScreenUtil().setHeight(80),
             // color: Colors.yellow,
-            child: Padding(
-              padding: EdgeInsets.only(
-                  top: ScreenUtil().setHeight(10),
-                  left: ScreenUtil().setWidth(20)),
-              child: Text(
-                '知·活动',
-                style: TextStyle(fontSize: ScreenUtil().setSp(50)),
-              ),
-            ),
+            padding: EdgeInsets.only(
+                top: ScreenUtil().setHeight(20),
+                left: ScreenUtil().setWidth(20)),
+            child: Text('知·活动',
+                style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: ScreenUtil().setSp(35),
+                    fontWeight: FontWeight.w600)),
           ),
           Material(
-            // color: Colors.green,
-            child: InkWell(
-              onTap: () {},
-              child: Container(
-                width: ScreenUtil().setWidth(250),
-                height: ScreenUtil().setHeight(80),
-                child: Padding(
-                    padding: EdgeInsets.only(
-                        // top: ScreenUtil().setHeight(15),
-                        left: ScreenUtil().setWidth(20)),
-                    child: Icon(Icons.more_horiz)),
-              ),
-            ),
+            color: Colors.white,
+            child: Padding(
+                padding: EdgeInsets.only(
+                    // top: ScreenUtil().setHeight(15),
+                    left: ScreenUtil().setWidth(60)),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.more_horiz,
+                    color: Colors.black,
+                    size: ScreenUtil().setSp(50),
+                  ),
+                  onPressed: () {},
+                )),
           ),
         ],
       ),
@@ -60,9 +66,9 @@ class HomePageActivities extends StatelessWidget {
 
   Widget _activityPart() {
     return Container(
-      height: ScreenUtil().setHeight(320),
+      height: ScreenUtil().setHeight(420),
       width: ScreenUtil().setWidth(750),
-      color: Colors.white,
+      // color: Colors.yellow,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: this.activities.data.length,
@@ -82,24 +88,53 @@ class HomePageActivities extends StatelessWidget {
         onTap: () {
           print(item.title);
         },
-        child: Container(
-          height: ScreenUtil().setHeight(320),
-          width: ScreenUtil().setWidth(550),
-          margin: isLastItem
-              ? EdgeInsets.only(
-                  left: ScreenUtil().setWidth(20),
-                  right: ScreenUtil().setWidth(20),
-                )
-              : EdgeInsets.only(
-                  left: ScreenUtil().setWidth(20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            height: ScreenUtil().setHeight(390),
+            width: ScreenUtil().setWidth(220),
+            // color: Colors.blue,
+            margin: isLastItem
+                ? EdgeInsets.only(
+                    left: ScreenUtil().setWidth(20),
+                    right: ScreenUtil().setWidth(20),
+                    top: ScreenUtil().setWidth(5),
+                  )
+                : EdgeInsets.only(
+                    left: ScreenUtil().setWidth(20),
+                    top: ScreenUtil().setWidth(5),
+                  ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  height: ScreenUtil().setHeight(310),
+                  width: ScreenUtil().setWidth(220),
+                  decoration: BoxDecoration(
+                    // color: Colors.green,
+                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                    // border: Border.all(color: Colors.black, width: 2),
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
                 ),
-          decoration: BoxDecoration(
-            // color: Colors.green,
-            borderRadius: BorderRadius.all(Radius.circular(3)),
-            // border: Border.all(color: Colors.black, width: 2),
-            image: DecorationImage(
-              image: imageProvider,
-              fit: BoxFit.fill,
+                Container(
+                  height: ScreenUtil().setHeight(80),
+                  width: ScreenUtil().setWidth(220),
+                  padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
+                  // color: Colors.amber,
+                  child: Text(item.title,
+                      maxLines: 2,
+                      textAlign: TextAlign.start,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: ScreenUtil().setSp(25),
+                          fontWeight: FontWeight.w600)),
+                )
+              ],
             ),
           ),
         ),

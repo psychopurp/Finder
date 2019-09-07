@@ -1,10 +1,13 @@
+import 'package:finder/config/api_client.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/routers/application.dart';
 
 import 'package:provider/provider.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:finder/model/user_model.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
 
 class FindPage extends StatefulWidget {
   @override
@@ -27,29 +30,38 @@ class _FindPageState extends State<FindPage> {
               if (user.isLogIn) {
                 return ListView(
                   children: <Widget>[
-                    Text(user.token),
-                    Text(user.userInfo.phone),
-                    Text(user.userInfo.nickname),
-                    Text(user.userInfo.introduction),
-                    Text(user.userInfo.birthday),
-                    CachedNetworkImage(
-                      imageUrl: user.userInfo.avatar,
+                    RaisedButton(
+                      // color: Colors.amber,
+                      onPressed: () {
+                        Application.router.navigateTo(context, '/publishTopic');
+                      },
+                      child: Text('发布话题'),
                     ),
+
+                    // Text(user.userInfo.phone),
+                    // Text(user.userInfo.nickname),
+                    // Text(user.userInfo.introduction),
+                    // Text(user.userInfo.birthday),
+                    // CachedNetworkImage(
+                    //   imageUrl: user.userInfo.avatar,
+                    // ),
                     FlatButton(
                         child: Text('image'),
                         onPressed: () async {
-                          var image = await getImage();
-                          var imagePath = await user.uploadImage(image);
-                          // user.upLoadUserProfile(new UserModel(
-                          //   nickname: 'Elyar',
-                          //   school: '南开大学',
-                          //   major: '计算机',
-                          //   birthday: getTime(year: 2019, month: 8, day: 5),
-                          //   phone: '15522005019',
-                          //   introduction: 'this is elyar',
-                          //   avatar: imagePath,
-                          // ));
-                        })
+                          // var image = await getImage();
+                          // var imagePath = await user.uploadImage(image);
+                          // user.addTopic('我来测试了', ['计算机'], imagePath);
+                          var data = await user.getFollowUsers();
+                          print(data);
+                        }),
+                    RaisedButton(
+                      child: Text('test'),
+                      onPressed: () async {
+                        var image = await getImage();
+                        var data = await uploadImage(image);
+                        print(data);
+                      },
+                    )
                   ],
                 );
               } else {
@@ -65,5 +77,29 @@ class _FindPageState extends State<FindPage> {
   Future getImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     return image;
+  }
+
+  Future uploadImage(File image) async {
+    var dio = new Dio();
+    // String path = image.path;
+    // var name = path.substring(path.lastIndexOf('/') + 1);
+    // print('图片名===========>$name');
+    // var formData = new FormData.from({
+    //   'sender': 'Elyar',
+    //   'title': 'image test',
+    //   // 'poster': new UploadFileInfo(image, name,
+    //   //     contentType: ContentType.parse('multipart/form-data'))
+    // });
+    var data = {'sender': 'Elyar', 'title': 'image test'};
+
+    try {
+      Response response =
+          await dio.post('http://192.168.80.1:8000/activity/', data: data);
+      print('上传图片成功==========>${response.data}');
+      // print(ApiClient.host + response.data['url']);
+      return response.data;
+    } catch (e) {
+      print('上传图片错误==========>$e');
+    }
   }
 }

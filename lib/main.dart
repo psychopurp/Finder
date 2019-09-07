@@ -1,5 +1,7 @@
+import 'package:finder/pages/home_page.dart';
 import 'package:flutter/material.dart';
-import 'pages/index_page.dart';
+import 'package:finder/pages/login_page.dart';
+import 'package:finder/pages/index_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 //路由管理
@@ -42,7 +44,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(primaryColor: Colors.white),
         title: 'Finder',
         debugShowCheckedModeBanner: false,
-        home: IndexPage(),
+        home: LoginPage(),
       ),
     );
   }

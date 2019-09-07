@@ -74,9 +74,54 @@ class ApiClient {
       });
       print('上传图片成功==========>${response.data}');
       // print(ApiClient.host + response.data['url']);
-      return ApiClient.host + response.data['url'];
+      return response.data['url'];
     } catch (e) {
       print('上传图片错误==========>$e');
+    }
+  }
+
+  //获取城市列表
+  Future getCities({int provinceId}) async {
+    var formData = {'province_id': provinceId};
+    try {
+      Response response = await dio.get(
+        'get_cities/',
+        queryParameters: formData,
+      );
+      return response.data;
+    } catch (e) {
+      print('获取城市列表错误==========>$e');
+    }
+  }
+
+  //获取省份
+  Future getProvinces() async {
+    try {
+      Response response = await dio.get(
+        'get_provinces/',
+      );
+      return response.data;
+    } catch (e) {
+      print('获取省份错误==========>$e');
+    }
+  }
+
+  //获取学校列表
+  Future getSchools({int id, int cityId}) async {
+    /*
+    获取一个学校时输入id
+    获取列表时输入city
+    */
+    var formData =
+        (id != null) ? {'city_id': cityId, 'id': id} : {'city_id': cityId};
+    try {
+      Response response = await dio.get(
+        'get_schools/',
+        queryParameters: formData,
+      );
+      return response.data;
+    } catch (e) {
+      print('获取学校列表错误==========>$e');
     }
   }
 
@@ -106,6 +151,73 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('获取活动错误==========>$e');
+    }
+  }
+
+  //用户发布话题
+  Future addTopic(String title, List<String> tags, String image, token,
+      {int schoolId}) async {
+    var formData = (schoolId != null)
+        ? {'title': title, 'tags': tags, 'image': image, 'school_id': schoolId}
+        : {
+            'title': title,
+            'tags': tags,
+            'image': image,
+          };
+    print(jsonEncode(formData));
+    try {
+      Response response = await dio.post('add_topic/',
+          data: jsonEncode(formData),
+          options: Options(headers: {"token": token}));
+      print('发布话题成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('发布话题错误==========>$e');
+    }
+  }
+
+  //获取用户关注的用户列表
+  Future getFollowUsers({String query = "", int page = 1, token}) async {
+    var formData = {'query': query, 'page': page};
+    print(token);
+    try {
+      Response response = await dio.get('get_follow_users/',
+          queryParameters: formData,
+          options: Options(headers: {"token": token}));
+
+      return response.data;
+    } catch (e) {
+      print('获取用户关注的用户列表错误==========>$e');
+    }
+  }
+
+  //获取招募列表
+  Future getRecruits({int page = 1, int typeId}) async {
+    var formData = (typeId != null)
+        ? {'page': page, 'type_id': typeId}
+        : {
+            'page': page,
+          };
+    // print(formData);
+    try {
+      Response response = await dio.get(
+        'get_recruits/',
+        queryParameters: formData,
+      );
+      return response.data;
+    } catch (e) {
+      print('获取招募列表错误==========>$e');
+    }
+  }
+
+  //获取招募类型列表
+  Future getRecruitTypes(token) async {
+    try {
+      Response response = await dio.get('get_recruit_types/',
+          options: Options(headers: {"token": token}));
+      return response.data;
+    } catch (e) {
+      print('获取招募类型列表错误==========>$e');
     }
   }
 

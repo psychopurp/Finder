@@ -8,11 +8,25 @@ import 'package:finder/pages/serve_page/tree_hole_page.dart';
 import 'package:finder/pages/serve_page/he_says_page.dart';
 import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/publish_page.dart';
+import 'package:finder/pages/home_page/publish_topic_page.dart';
+import 'package:finder/pages/home_page/publish_activity_page.dart';
 
 //返回首页
 var rootHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return IndexPage();
+});
+
+//首页 -- 发布话题
+var publishTopicHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return PublishTopicPage();
+});
+
+//首页 -- 发布活动
+var publishActivityHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return PublishActivityPage();
 });
 
 //服务页面 -- 失物招领

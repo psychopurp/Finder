@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
+import 'package:finder/public.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
@@ -22,7 +21,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Finders'),
+        title: Text(
+          'Finders',
+          style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Yellowtail',
+              fontWeight: FontWeight.w400,
+              fontSize: ScreenUtil().setSp(70)),
+        ),
         elevation: 0,
         centerTitle: true,
       ),
@@ -31,12 +37,16 @@ class _HomePageState extends State<HomePage> {
           future: _getHomePageData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView(
-                children: <Widget>[
-                  HomePageBanner(snapshot.data['banner']),
-                  HomePageTopics(snapshot.data['topics']),
-                  HomePageActivities(snapshot.data['activities']),
-                ],
+              return Container(
+                color: Colors.white.withOpacity(0.0),
+                child: ListView(
+                  children: <Widget>[
+                    HomePageBanner(snapshot.data['banner']),
+                    Align(child: HomePageTopics(snapshot.data['topics'])),
+                    Align(
+                        child: HomePageActivities(snapshot.data['activities'])),
+                  ],
+                ),
               );
             } else {
               return Center(child: CupertinoActivityIndicator());
@@ -48,21 +58,20 @@ class _HomePageState extends State<HomePage> {
   Future _getBannerData() async {
     var bannerData = await apiClient.getHomePageBanner();
     BannerModel banner = BannerModel.fromJson(bannerData);
-    // print('bannerData=============>$bannerData');
     return banner;
   }
 
   Future _getTopicsData() async {
-    var topicsData = await apiClient.getTopics();
+    var topicsData = await apiClient.getTopics(page: 4);
     TopicModel topics = TopicModel.fromJson(topicsData);
-    // print('topicsData=======>$topicsData');
+    // print('topicsData=======>${topics.data.length}');
     return topics;
   }
 
   Future _getAcitivitiesData() async {
     var activitiesData = await apiClient.getActivities();
     ActivityModel activities = ActivityModel.fromJson(activitiesData);
-    // print("activitiesData==========>$activities");
+    // print("activitiesData==========>$activitiesData");
     return activities;
   }
 

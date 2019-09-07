@@ -5,6 +5,9 @@ import 'router_handler.dart';
 class Routes {
   static String root = "/"; //首页
   static String serve = "/serve";
+  //首页
+  static String publishTopic = '/publishTopic';
+  static String publishActivity = '/publishActivity';
   //服务页
   static String lostFound = "/serve/lostFound"; //服务页面 -- 失物招领
   static String heSays = "/serve/heSays"; //服务页面 -- 他·她·说
@@ -24,6 +27,12 @@ class Routes {
       );
     });
     router.define(root, handler: rootHandler);
+
+    //首页
+    router.define(publishTopic,
+        handler: publishTopicHandler, transitionType: TransitionType.fadeIn);
+    router.define(publishActivity,
+        handler: publishActivityHandler, transitionType: TransitionType.fadeIn);
 
     //服务页 --导航
     router.define(lostFound,

@@ -12,15 +12,18 @@ class HomePageBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 0),
-      padding: EdgeInsets.symmetric(vertical: 20.0),
+      padding: EdgeInsets.symmetric(vertical: 10.0),
       height: ScreenUtil().setHeight(300),
       width: ScreenUtil().setWidth(750),
-      color: Colors.white,
+      // color: Colors.white,
       child: Swiper(
+        // layout: SwiperLayout.STACK,
         // autoplayDelay: 100,
         onTap: (index) {},
         viewportFraction: 0.65,
         scale: 0.6,
+        // itemWidth: 750,
+        // itemHeight: 400,
         autoplay: true,
         itemCount: banner.data.length,
         itemBuilder: (context, index) {

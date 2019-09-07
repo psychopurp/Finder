@@ -28,7 +28,7 @@ class _PublishPageState extends State<PublishPage>
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
-          MaterialButton(
+          FlatButton(
             onPressed: () {},
             child: Text('发布'),
           )
