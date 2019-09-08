@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/provider/user_provider.dart';
@@ -33,6 +34,10 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                   );
                   String showText =
                       (data['status'] == true) ? '发布话题成功' : '发布失败';
+                  if (data['status'] == false) {
+                    user.setToken(null);
+                    Application.router.navigateTo(context, '/login');
+                  }
                   Scaffold.of(context).showSnackBar(new SnackBar(
                     content: new Text("$showText"),
                     action: new SnackBarAction(

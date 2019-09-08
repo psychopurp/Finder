@@ -5,6 +5,7 @@ import 'router_handler.dart';
 class Routes {
   static String root = "/"; //首页
   static String serve = "/serve";
+  static String login = '/login';
   //首页
   static String publishTopic = '/publishTopic';
   static String publishActivity = '/publishActivity';
@@ -33,6 +34,8 @@ class Routes {
         handler: publishTopicHandler, transitionType: TransitionType.fadeIn);
     router.define(publishActivity,
         handler: publishActivityHandler, transitionType: TransitionType.fadeIn);
+    router.define(login,
+        handler: loginHandler, transitionType: TransitionType.fadeIn);
 
     //服务页 --导航
     router.define(lostFound,

@@ -20,8 +20,6 @@ class UserProvider with ChangeNotifier {
     prefs = await SharedPreferences.getInstance();
     if (this.prefs.getString('userToken') != null) {
       this.token = this.prefs.getString('userToken');
-      this.isLogIn = true;
-      notifyListeners();
       return true;
     } else {
       print('token 不存在，请设置');
@@ -32,7 +30,7 @@ class UserProvider with ChangeNotifier {
   setToken(String token) async {
     prefs = await SharedPreferences.getInstance();
     await this.prefs.setString('userToken', token);
-    notifyListeners();
+    this.token = token;
   }
 
   //登陆
@@ -44,10 +42,11 @@ class UserProvider with ChangeNotifier {
       this.token = data['token'];
       setToken(data['token']);
       this.isLogIn = true;
-      var userData = await apiClient.getUserProfile(this.token);
-      this.userInfo = UserModel.fromJson(userData['data']);
-      print(userData['data']);
-      print(userInfo.nickname);
+      // var userData = await apiClient.getUserProfile(this.token);
+      // this.userInfo = UserModel.fromJson(userData['data']);
+      // print(userData['data']);
+      // print(userInfo.nickname);
+      await getUserProfile();
       notifyListeners();
       return true;
     } else {
@@ -58,15 +57,20 @@ class UserProvider with ChangeNotifier {
   //修改用户信息
   Future upLoadUserProfile(UserModel userINfo) async {
     await apiClient.upLoadUserProfile(userINfo, this.token);
+
     getUserProfile();
   }
 
   //获取用户信息
   Future getUserProfile() async {
+    /*
+    通过是否能获取到用户信息来判断token是否失效
+    */
     var userData = await apiClient.getUserProfile(this.token);
-
     this.userInfo = UserModel.fromJson(userData['data']);
-    notifyListeners();
+    print('========getUserProfile=======');
+    this.isLogIn = true;
+    // notifyListeners();
   }
 
   //上传图片

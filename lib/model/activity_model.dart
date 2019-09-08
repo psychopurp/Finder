@@ -64,6 +64,9 @@ class ActivityModelData {
     startTime = json['start_time'];
     endTime = json['end_time'];
     place = json['place'];
+    if (json['poster'] == null) {
+      json['poster'] = 'null';
+    }
     poster = (json['poster'][0] == '/')
         ? ApiClient.host + json['poster']
         : ApiClient.host + '/' + json['poster'];

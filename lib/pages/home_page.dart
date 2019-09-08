@@ -62,14 +62,28 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future _getTopicsData() async {
-    var topicsData = await apiClient.getTopics(page: 4);
+    var topicsData = await apiClient.getTopics(page: 1);
+    var topicsData2 = await apiClient.getTopics(page: 2);
+    var topicsData3 = await apiClient.getTopics(page: 3);
+    var topicsData4 = await apiClient.getTopics(page: 4);
+    var topicsData5 = await apiClient.getTopics(page: 5);
+    var topicsData6 = await apiClient.getTopics(page: 6);
+    var topicsData7 = await apiClient.getTopics(page: 7);
+    // print(topicsData);
     TopicModel topics = TopicModel.fromJson(topicsData);
-    // print('topicsData=======>${topics.data.length}');
+    topics.data.addAll(TopicModel.fromJson(topicsData2).data);
+    topics.data.addAll(TopicModel.fromJson(topicsData3).data);
+    topics.data.addAll(TopicModel.fromJson(topicsData4).data);
+    topics.data.addAll(TopicModel.fromJson(topicsData5).data);
+    topics.data.addAll(TopicModel.fromJson(topicsData6).data);
+    topics.data.addAll(TopicModel.fromJson(topicsData7).data);
+    // print('topicsData=======>${topicsData}');
     return topics;
   }
 
   Future _getAcitivitiesData() async {
-    var activitiesData = await apiClient.getActivities();
+    var activitiesData = await apiClient.getActivities(page: 1);
+
     ActivityModel activities = ActivityModel.fromJson(activitiesData);
     // print("activitiesData==========>$activitiesData");
     return activities;

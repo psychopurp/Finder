@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    getToken(context);
+    // getToken(context);
 
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Scaffold(

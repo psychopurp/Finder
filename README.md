@@ -1,14 +1,15 @@
-# Finder 前端flutter部分
+# Finder 前端 flutter 部分
 
 Finder 前端
 
-##使用的三方包
- - flutter_screenutil: ^0.5.3
- - fluro: ^1.5.1
- - image_picker: ^0.6.1+2
- - dio: ^2.1.13
- - flutter_swiper: ^1.1.6
- - provider: ^3.1.0
+## 使用的三方包
+
+- flutter_screenutil: ^0.5.3
+- fluro: ^1.5.1
+- image_picker: ^0.6.1+2
+- dio: ^2.1.13
+- flutter_swiper: ^1.1.6
+- provider: ^3.1.0
 
 ## Getting Started
 

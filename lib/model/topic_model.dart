@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:finder/config/api_client.dart';
 
 class TopicModel {
@@ -44,9 +46,14 @@ class TopicModelData {
   TopicModelData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
+    if (json['image'] == null) {
+      json['image'] = 'null';
+    }
+
     image = (json['image'][0] == '/')
         ? ApiClient.host + json['image']
         : ApiClient.host + '/' + json['image'];
+
     time = json['time'];
     school =
         json['school'] != null ? new School.fromJson(json['school']) : null;

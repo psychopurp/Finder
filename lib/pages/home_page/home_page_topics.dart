@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:finder/model/topic_model.dart';
 import 'package:finder/public.dart';
-import 'package:finder/text_style.dart';
 
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;

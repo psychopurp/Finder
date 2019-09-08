@@ -5,7 +5,7 @@ class UserModel {
   String introduction;
   String birthday;
   String major;
-  String school;
+  School school;
 
   UserModel(
       {this.avatar,
@@ -22,7 +22,8 @@ class UserModel {
     introduction = json['introduction'];
     birthday = json["birthday"];
     major = json['major'];
-    school = json['school'];
+    school =
+        json['school'] != null ? new School.fromJson(json['school']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -33,7 +34,28 @@ class UserModel {
     json['introduction'] = this.introduction;
     json["birthday"] = this.birthday;
     json['major'] = this.major;
-    json['school'] = this.school;
+    if (this.school != null) {
+      json['school'] = this.school.toJson();
+    }
     return json;
+  }
+}
+
+class School {
+  int id;
+  String name;
+
+  School({this.id, this.name});
+
+  School.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    return data;
   }
 }

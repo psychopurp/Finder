@@ -15,6 +15,7 @@ class ApiClient {
       Response response = await dio.get(
         'get_recommend/',
       );
+      print('获得首页轮播图成功....');
       return response.data;
     } catch (e) {
       print('获得首页轮播图错误==========>$e');
@@ -134,6 +135,7 @@ class ApiClient {
         'get_topics/',
         queryParameters: formData,
       );
+      // print('获得话题成功....');
       return response.data;
     } catch (e) {
       print('获取话题错误==========>$e');
@@ -148,6 +150,7 @@ class ApiClient {
         'get_activities/',
         queryParameters: formData,
       );
+      print('获得活动成功....');
       return response.data;
     } catch (e) {
       print('获取活动错误==========>$e');
