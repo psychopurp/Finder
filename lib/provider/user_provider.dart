@@ -42,11 +42,11 @@ class UserProvider with ChangeNotifier {
       this.token = data['token'];
       setToken(data['token']);
       this.isLogIn = true;
-      // var userData = await apiClient.getUserProfile(this.token);
-      // this.userInfo = UserModel.fromJson(userData['data']);
+      var userData = await apiClient.getUserProfile(this.token);
+      this.userInfo = UserModel.fromJson(userData['data']);
       // print(userData['data']);
       // print(userInfo.nickname);
-      await getUserProfile();
+      // await getUserProfile();
       notifyListeners();
       return true;
     } else {
@@ -70,7 +70,7 @@ class UserProvider with ChangeNotifier {
     this.userInfo = UserModel.fromJson(userData['data']);
     print('========getUserProfile=======');
     this.isLogIn = true;
-    // notifyListeners();
+    notifyListeners();
   }
 
   //上传图片

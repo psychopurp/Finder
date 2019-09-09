@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           const Locale('en', 'US'),
         ],
         onGenerateRoute: Application.router.generator,
-        theme: ThemeData(primaryColor: Colors.white),
+        theme: ThemeData(primaryColor: Color.fromRGBO(219, 107, 92, 1)),
         title: 'Finder',
         debugShowCheckedModeBanner: false,
         home: StartApp(),
@@ -70,10 +70,13 @@ class _StartAppState extends State<StartApp> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     if (isLogin) {
       print('startapp isrunning.......');
-      getToken(context);
+      if (!user.isLogIn) {
+        getToken(user);
+      }
       return IndexPage();
     } else {
       return LoginPage();
@@ -101,11 +104,11 @@ class _StartAppState extends State<StartApp> {
     }
   }
 
-  getToken(BuildContext context) async {
+  getToken(UserProvider user) async {
     /*
   获得token 同时获得用户信息
   */
-    final user = Provider.of<UserProvider>(context);
+
     if (await user.getToken()) {
       user.getUserProfile();
     }

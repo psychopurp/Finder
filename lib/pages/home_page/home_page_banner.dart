@@ -13,15 +13,24 @@ class HomePageBanner extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(top: 0),
       padding: EdgeInsets.symmetric(vertical: 10.0),
-      height: ScreenUtil().setHeight(300),
+      height: ScreenUtil().setHeight(260),
       width: ScreenUtil().setWidth(750),
-      // color: Colors.white,
+      color: Colors.white,
       child: Swiper(
         // layout: SwiperLayout.STACK,
         // autoplayDelay: 100,
         onTap: (index) {},
-        viewportFraction: 0.65,
-        scale: 0.6,
+        viewportFraction: 0.75,
+        scale: 0.7,
+        pagination: SwiperPagination(
+            margin: const EdgeInsets.only(
+                top: 10.0, left: 10.0, right: 10.0, bottom: 5.0),
+            alignment: Alignment.bottomCenter,
+            builder: DotSwiperPaginationBuilder(
+                size: 6,
+                activeSize: 7,
+                activeColor: Colors.white,
+                color: Colors.white.withOpacity(0.5))),
         // itemWidth: 750,
         // itemHeight: 400,
         autoplay: true,
@@ -40,7 +49,7 @@ class HomePageBanner extends StatelessWidget {
         decoration: BoxDecoration(
           // color: Colors.green,
           borderRadius: BorderRadius.all(Radius.circular(3)),
-          border: Border.all(color: Colors.black, width: 2),
+          // border: Border.all(color: Colors.black, width: 2),
           image: DecorationImage(
             image: imageProvider,
             fit: BoxFit.fill,

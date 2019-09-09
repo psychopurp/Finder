@@ -1,7 +1,9 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
@@ -19,6 +21,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    // final user = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -29,7 +32,7 @@ class _HomePageState extends State<HomePage> {
               fontWeight: FontWeight.w400,
               fontSize: ScreenUtil().setSp(70)),
         ),
-        elevation: 0,
+        elevation: 1,
         centerTitle: true,
       ),
       backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
@@ -38,13 +41,12 @@ class _HomePageState extends State<HomePage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Container(
-                color: Colors.white.withOpacity(0.0),
+                color: Colors.white.withOpacity(0.1),
                 child: ListView(
                   children: <Widget>[
                     HomePageBanner(snapshot.data['banner']),
-                    Align(child: HomePageTopics(snapshot.data['topics'])),
-                    Align(
-                        child: HomePageActivities(snapshot.data['activities'])),
+                    HomePageTopics(snapshot.data['topics']),
+                    HomePageActivities(snapshot.data['activities']),
                   ],
                 ),
               );

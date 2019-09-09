@@ -17,6 +17,7 @@ class _MinePageState extends State<MinePage> {
         appBar: AppBar(
           title: Consumer<UserProvider>(
             builder: (context, user, child) {
+              // print('user.a===${user.a}');
               return Text(user.userInfo.nickname);
             },
           ),
@@ -26,7 +27,7 @@ class _MinePageState extends State<MinePage> {
         backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
         body: ListView(
           children: <Widget>[
-            topPart,
+            _topPart,
             MinePageBottom(),
             // topPart,
             // MinePageBottom(),
@@ -36,7 +37,7 @@ class _MinePageState extends State<MinePage> {
         ));
   }
 
-  var topPart = Consumer<UserProvider>(builder: (context, user, child) {
+  var _topPart = Consumer<UserProvider>(builder: (context, user, child) {
     return MinePageTop(
       user.userInfo,
       isLogIn: user.isLogIn,

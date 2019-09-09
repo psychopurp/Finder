@@ -12,12 +12,13 @@ class HomePageActivities extends StatelessWidget {
       width: ScreenUtil().setWidth(710),
       margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10))),
+        color: Colors.white,
+        // borderRadius: BorderRadius.only(
+        //     topLeft: Radius.circular(20),
+        //     topRight: Radius.circular(20),
+        //     bottomLeft: Radius.circular(10),
+        //     bottomRight: Radius.circular(10))
+      ),
       child: Column(
         children: <Widget>[_title(), _activityPart()],
       ),
@@ -35,30 +36,56 @@ class HomePageActivities extends StatelessWidget {
             width: ScreenUtil().setWidth(500),
             height: ScreenUtil().setHeight(80),
             // color: Colors.yellow,
+            alignment: Alignment.centerLeft,
             padding: EdgeInsets.only(
-                top: ScreenUtil().setHeight(20),
+                // top: ScreenUtil().setHeight(20),
                 left: ScreenUtil().setWidth(20)),
-            child: Text('知·活动',
-                style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: ScreenUtil().setSp(35),
-                    fontWeight: FontWeight.w600)),
-          ),
-          Material(
-            color: Colors.white,
-            child: Padding(
-                padding: EdgeInsets.only(
-                    // top: ScreenUtil().setHeight(15),
-                    left: ScreenUtil().setWidth(60)),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.more_horiz,
-                    color: Colors.black,
-                    size: ScreenUtil().setSp(50),
+            child: Stack(
+              alignment: AlignmentDirectional(-1, 0.6),
+              children: <Widget>[
+                Container(
+                  width: ScreenUtil().setWidth(150),
+                  height: ScreenUtil().setHeight(20),
+                  decoration: BoxDecoration(
+                    // color: Colors.amber,
+                    gradient: LinearGradient(
+                        colors: [Colors.white, Colors.cyanAccent, Colors.cyan]),
                   ),
-                  onPressed: () {},
-                )),
+                ),
+                Text('  知·活动',
+                    style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: ScreenUtil().setSp(35),
+                        fontWeight: FontWeight.w600)),
+              ],
+            ),
           ),
+          InkWell(
+            onTap: () {
+              print('chip');
+            },
+            child: Transform(
+              alignment: AlignmentDirectional(
+                  ScreenUtil().setWidth(6), ScreenUtil().setHeight(0)),
+              transform: Matrix4.identity()..scale(0.7),
+              child: Chip(
+                // padding: EdgeInsets.all(0),
+                backgroundColor: Colors.black.withOpacity(0.04),
+                label: Row(
+                  children: <Widget>[
+                    Text(
+                      '更多 ',
+                      style: TextStyle(fontSize: ScreenUtil().setSp(25)),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: ScreenUtil().setSp(25),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );

@@ -1,4 +1,3 @@
-import 'package:finder/config/api_client.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/routers/application.dart';
@@ -28,7 +27,6 @@ class _FindPageState extends State<FindPage> {
           child: Consumer<UserProvider>(
             builder: (context, user, child) {
               if (user.isLogIn) {
-                user.getUserProfile();
                 return ListView(
                   children: <Widget>[
                     RaisedButton(
@@ -43,6 +41,7 @@ class _FindPageState extends State<FindPage> {
                       color: Colors.amber,
                       child: Text('测试页！！'),
                     ),
+
                     // Text(user.userInfo.phone),
                     // Text(user.userInfo.nickname),
                     // Text(user.userInfo.introduction),
