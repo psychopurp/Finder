@@ -1,14 +1,17 @@
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/model/activity_model.dart';
 
 class HomePageActivities extends StatelessWidget {
   final ActivityModel activities;
+  final double mainHeight = 520;
+  final double titleHeight = 100;
   HomePageActivities(this.activities);
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(500),
+      height: ScreenUtil().setHeight(mainHeight),
       width: ScreenUtil().setWidth(710),
       margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
       decoration: BoxDecoration(
@@ -20,14 +23,14 @@ class HomePageActivities extends StatelessWidget {
         //     bottomRight: Radius.circular(10))
       ),
       child: Column(
-        children: <Widget>[_title(), _activityPart()],
+        children: <Widget>[_title(context), _activityPart()],
       ),
     );
   }
 
-  Widget _title() {
+  Widget _title(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(80),
+      height: ScreenUtil().setHeight(titleHeight),
       width: ScreenUtil().setWidth(750),
       // color: Colors.amber,
       child: Row(
@@ -48,8 +51,11 @@ class HomePageActivities extends StatelessWidget {
                   height: ScreenUtil().setHeight(20),
                   decoration: BoxDecoration(
                     // color: Colors.amber,
-                    gradient: LinearGradient(
-                        colors: [Colors.white, Colors.cyanAccent, Colors.cyan]),
+                    gradient: LinearGradient(colors: [
+                      Colors.white,
+                      Theme.of(context).primaryColor.withOpacity(0.5),
+                      Theme.of(context).primaryColor
+                    ]),
                   ),
                 ),
                 Text('  知·活动',
@@ -62,12 +68,12 @@ class HomePageActivities extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              print('chip');
+              Application.router.navigateTo(context, '/home/moreActivities');
             },
             child: Transform(
               alignment: AlignmentDirectional(
-                  ScreenUtil().setWidth(6), ScreenUtil().setHeight(0)),
-              transform: Matrix4.identity()..scale(0.7),
+                  ScreenUtil().setWidth(14), ScreenUtil().setHeight(0)),
+              transform: Matrix4.identity()..scale(0.9),
               child: Chip(
                 // padding: EdgeInsets.all(0),
                 backgroundColor: Colors.black.withOpacity(0.04),

@@ -1,15 +1,18 @@
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/model/topic_model.dart';
 import 'package:finder/public.dart';
 
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
+  final double mainHeight = 560;
+  final double titleHeight = 100;
   HomePageTopics(this.topics);
   @override
   Widget build(BuildContext context) {
-    print(topics.data[0].toJson());
+    // print(topics.data[0].toJson());
     return Container(
-      height: ScreenUtil().setHeight(540),
+      height: ScreenUtil().setHeight(mainHeight),
       width: ScreenUtil().setWidth(710),
       // margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
       decoration: BoxDecoration(
@@ -23,7 +26,7 @@ class HomePageTopics extends StatelessWidget {
       // color: Colors.white,
       child: Column(
         children: <Widget>[
-          _title(),
+          _title(context),
           _topicsInSchoolPart(),
           _topicsNotInSchoolPart()
         ],
@@ -31,9 +34,9 @@ class HomePageTopics extends StatelessWidget {
     );
   }
 
-  Widget _title() {
+  Widget _title(context) {
     return Container(
-      height: ScreenUtil().setHeight(80),
+      height: ScreenUtil().setHeight(titleHeight),
       width: ScreenUtil().setWidth(750),
       // color: Colors.amber,
       child: Row(
@@ -54,8 +57,11 @@ class HomePageTopics extends StatelessWidget {
                   height: ScreenUtil().setHeight(20),
                   decoration: BoxDecoration(
                     // color: Colors.amber,
-                    gradient: LinearGradient(
-                        colors: [Colors.white, Colors.cyanAccent, Colors.cyan]),
+                    gradient: LinearGradient(colors: [
+                      Colors.white,
+                      Theme.of(context).primaryColor.withOpacity(0.5),
+                      Theme.of(context).primaryColor
+                    ]),
                   ),
                 ),
                 Text('  与·话题',
@@ -68,12 +74,12 @@ class HomePageTopics extends StatelessWidget {
           ),
           InkWell(
             onTap: () {
-              print('chip');
+              Application.router.navigateTo(context, '/home/moreTopics');
             },
             child: Transform(
               alignment: AlignmentDirectional(
-                  ScreenUtil().setWidth(6), ScreenUtil().setHeight(0)),
-              transform: Matrix4.identity()..scale(0.7),
+                  ScreenUtil().setWidth(14), ScreenUtil().setHeight(0)),
+              transform: Matrix4.identity()..scale(0.9),
               child: Chip(
                 // padding: EdgeInsets.all(0),
                 backgroundColor: Colors.black.withOpacity(0.04),
@@ -99,11 +105,11 @@ class HomePageTopics extends StatelessWidget {
 
   Widget _topicsInSchoolPart() {
     return Container(
-      height: ScreenUtil().setHeight(225),
+      height: ScreenUtil().setHeight(220),
       width: ScreenUtil().setWidth(750),
       // color: Colors.green,
       child: ListView.builder(
-        padding: EdgeInsets.only(top: ScreenUtil().setHeight(5)),
+        padding: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
         scrollDirection: Axis.horizontal,
         itemCount: this.topics.data.length,
         itemBuilder: (context, index) {
@@ -115,7 +121,7 @@ class HomePageTopics extends StatelessWidget {
 
   Widget _topicsNotInSchoolPart() {
     return Container(
-      height: ScreenUtil().setHeight(225),
+      height: ScreenUtil().setHeight(240),
       width: ScreenUtil().setWidth(750),
       // color: Colors.blue,
       child: ListView.builder(
@@ -136,7 +142,7 @@ class HomePageTopics extends StatelessWidget {
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          print(item.title);
+          print(item.id);
         },
         child: Align(
           alignment: Alignment.topCenter,
@@ -190,6 +196,7 @@ class HomePageTopics extends StatelessWidget {
                 Container(
                   alignment: Alignment.center,
                   // color: Colors.blue,
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
                   child: Text(
                     item.title,
                     maxLines: 2,

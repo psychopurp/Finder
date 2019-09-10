@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:finder/config/api_client.dart';
 
 class TopicModel {

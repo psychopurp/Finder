@@ -12,7 +12,12 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
   int _selectIndex = 0;
-  var pages = [HomePage(), FindPage(), ServePage(), MinePage()];
+  var pages = [
+    HomePage(),
+    FindPage(),
+    ServePage(),
+    MinePage(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

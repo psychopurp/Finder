@@ -10,6 +10,8 @@ import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/publish_page.dart';
 import 'package:finder/pages/home_page/publish_topic_page.dart';
 import 'package:finder/pages/home_page/publish_activity_page.dart';
+import 'package:finder/pages/home_page/more_topics.dart';
+import 'package:finder/pages/home_page/more_activities.dart';
 import 'package:finder/pages/login_page.dart';
 
 //返回首页
@@ -18,9 +20,22 @@ var rootHandler = Handler(
   return IndexPage();
 });
 
+//登录页
 var loginHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return LoginPage();
+});
+
+//首页 -- 更多话题
+var moreTopicsHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return MoreTopics();
+});
+
+//首页 -- 更多活动
+var moreActivitiesHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return MoreActivities();
 });
 
 //首页 -- 发布话题

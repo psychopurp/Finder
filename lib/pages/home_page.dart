@@ -1,9 +1,7 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
-import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
-import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
@@ -12,6 +10,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:finder/model/banner_model.dart';
 import 'package:finder/model/topic_model.dart';
 import 'package:finder/model/activity_model.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           'Finders',
           style: TextStyle(
-              color: Colors.black,
+              color: Colors.black.withOpacity(0.8),
               fontFamily: 'Yellowtail',
               fontWeight: FontWeight.w400,
               fontSize: ScreenUtil().setSp(70)),
@@ -42,12 +42,20 @@ class _HomePageState extends State<HomePage> {
             if (snapshot.hasData) {
               return Container(
                 color: Colors.white.withOpacity(0.1),
-                child: ListView(
-                  children: <Widget>[
-                    HomePageBanner(snapshot.data['banner']),
-                    HomePageTopics(snapshot.data['topics']),
-                    HomePageActivities(snapshot.data['activities']),
-                  ],
+                child: EasyRefresh(
+                  header: MaterialHeader(),
+                  onRefresh: () async {
+                    await Future.delayed(Duration(seconds: 1), () {
+                      setState(() {});
+                    });
+                  },
+                  child: ListView(
+                    children: <Widget>[
+                      HomePageBanner(snapshot.data['banner']),
+                      HomePageTopics(snapshot.data['topics']),
+                      HomePageActivities(snapshot.data['activities']),
+                    ],
+                  ),
                 ),
               );
             } else {

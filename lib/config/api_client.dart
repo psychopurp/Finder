@@ -142,6 +142,27 @@ class ApiClient {
     }
   }
 
+  //获取话题评论
+  Future getTopicComments(
+      {int topicId, String query = '', int page = 0, int rootId, token}) async {
+    /**
+    topic_id: int
+    query: str
+    page: int
+    root_id(传了就是回复，不传是评论): int
+       */
+    var formData = {'topic_id': topicId, 'query': query, 'page': page};
+    try {
+      Response response = await dio.get('get_topic_comments/',
+          queryParameters: formData,
+          options: Options(headers: {"token": token}));
+      print('获得话题评论成功....${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取话题评论错误==========>$e');
+    }
+  }
+
   //获取活动
   Future getActivities({String query = "", int page = 1}) async {
     var formData = {'query': query, 'page': page};

@@ -1,4 +1,3 @@
-import 'package:finder/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/login_page.dart';
 import 'package:finder/pages/index_page.dart';
@@ -15,11 +14,21 @@ import 'routers/routes.dart';
 import 'package:finder/provider/user_provider.dart';
 
 void main() {
-  runApp(MyApp());
+  Future(() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('token---------${prefs.getString('userToken')}');
+    print('正在进行初始化.....');
+    var token = prefs.getString("userToken");
+    var data = await apiClient.getUserProfile(token);
+    return data['status'];
+  }).then((isLogin) => runApp(MyApp(
+        isLogin: isLogin,
+      )));
 }
 
 class MyApp extends StatelessWidget {
-  MyApp() {
+  final bool isLogin;
+  MyApp({this.isLogin}) {
     final router = Router();
     Routes.configureRoutes(router);
     Application.router = router;
@@ -47,13 +56,17 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(primaryColor: Color.fromRGBO(219, 107, 92, 1)),
         title: 'Finder',
         debugShowCheckedModeBanner: false,
-        home: StartApp(),
+        home: StartApp(
+          isLogin: this.isLogin,
+        ),
       ),
     );
   }
 }
 
 class StartApp extends StatefulWidget {
+  final bool isLogin;
+  StartApp({this.isLogin});
   @override
   _StartAppState createState() => _StartAppState();
 }
@@ -64,15 +77,16 @@ class _StartAppState extends State<StartApp> {
 
   @override
   void initState() {
+    this.isLogin = widget.isLogin;
     super.initState();
-    _validateToken();
+    // _validateToken();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
-    if (isLogin) {
+    if (this.isLogin) {
       print('startapp isrunning.......');
       if (!user.isLogIn) {
         getToken(user);
@@ -104,11 +118,10 @@ class _StartAppState extends State<StartApp> {
     }
   }
 
-  getToken(UserProvider user) async {
+  Future getToken(UserProvider user) async {
     /*
   获得token 同时获得用户信息
   */
-
     if (await user.getToken()) {
       user.getUserProfile();
     }

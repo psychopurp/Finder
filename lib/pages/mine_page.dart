@@ -1,3 +1,4 @@
+import 'package:finder/config/api_client.dart';
 import 'package:flutter/material.dart';
 
 import 'package:finder/provider/user_provider.dart';
@@ -14,9 +15,12 @@ class _MinePageState extends State<MinePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        endDrawer: Drawer(),
         appBar: AppBar(
           title: Consumer<UserProvider>(
             builder: (context, user, child) {
+              apiClient.getTopicComments(
+                  token: user.token, topicId: 2, page: 1);
               // print('user.a===${user.a}');
               return Text(user.userInfo.nickname);
             },

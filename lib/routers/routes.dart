@@ -7,8 +7,10 @@ class Routes {
   static String serve = "/serve";
   static String login = '/login';
   //首页
-  static String publishTopic = '/publishTopic';
-  static String publishActivity = '/publishActivity';
+  static String publishTopic = '/publishTopic'; //首页-- 发布话题
+  static String publishActivity = '/publishActivity'; //首页 -- 发布活动
+  static String moreTopics = '/home/moreTopics'; //首页 -- 更多话题
+  static String moreActivities = '/home/moreActivities'; //首页 -- 更多活动
   //服务页
   static String lostFound = "/serve/lostFound"; //服务页面 -- 失物招领
   static String heSays = "/serve/heSays"; //服务页面 -- 他·她·说
@@ -31,11 +33,15 @@ class Routes {
 
     //首页
     router.define(publishTopic,
-        handler: publishTopicHandler, transitionType: TransitionType.fadeIn);
+        handler: publishTopicHandler, transitionType: TransitionType.material);
     router.define(publishActivity,
         handler: publishActivityHandler, transitionType: TransitionType.fadeIn);
     router.define(login,
         handler: loginHandler, transitionType: TransitionType.fadeIn);
+    router.define(moreTopics,
+        handler: moreTopicsHandler, transitionType: TransitionType.fadeIn);
+    router.define(moreActivities,
+        handler: moreActivitiesHandler, transitionType: TransitionType.fadeIn);
 
     //服务页 --导航
     router.define(lostFound,
