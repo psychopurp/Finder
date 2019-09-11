@@ -19,8 +19,7 @@ class _MinePageState extends State<MinePage> {
         appBar: AppBar(
           title: Consumer<UserProvider>(
             builder: (context, user, child) {
-              apiClient.getTopicComments(
-                  token: user.token, topicId: 2, page: 1);
+              apiClient.getTopicComments(query: '', topicId: 45, page: 1);
               // print('user.a===${user.a}');
               return Text(user.userInfo.nickname);
             },

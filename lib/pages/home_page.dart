@@ -2,14 +2,15 @@ import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
 import 'package:finder/public.dart';
+import 'package:finder/config/global.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:flutter/cupertino.dart';
 //data model
-import 'package:finder/model/banner_model.dart';
-import 'package:finder/model/topic_model.dart';
-import 'package:finder/model/activity_model.dart';
+import 'package:finder/models/banner_model.dart';
+import 'package:finder/models/topic_model.dart';
+import 'package:finder/models/activity_model.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 
@@ -19,28 +20,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Map<String, dynamic> formData;
+
+  @override
+  void initState() {
+    print('homepage setstate');
+    _getHomePageData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     // final user = Provider.of<UserProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Finders',
-          style: TextStyle(
-              color: Colors.black.withOpacity(0.8),
-              fontFamily: 'Yellowtail',
-              fontWeight: FontWeight.w400,
-              fontSize: ScreenUtil().setSp(70)),
+        appBar: AppBar(
+          title: Text(
+            'Finders',
+            style: TextStyle(
+                color: Colors.black.withOpacity(0.8),
+                fontFamily: 'Yellowtail',
+                fontWeight: FontWeight.w400,
+                fontSize: ScreenUtil().setSp(70)),
+          ),
+          elevation: 1,
+          centerTitle: true,
         ),
-        elevation: 1,
-        centerTitle: true,
-      ),
-      backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-      body: FutureBuilder(
-          future: _getHomePageData(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Container(
+        backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+        body: (this.formData != null)
+            ? Container(
                 color: Colors.white.withOpacity(0.1),
                 child: EasyRefresh(
                   header: MaterialHeader(),
@@ -51,18 +58,14 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: ListView(
                     children: <Widget>[
-                      HomePageBanner(snapshot.data['banner']),
-                      HomePageTopics(snapshot.data['topics']),
-                      HomePageActivities(snapshot.data['activities']),
+                      HomePageBanner(this.formData['banner']),
+                      HomePageTopics(this.formData['topics']),
+                      HomePageActivities(this.formData['activities']),
                     ],
                   ),
                 ),
-              );
-            } else {
-              return Center(child: CupertinoActivityIndicator());
-            }
-          }),
-    );
+              )
+            : Center(child: CupertinoActivityIndicator()));
   }
 
   Future _getBannerData() async {
@@ -107,6 +110,8 @@ class _HomePageState extends State<HomePage> {
       'activities': await _getAcitivitiesData()
     };
     // print(formData);
-    return formData;
+    setState(() {
+      this.formData = formData;
+    });
   }
 }

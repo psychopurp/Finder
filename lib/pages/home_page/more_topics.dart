@@ -4,7 +4,7 @@ import 'package:finder/routers/application.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
-import 'package:finder/model/topic_model.dart';
+import 'package:finder/models/topic_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:flutter/rendering.dart';
@@ -18,7 +18,7 @@ import 'package:flutter_easyrefresh/material_footer.dart';
 /**
  * 此页面定义了三个statefull 页面
  * MoreTopics -父页面
- * SchoolTopics
+ * Topics
  * GlobalTopics
  */
 
@@ -80,8 +80,12 @@ class _MoreTopicsState extends State<MoreTopics>
             TabBarView(
               controller: _tabController,
               children: <Widget>[
-                SchoolTopics(),
-                SchoolTopics(),
+                Topics(
+                  isSchoolTopics: true,
+                ),
+                Topics(
+                  isSchoolTopics: false,
+                ),
               ],
             ),
             Positioned(
@@ -111,13 +115,18 @@ class _MoreTopicsState extends State<MoreTopics>
   }
 }
 
-class SchoolTopics extends StatefulWidget {
+class Topics extends StatefulWidget {
+  final bool isSchoolTopics;
+  Topics({this.isSchoolTopics});
   @override
-  _SchoolTopicsState createState() => _SchoolTopicsState();
+  _TopicsState createState() => _TopicsState(isSchoolTopics: isSchoolTopics);
 }
 
-class _SchoolTopicsState extends State<SchoolTopics>
-    with AutomaticKeepAliveClientMixin<SchoolTopics> {
+class _TopicsState extends State<Topics>
+    with AutomaticKeepAliveClientMixin<Topics> {
+  final bool isSchoolTopics;
+
+  _TopicsState({this.isSchoolTopics});
   TopicModel topics;
   int pageCount = 2;
   int itemCount = 0;
@@ -127,6 +136,7 @@ class _SchoolTopicsState extends State<SchoolTopics>
 
   @override
   void initState() {
+    print('topics正在initstate');
     _getInitialTopicsData(1);
     super.initState();
   }
@@ -151,7 +161,7 @@ class _SchoolTopicsState extends State<SchoolTopics>
         });
       },
       onLoad: () async {
-        var data = await _getMore(this.pageCount, context);
+        var data = await _getMore(this.pageCount);
         _refreshController.finishLoad(
             success: true, noMore: (data.length == 0));
       },
@@ -180,7 +190,7 @@ class _SchoolTopicsState extends State<SchoolTopics>
     return topics;
   }
 
-  Future _getMore(int pageCount, BuildContext context) async {
+  Future _getMore(int pageCount) async {
     var topicsData = await apiClient.getTopics(page: pageCount);
     // print(topicsData);
     TopicModel topics = TopicModel.fromJson(topicsData);
@@ -263,167 +273,6 @@ class _SchoolTopicsState extends State<SchoolTopics>
                             fontSize: ScreenUtil().setSp(20)),
                       ),
                     )),
-              ],
-            ),
-          ),
-        ),
-      ),
-      errorWidget: (context, url, error) => Icon(Icons.error),
-    );
-  }
-}
-
-class GlobalTopics extends StatefulWidget {
-  @override
-  _GlobalTopicsState createState() => _GlobalTopicsState();
-}
-
-class _GlobalTopicsState extends State<GlobalTopics>
-    with AutomaticKeepAliveClientMixin<GlobalTopics> {
-  TopicModel topics;
-  int pageCount = 2;
-  int itemCount = 0;
-  EasyRefreshController _refreshController = EasyRefreshController();
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    _getInitialTopicsData(1);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _refreshController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return EasyRefresh.custom(
-      enableControlFinishLoad: true,
-      header: MaterialHeader(),
-      footer: MaterialFooter(),
-      controller: _refreshController,
-      onRefresh: () async {
-        await Future.delayed(Duration(seconds: 1), () {
-          setState(() {});
-        });
-      },
-      onLoad: () async {
-        var data = await _getMore(this.pageCount, context);
-        _refreshController.finishLoad(
-            success: true, noMore: (data.length == 0));
-      },
-      slivers: <Widget>[
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return _singleItem(context, this.topics.data[index], index);
-            },
-            childCount: this.itemCount,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Future _getInitialTopicsData(int pageCount) async {
-    var topicsData = await apiClient.getTopics(page: 1);
-    // print(topicsData);
-    TopicModel topics = TopicModel.fromJson(topicsData);
-    // print('topicsData=======>${topicsData}');
-    setState(() {
-      this.topics = topics;
-      this.itemCount = topics.data.length;
-    });
-    return topics;
-  }
-
-  Future _getMore(int pageCount, BuildContext context) async {
-    var topicsData = await apiClient.getTopics(page: pageCount);
-    // print(topicsData);
-    TopicModel topics = TopicModel.fromJson(topicsData);
-    // print('hasmore=======${topics.hasMore}');
-    setState(() {
-      this.topics.data.addAll(topics.data);
-      this.itemCount = this.itemCount + topics.data.length;
-      this.pageCount++;
-    });
-    return topics.data;
-  }
-
-  _singleItem(BuildContext context, TopicModelData item, int index) {
-    return CachedNetworkImage(
-      imageUrl: item.image,
-      imageBuilder: (context, imageProvider) => InkWell(
-        onTap: () {
-          print(item.id);
-        },
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            margin: EdgeInsets.only(
-                left: ScreenUtil().setWidth(20),
-                right: ScreenUtil().setWidth(20),
-                top: ScreenUtil().setWidth(20)),
-            height: ScreenUtil().setHeight(400),
-            width: ScreenUtil().setWidth(750),
-            decoration: BoxDecoration(
-              // color: Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(3)),
-              // border: Border.all(color: Colors.black, width: 2),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.fill,
-              ),
-            ),
-            child: Stack(
-              children: <Widget>[
-                Positioned(
-                    top: ScreenUtil().setHeight(10),
-                    child: Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.only(
-                              // topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                              // bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(20))),
-                      child: Text(
-                        '校内话题',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: ScreenUtil().setSp(20)),
-                      ),
-                    )),
-                Opacity(
-                  opacity: 0.1,
-                  child: Container(
-                    // width: ScreenUtil().setWidth(750),
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.all(Radius.circular(3))),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  // color: Colors.blue,
-                  child: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil().setSp(28),
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                )
               ],
             ),
           ),

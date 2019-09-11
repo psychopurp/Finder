@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:finder/model/user_model.dart';
+import 'package:finder/config/global.dart';
+import 'package:finder/models/user_model.dart';
 
 class ApiClient {
   static const host = "http://47.94.247.8";
   static const baseURL = "http://47.94.247.8/api/";
 
-  var dio = ApiClient.createDio();
+  static Dio dio = new Dio(BaseOptions(baseUrl: baseURL));
 
   //获得首页轮播图
   Future getHomePageBanner() async {
@@ -23,11 +24,17 @@ class ApiClient {
   }
 
   //登陆
-  Future logIn(String phone, String password) async {
+  Future login(String phone, String password) async {
     var formData = {'phone': phone, 'password': password};
     var data = jsonEncode(formData);
     try {
       Response response = await dio.post('login/', data: data);
+      if (response.data['status'] == true) {
+        //登陆后给请求头加上token
+        dio.options.headers['token'] = response.data['token'];
+        //全局保存token
+        Global.saveToken(newToken: response.data['token']);
+      }
       return response.data;
     } catch (e) {
       print('登陆错误==========>$e');
@@ -35,10 +42,11 @@ class ApiClient {
   }
 
   //获取用户信息
-  Future getUserProfile(token) async {
+  Future getUserProfile() async {
     try {
-      Response response = await dio.get('get_user_profile/',
-          options: Options(headers: {"token": token}));
+      Response response = await dio.get(
+        'get_user_profile/',
+      );
       return response.data;
     } catch (e) {
       print('获取用户信息错误==========>$e');
@@ -46,11 +54,10 @@ class ApiClient {
   }
 
   //修改个人信息
-  Future upLoadUserProfile(UserModel userINfo, token) async {
+  Future upLoadUserProfile(UserModel userINfo) async {
     var data = jsonEncode(userINfo.toJson());
     try {
-      Response response = await dio.post('modify_profile/',
-          data: data, options: Options(headers: {"token": token}));
+      Response response = await dio.post('modify_profile/', data: data);
       print('修改个人信息成功=====${response.data}');
       return response.data;
     } catch (e) {
@@ -59,7 +66,7 @@ class ApiClient {
   }
 
   //上传图片
-  Future uploadImage(File image, token) async {
+  Future uploadImage(File image) async {
     String path = image.path;
     var name = path.substring(path.lastIndexOf('/') + 1);
     print('图片名===========>$name');
@@ -68,9 +75,8 @@ class ApiClient {
           contentType: ContentType.parse('multipart/form-data'))
     });
     try {
-      Response response = await dio.post('upload_image/',
-          options: Options(headers: {"token": token}),
-          data: formData, onSendProgress: (sent, total) {
+      Response response = await dio.post('upload_image/', data: formData,
+          onSendProgress: (sent, total) {
         print('$sent---$total');
       });
       print('上传图片成功==========>${response.data}');
@@ -144,7 +150,7 @@ class ApiClient {
 
   //获取话题评论
   Future getTopicComments(
-      {int topicId, String query = '', int page = 0, int rootId, token}) async {
+      {int topicId, String query = '', int page = 0, int rootId}) async {
     /**
     topic_id: int
     query: str
@@ -153,9 +159,8 @@ class ApiClient {
        */
     var formData = {'topic_id': topicId, 'query': query, 'page': page};
     try {
-      Response response = await dio.get('get_topic_comments/',
-          queryParameters: formData,
-          options: Options(headers: {"token": token}));
+      Response response =
+          await dio.get('get_topic_comments/', queryParameters: formData);
       print('获得话题评论成功....${response.data}');
       return response.data;
     } catch (e) {
@@ -179,7 +184,7 @@ class ApiClient {
   }
 
   //用户发布话题
-  Future addTopic(String title, List<String> tags, String image, token,
+  Future addTopic(String title, List<String> tags, String image,
       {int schoolId}) async {
     var formData = (schoolId != null)
         ? {'title': title, 'tags': tags, 'image': image, 'school_id': schoolId}
@@ -190,9 +195,8 @@ class ApiClient {
           };
     print(jsonEncode(formData));
     try {
-      Response response = await dio.post('add_topic/',
-          data: jsonEncode(formData),
-          options: Options(headers: {"token": token}));
+      Response response =
+          await dio.post('add_topic/', data: jsonEncode(formData));
       print('发布话题成功==========>${response.data}');
       return response.data;
     } catch (e) {
@@ -201,13 +205,11 @@ class ApiClient {
   }
 
   //获取用户关注的用户列表
-  Future getFollowUsers({String query = "", int page = 1, token}) async {
+  Future getFollowUsers({String query = "", int page = 1}) async {
     var formData = {'query': query, 'page': page};
-    print(token);
     try {
-      Response response = await dio.get('get_follow_users/',
-          queryParameters: formData,
-          options: Options(headers: {"token": token}));
+      Response response =
+          await dio.get('get_follow_users/', queryParameters: formData);
 
       return response.data;
     } catch (e) {
@@ -235,22 +237,21 @@ class ApiClient {
   }
 
   //获取招募类型列表
-  Future getRecruitTypes(token) async {
+  Future getRecruitTypes() async {
     try {
-      Response response = await dio.get('get_recruit_types/',
-          options: Options(headers: {"token": token}));
+      Response response = await dio.get(
+        'get_recruit_types/',
+      );
       return response.data;
     } catch (e) {
       print('获取招募类型列表错误==========>$e');
     }
   }
 
-  //初始化 Dio 对象
-  static Dio createDio() {
-    var options = BaseOptions(
-      baseUrl: baseURL,
-    );
-    return Dio(options);
+  //接口初始化
+  static void init() {
+    //初始化时带上默认token
+    dio.options.headers['token'] = Global.token;
   }
 }
 

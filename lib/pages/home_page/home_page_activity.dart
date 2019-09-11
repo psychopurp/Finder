@@ -1,7 +1,7 @@
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
-import 'package:finder/model/activity_model.dart';
+import 'package:finder/models/activity_model.dart';
 
 class HomePageActivities extends StatelessWidget {
   final ActivityModel activities;

@@ -268,11 +268,9 @@ class _LoginPageState extends State<LoginPage> {
 
   getToken(BuildContext context) async {
     final user = Provider.of<UserProvider>(context);
-    if (await user.getToken()) {
-      user.getUserProfile();
-      Navigator.of(context).pushAndRemoveUntil(
-          new MaterialPageRoute(builder: (context) => new IndexPage()),
-          (route) => route == null);
-    }
+
+    Navigator.of(context).pushAndRemoveUntil(
+        new MaterialPageRoute(builder: (context) => new IndexPage()),
+        (route) => route == null);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:finder/model/banner_model.dart';
+import 'package:finder/models/banner_model.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/cupertino.dart';
 

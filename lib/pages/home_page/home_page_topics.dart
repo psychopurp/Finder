@@ -1,6 +1,6 @@
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
-import 'package:finder/model/topic_model.dart';
+import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
 
 class HomePageTopics extends StatelessWidget {

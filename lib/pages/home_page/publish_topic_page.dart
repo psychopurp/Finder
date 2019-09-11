@@ -16,11 +16,24 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
   String _image;
   File _imageFile;
 
+  GlobalKey _formKey = new GlobalKey<FormState>();
+  TextEditingController _titleController = new TextEditingController();
+  // TextEditingController _pwdController = new TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    // _pwdController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
+        title: Text('发布话题'),
+        centerTitle: true,
         actions: <Widget>[
           Builder(
             builder: (BuildContext context) {
@@ -35,7 +48,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                   String showText =
                       (data['status'] == true) ? '发布话题成功' : '发布失败';
                   if (data['status'] == false) {
-                    user.setToken(null);
+                    // user.setToken(null);
                     Application.router.navigateTo(context, '/login');
                   }
                   Scaffold.of(context).showSnackBar(new SnackBar(
@@ -54,41 +67,100 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
         // title: Text('Finders'),
         elevation: 0,
       ),
-      body: ListView(
-        children: <Widget>[
-          TextField(
-            // maxLines: ,
-            maxLength: 100,
-            maxLines: 5,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              alignLabelWithHint: true,
-              border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1)),
-              labelText: '输入内容...',
-            ),
-            onChanged: (String value) {
-              _title = value;
-            },
-          ),
-          FlatButton(
-            color: Colors.yellow,
-            onPressed: () async {
-              var image = await getImage();
-              setState(() {
-                _imageFile = image;
-              });
-            },
-            child: Text('选择图片'),
-          ),
-          (_imageFile != null) ? Image.file(_imageFile) : Icon(Icons.gavel),
-        ],
+      body: Form(
+        key: _formKey,
+        autovalidate: true,
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(40)),
+          children: <Widget>[
+            uploadImage(),
+            titleForm(),
+          ],
+        ),
       ),
     );
   }
 
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    return image;
+  //处理图片部分
+  Widget uploadImage() {
+    /**
+     * 进行上传图片并显示操作
+     */
+    Future getImage() async {
+      var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      return image;
+    }
+
+    return Align(
+      child: InkWell(
+          onTap: () async {
+            var image = await getImage();
+            setState(() {
+              this._imageFile = image;
+            });
+          },
+          child: (this._imageFile != null)
+              ? Container(
+                  margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
+                  height: ScreenUtil().setHeight(300),
+                  width: ScreenUtil().setWidth(710),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: FileImage(this._imageFile), fit: BoxFit.fill),
+                  ))
+              : Container(
+                  margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
+                  height: ScreenUtil().setHeight(300),
+                  width: ScreenUtil().setWidth(710),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.add,
+                        color: Theme.of(context).primaryColor,
+                        size: ScreenUtil().setSp(100),
+                      ),
+                      Text(
+                        '上传背景图',
+                        style: TextStyle(
+                            fontFamily: 'Poppins',
+                            color: Theme.of(context).primaryColor,
+                            fontSize: ScreenUtil().setSp(50)),
+                      )
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                      // color: Colors.amber,
+                      border: Border.all(
+                          color: Theme.of(context).primaryColor, width: 1)))),
+    );
+  }
+
+  Widget titleForm() {
+    return Container(
+      margin: EdgeInsets.only(top: 50),
+      child: TextFormField(
+          onSaved: (val) {
+            setState(() {
+              this._title = val;
+            });
+          },
+          autofocus: false,
+          controller: _titleController,
+          decoration: InputDecoration(
+              fillColor: Colors.amber,
+              // labelText: 'elyar',
+              hintText: '请输出话题标题',
+              contentPadding:
+                  EdgeInsets.only(top: 20.0, left: 10, right: 10, bottom: 0),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                // prefixIcon: Icon(Icons.person),
+              )),
+          // 校验用户名（不能为空）
+          validator: (v) {
+            return v.trim().isNotEmpty ? null : '话题标题不能为空';
+          }),
+    );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:finder/model/user_model.dart';
+import 'package:finder/models/user_model.dart';
 import 'package:finder/public.dart';
 
 class MinePageTop extends StatelessWidget {
