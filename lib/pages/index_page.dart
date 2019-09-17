@@ -5,6 +5,7 @@ import 'mine_page.dart';
 import 'serve_page.dart';
 import 'find_page.dart';
 import 'package:finder/public.dart';
+import 'login.dart';
 
 class IndexPage extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _IndexPageState extends State<IndexPage> {
   int _selectIndex = 0;
   var pages = [
     HomePage(),
+    LoginPage(),
     FindPage(),
     ServePage(),
     MinePage(),
@@ -23,79 +25,99 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Scaffold(
-      primary: false,
-      floatingActionButton: FloatingActionButton(
-        mini: true,
-        focusColor: Colors.blue,
-        backgroundColor: Colors.white,
-        onPressed: () {},
-        child: Icon(
-          Icons.add,
-          color: Colors.black,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: pages[_selectIndex],
-      bottomNavigationBar: BottomAppBar(
-        // color: Colors.blue,
-        notchMargin: 1,
-        shape: CircularNotchedRectangle(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(
-                IconData(0xe688, fontFamily: 'myIcon'),
-                color: _selectIndex == 0 ? Colors.yellow : Colors.black,
+        primary: false,
+        body: pages[_selectIndex],
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          // clipBehavior: Clip.antiAliasWithSaveLayer,
+          elevation: 0,
+          // shape: CircularNotchedRectangle(),
+          // notchMargin: 1,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              _singleButton(IconData(0xe688, fontFamily: 'myIcon'), 'Home', 0),
+              _singleButton(IconData(0xe631, fontFamily: 'myIcon'), 'Find', 1),
+              Container(
+                height: kBottomNavigationBarHeight - 6,
+                alignment: Alignment.center,
+                width: ScreenUtil().setWidth(150),
+                decoration: ShapeDecoration(
+                  shadows: [
+                    BoxShadow(
+                        color: Colors.black12,
+                        spreadRadius: 1,
+                        offset: Offset(-0.6, 2))
+                  ],
+                  shape: CircleBorder(),
+                  gradient: SweepGradient(
+                    center: FractionalOffset.center,
+                    startAngle: 0.0,
+                    endAngle: 20,
+                    colors: <Color>[
+                      Theme.of(context).primaryColor,
+                      Theme.of(context).primaryColor.withGreen(150),
+                      Theme.of(context).primaryColor.withBlue(70),
+                      Theme.of(context).primaryColor.withRed(40),
+                      Theme.of(context).primaryColor.withOpacity(0.5),
+                    ],
+                    stops: const <double>[0.0, 0.25, 0.5, 0.75, 1.0],
+                  ),
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {},
+                ),
               ),
-              color: Colors.black,
-              onPressed: () {
-                setState(() {
-                  _selectIndex = 0;
-                });
-              },
-            ),
-            IconButton(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 80.0, 8.0),
-              icon: Icon(
-                IconData(0xe631, fontFamily: 'myIcon'),
-                color: _selectIndex == 1 ? Colors.yellow : Colors.black,
-              ),
-              color: Colors.black,
-              onPressed: () {
-                setState(() {
-                  _selectIndex = 1;
-                });
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                IconData(0xe6b8, fontFamily: 'myIcon'),
-                color: _selectIndex == 2 ? Colors.yellow : Colors.black,
-              ),
-              color: Colors.black,
-              onPressed: () {
-                setState(() {
-                  _selectIndex = 2;
-                });
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                IconData(0xe66d, fontFamily: 'myIcon'),
-                color: _selectIndex == 3 ? Colors.yellow : Colors.black,
-              ),
-              color: Colors.black,
-              onPressed: () {
-                setState(() {
-                  _selectIndex = 3;
-                });
-              },
-            ),
-          ],
-        ),
-      ),
+              _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), 'Serve', 3),
+              _singleButton(
+                  IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),
+            ],
+          ),
+        ));
+  }
+
+  _singleButton(IconData iconData, String title, int index) {
+    bool isSelected = (this._selectIndex == index) ? true : false;
+    // switch (index) {
+    //   case 0:
+    //     myColor = Colors.amber;
+    //     print('sho');
+    //     break;
+    //   case 1:
+    //     myColor = Colors.cyan;
+    //     print('ping');
+    //     break;
+    //   case 3:
+    //     myColor = Colors.deepPurple;
+    //     break;
+    //   case 4:
+    //     break;
+    //   default:
+    //     myColor = Colors.blue;
+    // }
+    return InkWell(
+      onTap: () {
+        setState(() {
+          this._selectIndex = index;
+        });
+      },
+      child: Container(
+          height: kBottomNavigationBarHeight,
+          width: ScreenUtil().setWidth(150),
+          child: isSelected
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[Icon(iconData), Text(title)],
+                )
+              : Icon(
+                  iconData,
+                  color: Colors.black.withOpacity(0.5),
+                )),
     );
   }
 }

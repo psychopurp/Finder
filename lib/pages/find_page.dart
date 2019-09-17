@@ -94,8 +94,6 @@ class _FindPageState extends State<FindPage> {
       'poster': new UploadFileInfo(image, name,
           contentType: ContentType.parse('multipart/form-data'))
     });
-    var data = {'sender': 'Elyar', 'title': 'image test'};
-
     try {
       Response response =
           await dio.post('http://192.168.80.1:8000/activity/', data: formData);

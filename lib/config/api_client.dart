@@ -161,7 +161,7 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_topic_comments/', queryParameters: formData);
-      print('获得话题评论成功....${response.data}');
+      // print('获得话题评论成功....${response.data}');
       return response.data;
     } catch (e) {
       print('获取话题评论错误==========>$e');

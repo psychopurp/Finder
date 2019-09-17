@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:finder/config/api_client.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -13,7 +14,6 @@ class PublishTopicPage extends StatefulWidget {
 
 class _PublishTopicPageState extends State<PublishTopicPage> {
   String _title;
-  String _image;
   File _imageFile;
 
   GlobalKey _formKey = new GlobalKey<FormState>();
@@ -39,7 +39,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
             builder: (BuildContext context) {
               return FlatButton(
                 onPressed: () async {
-                  var imagePath = await user.uploadImage(_imageFile);
+                  var imagePath = await apiClient.uploadImage(_imageFile);
                   var data = await user.addTopic(
                     _title,
                     [],
@@ -117,30 +117,30 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                     children: <Widget>[
                       Icon(
                         Icons.add,
-                        color: Theme.of(context).primaryColor,
+                        color: Color(0xFFF0AA89),
                         size: ScreenUtil().setSp(100),
                       ),
                       Text(
                         '上传背景图',
                         style: TextStyle(
                             fontFamily: 'Poppins',
-                            color: Theme.of(context).primaryColor,
+                            color: Color(0xFFF0AA89),
                             fontSize: ScreenUtil().setSp(50)),
                       )
                     ],
                   ),
                   decoration: BoxDecoration(
                       // color: Colors.amber,
-                      border: Border.all(
-                          color: Theme.of(context).primaryColor, width: 1)))),
+                      border: Border.all(color: Color(0xFFF0AA89), width: 1)))),
     );
   }
 
   Widget titleForm() {
     return Container(
+      // color: Colors.amber,
       margin: EdgeInsets.only(top: 50),
       child: TextFormField(
-          onSaved: (val) {
+          onChanged: (val) {
             setState(() {
               this._title = val;
             });
@@ -148,13 +148,14 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
           autofocus: false,
           controller: _titleController,
           decoration: InputDecoration(
-              fillColor: Colors.amber,
+              // focusColor: Colors.amber,
+              // fillColor: Colors.amber,
               // labelText: 'elyar',
               hintText: '请输出话题标题',
               contentPadding:
                   EdgeInsets.only(top: 20.0, left: 10, right: 10, bottom: 0),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
+                borderRadius: BorderRadius.circular(20.0),
                 // prefixIcon: Icon(Icons.person),
               )),
           // 校验用户名（不能为空）

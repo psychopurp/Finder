@@ -142,7 +142,8 @@ class HomePageTopics extends StatelessWidget {
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          print(item.id);
+          Application.router.navigateTo(context,
+              '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
         },
         child: Align(
           alignment: Alignment.topCenter,

@@ -1,3 +1,4 @@
+import 'package:finder/models/topic_comments_model.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/serve_page/lost_found_page.dart';
@@ -13,6 +14,7 @@ import 'package:finder/pages/home_page/publish_activity_page.dart';
 import 'package:finder/pages/home_page/more_topics.dart';
 import 'package:finder/pages/home_page/more_activities.dart';
 import 'package:finder/pages/login_page.dart';
+import 'package:finder/pages/home_page/topic_detail_page.dart';
 
 //返回首页
 var rootHandler = Handler(
@@ -30,6 +32,17 @@ var loginHandler = Handler(
 var moreTopicsHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return MoreTopics();
+});
+
+var topicDetailsHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  String topicId = params['id']?.first;
+  String topicTitle = params['title']?.first;
+  String topicImage = params['image']?.first;
+  return TopicDetailPage(
+      topicId: int.parse(topicId),
+      topicImage: topicImage,
+      topicTitle: topicTitle);
 });
 
 //首页 -- 更多活动

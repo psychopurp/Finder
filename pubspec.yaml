@@ -79,7 +79,7 @@ flutter:
       fonts:
         - asset: assets/font/Poppins/Poppins-SemiBold.ttf
           #       - asset: fonts/TrajanPro_Bold.ttf
-          weight: 600
+          weight: 400
     - family: Yellowtail
       fonts:
         - asset: assets/font/Yellowtail/Yellowtail-Regular.ttf

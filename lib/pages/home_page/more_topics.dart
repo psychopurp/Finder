@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:finder/routers/application.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/models/topic_model.dart';
@@ -15,12 +12,13 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 
-/**
- * 此页面定义了三个statefull 页面
- * MoreTopics -父页面
- * Topics
- * GlobalTopics
- */
+/// 此页面定义了三个statefull 页面
+
+/// MoreTopics -父页面
+
+/// Topics
+
+/// GlobalTopics
 
 class MoreTopics extends StatefulWidget {
   @override
@@ -208,7 +206,8 @@ class _TopicsState extends State<Topics>
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          print(item.id);
+          Application.router.navigateTo(context,
+              '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
         },
         child: Align(
           alignment: Alignment.topCenter,
