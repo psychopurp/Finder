@@ -210,10 +210,23 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_follow_users/', queryParameters: formData);
-
+      print(response.data);
       return response.data;
     } catch (e) {
       print('获取用户关注的用户列表错误==========>$e');
+    }
+  }
+
+  //获取关注该用户的用户列表
+  Future getFanUsers({String query = "", int page = 1}) async {
+    var formData = {'query': query, 'page': page};
+    try {
+      Response response =
+          await dio.get('get_fan_users/', queryParameters: formData);
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      print('获取关注该用户的用户列表错误==========>$e');
     }
   }
 
@@ -245,6 +258,18 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('获取招募类型列表错误==========>$e');
+    }
+  }
+
+  //获取用户收藏列表
+  Future getCollections({String query = "", int page = 1}) async {
+    var formData = {'query': query, 'page': page};
+    try {
+      Response response =
+          await dio.get('get_collections/', queryParameters: formData);
+      return response.data;
+    } catch (e) {
+      print('获取用户收藏列表错误==========>$e');
     }
   }
 

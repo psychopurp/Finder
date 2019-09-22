@@ -1,3 +1,4 @@
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/public.dart';
@@ -14,7 +15,7 @@ class MinePageTop extends StatelessWidget {
       // color: Colors.pink,
       child: Column(
         children: <Widget>[
-          userAvatar(),
+          userAvatar(context),
           fanFollowerArea(),
         ],
       ),
@@ -22,22 +23,23 @@ class MinePageTop extends StatelessWidget {
   }
 
   //头像
-  Widget userAvatar() {
+  Widget userAvatar(context) {
     return Container(
-        margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(40)),
-        // color: Colors.cyan,
-        height: ScreenUtil().setHeight(200),
-        child: InkWell(
-          onTap: () {
-            print(user.nickname);
-          },
-          child: CircleAvatar(
-            radius: 50.0,
-            backgroundImage: CachedNetworkImageProvider(
-              this.user.avatar,
-            ),
+      margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(40)),
+      height: ScreenUtil().setHeight(200),
+      child: InkWell(
+        onTap: () {
+          Application.router.navigateTo(context, '/mine/userProfile');
+        },
+        enableFeedback: false,
+        child: CircleAvatar(
+          radius: 50.0,
+          backgroundImage: CachedNetworkImageProvider(
+            this.user.avatar,
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   //关注-粉丝 区域

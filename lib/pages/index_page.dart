@@ -25,12 +25,13 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Scaffold(
-        primary: false,
-        body: pages[_selectIndex],
-        bottomNavigationBar: BottomAppBar(
+      primary: false,
+      body: pages[_selectIndex],
+      bottomNavigationBar: SafeArea(
+        child: BottomAppBar(
           color: Colors.white,
           // clipBehavior: Clip.antiAliasWithSaveLayer,
-          elevation: 0,
+          // elevation: 0,
           // shape: CircularNotchedRectangle(),
           // notchMargin: 1,
           child: Row(
@@ -78,7 +79,9 @@ class _IndexPageState extends State<IndexPage> {
                   IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   _singleButton(IconData iconData, String title, int index) {
@@ -106,18 +109,24 @@ class _IndexPageState extends State<IndexPage> {
           this._selectIndex = index;
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+          duration: Duration(seconds: 2),
           height: kBottomNavigationBarHeight,
           width: ScreenUtil().setWidth(150),
-          child: isSelected
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[Icon(iconData), Text(title)],
-                )
-              : Icon(
-                  iconData,
-                  color: Colors.black.withOpacity(0.5),
-                )),
+          // color: isSelected ? Colors.amber : Colors.cyan,
+          child: Column(
+            mainAxisAlignment: isSelected
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                iconData,
+                color:
+                    isSelected ? Colors.black : Colors.black.withOpacity(0.5),
+              ),
+              isSelected ? Text(title) : Container(),
+            ],
+          )),
     );
   }
 }

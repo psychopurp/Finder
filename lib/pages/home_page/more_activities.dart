@@ -31,17 +31,30 @@ class _MoreActivitiesState extends State<MoreActivities>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('more topics'),
+          iconTheme: IconThemeData(color: Colors.black),
+          textTheme: TextTheme(
+              title: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Poppins',
+                  fontSize: ScreenUtil().setSp(45))),
+          title: Text('知 · 活动'),
+          actions: <Widget>[
+            MaterialButton(
+              child: Icon(Icons.search),
+              onPressed: () {},
+            ),
+          ],
           elevation: 0,
+          backgroundColor: Colors.white,
           centerTitle: true,
           bottom: new TabBar(
             isScrollable: true,
             labelColor: Colors.black,
-            indicatorColor: Colors.white,
+            indicatorColor: Colors.black,
             tabs: <Widget>[
               new Tab(
                 child: Text(
-                  '   推荐    ',
+                  '推荐',
                   style: TextStyle(
                       fontSize: ScreenUtil().setSp(30),
                       fontWeight: FontWeight.w500),
@@ -49,7 +62,7 @@ class _MoreActivitiesState extends State<MoreActivities>
               ),
               new Tab(
                 child: Text(
-                  '   学术讲座    ',
+                  '学术讲座',
                   style: TextStyle(
                       fontSize: ScreenUtil().setSp(30),
                       fontWeight: FontWeight.w500),
@@ -57,7 +70,7 @@ class _MoreActivitiesState extends State<MoreActivities>
               ),
               new Tab(
                 child: Text(
-                  '   文娱活动    ',
+                  '文娱活动',
                   style: TextStyle(
                       fontSize: ScreenUtil().setSp(30),
                       fontWeight: FontWeight.w500),
@@ -65,7 +78,7 @@ class _MoreActivitiesState extends State<MoreActivities>
               ),
               new Tab(
                 child: Text(
-                  '   其他    ',
+                  '其他',
                   style: TextStyle(
                       fontSize: ScreenUtil().setSp(30),
                       fontWeight: FontWeight.w500),
@@ -75,6 +88,7 @@ class _MoreActivitiesState extends State<MoreActivities>
             controller: _tabController,
           ),
         ),
+        backgroundColor: Colors.white,
         body: TabBarView(
           controller: _tabController,
           children: <Widget>[
@@ -117,7 +131,6 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   @override
   void initState() {
-    // this.tagName=widget.tagName
     _getInitialActivitiesData(1);
     super.initState();
   }
@@ -189,69 +202,115 @@ class _ChildActivitiesState extends State<ChildActivities>
       imageUrl: item.poster,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          print(item.id);
+          print(index);
         },
         child: Align(
           alignment: Alignment.topCenter,
           child: Container(
-            margin: EdgeInsets.only(
-                left: ScreenUtil().setWidth(20),
-                right: ScreenUtil().setWidth(20),
-                top: ScreenUtil().setWidth(20)),
+            // margin: EdgeInsets.only(
+            //   left: ScreenUtil().setWidth(40),
+            //   right: ScreenUtil().setWidth(40),
+            // ),
             height: ScreenUtil().setHeight(400),
-            width: ScreenUtil().setWidth(750),
+            width: ScreenUtil().setWidth(670),
             decoration: BoxDecoration(
-              // color: Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(3)),
-              // border: Border.all(color: Colors.black, width: 2),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.fill,
-              ),
-            ),
-            child: Stack(
+                // color: Colors.blue,
+                border: Border(bottom: BorderSide(color: Colors.black12))),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Positioned(
-                    top: ScreenUtil().setHeight(10),
-                    child: Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.only(
-                              // topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                              // bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(20))),
-                      child: Text(
-                        '校内话题',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: ScreenUtil().setSp(20)),
+                Container(
+                    height: ScreenUtil().setHeight(320),
+                    width: ScreenUtil().setWidth(250),
+                    decoration: BoxDecoration(
+                      // color: Colors.green,
+                      borderRadius: BorderRadius.all(Radius.circular(3)),
+                      // border: Border.all(color: Colors.black, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black38,
+                            offset: Offset(-3.0, 5.0),
+                            blurRadius: 10.0,
+                            spreadRadius: 1.0),
+                      ],
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.fill,
                       ),
                     )),
-                Opacity(
-                  opacity: 0.1,
-                  child: Container(
-                    // width: ScreenUtil().setWidth(750),
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.all(Radius.circular(3))),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  // color: Colors.blue,
-                  child: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil().setSp(28),
-                      fontWeight: FontWeight.bold,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(
+                          top: ScreenUtil().setHeight(50),
+                          bottom: ScreenUtil().setHeight(20)),
+                      // color: Colors.cyan,
+                      width: ScreenUtil().setWidth(420),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(30),
+                            fontWeight: FontWeight.lerp(
+                                FontWeight.w400, FontWeight.w800, 0.8)),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                    Container(
+                      // color: Colors.amber,
+                      width: ScreenUtil().setWidth(420),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        item.startTime.split(" ")[0].replaceAll('-', '.') +
+                            "-" +
+                            item.endTime.split(' ')[0].replaceAll('-', '.'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(30),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    Container(
+                      // color: Colors.amber,
+                      margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+                      width: ScreenUtil().setWidth(420),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        item.place,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(30),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(
+                          right: ScreenUtil().setWidth(40),
+                          top: ScreenUtil().setHeight(40)),
+                      padding: EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                          // color: Colors.amber,
+                          border: Border.all(color: Color(0xFFF0AA89)),
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Text(
+                        "  详情  ",
+                        style: TextStyle(
+                            fontSize: ScreenUtil().setSp(22),
+                            color: Color(0xFFF0AA89)),
+                      ),
+                    )
+                  ],
                 )
               ],
             ),

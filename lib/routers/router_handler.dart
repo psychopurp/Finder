@@ -15,6 +15,7 @@ import 'package:finder/pages/home_page/more_topics.dart';
 import 'package:finder/pages/home_page/more_activities.dart';
 import 'package:finder/pages/login_page.dart';
 import 'package:finder/pages/home_page/topic_detail_page.dart';
+import 'package:finder/pages/mine_page/user_profile_page.dart';
 
 //返回首页
 var rootHandler = Handler(
@@ -34,6 +35,7 @@ var moreTopicsHandler = Handler(
   return MoreTopics();
 });
 
+//话题详情页
 var topicDetailsHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   String topicId = params['id']?.first;
@@ -102,4 +104,10 @@ var psychoTestHandler = Handler(
 var treeHoleHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TreeHolePage();
+});
+
+//用户详情页
+var userProfileHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return UserProfilePage();
 });
