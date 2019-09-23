@@ -86,47 +86,56 @@ class _IndexPageState extends State<IndexPage> {
 
   _singleButton(IconData iconData, String title, int index) {
     bool isSelected = (this._selectIndex == index) ? true : false;
-    // switch (index) {
-    //   case 0:
-    //     myColor = Colors.amber;
-    //     print('sho');
-    //     break;
-    //   case 1:
-    //     myColor = Colors.cyan;
-    //     print('ping');
-    //     break;
-    //   case 3:
-    //     myColor = Colors.deepPurple;
-    //     break;
-    //   case 4:
-    //     break;
-    //   default:
-    //     myColor = Colors.blue;
-    // }
-    return InkWell(
-      onTap: () {
-        setState(() {
-          this._selectIndex = index;
-        });
-      },
-      child: AnimatedContainer(
-          duration: Duration(seconds: 2),
-          height: kBottomNavigationBarHeight,
-          width: ScreenUtil().setWidth(150),
-          // color: isSelected ? Colors.amber : Colors.cyan,
-          child: Column(
-            mainAxisAlignment: isSelected
-                ? MainAxisAlignment.spaceEvenly
-                : MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                iconData,
-                color:
-                    isSelected ? Colors.black : Colors.black.withOpacity(0.5),
-              ),
-              isSelected ? Text(title) : Container(),
-            ],
-          )),
+    var selectedWidget = Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Icon(
+          iconData,
+          color: Colors.black,
+        ),
+        Text(title),
+      ],
     );
+    var unSelectedWidget = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(
+          iconData,
+          color: Colors.black.withOpacity(0.5),
+        ),
+        Container(),
+      ],
+    );
+    Widget currentWidget = isSelected ? selectedWidget : unSelectedWidget;
+    return InkWell(
+        onTap: () {
+          if (!isSelected) {
+            setState(() {
+              this._selectIndex = index;
+              currentWidget = selectedWidget;
+            });
+          }
+        },
+        child: !isSelected
+            ? AnimatedSwitcher(
+                transitionBuilder:
+                    (Widget child, Animation<double> animation) =>
+                        ScaleTransition(child: child, scale: animation),
+                duration: Duration(milliseconds: 300),
+                child: Container(
+                  key: ValueKey(currentWidget),
+                  height: kBottomNavigationBarHeight,
+                  width: ScreenUtil().setWidth(150),
+                  // color: isSelected ? Colors.amber : Colors.cyan,
+                  child: currentWidget,
+                ),
+              )
+            : Container(
+                key: ValueKey(currentWidget),
+                height: kBottomNavigationBarHeight,
+                width: ScreenUtil().setWidth(150),
+                // color: isSelected ? Colors.amber : Colors.cyan,
+                child: currentWidget,
+              ));
   }
 }

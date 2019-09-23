@@ -10,25 +10,42 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String _phone, _password;
+  FocusNode phoneNode = new FocusNode();
+  FocusNode passwordNode = new FocusNode();
+  AnimationController animationController;
+  Animation<double> animation;
+
   bool _isObscure = true;
   Color _eyeColor;
   List _loginMethod = [
-    {
-      "title": "facebook",
-      "icon": Icons.book,
-    },
-    {
-      "title": "google",
-      "icon": Icons.search,
-    },
-    {
-      "title": "twitter",
-      "icon": Icons.flag,
-    },
+    {"title": "微信", "icon": IconData(0xe628, fontFamily: 'myIcon')},
+    {"title": "QQ", "icon": IconData(0xe67f, fontFamily: 'myIcon')},
+    {"title": "微博", "icon": IconData(0xe644, fontFamily: 'myIcon')},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 2));
+    animation = Tween(begin: 600.0, end: 300.0).animate(CurvedAnimation(
+        parent: animationController, curve: Curves.fastOutSlowIn))
+      ..addListener(() {
+        setState(() {
+          print(animation.value);
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +55,23 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
         body: Form(
             key: _formKey,
-            child: ListView(
-              padding:
-                  EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(30)),
-              children: <Widget>[
-                buildTitle(),
-                buildEmailTextField(),
-                Container(height: ScreenUtil().setHeight(60)),
-                buildPasswordTextField(context),
-                buildForgetPasswordText(context),
-                buildLoginButton(context),
-                buildOtherLoginText(),
-                buildOtherMethod(context),
-                buildRegisterText(context),
-              ],
+            child: Container(
+              // color: Colors.amber,
+              child: ListView(
+                padding:
+                    EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(30)),
+                children: <Widget>[
+                  title(),
+                  phoneTextField(),
+                  Container(height: ScreenUtil().setHeight(60)),
+                  passwordTextField(context),
+                  buildForgetPasswordText(context),
+                  loginButton(context),
+                  buildOtherLoginText(),
+                  otherMethod(context),
+                  buildRegisterText(context),
+                ],
+              ),
             )));
   }
 
@@ -67,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
             InkWell(
               child: Text(
                 '点击注册',
-                style: TextStyle(color: Colors.green),
+                style: TextStyle(color: Theme.of(context).primaryColor),
               ),
               onTap: () {
                 //TODO 跳转到注册页面
@@ -81,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  ButtonBar buildOtherMethod(BuildContext context) {
+  ButtonBar otherMethod(BuildContext context) {
     return ButtonBar(
       alignment: MainAxisAlignment.center,
       children: _loginMethod
@@ -118,57 +138,65 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
-  Container buildLoginButton(BuildContext context) {
+  Widget loginButton(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
-    return Container(
-      // color: Colors.green,
-      width: ScreenUtil().setWidth(690),
-      height: ScreenUtil().setHeight(200),
-      padding: EdgeInsets.all(ScreenUtil().setHeight(40)),
-      child: RaisedButton(
-        child: Text(
-          'Login',
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        color: Colors.black,
-        onPressed: () async {
-          if (_formKey.currentState.validate()) {
-            ///只有输入的内容符合要求通过才会到达此处
+    return Align(
+      child: AnimatedContainer(
+        duration: Duration(microseconds: 1000),
+        // color: Colors.green,
+        margin: EdgeInsets.only(
+            top: ScreenUtil().setHeight(20),
+            bottom: ScreenUtil().setHeight(40)),
+        width: ScreenUtil().setWidth(600),
+        height: ScreenUtil().setHeight(100),
+        child: RaisedButton(
+          child: Text(
+            'Login',
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          color: Theme.of(context).primaryColor,
+          onPressed: () async {
+            print("pressed");
+            animationController.forward();
 
-            showDialog(
-                context: context,
-                builder: (context) => Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: ScreenUtil().setHeight(367),
-                          horizontal: ScreenUtil().setWidth(100)),
-                      child: Container(
-                        color: Colors.white,
-                        child: CupertinoActivityIndicator(),
-                      ),
-                    ));
-            _formKey.currentState.save();
-            //TODO 执行登录方法
-            if (await user.login(phone: _phone, password: _password)) {
-              Navigator.of(context).pushAndRemoveUntil(
-                  new MaterialPageRoute(builder: (context) => new IndexPage()),
-                  (route) => route == null);
-            } else {
-              showDialog(
-                  context: context,
-                  builder: (context) => Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: ScreenUtil().setHeight(367),
-                            horizontal: ScreenUtil().setWidth(100)),
-                        child: Container(
-                          color: Colors.white,
-                          child: Text('登陆失败'),
-                        ),
-                      ));
-            }
-            print('email:$_phone , password:$_password');
-          }
-        },
-        shape: StadiumBorder(side: BorderSide()),
+            // if (_formKey.currentState.validate()) {
+            //   ///只有输入的内容符合要求通过才会到达此处
+
+            //   showDialog(
+            //       context: context,
+            //       builder: (context) => Padding(
+            //             padding: EdgeInsets.symmetric(
+            //                 vertical: ScreenUtil().setHeight(367),
+            //                 horizontal: ScreenUtil().setWidth(100)),
+            //             child: Container(
+            //               color: Colors.white,
+            //               child: CupertinoActivityIndicator(),
+            //             ),
+            //           ));
+            //   _formKey.currentState.save();
+            //   //TODO 执行登录方法
+            //   if (await user.login(phone: _phone, password: _password)) {
+            //     Navigator.of(context).pushAndRemoveUntil(
+            //         new MaterialPageRoute(builder: (context) => new IndexPage()),
+            //         (route) => route == null);
+            //   } else {
+            //     showDialog(
+            //         context: context,
+            //         builder: (context) => Padding(
+            //               padding: EdgeInsets.symmetric(
+            //                   vertical: ScreenUtil().setHeight(367),
+            //                   horizontal: ScreenUtil().setWidth(100)),
+            //               child: Container(
+            //                 color: Colors.white,
+            //                 child: Text('登陆失败'),
+            //               ),
+            //             ));
+            //   }
+            //   print('email:$_phone , password:$_password');
+            // }
+          },
+          shape: StadiumBorder(),
+        ),
       ),
     );
   }
@@ -188,75 +216,94 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  TextFormField buildPasswordTextField(BuildContext context) {
-    return TextFormField(
-      onSaved: (String value) => _password = value,
-      obscureText: _isObscure,
-      validator: (value) {
-        if (value.isEmpty) {
-          return '请输入密码';
-        }
-      },
-      decoration: InputDecoration(
-          labelText: '密码',
-          // prefixIcon: Icon(Icons.person),
-          suffixIcon: IconButton(
-              icon: Icon(
-                Icons.remove_red_eye,
-                color: _eyeColor,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isObscure = !_isObscure;
-                  _eyeColor = _isObscure
-                      ? Colors.grey
-                      : Theme.of(context).iconTheme.color;
-                });
-              })),
-    );
-  }
-
-  TextFormField buildEmailTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.phone,
-      decoration: InputDecoration(
-        // prefixIcon: Icon(Icons.person),
-        labelText: '手机号/邮箱地址',
-      ),
-      // validator: (String value) {
-      //   var emailReg = RegExp(
-      //       r"[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?");
-      //   if (!emailReg.hasMatch(value)) {
-      //     return '请输入正确的邮箱地址';
-      //   } else {
-      //     return '正确';
-      //   }
-      // },
-      onSaved: (String value) => _phone = value,
-    );
-  }
-
-  Container buildTitle() {
+  Container title() {
     return Container(
       // color: Colors.amber,
       padding: EdgeInsets.only(
-          left: ScreenUtil().setHeight(20),
+          left: ScreenUtil().setHeight(100),
           top: kToolbarHeight,
-          bottom: ScreenUtil().setHeight(90)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Login',
-            style: TextStyle(fontSize: 42.0),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
-            color: Colors.black,
-            width: ScreenUtil().setWidth(100),
-            height: ScreenUtil().setHeight(4),
-          ),
-        ],
+          bottom: ScreenUtil().setHeight(130)),
+      child: DefaultTextStyle(
+        style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontFamily: "Poppins",
+            fontSize: ScreenUtil().setSp(50)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Login · 登陆',
+            ),
+            Container(
+              margin: EdgeInsets.only(top: ScreenUtil().setHeight(15)),
+              color: Theme.of(context).primaryColor,
+              width: ScreenUtil().setWidth(270),
+              height: ScreenUtil().setHeight(2),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container phoneTextField() {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: TextFormField(
+        focusNode: phoneNode,
+        onEditingComplete: () {
+          FocusScope.of(context).requestFocus(passwordNode);
+        },
+        autofocus: false,
+        keyboardType: TextInputType.phone,
+        decoration: InputDecoration(
+            // icon: Icon(Icons.person),
+            hintText: "",
+            labelText: '手机号/邮箱地址',
+            contentPadding: EdgeInsets.only(bottom: 10)),
+        // validator: (String value) {
+        //   var emailReg = RegExp(
+        //       r"[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?");
+        //   if (!emailReg.hasMatch(value)) {
+        //     return '请输入正确的邮箱地址';
+        //   } else {
+        //     return '正确';
+        //   }
+        // },
+        onSaved: (String value) => _phone = value,
+      ),
+    );
+  }
+
+  Container passwordTextField(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: TextFormField(
+        focusNode: passwordNode,
+        onSaved: (String value) => _password = value,
+        obscureText: _isObscure,
+        validator: (value) {
+          if (value.isEmpty) {
+            return '请输入密码';
+          }
+        },
+        decoration: InputDecoration(
+            labelText: '密码',
+            // prefixIcon: Icon(Icons.person),
+            contentPadding: EdgeInsets.only(bottom: 10),
+            suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.remove_red_eye,
+                  color: _eyeColor,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isObscure = !_isObscure;
+                    _eyeColor = _isObscure
+                        ? Colors.grey
+                        : Theme.of(context).iconTheme.color;
+                  });
+                })),
       ),
     );
   }
