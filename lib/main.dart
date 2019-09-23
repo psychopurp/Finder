@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(primaryColor: Color.fromRGBO(219, 107, 92, 1)),
         title: 'Finder',
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        home: isLogin ? IndexPage() : LoginPage(),
       ),
     );
   }
