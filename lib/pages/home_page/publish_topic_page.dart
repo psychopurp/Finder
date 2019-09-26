@@ -16,50 +16,79 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
   String _title;
   File _imageFile;
 
-  GlobalKey _formKey = new GlobalKey<FormState>();
+  ///标签
+  List<String> tab = [];
+
+  bool onlyInSchool = false;
+
   TextEditingController _titleController = new TextEditingController();
-  // TextEditingController _pwdController = new TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
-    // _pwdController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
+
+    //仅本校可见部分
+    var onlySchool = Container(
+      margin: EdgeInsets.only(top: 20),
+      child: ListTile(
+        title: Text("仅本校可见"),
+        trailing: Switch(
+          activeTrackColor: Theme.of(context).primaryColor,
+          activeColor: Colors.white,
+          value: onlyInSchool,
+          onChanged: (isSelect) {
+            setState(() {
+              this.onlyInSchool = isSelect;
+            });
+          },
+        ),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('发布话题'),
+        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+        title: Text(
+          '创建话题',
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
         centerTitle: true,
         actions: <Widget>[
           Builder(
             builder: (BuildContext context) {
               return FlatButton(
+                highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
                 onPressed: () async {
-                  var imagePath = await apiClient.uploadImage(_imageFile);
-                  var data = await user.addTopic(
-                    _title,
-                    [],
-                    imagePath,
-                  );
-                  String showText =
-                      (data['status'] == true) ? '发布话题成功' : '发布失败';
-                  if (data['status'] == false) {
-                    // user.setToken(null);
-                    Application.router.navigateTo(context, '/login');
-                  }
-                  Scaffold.of(context).showSnackBar(new SnackBar(
-                    content: new Text("$showText"),
-                    action: new SnackBarAction(
-                      label: "取消",
-                      onPressed: () {},
-                    ),
-                  ));
+                  publishTopic(user).then((val) {
+                    String showText =
+                        (val['status'] == true) ? '发布话题成功' : '发布失败';
+
+                    Scaffold.of(context).showSnackBar(new SnackBar(
+                      content: new Text("$showText"),
+                      action: new SnackBarAction(
+                        label: "取消",
+                        onPressed: () {},
+                      ),
+                    ));
+                    if (val["status"] == true) {}
+                  });
                 },
-                child: Text('发布'),
+                child: Text(
+                  '发布',
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontFamily: "Poppins",
+                      fontSize: ScreenUtil().setSp(30)),
+                ),
               );
             },
           )
@@ -67,16 +96,13 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
         // title: Text('Finders'),
         elevation: 0,
       ),
-      body: Form(
-        key: _formKey,
-        autovalidate: true,
-        child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(40)),
-          children: <Widget>[
-            uploadImage(),
-            titleForm(),
-          ],
-        ),
+      body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(40)),
+        children: <Widget>[
+          uploadImage(),
+          titleForm(),
+          onlySchool,
+        ],
       ),
     );
   }
@@ -125,7 +151,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                         style: TextStyle(
                             fontFamily: 'Poppins',
                             color: Color(0xFFF0AA89),
-                            fontSize: ScreenUtil().setSp(50)),
+                            fontSize: ScreenUtil().setSp(40)),
                       )
                     ],
                   ),
@@ -135,9 +161,9 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
     );
   }
 
+  //处理标题部分
   Widget titleForm() {
     return Container(
-      // color: Colors.amber,
       margin: EdgeInsets.only(top: 50),
       child: TextFormField(
           onChanged: (val) {
@@ -153,7 +179,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
               // labelText: 'elyar',
               hintText: '请输出话题标题',
               contentPadding:
-                  EdgeInsets.only(top: 20.0, left: 10, right: 10, bottom: 0),
+                  EdgeInsets.only(top: 20.0, left: 20, right: 10, bottom: 0),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20.0),
                 // prefixIcon: Icon(Icons.person),
@@ -163,5 +189,12 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
             return v.trim().isNotEmpty ? null : '话题标题不能为空';
           }),
     );
+  }
+
+  Future publishTopic(UserProvider user) async {
+    var imagePath = await apiClient.uploadImage(this._imageFile);
+    var data = await user.addTopic(this._title, this.tab, imagePath,
+        schoolId: this.onlyInSchool ? user.userInfo.school.id : null);
+    return data;
   }
 }

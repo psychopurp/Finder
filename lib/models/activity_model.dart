@@ -67,9 +67,13 @@ class ActivityModelData {
     if (json['poster'] == null) {
       json['poster'] = 'null';
     }
-    poster = (json['poster'][0] == '/')
-        ? ApiClient.host + json['poster']
-        : ApiClient.host + '/' + json['poster'];
+    if (!json['poster'].startsWith("http")) {
+      poster = (json['poster'][0] == '/')
+          ? ApiClient.host + json['poster']
+          : ApiClient.host + '/' + json['poster'];
+    } else {
+      poster = json['poster'];
+    }
     description = json['description'];
     position = json['position'];
   }

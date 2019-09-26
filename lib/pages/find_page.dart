@@ -22,7 +22,7 @@ class _FindPageState extends State<FindPage> {
           elevation: 0,
           centerTitle: true,
         ),
-        backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+        // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
         body: Center(
           child: Consumer<UserProvider>(
             builder: (context, user, child) {

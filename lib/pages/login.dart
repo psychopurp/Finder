@@ -197,66 +197,6 @@ class _UserAgreementDialogState extends State<UserAgreementDialog>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          AnimatedContainer(
-            foregroundDecoration: BoxDecoration(color: foregroundColor),
-            duration: Duration(milliseconds: 200),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(height: 1.4),
-                    children: <TextSpan>[
-                      TextSpan(
-                        text:
-                            'Jonw privacy is belangrijk voor ons. jouw now persoonijjke gegevens rowden verwtk in njal oversdffmming met ',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
-                      TextSpan(
-                        text: 'onze pridvaojgltoand',
-                        style:
-                            TextStyle(fontSize: 16, color: Color(0xFF58E7ED)),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(top: 20, right: 0, bottom: 20),
-                      child: CustomCheckbox(
-                        value: checkState,
-                        activeColor: Color(0xFF58E7ED),
-                        useTapTarget: false,
-                        onChanged: (v) {
-                          setState(() {
-                            checkState = v;
-                          });
-                        },
-                      ),
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(height: 1.2),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Ik acceptter de ',
-                            style: TextStyle(fontSize: 10, color: Colors.black),
-                          ),
-                          TextSpan(
-                            text: 'Aligemene Voorwaarden',
-                            style: TextStyle(
-                                fontSize: 10, color: Color(0xFF58E7ED)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
           GestureDetector(
             onTapDown: (d) {
               setState(() {
@@ -306,7 +246,7 @@ class _UserAgreementDialogState extends State<UserAgreementDialog>
                         scale: _scaleTween.animate(_animation),
                         child: Icon(
                           Icons.ac_unit,
-                          size: 100,
+                          size: 50,
                         ),
                       )
                     ],

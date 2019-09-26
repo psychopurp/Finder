@@ -52,7 +52,7 @@ class UserProvider with ChangeNotifier {
   //用户发布话题
   Future addTopic(String title, List<String> tags, String image,
       {int schoolId}) async {
-    var data = await apiClient.addTopic(title, tags, image);
+    var data = await apiClient.addTopic(title, tags, image, schoolId: schoolId);
     return data;
   }
 

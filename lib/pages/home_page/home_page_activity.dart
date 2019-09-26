@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -119,7 +121,9 @@ class HomePageActivities extends StatelessWidget {
       imageUrl: item.poster,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          print(item.title);
+          var activityData = jsonEncode(item.toJson());
+          Application.router.navigateTo(context,
+              "/home/activityDetail?activityData=${Uri.encodeComponent(activityData)}");
         },
         child: Align(
           alignment: Alignment.topCenter,

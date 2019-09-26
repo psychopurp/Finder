@@ -41,7 +41,15 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text(topicTitle),
+          title: Container(
+            alignment: Alignment.center,
+            child: Text("+ 参与话题"),
+            width: ScreenUtil().setWidth(270),
+            height: ScreenUtil().setHeight(70),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Colors.white, width: 1.5)),
+          ),
           elevation: 0,
         ),
         body: (this.topicComments != null)
@@ -82,24 +90,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           ),
           child: Stack(
             children: <Widget>[
-              // Positioned(
-              //     top: ScreenUtil().setHeight(10),
-              //     child: Container(
-              //       padding: EdgeInsets.all(3),
-              //       decoration: BoxDecoration(
-              //           color: Colors.black.withOpacity(0.7),
-              //           borderRadius: BorderRadius.only(
-              //               // topLeft: Radius.circular(20),
-              //               topRight: Radius.circular(20),
-              //               // bottomLeft: Radius.circular(10),
-              //               bottomRight: Radius.circular(20))),
-              //       child: Text(
-              //         '校内话题',
-              //         style: TextStyle(
-              //             color: Colors.white,
-              //             fontSize: ScreenUtil().setSp(20)),
-              //       ),
-              //     )),
               Opacity(
                 opacity: 0.1,
                 child: Container(
@@ -146,7 +136,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                   right: ScreenUtil().setWidth(45),
                   top: ScreenUtil().setWidth(20)),
               color: Colors.white,
-              margin: EdgeInsets.only(bottom: 20),
+              margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.start,

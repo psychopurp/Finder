@@ -12,6 +12,7 @@ class Routes {
   static String moreTopics = '/home/moreTopics'; //首页 -- 更多话题
   static String moreActivities = '/home/moreActivities'; //首页 -- 更多活动
   static String topicDetail = '/home/topicDetail'; //首页 -- 话题详情
+  static String activityDetail = '/home/activityDetail'; //首页 -- 活动详情
   //服务页
   static String lostFound = "/serve/lostFound"; //服务页面 -- 失物招领
   static String heSays = "/serve/heSays"; //服务页面 -- 他·她·说
@@ -47,6 +48,8 @@ class Routes {
         handler: moreActivitiesHandler, transitionType: TransitionType.fadeIn);
     router.define(topicDetail,
         handler: topicDetailsHandler, transitionType: TransitionType.fadeIn);
+    router.define(activityDetail,
+        handler: acitvityDetailsHandler, transitionType: TransitionType.fadeIn);
 
     //服务页 --导航
     router.define(lostFound,

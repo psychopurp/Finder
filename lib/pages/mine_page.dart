@@ -28,7 +28,7 @@ class _MinePageState extends State<MinePage> {
           elevation: 0,
           centerTitle: true,
         ),
-        backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+        // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
         body: ListView(
           children: <Widget>[
             _topPart,

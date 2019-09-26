@@ -4,6 +4,7 @@ import 'package:finder/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/pages/index_page.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:finder/plugin/animated_button.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -16,8 +17,6 @@ class _LoginPageState extends State<LoginPage>
   String _phone, _password;
   FocusNode phoneNode = new FocusNode();
   FocusNode passwordNode = new FocusNode();
-  AnimationController animationController;
-  Animation<double> animation;
 
   bool _isObscure = true;
   Color _eyeColor;
@@ -30,21 +29,6 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
-    animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 2));
-    animation = Tween(begin: 600.0, end: 300.0).animate(CurvedAnimation(
-        parent: animationController, curve: Curves.fastOutSlowIn))
-      ..addListener(() {
-        setState(() {
-          print(animation.value);
-        });
-      });
-  }
-
-  @override
-  void dispose() {
-    animationController.dispose();
-    super.dispose();
   }
 
   @override
@@ -70,6 +54,10 @@ class _LoginPageState extends State<LoginPage>
                   buildOtherLoginText(),
                   otherMethod(context),
                   buildRegisterText(context),
+                  AnimatedButton(),
+                  Container(
+                    height: 200,
+                  )
                 ],
               ),
             )));
@@ -141,8 +129,7 @@ class _LoginPageState extends State<LoginPage>
   Widget loginButton(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
     return Align(
-      child: AnimatedContainer(
-        duration: Duration(microseconds: 1000),
+      child: Container(
         // color: Colors.green,
         margin: EdgeInsets.only(
             top: ScreenUtil().setHeight(20),
@@ -157,7 +144,6 @@ class _LoginPageState extends State<LoginPage>
           color: Theme.of(context).primaryColor,
           onPressed: () async {
             print("pressed");
-            animationController.forward();
 
             // if (_formKey.currentState.validate()) {
             //   ///只有输入的内容符合要求通过才会到达此处

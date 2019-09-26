@@ -186,6 +186,7 @@ class ApiClient {
   //用户发布话题
   Future addTopic(String title, List<String> tags, String image,
       {int schoolId}) async {
+    image = image.split("/")[2];
     var formData = (schoolId != null)
         ? {'title': title, 'tags': tags, 'image': image, 'school_id': schoolId}
         : {

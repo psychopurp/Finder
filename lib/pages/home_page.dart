@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
           elevation: 1,
           centerTitle: true,
         ),
-        backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+        // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
         body: (this.formData != null)
             ? Container(
                 color: Colors.white.withOpacity(0.1),

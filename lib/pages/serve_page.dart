@@ -55,7 +55,7 @@ class _ServePageState extends State<ServePage> {
         elevation: 0,
         centerTitle: true,
       ),
-      backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+      // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
       body: Container(
         // color: Colors.white,
         child: ListView.builder(

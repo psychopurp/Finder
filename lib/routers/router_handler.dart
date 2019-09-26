@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +19,7 @@ import 'package:finder/pages/home_page/more_activities.dart';
 import 'package:finder/pages/login_page.dart';
 import 'package:finder/pages/home_page/topic_detail_page.dart';
 import 'package:finder/pages/mine_page/user_profile_page.dart';
+import 'package:finder/pages/home_page/activity_detail_page.dart';
 
 //返回首页
 var rootHandler = Handler(
@@ -45,6 +49,17 @@ var topicDetailsHandler = Handler(
       topicId: int.parse(topicId),
       topicImage: topicImage,
       topicTitle: topicTitle);
+});
+
+//活动详情页
+var acitvityDetailsHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  String activityData = params['activityData']?.first;
+  // print("activityData====>$activityData");
+  var activity = ActivityModelData.fromJson(jsonDecode(activityData));
+  return ActivityDetailPage(
+    activity: activity,
+  );
 });
 
 //首页 -- 更多活动
