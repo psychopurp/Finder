@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
           theme: _buildAppTheme(),
           title: 'Finder',
           debugShowCheckedModeBanner: false,
-          home: LoginPage()),
+          home: IndexPage()),
     );
   }
 }
@@ -77,7 +77,7 @@ ThemeData _buildAppTheme() {
     // platform: TargetPlatform.android,
     brightness: Brightness.light,
     // 主题颜色样本
-    primarySwatch: Colors.orange,
+    // primarySwatch: Colors.orange,
   );
   return base.copyWith(
       //主色，决定导航栏颜色
@@ -94,10 +94,6 @@ ThemeData _buildAppTheme() {
       textTheme: _buildTextTheme(base.textTheme),
       primaryTextTheme: _buildTextTheme(base.primaryTextTheme),
       accentTextTheme: _buildTextTheme(base.accentTextTheme),
-      // appBarTheme: base.appBarTheme.copyWith(
-      //     textTheme: base.textTheme.copyWith(
-      //         title: base.appBarTheme.textTheme.title
-      //             .copyWith(color: Colors.white))),
       inputDecorationTheme: base.inputDecorationTheme);
 }
 
@@ -105,8 +101,8 @@ ThemeData _buildAppTheme() {
 TextTheme _buildTextTheme(TextTheme base) {
   return base
       .copyWith(
-        title: base.title.copyWith(fontSize: ScreenUtil().setSp(35)),
-        body1: base.body1.copyWith(fontSize: ScreenUtil().setSp(25)),
+        title: base.title.copyWith(fontSize: 18),
+        body1: base.body1.copyWith(fontSize: 13),
       )
       .apply(
         fontFamily: "Poppins",
