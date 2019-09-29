@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/provider/user_provider.dart';
-import 'package:finder/plugin/flexible_app_bar.dart';
 import 'package:finder/plugin/my_appbar.dart';
 
 class UserProfilePage extends StatefulWidget {

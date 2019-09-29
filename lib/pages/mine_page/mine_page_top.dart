@@ -2,7 +2,6 @@ import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/public.dart';
-import 'package:finder/pages/mine_page/user_profile_page.dart';
 
 class MinePageTop extends StatelessWidget {
   final UserModel user;

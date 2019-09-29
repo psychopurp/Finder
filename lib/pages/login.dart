@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:finder/pages/custom.dart';
 
 // import 'login_page2.dart';
 

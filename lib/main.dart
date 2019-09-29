@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:finder/pages/login_page.dart';
+import 'package:flutter/material.dart';
 import 'package:finder/pages/index_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:finder/config/global.dart';
 //路由管理
 import 'routers/application.dart';
@@ -48,7 +47,7 @@ class MyApp extends StatelessWidget {
           theme: _buildAppTheme(),
           title: 'Finder',
           debugShowCheckedModeBanner: false,
-          home: IndexPage()),
+          home: LoginPage()),
     );
   }
 }
@@ -101,7 +100,7 @@ ThemeData _buildAppTheme() {
 TextTheme _buildTextTheme(TextTheme base) {
   return base
       .copyWith(
-        title: base.title.copyWith(fontSize: 18),
+        title: base.title.copyWith(fontSize: 25),
         body1: base.body1.copyWith(fontSize: 13),
       )
       .apply(

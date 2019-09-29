@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 ///登录页动画按钮
 
 class AnimatedButton extends StatefulWidget {
+  final double beginWidth;
+  final double endWidth;
+  final Widget child;
+  const AnimatedButton({this.beginWidth, this.endWidth, this.child});
   @override
   _AnimatedButtonState createState() => _AnimatedButtonState();
 }
@@ -32,7 +36,8 @@ class _AnimatedButtonState extends State<AnimatedButton>
     _widthController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _widthTween = Tween(
-        begin: ScreenUtil().setWidth(600), end: ScreenUtil().setWidth(150));
+        begin: ScreenUtil().setWidth(widget.beginWidth),
+        end: ScreenUtil().setWidth(widget.endWidth));
     _scaleTween = Tween(begin: 0, end: 1);
 
     _animation =
@@ -75,13 +80,10 @@ class _AnimatedButtonState extends State<AnimatedButton>
                 alignment: Alignment.center,
                 index: index,
                 children: <Widget>[
-                  Text(
-                    "登陆",
-                    style: TextStyle(
-                        fontFamily: "Poppins",
-                        color: Colors.white,
-                        fontSize: ScreenUtil().setSp(30)),
-                  ),
+                  Text("登陆",
+                      style: Theme.of(context).textTheme.title.copyWith(
+                          color: Colors.white,
+                          fontSize: ScreenUtil().setSp(35))),
                   ScaleTransition(
                     scale: _scaleTween.animate(_animation),
                     child: Icon(

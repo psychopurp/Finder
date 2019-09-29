@@ -45,26 +45,29 @@ class _HomePageState extends State<HomePage> {
           centerTitle: true,
         ),
         // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-        body: (this.formData != null)
-            ? Container(
-                color: Colors.white.withOpacity(0.1),
-                child: EasyRefresh(
-                  header: MaterialHeader(),
-                  onRefresh: () async {
-                    await Future.delayed(Duration(seconds: 1), () {
-                      setState(() {});
-                    });
-                  },
-                  child: ListView(
-                    children: <Widget>[
-                      HomePageBanner(this.formData['banner']),
-                      HomePageTopics(this.formData['topics']),
-                      HomePageActivities(this.formData['activities']),
-                    ],
+        body: Hero(
+          tag: "login",
+          child: (this.formData != null)
+              ? Container(
+                  color: Colors.white.withOpacity(0.1),
+                  child: EasyRefresh(
+                    header: MaterialHeader(),
+                    onRefresh: () async {
+                      await Future.delayed(Duration(seconds: 1), () {
+                        setState(() {});
+                      });
+                    },
+                    child: ListView(
+                      children: <Widget>[
+                        HomePageBanner(this.formData['banner']),
+                        HomePageTopics(this.formData['topics']),
+                        HomePageActivities(this.formData['activities']),
+                      ],
+                    ),
                   ),
-                ),
-              )
-            : Center(child: CupertinoActivityIndicator()));
+                )
+              : Center(child: CupertinoActivityIndicator()),
+        ));
   }
 
   Future _getBannerData() async {
