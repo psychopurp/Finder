@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:dio/dio.dart';
+import 'package:finder/config/api_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/routers/application.dart';
@@ -19,8 +22,13 @@ class HeSaysPage extends StatefulWidget {
 
 class _HeSaysPageState extends State<HeSaysPage> {
   DateTime _time;
-  List<HeSheSayItem> data;
-  List<HeSheSayItem> bannerData;
+  List<HeSheSayItem> data = [];
+  List<HeSheSayItem> bannerData = [];
+  bool requestStatus = true;
+  bool isRequest = false;
+  bool hasMore = true;
+  int page = 1;
+  String error = "网络连接失败, 请稍后再试";
 
   set time(DateTime time) {
     setState(() {
@@ -31,52 +39,125 @@ class _HeSaysPageState extends State<HeSaysPage> {
   @override
   void initState() {
     super.initState();
-    DateTime time = new DateTime.now();
-    data = <HeSheSayItem>[
-      HeSheSayItem(
-          authorAvatar:
-              "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
-          authorId: 0,
-          authorName: "Tobias",
-          content: "一般tata 说显示3 行，多于三行显示前三行，并出现全文按钮",
-          image:
-              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-          isLike: false,
-          likeCount: 100),
-      HeSheSayItem(
-          authorAvatar:
-              "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
-          authorId: 0,
-          authorName: "Daisy",
-          content:
-              "国务院港澳办发言人表示，香港局势发展越来越清楚地表明，围绕移交逃犯条例修订出现的风波已经完全变质，正在外部势力的插手干预下演变为一场“港版颜色革命”，某些街头抗争正在向有预谋、有计划、有组织的暴力犯罪方向演化，已经严重威胁到公共安全。当前香港面临的最大危险是暴力横行、法治不彰。在此情况下，特区政府制订《禁止蒙面规例》，合法合理合情，极为必要。世界上许多国家和地区都已制订禁止蒙面的法律，在香港实施上述规例，并不影响香港市民依法享有包括游行集会自由在内的各项权利和自由。",
-          image:
-              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-          isLike: false,
-          likeCount: 100),
-      HeSheSayItem(
-          authorAvatar:
-              "http://img2.imgtn.bdimg.com/it/u=320178652,790985626&fm=26&gp=0.jpg",
-          authorId: 0,
-          authorName: "hello",
-          content: "aaafdafsafdfdsffaggggggggggggggggggggggaaaaaa",
-          image:
-              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-          isLike: false,
-          likeCount: 100),
-      HeSheSayItem(
-          authorAvatar:
-              "http://img2.imgtn.bdimg.com/it/u=320178652,790985626&fm=26&gp=0.jpg",
-          authorId: 0,
-          authorName: "aaa",
-          content: "aaaaaaaaa",
-          image:
-              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-          isLike: false,
-          likeCount: 100),
-    ];
-    bannerData = data;
-    this.time = time;
+    this.time = new DateTime.now();
+//    data = <HeSheSayItem>[
+//      HeSheSayItem(
+//          authorAvatar:
+//              "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
+//          authorId: 0,
+//          authorName: "Tobias",
+//          content: "一般tata 说显示3 行，多于三行显示前三行，并出现全文按钮",
+//          image:
+//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//          isLike: false,
+//          likeCount: 100),
+//      HeSheSayItem(
+//          authorAvatar:
+//              "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
+//          authorId: 0,
+//          authorName: "Daisy",
+//          content:
+//              "国务院港澳办发言人表示，香港局势发展越来越清楚地表明，围绕移交逃犯条例修订出现的风波已经完全变质，正在外部势力的插手干预下演变为一场“港版颜色革命”，某些街头抗争正在向有预谋、有计划、有组织的暴力犯罪方向演化，已经严重威胁到公共安全。当前香港面临的最大危险是暴力横行、法治不彰。在此情况下，特区政府制订《禁止蒙面规例》，合法合理合情，极为必要。世界上许多国家和地区都已制订禁止蒙面的法律，在香港实施上述规例，并不影响香港市民依法享有包括游行集会自由在内的各项权利和自由。",
+//          image:
+//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//          isLike: false,
+//          likeCount: 100),
+//      HeSheSayItem(
+//          authorAvatar:
+//              "http://img2.imgtn.bdimg.com/it/u=320178652,790985626&fm=26&gp=0.jpg",
+//          authorId: 0,
+//          authorName: "hello",
+//          content: "aaafdafsafdfdsffaggggggggggggggggggggggaaaaaa",
+//          image:
+//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//          isLike: false,
+//          likeCount: 100),
+//      HeSheSayItem(
+//          authorAvatar:
+//              "http://img2.imgtn.bdimg.com/it/u=320178652,790985626&fm=26&gp=0.jpg",
+//          authorId: 0,
+//          authorName: "aaa",
+//          content: "aaaaaaaaa",
+//          image:
+//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//          isLike: false,
+//          likeCount: 100),
+//    ];
+//    bannerData = <HeSheSayItem>[
+//      HeSheSayItem(
+//          authorAvatar:
+//              "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
+//          authorId: 0,
+//          title: "他她说简介",
+//          authorName: "Tobias",
+//          content: "一般tata 说显示3 行，多于三行显示前三行，并出现全文按钮",
+//          image:
+//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//          isLike: false,
+//          likeCount: 100),
+//      HeSheSayItem(
+//          authorAvatar:
+//              "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
+//          authorId: 0,
+//          title: "大新闻一号",
+//          authorName: "Daisy",
+//          content:
+//              "国务院港澳办发言人表示，香港局势发展越来越清楚地表明，围绕移交逃犯条例修订出现的风波已经完全变质，正在外部势力的插手干预下演变为一场“港版颜色革命”，某些街头抗争正在向有预谋、有计划、有组织的暴力犯罪方向演化，已经严重威胁到公共安全。当前香港面临的最大危险是暴力横行、法治不彰。在此情况下，特区政府制订《禁止蒙面规例》，合法合理合情，极为必要。世界上许多国家和地区都已制订禁止蒙面的法律，在香港实施上述规例，并不影响香港市民依法享有包括游行集会自由在内的各项权利和自由。",
+//          image:
+//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//          isLike: false,
+//          likeCount: 100),
+//    ];
+    getHeSheSays();
+    getLeadHeSheSays();
+  }
+
+  void getHeSheSays() async {
+    int timestamp = this._time.millisecondsSinceEpoch ~/ 1000;
+    Dio dio = ApiClient.dio;
+    try {
+      Response response = await dio.get('get_he_she_say/',
+          queryParameters: {"timestamp": timestamp, "page": page});
+      String responseData = response.data;
+      Map<String, dynamic> result = json.decode(responseData);
+      setState(() {
+        if (result["status"]) {
+          data.addAll(List.generate(result["data"].length,
+              (index) => HeSheSayItem.fromJson(result["data"][index])));
+          requestStatus = true;
+          hasMore = result["has_more"];
+        } else {
+          requestStatus = false;
+          error = result["error"];
+        }
+        isRequest = false;
+      });
+    } on DioError catch (e) {
+      print(e);
+      setState(() {
+        requestStatus = false;
+      });
+    }
+  }
+
+  void getLeadHeSheSays() async {
+    try {
+      Dio dio = ApiClient.dio;
+      Response response = await dio.get('get_lead_he_she_say/');
+      String responseData = response.data;
+      Map<String, dynamic> result = json.decode(responseData);
+      if (result["status"]) {
+        setState(() {
+          bannerData = List.generate(result["data"].length,
+              (index) => HeSheSayItem.fromJson(result["data"][index]));
+        });
+      }
+    } on DioError catch (e) {
+      print(e);
+      setState(() {
+        bannerData = [];
+      });
+    }
   }
 
   @override
@@ -97,30 +178,6 @@ class _HeSaysPageState extends State<HeSaysPage> {
             Navigator.pop(context);
           },
         ),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 8, bottom: 8, right: 10),
-            child: MaterialButton(
-              highlightColor: ActionColorActive,
-              splashColor: Colors.white,
-              color: ActionColor,
-              child: Padding(
-                  padding: EdgeInsets.only(left: 5, right: 5),
-                  child: Text(
-                    "+ 发布我的",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  )),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100)),
-              onPressed: () {
-                Application.router
-                    .navigateTo(context, '/serve/heSays/heSaysPublish');
-              },
-            ),
-          )
-        ],
         title: Text(
           "他 · 她说",
           style: TextStyle(
@@ -132,7 +189,13 @@ class _HeSaysPageState extends State<HeSaysPage> {
         bottom: TimeSelector(
           time: _time,
           onSelected: (time) {
-            this.time = time;
+            setState(() {
+              this.time = time;
+              page = 1;
+              isRequest = true;
+            });
+            getLeadHeSheSays();
+            getHeSheSays();
           },
         ),
         elevation: 0.5,
@@ -140,14 +203,117 @@ class _HeSaysPageState extends State<HeSaysPage> {
       ),
       backgroundColor: PageBackgroundColor,
       body: body,
+      floatingActionButton: FloatingActionButton(
+//        highlightColor: ActionColorActive,
+        splashColor: ActionColorActive,
+        backgroundColor: ActionColor,
+        hoverColor: ActionColorActive,
+        focusColor: ActionColorActive,
+        foregroundColor: ActionColorActive,
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 30,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+        onPressed: () {
+          Application.router.navigateTo(context, '/serve/heSays/heSaysPublish');
+        },
+      ),
     );
   }
 
   get body {
+    if (!requestStatus && !isRequest) {
+      return Center(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            Icon(
+              Icons.error,
+              size: 50,
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+            ),
+            Text(error)
+          ],
+        ),
+      );
+    }
+    if (isRequest) {
+      return Center(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            Container(
+              height: 50,
+              width: 50,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+            ),
+            Text("加载中...")
+          ],
+        ),
+      );
+    }
+    Widget last = Container(
+      color: Colors.white,
+      child: Column(children: [
+        Center(
+          child: hasMore
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                    ),
+                    Text("加载中"),
+                  ],
+                )
+              : Text("没有更多了"),
+        ),
+        Container(
+          padding: EdgeInsets.only(bottom: 15),
+        )
+      ]),
+    );
+    if (bannerData.length == 0) {
+      return ListView.builder(
+        itemBuilder: (context, index) {
+          if (index == data.length) {
+            if (hasMore) {
+              page += 1;
+              getHeSheSays();
+            }
+            return last;
+          }
+          return _itemBuilder(index);
+        },
+        itemCount: data.length + 1,
+      );
+    }
     return ListView.builder(
       itemBuilder: (context, index) {
         if (index == 0) {
           return banner;
+        } else if (index == data.length) {
+          if (hasMore) {
+            page += 1;
+            getHeSheSays();
+          }
+          return last;
         } else {
           return _itemBuilder(index - 1);
         }
@@ -196,10 +362,9 @@ class _HeSaysPageState extends State<HeSaysPage> {
                               imageUrl: item.authorAvatar,
                               errorWidget: (context, url, err) {
                                 return Container(
-                                  padding: EdgeInsets.all(10),
                                   child: Icon(
                                     Icons.cancel,
-                                    size: 30,
+                                    size: 50,
                                     color: Colors.grey,
                                   ),
                                 );
@@ -244,18 +409,14 @@ class _HeSaysPageState extends State<HeSaysPage> {
               ContentWidget(content: item.content),
             ],
           ),
-          index != data.length - 1
-              ? Container(
-                  constraints: BoxConstraints(
-                    minWidth: double.infinity,
-                    minHeight: 1,
-                  ),
-                  margin: EdgeInsets.symmetric(vertical: verticalPadding),
-                  color: PageBackgroundColor,
-                )
-              : Container(
-                  padding: EdgeInsets.only(bottom: verticalPadding),
-                )
+          Container(
+            constraints: BoxConstraints(
+              minWidth: double.infinity,
+              minHeight: 1,
+            ),
+            margin: EdgeInsets.symmetric(vertical: verticalPadding),
+            color: PageBackgroundColor,
+          )
         ],
       ),
     );
@@ -307,10 +468,10 @@ class _HeSaysPageState extends State<HeSaysPage> {
                     color: Color.fromARGB(50, 45, 45, 45),
                   ),
                   Container(
-                    constraints: BoxConstraints(maxWidth: 200),
+                    constraints: BoxConstraints(maxWidth: 300),
                     child: Text(
-                      item.content,
-                      maxLines: 1,
+                      item.title,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: Color.fromARGB(255, 239, 239, 239),
@@ -336,15 +497,22 @@ class _HeSaysPageState extends State<HeSaysPage> {
     );
   }
 
-  _handleLike(HeSheSayItem item, bool status) {
-    setState(() {
-      item.isLike = status;
-      if (status) {
-        item.likeCount += 1;
-      } else {
-        item.likeCount -= 1;
-      }
-    });
+  _handleLike(HeSheSayItem item, bool status) async {
+    Dio dio = ApiClient.dio;
+    var data = {"like": status, "id": item.id};
+    var jsonData = json.encode(data);
+    var response = await dio.post("like_he_she_say", data: jsonData);
+    var responseData = json.decode(response.data);
+    if (responseData["status"]) {
+      setState(() {
+        item.isLike = status;
+        if (status) {
+          item.likeCount += 1;
+        } else {
+          item.likeCount -= 1;
+        }
+      });
+    }
   }
 }
 
@@ -469,12 +637,39 @@ class HeSheSayItem {
       this.content,
       this.image,
       this.isLike,
-      this.likeCount});
+      this.likeCount,
+      this.title,
+      this.id});
 
+  factory HeSheSayItem.fromJson(Map<String, dynamic> map) {
+    Map<String, dynamic> author = map["author"];
+    String authorAvatar = author["avatar"];
+    int authorId = author["id"];
+    String authorName = author["name"];
+    String title = map["title"];
+    String content = map["content"];
+    String image = map["image"];
+    int likeCount = map["like"];
+    bool isLike = map["isLike"];
+    int id = map["id"];
+    return HeSheSayItem(
+        authorName: authorName,
+        authorAvatar: authorAvatar,
+        authorId: authorId,
+        isLike: isLike,
+        likeCount: likeCount,
+        image: image,
+        content: content,
+        title: title,
+        id: id);
+  }
+
+  final int id;
   final String authorName;
   final int authorId;
   final String authorAvatar;
   final String content;
+  final String title;
   bool isLike;
   int likeCount;
   String image;
