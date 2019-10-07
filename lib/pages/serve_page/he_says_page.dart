@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/routers/application.dart';
@@ -85,28 +86,32 @@ class _HeSaysPageState extends State<HeSaysPage> {
 //    ];
 //    bannerData = <HeSheSayItem>[
 //      HeSheSayItem(
-//          authorAvatar:
-//              "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
-//          authorId: 0,
-//          title: "他她说简介",
-//          authorName: "Tobias",
-//          content: "一般tata 说显示3 行，多于三行显示前三行，并出现全文按钮",
-//          image:
-//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//          isLike: false,
-//          likeCount: 100),
+//        authorAvatar:
+//            "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
+//        authorId: 0,
+//        title: "他她说简介",
+//        authorName: "Tobias",
+//        content: "一般tata 说显示3 行，多于三行显示前三行，并出现全文按钮",
+//        image:
+//            'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//        isLike: false,
+//        likeCount: 100,
+//        time: "2019-9-9 20:20",
+//      ),
 //      HeSheSayItem(
-//          authorAvatar:
-//              "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
-//          authorId: 0,
-//          title: "大新闻一号",
-//          authorName: "Daisy",
-//          content:
-//              "国务院港澳办发言人表示，香港局势发展越来越清楚地表明，围绕移交逃犯条例修订出现的风波已经完全变质，正在外部势力的插手干预下演变为一场“港版颜色革命”，某些街头抗争正在向有预谋、有计划、有组织的暴力犯罪方向演化，已经严重威胁到公共安全。当前香港面临的最大危险是暴力横行、法治不彰。在此情况下，特区政府制订《禁止蒙面规例》，合法合理合情，极为必要。世界上许多国家和地区都已制订禁止蒙面的法律，在香港实施上述规例，并不影响香港市民依法享有包括游行集会自由在内的各项权利和自由。",
-//          image:
-//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//          isLike: false,
-//          likeCount: 100),
+//        authorAvatar:
+//            "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
+//        authorId: 0,
+//        title: "大新闻一号",
+//        authorName: "Daisy",
+//        content:
+//            "国务院港澳办发言人表示，香港局势发展越来越清楚地表明，围绕移交逃犯条例修订出现的风波已经完全变质，正在外部势力的插手干预下演变为一场“港版颜色革命”，某些街头抗争正在向有预谋、有计划、有组织的暴力犯罪方向演化，已经严重威胁到公共安全。当前香港面临的最大危险是暴力横行、法治不彰。在此情况下，特区政府制订《禁止蒙面规例》，合法合理合情，极为必要。世界上许多国家和地区都已制订禁止蒙面的法律，在香港实施上述规例，并不影响香港市民依法享有包括游行集会自由在内的各项权利和自由。",
+//        image:
+//            'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
+//        isLike: false,
+//        likeCount: 100,
+//        time: "2019-9-9 20:20",
+//      ),
 //    ];
     getHeSheSays();
     getLeadHeSheSays();
@@ -118,8 +123,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
     try {
       Response response = await dio.get('get_he_she_say/',
           queryParameters: {"timestamp": timestamp, "page": page});
-      String responseData = response.data;
-      Map<String, dynamic> result = json.decode(responseData);
+      Map<String, dynamic> result = response.data;
       setState(() {
         if (result["status"]) {
           data.addAll(List.generate(result["data"].length,
@@ -134,6 +138,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
       });
     } on DioError catch (e) {
       print(e);
+      print(e.response.data.toString());
       setState(() {
         requestStatus = false;
       });
@@ -144,8 +149,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
     try {
       Dio dio = ApiClient.dio;
       Response response = await dio.get('get_lead_he_she_say/');
-      String responseData = response.data;
-      Map<String, dynamic> result = json.decode(responseData);
+      Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
           bannerData = List.generate(result["data"].length,
@@ -282,7 +286,10 @@ class _HeSaysPageState extends State<HeSaysPage> {
                     Text("加载中"),
                   ],
                 )
-              : Text("没有更多了"),
+              : Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: Text("没有更多了"),
+                ),
         ),
         Container(
           padding: EdgeInsets.only(bottom: 15),
@@ -401,7 +408,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                       child: Container(),
                     ),
                     LikeButton(item.isLike, item.likeCount, (status) {
-                      _handleLike(item, status);
+                      handleLike(item, status);
                     })
                   ],
                 ),
@@ -432,6 +439,10 @@ class _HeSaysPageState extends State<HeSaysPage> {
       child: Swiper(
         itemCount: bannerData.length,
         autoplay: true,
+        onTap: (index) {
+          Navigator.pushNamed(context, Routes.heSaysDetail,
+              arguments: bannerData[index]);
+        },
         pagination: SwiperPagination(
           margin: const EdgeInsets.only(
               top: 10.0, left: 10.0, right: 10.0, bottom: 5.0),
@@ -485,7 +496,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                       item.isLike,
                       item.likeCount,
                       (status) {
-                        _handleLike(item, status);
+                        handleLike(item, status);
                       },
                       notLikeColor: Color.fromARGB(255, 239, 239, 239),
                     ),
@@ -497,12 +508,12 @@ class _HeSaysPageState extends State<HeSaysPage> {
     );
   }
 
-  _handleLike(HeSheSayItem item, bool status) async {
+  handleLike(HeSheSayItem item, bool status) async {
     Dio dio = ApiClient.dio;
     var data = {"like": status, "id": item.id};
     var jsonData = json.encode(data);
-    var response = await dio.post("like_he_she_say", data: jsonData);
-    var responseData = json.decode(response.data);
+    var response = await dio.post("like_he_she_say/", data: jsonData);
+    var responseData = response.data;
     if (responseData["status"]) {
       setState(() {
         item.isLike = status;
@@ -512,6 +523,28 @@ class _HeSaysPageState extends State<HeSaysPage> {
           item.likeCount -= 1;
         }
       });
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("提示"),
+              content: Text("请先登录再点赞!"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("取消"),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                FlatButton(
+                  child: Text("确认"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/login');
+                  },
+                ),
+              ],
+            );
+          });
     }
   }
 }
@@ -639,7 +672,8 @@ class HeSheSayItem {
       this.isLike,
       this.likeCount,
       this.title,
-      this.id});
+      this.id,
+      this.time});
 
   factory HeSheSayItem.fromJson(Map<String, dynamic> map) {
     Map<String, dynamic> author = map["author"];
@@ -652,6 +686,7 @@ class HeSheSayItem {
     int likeCount = map["like"];
     bool isLike = map["isLike"];
     int id = map["id"];
+    String time = map["time"];
     return HeSheSayItem(
         authorName: authorName,
         authorAvatar: authorAvatar,
@@ -661,7 +696,8 @@ class HeSheSayItem {
         image: image,
         content: content,
         title: title,
-        id: id);
+        id: id,
+        time: time);
   }
 
   final int id;
@@ -673,6 +709,7 @@ class HeSheSayItem {
   bool isLike;
   int likeCount;
   String image;
+  final String time;
 }
 
 typedef TimeSelectedCallback = void Function(DateTime time);
@@ -777,8 +814,8 @@ class LikeButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Icon(
-                Icons.favorite,
-                color: isLike ? ActionColor : notLikeColor ?? Colors.grey,
+                isLike ? Icons.favorite : Icons.favorite_border,
+                color: ActionColor,
                 size: 28,
               ),
               Padding(

@@ -18,6 +18,8 @@ class Routes {
   static String heSays = "/serve/heSays"; //服务页面 -- 他·她·说
   static String heSaysPublish =
       "/serve/heSays/heSaysPublish"; //服务页面 -- 他·她·说 --发布页
+  static String heSaysDetail =
+      "/serve/heSays/heSaysDetail"; //服务页面 -- 他·她·说 --发布页
   static String study = "/serve/study"; //服务页面 -- 一起学习
   static String selectCourse = "/serve/selectCourse"; //服务页面 -- 选课指南
   static String psychoTest = "/serve/psychoTest"; //服务页面 -- 心理测试
@@ -58,6 +60,8 @@ class Routes {
         handler: heSaysHandler, transitionType: TransitionType.fadeIn);
     router.define(heSaysPublish,
         handler: heSaysPublishHandler, transitionType: TransitionType.fadeIn);
+    router.define(heSaysDetail,
+        handler: heSaysDetailHandler, transitionType: TransitionType.fadeIn);
     router.define(study, handler: studyHandler);
     router.define(selectCourse, handler: selectCourseHandler);
     router.define(psychoTest, handler: psychoTestHandler);

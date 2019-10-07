@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
+import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/serve_page/lost_found_page.dart';
@@ -95,6 +96,11 @@ var heSaysHandler = Handler(
 var heSaysPublishHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return PublishPage();
+});
+
+var heSaysDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return HeSaysDetail();
 });
 
 //服务页面 -- 一起学习
