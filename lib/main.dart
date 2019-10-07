@@ -13,7 +13,7 @@ import 'package:finder/provider/user_provider.dart';
 
 void main() {
   Global.init().then((isLogin) => runApp(MyApp(
-        isLogin: isLogin,
+        isLogin: true,
       )));
 }
 
