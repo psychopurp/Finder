@@ -405,12 +405,12 @@ class _LoginButtonState extends State<LoginButton>
 
                 widget.onPress();
               });
-              Future.delayed(Duration(seconds: 2), () {
-                _controller.reverse();
-                setState(() {
-                  this.index = 0;
-                });
-              });
+              // Future.delayed(Duration(seconds: 2), () {
+              //   _controller.reverse();
+              //   setState(() {
+              //     this.index = 0;
+              //   });
+              // });
             },
             onDoubleTap: () {
               _controller.reverse();

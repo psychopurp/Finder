@@ -205,6 +205,47 @@ class ApiClient {
     }
   }
 
+  ///用户发布活动
+  Future addActivity(
+      {String sponser,
+      String title,
+      String place,
+      String poster,
+      List<String> categories,
+      String startTime,
+      String endTime,
+      String description}) async {
+    /**
+         *   sponsor: str
+    title: str
+    place: str
+    poster: str
+    start_time: timestamp(str)
+    end_time: timestamp(str)
+    description: str
+    categories: list
+         */
+
+    var formData = {
+      'title': title,
+      'place': place,
+      'poster': poster,
+      'start_time': startTime,
+      'end_time': endTime,
+      'description': description,
+      'categories': categories,
+    };
+    print(jsonEncode(formData));
+    try {
+      Response response =
+          await dio.post('add_activity/', data: jsonEncode(formData));
+      print('发布活动成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('发布活动错误==========>$e');
+    }
+  }
+
   //获取用户关注的用户列表
   Future getFollowUsers({String query = "", int page = 1}) async {
     var formData = {'query': query, 'page': page};
@@ -264,7 +305,16 @@ class ApiClient {
 
   //获取用户收藏列表
   Future getCollections({String query = "", int page = 1}) async {
+    /**
+     *  data 里面包括四个种类的收藏 
+    基本结构：
+    {
+    id：int
+    time：
+    type:int(活动、话题、话题评论、招募、分别是1，2，3，4)
+*/
     var formData = {'query': query, 'page': page};
+    print(formData);
     try {
       Response response =
           await dio.get('get_collections/', queryParameters: formData);

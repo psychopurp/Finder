@@ -28,13 +28,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      //全局状态管理
-      providers: [
-        ChangeNotifierProvider(
-          builder: (_) => UserProvider(),
-        )
-      ],
-      child: MaterialApp(
+        //全局状态管理
+        providers: [
+          ChangeNotifierProvider(
+            builder: (_) => UserProvider(),
+          )
+        ],
+        child: MaterialApp(
           localizationsDelegates: [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
@@ -47,8 +47,8 @@ class MyApp extends StatelessWidget {
           theme: _buildAppTheme(),
           title: 'Finder',
           debugShowCheckedModeBanner: false,
-          home: LoginPage()),
-    );
+          home: LoginPage(),
+        ));
   }
 }
 
@@ -100,7 +100,7 @@ ThemeData _buildAppTheme() {
 TextTheme _buildTextTheme(TextTheme base) {
   return base
       .copyWith(
-        title: base.title.copyWith(fontSize: 25),
+        title: base.title.copyWith(fontSize: 20),
         body1: base.body1.copyWith(fontSize: 13),
       )
       .apply(

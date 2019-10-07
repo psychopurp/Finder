@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/models/activity_model.dart';
@@ -202,7 +205,9 @@ class _ChildActivitiesState extends State<ChildActivities>
       imageUrl: item.poster,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          print(index);
+          var activityData = jsonEncode(item.toJson());
+          Application.router.navigateTo(context,
+              "/home/activityDetail?activityData=${Uri.encodeComponent(activityData)}");
         },
         child: Align(
           alignment: Alignment.topCenter,
@@ -241,11 +246,9 @@ class _ChildActivitiesState extends State<ChildActivities>
                     )),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(
-                          top: ScreenUtil().setHeight(50),
-                          bottom: ScreenUtil().setHeight(20)),
                       // color: Colors.cyan,
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
@@ -280,7 +283,7 @@ class _ChildActivitiesState extends State<ChildActivities>
                     ),
                     Container(
                       // color: Colors.amber,
-                      margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+                      // margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
@@ -290,14 +293,15 @@ class _ChildActivitiesState extends State<ChildActivities>
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: ScreenUtil().setSp(30),
+                            fontSize: ScreenUtil().setSp(25),
                             fontWeight: FontWeight.w500),
                       ),
                     ),
                     Container(
                       margin: EdgeInsets.only(
-                          right: ScreenUtil().setWidth(40),
-                          top: ScreenUtil().setHeight(40)),
+                        right: ScreenUtil().setWidth(40),
+                        // top: ScreenUtil().setHeight(20)),
+                      ),
                       padding: EdgeInsets.all(7),
                       decoration: BoxDecoration(
                           // color: Colors.amber,
