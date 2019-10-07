@@ -17,15 +17,17 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
   File _imageFile;
 
   ///标签
-  List<String> tab = [];
+  List<String> tags = [];
 
   bool onlyInSchool = false;
 
   TextEditingController _titleController = new TextEditingController();
+  TextEditingController _tagController = new TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
+    _tagController.dispose();
     super.dispose();
   }
 
@@ -98,10 +100,83 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(40)),
+        children: <Widget>[uploadImage(), titleForm(), onlySchool, tag()],
+      ),
+    );
+  }
+
+  ///标签
+  tag() {
+    String _tag;
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(50)),
+      // color: Colors.amber,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          uploadImage(),
-          titleForm(),
-          onlySchool,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: ScreenUtil().setWidth(500),
+                child: TextField(
+                  maxLines: 1,
+                  // focusNode: passwordNode,
+                  controller: _tagController,
+                  onChanged: (String value) => _tag = value,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(width: 0, style: BorderStyle.none),
+                        borderRadius: BorderRadius.circular(20)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(width: 5, style: BorderStyle.none),
+                        borderRadius: BorderRadius.circular(20)),
+                    hintText: '添加标签',
+                    fillColor: Colors.black12,
+                    hoverColor: Colors.green,
+                    focusColor: Colors.white,
+                    filled: true,
+                    // prefixIcon: Icon(Icons.person),
+                    contentPadding: EdgeInsets.all(10),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    if (_tag != null) {
+                      tags.add(_tag.toString());
+                      _tagController.clear();
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+          Container(
+            // color: Colors.yellow,
+            child: Wrap(
+              spacing: 5,
+              children: tags.map((val) {
+                return Chip(
+                  onDeleted: () {
+                    setState(() {
+                      tags.remove(val);
+                    });
+                  },
+                  deleteButtonTooltipMessage: "删除此标签",
+                  deleteIconColor: Colors.black38,
+                  backgroundColor:
+                      Theme.of(context).primaryColor.withOpacity(0.5),
+                  labelStyle: TextStyle(color: Colors.white),
+                  label: Text(val),
+                );
+              }).toList(),
+            ),
+          )
         ],
       ),
     );
@@ -193,7 +268,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
 
   Future publishTopic(UserProvider user) async {
     var imagePath = await apiClient.uploadImage(this._imageFile);
-    var data = await user.addTopic(this._title, this.tab, imagePath,
+    var data = await user.addTopic(this._title, this.tags, imagePath,
         schoolId: this.onlyInSchool ? user.userInfo.school.id : null);
     return data;
   }

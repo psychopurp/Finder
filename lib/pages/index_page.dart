@@ -1,3 +1,5 @@
+import 'package:finder/pages/mine_page/user_profile_page.dart';
+import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
@@ -12,15 +14,17 @@ class IndexPage extends StatefulWidget {
   _IndexPageState createState() => _IndexPageState();
 }
 
-class _IndexPageState extends State<IndexPage> {
+class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
   int _selectIndex = 0;
+
   var pages = [
     HomePage(),
-    LoginPage(),
-    FindPage(),
+    FindPage(), FindPage(),
+    // LoginPage(),
     ServePage(),
-    MinePage(),
+    UserProfilePage(),
   ];
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
@@ -71,7 +75,9 @@ class _IndexPageState extends State<IndexPage> {
                     Icons.add,
                     color: Colors.white,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Application.router.navigateTo(context, "/publishActivity");
+                  },
                 ),
               ),
               _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), 'Serve', 3),
@@ -106,36 +112,49 @@ class _IndexPageState extends State<IndexPage> {
         Container(),
       ],
     );
-    Widget currentWidget = isSelected ? selectedWidget : unSelectedWidget;
+
     return InkWell(
         onTap: () {
-          if (!isSelected) {
-            setState(() {
-              this._selectIndex = index;
-              currentWidget = selectedWidget;
-            });
-          }
+          Future.delayed(Duration(microseconds: 500), () {});
+          setState(() {
+            this._selectIndex = index;
+          });
         },
-        child: !isSelected
-            ? AnimatedSwitcher(
-                transitionBuilder:
-                    (Widget child, Animation<double> animation) =>
-                        ScaleTransition(child: child, scale: animation),
-                duration: Duration(milliseconds: 300),
-                child: Container(
-                  key: ValueKey(currentWidget),
-                  height: kBottomNavigationBarHeight,
-                  width: ScreenUtil().setWidth(150),
-                  // color: isSelected ? Colors.amber : Colors.cyan,
-                  child: currentWidget,
-                ),
-              )
-            : Container(
-                key: ValueKey(currentWidget),
-                height: kBottomNavigationBarHeight,
-                width: ScreenUtil().setWidth(150),
-                // color: isSelected ? Colors.amber : Colors.cyan,
-                child: currentWidget,
-              ));
+        child: IndexedStack(
+          index: isSelected ? 1 : 0,
+          children: <Widget>[
+            Container(
+              height: kBottomNavigationBarHeight,
+              width: ScreenUtil().setWidth(150),
+              child: unSelectedWidget,
+            ),
+            Container(
+              height: kBottomNavigationBarHeight,
+              width: ScreenUtil().setWidth(150),
+              child: selectedWidget,
+            ),
+          ],
+        ));
+    // child: !isSelected
+    //     ? AnimatedSwitcher(
+    //         transitionBuilder:
+    //             (Widget child, Animation<double> animation) =>
+    //                 ScaleTransition(child: child, scale: animation),
+    //         duration: Duration(milliseconds: 300),
+    //         child: Container(
+    //           key: ValueKey(currentWidget),
+    //           height: kBottomNavigationBarHeight,
+    //           width: ScreenUtil().setWidth(150),
+    //           // color: isSelected ? Colors.amber : Colors.cyan,
+    //           child: currentWidget,
+    //         ),
+    //       )
+    //     : Container(
+    //         key: ValueKey(currentWidget),
+    //         height: kBottomNavigationBarHeight,
+    //         width: ScreenUtil().setWidth(150),
+    //         // color: isSelected ? Colors.amber : Colors.cyan,
+    //         child: currentWidget,
+    //       ));
   }
 }

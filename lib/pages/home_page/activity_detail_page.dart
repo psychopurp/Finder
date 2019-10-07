@@ -45,7 +45,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       fit: BoxFit.fill)),
             ),
             DefaultTextStyle(
-              style: Theme.of(context).textTheme.title,
+              style: Theme.of(context).textTheme.body1,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +149,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                             textAlign: TextAlign.left,
                             style: TextStyle(
                                 color: Colors.black,
-                                fontSize: ScreenUtil().setSp(30),
+                                fontSize: ScreenUtil().setSp(25),
                                 fontWeight: FontWeight.w500),
                           ),
                         ),

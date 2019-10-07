@@ -14,16 +14,10 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
-    apiClient.getFollowUsers(page: 0);
-    apiClient.getCollections(page: 1);
+    apiClient.getFollowUsers();
+    apiClient.getCollections(page: 1, query: "");
     apiClient.getFanUsers();
     return Scaffold(
-      // appBar: MyAppBar(
-      //     // backgroundColor: Colors.yellow,
-      //     // toolbarOpacity: 1,
-      //     // elevation: 0,
-      //     ),
-      // backgroundColor: Theme.of(context).primaryColor,
       body: Consumer<UserProvider>(builder: (context, user, child) {
         return SafeArea(
           top: false,
@@ -73,8 +67,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ],
                     ),
                   ),
-                  buildUserBackground(user.userInfo, context),
-                  buildUserBackground(user.userInfo, context),
+                  // buildUserBackground(user.userInfo, context),
+                  // buildUserBackground(user.userInfo, context),
                 ],
               ),
             ),
