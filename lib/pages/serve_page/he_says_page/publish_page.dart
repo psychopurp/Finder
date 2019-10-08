@@ -91,7 +91,7 @@ class _PublishPageState extends State<PublishPage>
           data: json.encode({
             "title": title,
             "content": content,
-            "is_show_name": nameLess,
+            "is_show_name": !nameLess,
             "image": image,
           }));
       var data = response.data;
@@ -118,7 +118,7 @@ class _PublishPageState extends State<PublishPage>
       var response = await dio.post("add_he_she_say/",
           data: json.encode({
             "content": content,
-            "is_show_name": nameLess,
+            "is_show_name": !nameLess,
           }));
       var data = response.data;
       if (!data["status"]) {
@@ -154,7 +154,7 @@ class _PublishPageState extends State<PublishPage>
       var response = await dio.post("add_he_she_say/",
           data: json.encode({
             "content": content,
-            "is_show_name": nameLess,
+            "is_show_name": !nameLess,
           }));
       var data = response.data;
       if (!data["status"]) {
