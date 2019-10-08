@@ -4,6 +4,7 @@ library public;
 export 'package:flutter_screenutil/flutter_screenutil.dart';
 export 'package:cached_network_image/cached_network_image.dart';
 export 'package:image_picker/image_picker.dart';
+export 'package:fluttertoast/fluttertoast.dart';
 
 //日期转化成时间戳工具
 String getTime({int year, int month, int day}) {

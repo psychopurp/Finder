@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PublishActivityPage extends StatefulWidget {
   @override
@@ -13,15 +15,19 @@ class PublishActivityPage extends StatefulWidget {
 }
 
 class _PublishActivityPageState extends State<PublishActivityPage> {
-  String _title;
-  String _place;
-  // String _poster;
-  String _sponser;
-  String _description;
+  String errorHint = "";
   String startTime;
   String endTime;
   DateTime startDateTime;
   DateTime endDateTime;
+
+  FocusNode titleNode;
+  FocusNode sponsorNode;
+  FocusNode placeNode;
+  FocusNode descriptionNode;
+  FocusNode tagNode;
+
+  static const Color inputColor = Color.fromARGB(255, 245, 241, 241);
 
   ///标签
   List<String> tags = [];
@@ -30,13 +36,29 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
 
   bool onlyInSchool = false;
 
-  TextEditingController _titleController;
-  TextEditingController _tagController;
+  TextEditingController _titleInputController;
+  TextEditingController _placeInputController;
+  TextEditingController _descriptionInputController;
+  TextEditingController _linkInputController;
+  TextEditingController _sponsorInputController;
+
+  TextEditingController _tagInputController;
 
   @override
   void initState() {
-    _tagController = new TextEditingController();
-    _titleController = new TextEditingController();
+    getActivityType();
+    _descriptionInputController = TextEditingController();
+    _placeInputController = TextEditingController();
+    _linkInputController = TextEditingController();
+    _sponsorInputController = TextEditingController();
+    _tagInputController = new TextEditingController();
+    _titleInputController = new TextEditingController();
+
+    descriptionNode = FocusNode();
+    placeNode = FocusNode();
+    titleNode = FocusNode();
+    sponsorNode = FocusNode();
+    tagNode = FocusNode();
 
     DateTime time = new DateTime.now();
     startDateTime = time;
@@ -51,25 +73,30 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
   }
 
   ///下拉选择活动类型
-  final List<DropdownMenuItem> activityTypeItems = [
-    DropdownMenuItem(value: '学术讲座', child: Text('学术讲座')),
-    DropdownMenuItem(value: '文娱活动', child: Text('文娱活动')),
-    DropdownMenuItem(value: '比赛', child: Text('比赛')),
-    DropdownMenuItem(value: '约会', child: Text('约会')),
-  ];
-  var selectedTypeValue;
+  int selectedActivityTypeValue;
+
+  List<ActivityTypesData> activityTypes = [];
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _tagController.dispose();
+    _tagInputController.dispose();
+    _placeInputController.dispose();
+    _descriptionInputController.dispose();
+    _linkInputController.dispose();
+    _sponsorInputController.dispose();
+    _titleInputController.dispose();
+    descriptionNode.dispose();
+    placeNode.dispose();
+    titleNode.dispose();
+    sponsorNode.dispose();
+    tagNode.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
@@ -82,35 +109,43 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          Builder(
-            builder: (BuildContext context) {
-              return FlatButton(
-                highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                onPressed: () async {
-                  publishActivity(user).then((val) {
-                    String showText =
-                        (val['status'] == true) ? '发布话题成功' : '发布失败';
-
-                    Scaffold.of(context).showSnackBar(new SnackBar(
-                      content: new Text("$showText"),
-                      action: new SnackBarAction(
-                        label: "取消",
-                        onPressed: () {},
-                      ),
-                    ));
-                    if (val["status"] == true) {}
-                  });
+          FlatButton(
+            onPressed: () async {
+              showDialog(
+                context: context,
+                barrierDismissible: false, //点击遮罩不关闭对话框
+                builder: (context) {
+                  return AlertDialog(
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        CircularProgressIndicator(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 26.0),
+                          child: Text("正在发布，请稍后..."),
+                        )
+                      ],
+                    ),
+                  );
                 },
-                child: Text(
-                  '发布',
-                  style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontFamily: "Poppins",
-                      fontSize: ScreenUtil().setSp(30)),
-                ),
               );
+              bool status = await publishActivity(user);
+              print(status);
+
+              Navigator.pop(context);
+              if (!status) {
+                handleError();
+              } else {
+                handleSuccess();
+              }
             },
-          )
+            child: Text(
+              '发布',
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: ScreenUtil().setSp(30)),
+            ),
+          ),
         ],
         // title: Text('Finders'),
         elevation: 0,
@@ -123,8 +158,9 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
   }
 
   topPart() => Container(
-        height: ScreenUtil().setHeight(400),
+        // height: ScreenUtil().setHeight(600),
         width: ScreenUtil().setWidth(220),
+        margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
         // color: Colors.amber,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -133,98 +169,92 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
             uploadImage(),
             Container(
               // color: Colors.amber,
-              padding: EdgeInsets.only(left: ScreenUtil().setWidth(50)),
+              padding: EdgeInsets.only(left: ScreenUtil().setWidth(30)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   ///活动名称
                   Container(
-                    // height: ScreenUtil().setHeight(200),
-                    width: ScreenUtil().setWidth(400),
-                    // padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        // color: Colors.amber,
-                        borderRadius: BorderRadius.circular(20)),
+                    width: ScreenUtil().setWidth(420),
+                    padding: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+                    // color: Colors.amber,
                     child: TextField(
-                      // focusNode: passwordNode,
-                      onChanged: (String value) => _title = value,
+                      maxLines: 1,
+                      // maxLength: 20,
+                      minLines: 1,
+                      focusNode: titleNode,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(sponsorNode);
+                      },
+                      cursorColor: Theme.of(context).primaryColor,
+                      controller: _titleInputController,
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 0, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 5, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        hintText: '请输入活动名称',
-                        fillColor: Colors.black12,
-                        hoverColor: Colors.green,
-                        focusColor: Colors.white,
+                        labelText: '活动名称',
                         filled: true,
-                        // prefixIcon: Icon(Icons.person),
-                        contentPadding: EdgeInsets.all(7),
+                        hintText: '请输入活动名称',
+                        fillColor: Color.fromARGB(255, 245, 241, 241),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: EdgeInsets.all(12),
                       ),
                     ),
                   ),
 
                   ///主办方
                   Container(
-                    // height: ScreenUtil().setHeight(200),
-                    width: ScreenUtil().setWidth(400),
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                        // color: Colors.amber,
-                        borderRadius: BorderRadius.circular(20)),
+                    width: ScreenUtil().setWidth(420),
+                    padding: EdgeInsets.only(top: 20),
+                    // color: Colors.amber,
                     child: TextField(
-                      // focusNode: passwordNode,
-                      onChanged: (String value) => _sponser = value,
+                      maxLines: 1,
+                      // maxLength: 30,
+                      minLines: 1,
+                      focusNode: sponsorNode,
+                      cursorColor: Theme.of(context).primaryColor,
+                      controller: _sponsorInputController,
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 0, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 5, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        hintText: '请输入主办方',
-                        fillColor: Colors.black12,
-                        hoverColor: Colors.green,
-                        focusColor: Colors.white,
+                        labelText: '主办方',
                         filled: true,
-                        // prefixIcon: Icon(Icons.person),
-                        contentPadding: EdgeInsets.all(7),
+                        hintText: '请输入主办方',
+                        fillColor: Color.fromARGB(255, 245, 241, 241),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: EdgeInsets.all(12),
                       ),
                     ),
                   ),
 
                   ///选择活动类型
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                          height: ScreenUtil().setHeight(70),
-                          width: ScreenUtil().setWidth(400),
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                              color: Colors.black12,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: DropdownButton(
-                            hint: Text('请选择活动类型'),
-                            items: activityTypeItems,
-                            value: this.selectedTypeValue,
-                            isExpanded: true,
-                            underline: Text(''),
-                            onChanged: (t) {
-                              setState(() {
-                                this.selectedTypeValue = t;
-                              });
-                            },
-                          )),
-                    ],
-                  )
+                  Container(
+                      height: ScreenUtil().setHeight(70),
+                      width: ScreenUtil().setWidth(420),
+                      margin: EdgeInsets.only(top: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 245, 241, 241),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: DropdownButton(
+                        hint: Text('请选择活动类型'),
+                        items: activityTypes.map((item) {
+                          return DropdownMenuItem(
+                            value: item.id,
+                            child: Text(item.name),
+                          );
+                        }).toList(),
+                        value: this.selectedActivityTypeValue,
+                        isExpanded: true,
+                        underline: Text(''),
+                        onChanged: (t) {
+                          setState(() {
+                            this.selectedActivityTypeValue = t;
+                          });
+                        },
+                      )),
                 ],
               ),
             ),
@@ -250,8 +280,8 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                 Container(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                        color: Colors.black12,
-                        borderRadius: BorderRadius.circular(20)),
+                        color: inputColor,
+                        borderRadius: BorderRadius.circular(15)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -317,88 +347,59 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
 
           ///活动地点
           Container(
-              margin:
-                  EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "活动地点",
-                    style: TextStyle(fontSize: ScreenUtil().setSp(30)),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(10),
-                  ),
-                  Container(
-                    child: TextField(
-                      // focusNode: passwordNode,
-                      onChanged: (String value) => _place = value,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 0, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 5, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        hintText: '请输入活动地点',
-                        fillColor: Colors.black12,
-                        hoverColor: Colors.green,
-                        focusColor: Colors.white,
-                        filled: true,
-
-                        // prefixIcon: Icon(Icons.person),
-                        contentPadding: EdgeInsets.all(10),
-                      ),
-                    ),
-                  )
-                ],
-              )),
+            // width: ScreenUtil().setWidth(420),
+            margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
+            padding: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+            // color: Colors.amber,
+            child: TextField(
+              maxLines: 3,
+              maxLength: 100,
+              minLines: 1,
+              focusNode: placeNode,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(descriptionNode);
+              },
+              cursorColor: Theme.of(context).primaryColor,
+              controller: _placeInputController,
+              decoration: InputDecoration(
+                labelText: '活动地点',
+                filled: true,
+                hintText: '请输入活动地点',
+                fillColor: Color.fromARGB(255, 245, 241, 241),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.all(12),
+              ),
+            ),
+          ),
 
           ///活动详情
           Container(
-              margin:
-                  EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "活动详情",
-                    style: TextStyle(fontSize: ScreenUtil().setSp(30)),
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(10),
-                  ),
-                  Container(
-                    // color: Colors.yellow,
-
-                    child: TextField(
-                      maxLines: 5,
-                      // focusNode: passwordNode,
-                      onChanged: (String value) => _description = value,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 0, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 5, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        hintText: '请输入活动详情',
-                        fillColor: Colors.black12,
-                        hoverColor: Colors.green,
-                        focusColor: Colors.white,
-                        filled: true,
-
-                        // prefixIcon: Icon(Icons.person),
-                        contentPadding: EdgeInsets.all(10),
-                      ),
-                    ),
-                  )
-                ],
-              )),
+            height: ScreenUtil().setHeight(400),
+            width: ScreenUtil().setWidth(670),
+            child: TextField(
+              decoration: InputDecoration(
+                // border: UnderlineInputBorder(),
+                fillColor: inputColor,
+                filled: true,
+                hintText: '请输入活动详情',
+                border: InputBorder.none,
+              ),
+              focusNode: descriptionNode,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(tagNode);
+              },
+              expands: true,
+              maxLines: null,
+              maxLengthEnforced: true,
+              maxLength: 1000,
+              autofocus: false,
+              cursorColor: Theme.of(context).primaryColor,
+              controller: _descriptionInputController,
+            ),
+          ),
 
           ///报名链接
           Container(
@@ -419,36 +420,30 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(10),
-                  ),
                   Container(
-                    // color: Colors.yellow,
-
+                    // width: ScreenUtil().setWidth(420),
+                    margin: EdgeInsets.symmetric(
+                        vertical: ScreenUtil().setHeight(20)),
+                    // color: Colors.amber,
                     child: TextField(
                       maxLines: 1,
-                      // focusNode: passwordNode,
-                      onChanged: (String value) => _title = value,
+                      maxLength: 100,
+                      minLines: 1,
+                      cursorColor: Theme.of(context).primaryColor,
+                      controller: _linkInputController,
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 0, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(width: 5, style: BorderStyle.none),
-                            borderRadius: BorderRadius.circular(20)),
-                        hintText: '请输入报名链接',
-                        fillColor: Colors.black12,
-                        hoverColor: Colors.green,
-                        focusColor: Colors.white,
+                        // labelText: '报名链接',
                         filled: true,
-
-                        // prefixIcon: Icon(Icons.person),
-                        contentPadding: EdgeInsets.all(10),
+                        hintText: '请输入报名链接',
+                        fillColor: Color.fromARGB(255, 245, 241, 241),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: EdgeInsets.all(12),
                       ),
                     ),
-                  )
+                  ),
                 ],
               )),
         ],
@@ -457,47 +452,48 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
   tag() {
     String _tag;
     return Container(
-      margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(50)),
+      // margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(50)),
       // color: Colors.amber,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
                 width: ScreenUtil().setWidth(500),
+                margin:
+                    EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
+                padding: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+                // color: Colors.amber,
                 child: TextField(
                   maxLines: 1,
-                  // focusNode: passwordNode,
-                  controller: _tagController,
-                  onChanged: (String value) => _tag = value,
+                  // maxLength: 100,
+                  minLines: 1,
+                  cursorColor: Theme.of(context).primaryColor,
+                  controller: _tagInputController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(width: 0, style: BorderStyle.none),
-                        borderRadius: BorderRadius.circular(20)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(width: 5, style: BorderStyle.none),
-                        borderRadius: BorderRadius.circular(20)),
-                    hintText: '添加标签',
-                    fillColor: Colors.black12,
-                    hoverColor: Colors.green,
-                    focusColor: Colors.white,
+                    labelText: '添加标签',
                     filled: true,
-                    // prefixIcon: Icon(Icons.person),
-                    contentPadding: EdgeInsets.all(10),
+                    hintText: '请输入标签',
+                    fillColor: Color.fromARGB(255, 245, 241, 241),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.all(12),
                   ),
                 ),
               ),
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () {
+                  _tag = _tagInputController.text.toString();
                   setState(() {
                     if (_tag != null) {
                       tags.add(_tag.toString());
-                      _tagController.clear();
+                      _tagInputController.clear();
                     }
                   });
                 },
@@ -506,6 +502,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
           ),
           Container(
             // color: Colors.yellow,
+            height: ScreenUtil().setHeight(400),
             child: Wrap(
               spacing: 5,
               children: tags.map((val) {
@@ -589,44 +586,74 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
     );
   }
 
-  //处理标题部分
-  Widget titleForm() {
-    return Container(
-      margin: EdgeInsets.only(top: 50),
-      child: TextFormField(
-          onChanged: (val) {
-            setState(() {
-              this._title = val;
-            });
-          },
-          autofocus: false,
-          controller: _titleController,
-          decoration: InputDecoration(
-              // focusColor: Colors.amber,
-              // fillColor: Colors.amber,
-              // labelText: 'elyar',
-              hintText: '请输出话题标题',
-              contentPadding:
-                  EdgeInsets.only(top: 20.0, left: 20, right: 10, bottom: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                // prefixIcon: Icon(Icons.person),
-              )),
-          // 校验用户名（不能为空）
-          validator: (v) {
-            return v.trim().isNotEmpty ? null : '话题标题不能为空';
-          }),
-    );
+  void handleSuccess() {
+    Navigator.pop(context);
+    Fluttertoast.showToast(
+        msg: "创建活动成功",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: inputColor,
+        textColor: Colors.black,
+        fontSize: 16.0);
+    Application.router.navigateTo(context, '/home/moreActivities');
   }
 
-  Future publishActivity(UserProvider user) async {
+  void handleError() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("提示"),
+            content: Text(errorHint),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("确认"),
+                onPressed: () => Navigator.of(context).pop(), //关闭对话框
+              ),
+            ],
+          );
+        });
+  }
+
+  Future<bool> publishActivity(UserProvider user) async {
+    if (this._imageFile == null) {
+      errorHint = "请上传图片";
+      return false;
+    }
+    String title = _titleInputController.text;
+    if (title == "" || title == null) {
+      errorHint = "请输入标题";
+      return false;
+    }
+    String sponsor = _sponsorInputController.text;
+    if (sponsor == null || sponsor == "") {
+      errorHint = "请输入主办方";
+      return false;
+    }
     String imagePath = await apiClient.uploadImage(this._imageFile);
-    print(startDateTime.month);
+    if (imagePath == null) {
+      errorHint = "图片上传失败, 请重试";
+      return false;
+    }
+
+    String place = _placeInputController.text;
+    if (place == null || place == "") {
+      errorHint = "请输入活动地点";
+      return false;
+    }
+    String description = _descriptionInputController.text;
+    if (description == null || description == "") {
+      errorHint = "请输入活动详情";
+      return false;
+    }
+
     var data = await user.addActivity(
-        title: _title,
-        place: _place,
+        title: title,
+        place: place,
         poster: imagePath.split('/')[2],
-        description: _description,
+        description: description,
+        typeId: this.selectedActivityTypeValue,
         startTime: getTime(
             month: startDateTime.month,
             day: startDateTime.day,
@@ -635,8 +662,78 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
             month: endDateTime.month,
             day: endDateTime.day,
             year: endDateTime.year),
-        categories: tags,
-        sponser: _sponser);
+        tags: tags,
+        sponsor: sponsor);
+
+    if (!data["status"]) {
+      errorHint = '接口错误：' + data["error"];
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  Future getActivityType() async {
+    try {
+      var response = await ApiClient.dio.get('get_activity_types/');
+      ActivityTypes activityTypes = ActivityTypes.fromJson(response.data);
+      setState(() {
+        this.activityTypes = activityTypes.data;
+      });
+    } catch (e) {
+      print('获取错误==========>$e');
+    }
+  }
+}
+
+///活动类型模型
+class ActivityTypes {
+  List<ActivityTypesData> data;
+  int totalPage;
+  bool status;
+  bool hasMore;
+
+  ActivityTypes({this.data, this.totalPage, this.status, this.hasMore});
+
+  ActivityTypes.fromJson(Map<String, dynamic> json) {
+    if (json['data'] != null) {
+      data = new List<ActivityTypesData>();
+      json['data'].forEach((v) {
+        data.add(new ActivityTypesData.fromJson(v));
+      });
+    }
+    totalPage = json['total_page'];
+    status = json['status'];
+    hasMore = json['has_more'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.data != null) {
+      data['data'] = this.data.map((v) => v.toJson()).toList();
+    }
+    data['total_page'] = this.totalPage;
+    data['status'] = this.status;
+    data['has_more'] = this.hasMore;
+    return data;
+  }
+}
+
+class ActivityTypesData {
+  int id;
+  String name;
+
+  ActivityTypesData({this.id, this.name});
+
+  ActivityTypesData.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
     return data;
   }
 }

@@ -67,20 +67,24 @@ class UserProvider with ChangeNotifier {
 
   ///用户发布活动
   Future addActivity(
-      {String sponser,
+      {String sponsor,
       String title,
       String place,
       String poster,
-      List<String> categories,
+      List<String> tags,
       String startTime,
       String endTime,
-      String description}) async {
+      String description,
+      int typeId,
+      int associationId}) async {
     var data = await apiClient.addActivity(
-        sponser: sponser,
+        sponsor: sponsor,
         title: title,
         place: place,
         poster: poster,
-        categories: categories,
+        tags: tags,
+        typeId: typeId,
+        associationId: associationId,
         startTime: startTime,
         endTime: endTime,
         description: description);

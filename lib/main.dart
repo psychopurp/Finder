@@ -1,6 +1,5 @@
 import 'package:finder/pages/login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:finder/pages/index_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/config/global.dart';
@@ -85,6 +84,7 @@ ThemeData _buildAppTheme() {
       accentColor: Color.fromRGBO(219, 107, 92, 1),
       // scaffoldBackgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
       accentIconTheme: base.accentIconTheme.copyWith(color: Colors.white),
+      dividerColor: Color.fromARGB(255, 245, 241, 241),
 
       // Icon的默认样式
       iconTheme:

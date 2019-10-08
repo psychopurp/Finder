@@ -212,16 +212,19 @@ class ApiClient {
 
   ///用户发布活动
   Future addActivity(
-      {String sponser,
+      {String sponsor,
       String title,
       String place,
       String poster,
-      List<String> categories,
+      List<String> tags,
       String startTime,
       String endTime,
-      String description}) async {
+      int typeId = 0,
+      String description,
+      int associationId}) async {
     /**
-         *   sponsor: str
+    sponsor: str
+    association_id可以不给 给了是社团活动
     title: str
     place: str
     poster: str
@@ -229,6 +232,7 @@ class ApiClient {
     end_time: timestamp(str)
     description: str
     categories: list
+    type:int 是活动类型
          */
 
     var formData = {
@@ -238,8 +242,13 @@ class ApiClient {
       'start_time': startTime,
       'end_time': endTime,
       'description': description,
-      'categories': categories,
+      'tags': tags,
+      'type_id': typeId,
+      'sponsor': sponsor
     };
+    if (associationId != null) {
+      formData.addAll({'association_id': associationId});
+    }
     print(jsonEncode(formData));
     try {
       Response response =
@@ -248,6 +257,19 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('发布活动错误==========>$e');
+    }
+  }
+
+  ///删除活动
+  Future deleteActivity({int activityId}) async {
+    var formData = {'activity_id': activityId};
+    try {
+      Response response =
+          await dio.get('delete_activity/', queryParameters: formData);
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      print('删除活动错误==========>$e');
     }
   }
 

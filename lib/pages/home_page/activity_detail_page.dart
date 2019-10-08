@@ -18,6 +18,9 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   List<IconData> collectIcons = [Icons.favorite_border, Icons.favorite];
   _ActivityDetailPageState(this.activity);
 
+  ///是否已收藏
+  bool isContain;
+
   @override
   void dispose() {
     if (collectIcon == collectIcons[1]) {
@@ -32,6 +35,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     if (user.collection['activity'].contains(activity.id)) {
       collectIcon = collectIcons[1];
     }
+    isContain = user.collection['activity'].contains(activity.id);
 
     var top = Align(
       child: Container(

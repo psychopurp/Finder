@@ -18,8 +18,8 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String _phone, _password;
-  FocusNode phoneNode = new FocusNode();
-  FocusNode passwordNode = new FocusNode();
+  FocusNode phoneNode;
+  FocusNode passwordNode;
 
   bool _isObscure = true;
   Color _eyeColor;
@@ -31,7 +31,16 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   void initState() {
+    phoneNode = FocusNode();
+    passwordNode = FocusNode();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    phoneNode.dispose();
+    passwordNode.dispose();
+    super.dispose();
   }
 
   @override
