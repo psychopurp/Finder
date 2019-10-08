@@ -25,8 +25,8 @@ class _HeSaysPageState extends State<HeSaysPage> {
   DateTime _time;
   List<HeSheSayItem> data = [];
   List<HeSheSayItem> bannerData = [];
-  bool requestStatus = true;
-  bool isRequest = false;
+  bool requestStatus = false;
+  bool isRequest = true;
   bool hasMore = true;
   int page = 1;
   int lastPage = 1;
