@@ -64,8 +64,11 @@ class _HeSaysPageState extends State<HeSaysPage> {
       Map<String, dynamic> result = response.data;
       setState(() {
         if (result["status"]) {
-          data.addAll(List.generate(result["data"].length,
-              (index) => HeSheSayItem.fromJson(result["data"][index])));
+          data.addAll(List.generate(result["data"].length, (index) {
+            var item = HeSheSayItem.fromJson(result["data"][index]);
+            item.authorAvatar = ApiClient.host + item.authorAvatar;
+            return item;
+          }));
           requestStatus = true;
           if (hasMore && !result["has_more"]) {
             lastPage = reqPage;
@@ -96,6 +99,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
           bannerData = List.generate(result["data"].length, (index) {
             var item = HeSheSayItem.fromJson(result["data"][index]);
             item.image = ApiClient.host + item.image;
+            item.authorAvatar = ApiClient.host + item.authorAvatar;
             return item;
           });
         });
@@ -245,7 +249,8 @@ class _HeSaysPageState extends State<HeSaysPage> {
               : GestureDetector(
                   onTap: () async {
                     await _scrollController.animateTo(0,
-                        duration: Duration(milliseconds: 200), curve: Curves.easeOut);
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeOut);
                     setState(() {
                       data = [];
                       page = 1;
@@ -688,7 +693,7 @@ class HeSheSayItem {
   final int id;
   final String authorName;
   final int authorId;
-  final String authorAvatar;
+  String authorAvatar;
   final String content;
   final String title;
   bool isLike;
