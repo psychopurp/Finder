@@ -49,12 +49,15 @@ class _HeSaysPageState extends State<HeSaysPage> {
   void initState() {
     super.initState();
     this.time = new DateTime.now();
-    getHeSheSays();
-    getLeadHeSheSays();
+    getHeSheSays(delay: true);
+    getLeadHeSheSays(delay: true);
     _scrollController = ScrollController();
   }
 
-  Future<void> getHeSheSays() async {
+  Future<void> getHeSheSays({bool delay: false}) async {
+    if(delay){
+      await Future.delayed(Duration(milliseconds: 100));
+    }
     int timestamp = this._time.millisecondsSinceEpoch ~/ 1000;
     Dio dio = ApiClient.dio;
     try {
@@ -89,7 +92,10 @@ class _HeSaysPageState extends State<HeSaysPage> {
     }
   }
 
-  Future<void> getLeadHeSheSays() async {
+  Future<void> getLeadHeSheSays({bool delay: false}) async {
+    if(delay){
+      await Future.delayed(Duration(milliseconds: 100));
+    }
     try {
       Dio dio = ApiClient.dio;
       Response response = await dio.get('get_lead_he_she_say/');

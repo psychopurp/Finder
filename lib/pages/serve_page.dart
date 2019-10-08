@@ -1,3 +1,4 @@
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:finder/routers/application.dart';
@@ -14,36 +15,42 @@ class _ServePageState extends State<ServePage> {
       'preIcon': IconData(0xe62e, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.yellow,
+      'url': Routes.lostFound
     },
     {
       'name': '他·她·说',
       'preIcon': IconData(0xe627, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.pink[200],
+      'url': Routes.heSays
     },
     {
       'name': '一起学习',
       'preIcon': IconData(0xe668, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.orange,
+      'url': Routes.study
     },
     {
       'name': '选课指南',
       'preIcon': IconData(0xe635, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.cyan,
+      'url': Routes.selectCourse
     },
     {
       'name': '心理测试',
       'preIcon': IconData(0xe6bd, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.blue,
+      'url': Routes.psychoTest
     },
     {
       'name': '我·树洞',
       'preIcon': IconData(0xe60b, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.green,
+      'url': Routes.treeHole
     },
   ];
 
@@ -75,29 +82,7 @@ class _ServePageState extends State<ServePage> {
         height: ScreenUtil().setHeight(110),
         child: ListTile(
           onTap: () {
-            var name = serviceItemList[index]['name'];
-            switch (name) {
-              case '失物招领':
-                Application.router.navigateTo(context, '/serve/lostFound');
-                break;
-              case '他·她·说':
-                Application.router.navigateTo(context, '/serve/heSays');
-                break;
-              case '一起学习':
-                Application.router.navigateTo(context, '/serve/study');
-                break;
-              case '选课指南':
-                Application.router.navigateTo(context, '/serve/selectCourse');
-                break;
-              case '心理测试':
-                Application.router.navigateTo(context, '/serve/psychoTest');
-                break;
-              case '我·树洞':
-                Application.router.navigateTo(context, '/serve/treeHole');
-                break;
-              default:
-                print('done');
-            }
+            Application.router.navigateTo(context, serviceItemList[index]['url']);
           },
           title: Text(serviceItemList[index]['name']),
           leading: Icon(
@@ -108,31 +93,5 @@ class _ServePageState extends State<ServePage> {
         ),
       ),
     );
-  }
-
-  void onTapHandler(index) {
-    var name = serviceItemList[index]['name'];
-    switch (name) {
-      case '失物招领':
-        Application.router.navigateTo(context, '/serve/lostFound');
-        break;
-      case '他·她·说':
-        Application.router.navigateTo(context, '/serve/heSays');
-        break;
-      case '一起学习':
-        Application.router.navigateTo(context, '/serve/study');
-        break;
-      case '选课指南':
-        Application.router.navigateTo(context, '/serve/selectCourse');
-        break;
-      case '心理测试':
-        Application.router.navigateTo(context, '/serve/psychoTest');
-        break;
-      case '我·树洞':
-        Application.router.navigateTo(context, '/serve/treeHole');
-        break;
-      default:
-        print('done');
-    }
   }
 }

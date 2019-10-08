@@ -1,8 +1,8 @@
 import 'package:finder/pages/mine_page/user_profile_page.dart';
 import 'package:finder/routers/application.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'message_page.dart';
 import 'mine_page.dart';
 import 'serve_page.dart';
 import 'find_page.dart';
@@ -21,8 +21,9 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     HomePage(),
     FindPage(), FindPage(),
     // LoginPage(),
+    MessagePage(),
     ServePage(),
-    UserProfilePage(),
+//    UserProfilePage(),
   ];
 
   @override
@@ -30,6 +31,14 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Scaffold(
       primary: false,
+//      body: AnimatedSwitcher(
+//        duration: Duration(seconds: 1),
+//        transitionBuilder: (context, animate) => SlideTransition(
+//          child: pages[_selectIndex],
+//          position: Tween(begin: Offset(-1, 0), end: Offset(0, 0)).animate(animate),
+//        ),
+//        child: pages[_selectIndex],
+//      ), // 切换动画
       body: pages[_selectIndex],
       bottomNavigationBar: SafeArea(
         child: BottomAppBar(
@@ -80,9 +89,11 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                   },
                 ),
               ),
-              _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), 'Serve', 3),
               _singleButton(
-                  IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),
+                  IconData(0xe879, fontFamily: 'myIcon'), 'Message', 3),
+              _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), 'Serve', 4),
+//              _singleButton(
+//                  IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),
             ],
           ),
         ),
