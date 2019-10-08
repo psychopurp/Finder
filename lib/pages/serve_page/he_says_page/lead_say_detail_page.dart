@@ -161,18 +161,21 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
             padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
             width: double.infinity,
             height: 250,
-            child: CachedNetworkImage(
-              imageUrl: item.image,
-              imageBuilder: (context, imageProvider) => Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  image: DecorationImage(
-                    image: imageProvider,
-                    fit: BoxFit.cover,
+            child: Hero(
+              tag: item.id,
+              child: CachedNetworkImage(
+                imageUrl: item.image,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-            ),
+            )
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),

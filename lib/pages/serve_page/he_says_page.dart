@@ -86,6 +86,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
 //    ];
 //    bannerData = <HeSheSayItem>[
 //      HeSheSayItem(
+//        id: 2,
 //        authorAvatar:
 //            "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
 //        authorId: 0,
@@ -99,6 +100,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
 //        time: "2019-9-9 20:20",
 //      ),
 //      HeSheSayItem(
+//        id: 1,
 //        authorAvatar:
 //            "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
 //        authorId: 0,
@@ -461,14 +463,17 @@ class _HeSaysPageState extends State<HeSaysPage> {
               child: Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
-                  CachedNetworkImage(
-                    imageUrl: item.image,
-                    imageBuilder: (context, imageProvider) => Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(3)),
-                        image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
+                  Hero(
+                    tag: item.id,
+                    child: CachedNetworkImage(
+                      imageUrl: item.image,
+                      imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(3)),
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
