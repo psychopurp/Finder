@@ -9,6 +9,15 @@ class UserProvider with ChangeNotifier {
   UserModel userInfo = Global.userInfo;
   int tokenExpireIn = 0;
   bool isLogIn = Global.isLogin;
+
+  ///收藏
+  Map<String, Set<int>> collection = {
+    "activity": Set(),
+    "topic": Set(),
+    "comment": Set(),
+    "recruit": Set()
+  };
+
   //登陆
   Future<bool> login(
       {@required String phone, @required String password}) async {

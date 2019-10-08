@@ -10,6 +10,11 @@ class ApiClient {
 
   static Dio dio = new Dio(BaseOptions(baseUrl: baseURL));
 
+  static const int ACTIVITY = 1;
+  static const int TOPIC = 2;
+  static const int COMMENT = 3;
+  static const int RECRUIT = 4;
+
   //获得首页轮播图
   Future getHomePageBanner() async {
     try {
@@ -318,9 +323,30 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_collections/', queryParameters: formData);
+      print('用户收藏列表==========>${response.data}');
       return response.data;
     } catch (e) {
       print('获取用户收藏列表错误==========>$e');
+    }
+  }
+
+  ///用户收藏某个
+  Future addCollection({int type, int id}) async {
+    /**
+     *   type1234分别对应：
+    活动，话题，话题评论，招募
+    id是对应的被收藏东西的id
+     */
+
+    var formData = {'type': type, 'id': id};
+    print(formData);
+    try {
+      Response response =
+          await dio.post('add_collection/', data: jsonEncode(formData));
+      print('用户收藏成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('用户收藏错误==========>$e');
     }
   }
 
