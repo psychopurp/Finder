@@ -468,7 +468,7 @@ class _PublishPageState extends State<PublishPage>
           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
           child: TextField(
             maxLines: 1,
-            maxLength: 10,
+            maxLength: 20,
             minLines: 1,
             cursorColor: ActionColor,
             controller: titleInputController,
