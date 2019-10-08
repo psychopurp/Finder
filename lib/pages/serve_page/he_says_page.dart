@@ -30,6 +30,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
   bool hasMore = true;
   int page = 1;
   int lastPage = 1;
+  ScrollController _scrollController;
   String error = "网络连接失败, 请稍后再试";
 
   set time(DateTime time) {
@@ -39,11 +40,18 @@ class _HeSaysPageState extends State<HeSaysPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     this.time = new DateTime.now();
     getHeSheSays();
     getLeadHeSheSays();
+    _scrollController = ScrollController();
   }
 
   Future<void> getHeSheSays() async {
@@ -176,8 +184,9 @@ class _HeSaysPageState extends State<HeSaysPage> {
   }
 
   get body {
+    Widget child;
     if (!requestStatus && !isRequest) {
-      return Center(
+      child = Center(
         child: Column(
           children: <Widget>[
             Padding(
@@ -194,9 +203,8 @@ class _HeSaysPageState extends State<HeSaysPage> {
           ],
         ),
       );
-    }
-    if (isRequest) {
-      return Center(
+    } else if (isRequest) {
+      child = Center(
         child: Column(
           children: <Widget>[
             Padding(
@@ -236,10 +244,14 @@ class _HeSaysPageState extends State<HeSaysPage> {
                 )
               : GestureDetector(
                   onTap: () async {
+                    await _scrollController.animateTo(0,
+                        duration: Duration(milliseconds: 200), curve: Curves.easeOut);
                     setState(() {
-                      page = lastPage + 1;
-                      hasMore = true;
+                      data = [];
+                      page = 1;
+                      isRequest = true;
                     });
+                    await getLeadHeSheSays();
                     await getHeSheSays();
                   },
                   child: Container(
@@ -256,8 +268,9 @@ class _HeSaysPageState extends State<HeSaysPage> {
         )
       ]),
     );
-    if (bannerData.length == 0) {
-      return ListView.builder(
+    if (bannerData.length == 0 && child == null) {
+      child = ListView.builder(
+        controller: _scrollController,
         itemBuilder: (context, index) {
           if (index == data.length) {
             if (hasMore) {
@@ -271,21 +284,30 @@ class _HeSaysPageState extends State<HeSaysPage> {
         itemCount: data.length + 1,
       );
     }
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return banner;
-        } else if (index == data.length + 1) {
-          if (hasMore) {
-            page += 1;
-            getHeSheSays();
+    if (child == null)
+      child = ListView.builder(
+        controller: _scrollController,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return banner;
+          } else if (index == data.length + 1) {
+            if (hasMore) {
+              page += 1;
+              getHeSheSays();
+            }
+            return last;
+          } else {
+            return _itemBuilder(index - 1);
           }
-          return last;
-        } else {
-          return _itemBuilder(index - 1);
-        }
+        },
+        itemCount: data.length + 2,
+      );
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 400),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(child: child, opacity: animation);
       },
-      itemCount: data.length + 2,
+      child: child,
     );
   }
 
