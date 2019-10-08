@@ -29,6 +29,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
   bool isRequest = false;
   bool hasMore = true;
   int page = 1;
+  int lastPage = 1;
   String error = "网络连接失败, 请稍后再试";
 
   set time(DateTime time) {
@@ -41,88 +42,15 @@ class _HeSaysPageState extends State<HeSaysPage> {
   void initState() {
     super.initState();
     this.time = new DateTime.now();
-//    data = <HeSheSayItem>[
-//      HeSheSayItem(
-//          authorAvatar:
-//              "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
-//          authorId: 0,
-//          authorName: "Tobias",
-//          content: "一般tata 说显示3 行，多于三行显示前三行，并出现全文按钮",
-//          image:
-//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//          isLike: false,
-//          likeCount: 100),
-//      HeSheSayItem(
-//          authorAvatar:
-//              "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
-//          authorId: 0,
-//          authorName: "Daisy",
-//          content:
-//              "国务院港澳办发言人表示，香港局势发展越来越清楚地表明，围绕移交逃犯条例修订出现的风波已经完全变质，正在外部势力的插手干预下演变为一场“港版颜色革命”，某些街头抗争正在向有预谋、有计划、有组织的暴力犯罪方向演化，已经严重威胁到公共安全。当前香港面临的最大危险是暴力横行、法治不彰。在此情况下，特区政府制订《禁止蒙面规例》，合法合理合情，极为必要。世界上许多国家和地区都已制订禁止蒙面的法律，在香港实施上述规例，并不影响香港市民依法享有包括游行集会自由在内的各项权利和自由。",
-//          image:
-//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//          isLike: false,
-//          likeCount: 100),
-//      HeSheSayItem(
-//          authorAvatar:
-//              "http://img2.imgtn.bdimg.com/it/u=320178652,790985626&fm=26&gp=0.jpg",
-//          authorId: 0,
-//          authorName: "hello",
-//          content: "aaafdafsafdfdsffaggggggggggggggggggggggaaaaaa",
-//          image:
-//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//          isLike: false,
-//          likeCount: 100),
-//      HeSheSayItem(
-//          authorAvatar:
-//              "http://img2.imgtn.bdimg.com/it/u=320178652,790985626&fm=26&gp=0.jpg",
-//          authorId: 0,
-//          authorName: "aaa",
-//          content: "aaaaaaaaa",
-//          image:
-//              'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//          isLike: false,
-//          likeCount: 100),
-//    ];
-//    bannerData = <HeSheSayItem>[
-//      HeSheSayItem(
-//        id: 2,
-//        authorAvatar:
-//            "http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg",
-//        authorId: 0,
-//        title: "他她说简介",
-//        authorName: "Tobias",
-//        content: "一般tata 说显示3 行，多于三行显示前三行，并出现全文按钮",
-//        image:
-//            'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//        isLike: false,
-//        likeCount: 100,
-//        time: "2019-9-9 20:20",
-//      ),
-//      HeSheSayItem(
-//        id: 1,
-//        authorAvatar:
-//            "http://img2.imgtn.bdimg.com/it/u=4176040192,3002869256&fm=26&gp=0.jpg",
-//        authorId: 0,
-//        title: "大新闻一号",
-//        authorName: "Daisy",
-//        content:
-//            "国务院港澳办发言人表示，香港局势发展越来越清楚地表明，围绕移交逃犯条例修订出现的风波已经完全变质，正在外部势力的插手干预下演变为一场“港版颜色革命”，某些街头抗争正在向有预谋、有计划、有组织的暴力犯罪方向演化，已经严重威胁到公共安全。当前香港面临的最大危险是暴力横行、法治不彰。在此情况下，特区政府制订《禁止蒙面规例》，合法合理合情，极为必要。世界上许多国家和地区都已制订禁止蒙面的法律，在香港实施上述规例，并不影响香港市民依法享有包括游行集会自由在内的各项权利和自由。",
-//        image:
-//            'http://b-ssl.duitang.com/uploads/item/201507/13/20150713184527_h3YMV.jpeg',
-//        isLike: false,
-//        likeCount: 100,
-//        time: "2019-9-9 20:20",
-//      ),
-//    ];
     getHeSheSays();
     getLeadHeSheSays();
   }
 
-  void getHeSheSays() async {
+  Future<void> getHeSheSays() async {
     int timestamp = this._time.millisecondsSinceEpoch ~/ 1000;
     Dio dio = ApiClient.dio;
     try {
+      var reqPage = page;
       Response response = await dio.get('get_he_she_say/',
           queryParameters: {"timestamp": timestamp, "page": page});
       Map<String, dynamic> result = response.data;
@@ -131,6 +59,9 @@ class _HeSaysPageState extends State<HeSaysPage> {
           data.addAll(List.generate(result["data"].length,
               (index) => HeSheSayItem.fromJson(result["data"][index])));
           requestStatus = true;
+          if (hasMore && !result["has_more"]) {
+            lastPage = reqPage;
+          }
           hasMore = result["has_more"];
         } else {
           requestStatus = false;
@@ -147,15 +78,18 @@ class _HeSaysPageState extends State<HeSaysPage> {
     }
   }
 
-  void getLeadHeSheSays() async {
+  Future<void> getLeadHeSheSays() async {
     try {
       Dio dio = ApiClient.dio;
       Response response = await dio.get('get_lead_he_she_say/');
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
-          bannerData = List.generate(result["data"].length,
-              (index) => HeSheSayItem.fromJson(result["data"][index]));
+          bannerData = List.generate(result["data"].length, (index) {
+            var item = HeSheSayItem.fromJson(result["data"][index]);
+            item.image = ApiClient.host + item.image;
+            return item;
+          });
         });
       }
     } on DioError catch (e) {
@@ -199,6 +133,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
               this.time = time;
               page = 1;
               isRequest = true;
+              data = [];
             });
             getLeadHeSheSays();
             getHeSheSays();
@@ -208,7 +143,18 @@ class _HeSaysPageState extends State<HeSaysPage> {
         centerTitle: true,
       ),
       backgroundColor: PageBackgroundColor,
-      body: body,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            data = [];
+            page = 1;
+            isRequest = true;
+          });
+          await getLeadHeSheSays();
+          await getHeSheSays();
+        },
+        child: body,
+      ),
       floatingActionButton: FloatingActionButton(
 //        highlightColor: ActionColorActive,
         splashColor: ActionColorActive,
@@ -288,9 +234,21 @@ class _HeSaysPageState extends State<HeSaysPage> {
                     Text("加载中"),
                   ],
                 )
-              : Padding(
-                  padding: EdgeInsets.only(top: 15),
-                  child: Text("没有更多了"),
+              : GestureDetector(
+                  onTap: () async {
+                    setState(() {
+                      page = lastPage + 1;
+                      hasMore = true;
+                    });
+                    await getHeSheSays();
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.white,
+                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    alignment: Alignment.center,
+                    child: Text("没有更多了"),
+                  ),
                 ),
         ),
         Container(
@@ -317,7 +275,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
       itemBuilder: (context, index) {
         if (index == 0) {
           return banner;
-        } else if (index == data.length) {
+        } else if (index == data.length + 1) {
           if (hasMore) {
             page += 1;
             getHeSheSays();
@@ -327,7 +285,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
           return _itemBuilder(index - 1);
         }
       },
-      itemCount: data.length + 1,
+      itemCount: data.length + 2,
     );
   }
 
@@ -440,7 +398,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
       color: Colors.white,
       child: Swiper(
         itemCount: bannerData.length,
-        autoplay: true,
+        autoplay: bannerData.length > 1,
         onTap: (index) {
           Navigator.pushNamed(context, Routes.heSaysDetail,
               arguments: bannerData[index]);
@@ -458,26 +416,26 @@ class _HeSaysPageState extends State<HeSaysPage> {
         ),
         itemBuilder: (context, index) {
           HeSheSayItem item = bannerData[index];
+          var image = CachedNetworkImage(
+            imageUrl: item.image,
+            imageBuilder: (context, imageProvider) => Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(3)),
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          );
           return Padding(
               padding: EdgeInsets.only(bottom: 25, left: 10, right: 10),
               child: Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
-                  Hero(
-                    tag: item.id,
-                    child: CachedNetworkImage(
-                      imageUrl: item.image,
-                      imageBuilder: (context, imageProvider) => Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(3)),
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  bannerData.length > 1
+                      ? Hero(tag: item.id, child: image)
+                      : image,
                   Container(
                     constraints: BoxConstraints(
                         minHeight: double.infinity, minWidth: double.infinity),
@@ -684,14 +642,14 @@ class HeSheSayItem {
     Map<String, dynamic> author = map["author"];
     String authorAvatar = author["avatar"];
     int authorId = author["id"];
-    String authorName = author["name"];
+    String authorName = author["nickname"];
     String title = map["title"];
     String content = map["content"];
     String image = map["image"];
     int likeCount = map["like"];
     bool isLike = map["isLike"];
     int id = map["id"];
-    String time = map["time"];
+    String time = map["time"].toString();
     return HeSheSayItem(
         authorName: authorName,
         authorAvatar: authorAvatar,
