@@ -9,6 +9,15 @@ class UserProvider with ChangeNotifier {
   UserModel userInfo = Global.userInfo;
   int tokenExpireIn = 0;
   bool isLogIn = Global.isLogin;
+
+  ///收藏
+  Map<String, Set<int>> collection = {
+    "activity": Set(),
+    "topic": Set(),
+    "comment": Set(),
+    "recruit": Set()
+  };
+
   //登陆
   Future<bool> login(
       {@required String phone, @required String password}) async {
@@ -58,20 +67,24 @@ class UserProvider with ChangeNotifier {
 
   ///用户发布活动
   Future addActivity(
-      {String sponser,
+      {String sponsor,
       String title,
       String place,
       String poster,
-      List<String> categories,
+      List<String> tags,
       String startTime,
       String endTime,
-      String description}) async {
+      String description,
+      int typeId,
+      int associationId}) async {
     var data = await apiClient.addActivity(
-        sponser: sponser,
+        sponsor: sponsor,
         title: title,
         place: place,
         poster: poster,
-        categories: categories,
+        tags: tags,
+        typeId: typeId,
+        associationId: associationId,
         startTime: startTime,
         endTime: endTime,
         description: description);

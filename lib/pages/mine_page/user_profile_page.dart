@@ -15,10 +15,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     apiClient.getFollowUsers();
-    apiClient.getCollections(page: 1, query: "");
+    apiClient.getCollections(page: 1);
     apiClient.getFanUsers();
     return Scaffold(
       body: Consumer<UserProvider>(builder: (context, user, child) {
+        print(user.collection);
         return SafeArea(
           top: false,
           child: Container(

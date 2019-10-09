@@ -13,16 +13,23 @@ class PublishTopicPage extends StatefulWidget {
 }
 
 class _PublishTopicPageState extends State<PublishTopicPage> {
-  String _title;
   File _imageFile;
+  String errorHint = "";
 
   ///标签
   List<String> tags = [];
 
   bool onlyInSchool = false;
 
-  TextEditingController _titleController = new TextEditingController();
-  TextEditingController _tagController = new TextEditingController();
+  TextEditingController _titleController;
+  TextEditingController _tagController;
+
+  @override
+  void initState() {
+    _titleController = TextEditingController();
+    _tagController = TextEditingController();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -37,7 +44,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
 
     //仅本校可见部分
     var onlySchool = Container(
-      margin: EdgeInsets.only(top: 20),
+      // margin: EdgeInsets.only(top: 20),
       child: ListTile(
         title: Text("仅本校可见"),
         trailing: Switch(
@@ -65,34 +72,43 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
         ),
         centerTitle: true,
         actions: <Widget>[
-          Builder(
-            builder: (BuildContext context) {
-              return FlatButton(
-                highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                onPressed: () async {
-                  publishTopic(user).then((val) {
-                    String showText =
-                        (val['status'] == true) ? '发布话题成功' : '发布失败';
-
-                    Scaffold.of(context).showSnackBar(new SnackBar(
-                      content: new Text("$showText"),
-                      action: new SnackBarAction(
-                        label: "取消",
-                        onPressed: () {},
-                      ),
-                    ));
-                    if (val["status"] == true) {}
-                  });
+          FlatButton(
+            highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
+            onPressed: () async {
+              showDialog(
+                context: context,
+                barrierDismissible: false, //点击遮罩不关闭对话框
+                builder: (context) {
+                  return AlertDialog(
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        CircularProgressIndicator(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 26.0),
+                          child: Text("正在发布，请稍后..."),
+                        )
+                      ],
+                    ),
+                  );
                 },
-                child: Text(
-                  '发布',
-                  style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontFamily: "Poppins",
-                      fontSize: ScreenUtil().setSp(30)),
-                ),
               );
+              bool status = await publishTopic(user);
+              // print(status);
+              Navigator.pop(context);
+              if (!status) {
+                handleError();
+              } else {
+                handleSuccess();
+              }
             },
+            child: Text(
+              '发布',
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontFamily: "Poppins",
+                  fontSize: ScreenUtil().setSp(30)),
+            ),
           )
         ],
         // title: Text('Finders'),
@@ -109,43 +125,44 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
   tag() {
     String _tag;
     return Container(
-      margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(50)),
+      // margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(50)),
       // color: Colors.amber,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
                 width: ScreenUtil().setWidth(500),
+                margin:
+                    EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(20)),
+                padding: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+                // color: Colors.amber,
                 child: TextField(
                   maxLines: 1,
-                  // focusNode: passwordNode,
+                  // maxLength: 100,
+                  minLines: 1,
+                  cursorColor: Theme.of(context).primaryColor,
                   controller: _tagController,
-                  onChanged: (String value) => _tag = value,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(width: 0, style: BorderStyle.none),
-                        borderRadius: BorderRadius.circular(20)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(width: 5, style: BorderStyle.none),
-                        borderRadius: BorderRadius.circular(20)),
-                    hintText: '添加标签',
-                    fillColor: Colors.black12,
-                    hoverColor: Colors.green,
-                    focusColor: Colors.white,
+                    labelText: '添加标签',
                     filled: true,
-                    // prefixIcon: Icon(Icons.person),
-                    contentPadding: EdgeInsets.all(10),
+                    hintText: '请输入标签',
+                    fillColor: Color.fromARGB(255, 245, 241, 241),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.all(12),
                   ),
                 ),
               ),
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () {
+                  _tag = _tagController.text.toString();
                   setState(() {
                     if (_tag != null) {
                       tags.add(_tag.toString());
@@ -158,6 +175,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
           ),
           Container(
             // color: Colors.yellow,
+            height: ScreenUtil().setHeight(400),
             child: Wrap(
               spacing: 5,
               children: tags.map((val) {
@@ -239,37 +257,82 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
   //处理标题部分
   Widget titleForm() {
     return Container(
-      margin: EdgeInsets.only(top: 50),
-      child: TextFormField(
-          onChanged: (val) {
-            setState(() {
-              this._title = val;
-            });
-          },
-          autofocus: false,
-          controller: _titleController,
-          decoration: InputDecoration(
-              // focusColor: Colors.amber,
-              // fillColor: Colors.amber,
-              // labelText: 'elyar',
-              hintText: '请输出话题标题',
-              contentPadding:
-                  EdgeInsets.only(top: 20.0, left: 20, right: 10, bottom: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                // prefixIcon: Icon(Icons.person),
-              )),
-          // 校验用户名（不能为空）
-          validator: (v) {
-            return v.trim().isNotEmpty ? null : '话题标题不能为空';
-          }),
+      width: ScreenUtil().setWidth(420),
+      padding: EdgeInsets.only(top: 20),
+      // color: Colors.amber,
+      child: TextField(
+        maxLines: 1,
+        maxLength: 30,
+        minLines: 1,
+        cursorColor: Theme.of(context).primaryColor,
+        controller: _titleController,
+        decoration: InputDecoration(
+          labelText: '话题标题',
+          filled: true,
+          hintText: '请输入标题',
+          fillColor: Color.fromARGB(255, 245, 241, 241),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: EdgeInsets.all(12),
+        ),
+      ),
     );
   }
 
+  void handleSuccess() {
+    Navigator.pop(context);
+    Fluttertoast.showToast(
+        msg: "创建活动成功",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: Theme.of(context).dividerColor,
+        textColor: Colors.black,
+        fontSize: 16.0);
+    Application.router.navigateTo(context, '/home/moreTopics');
+  }
+
+  void handleError() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("提示"),
+            content: Text(errorHint),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("确认"),
+                onPressed: () => Navigator.of(context).pop(), //关闭对话框
+              ),
+            ],
+          );
+        });
+  }
+
   Future publishTopic(UserProvider user) async {
-    var imagePath = await apiClient.uploadImage(this._imageFile);
-    var data = await user.addTopic(this._title, this.tags, imagePath,
+    if (this._imageFile == null) {
+      errorHint = "请上传图片";
+      return false;
+    }
+    String title = _titleController.text;
+    if (title == "" || title == null) {
+      errorHint = "请输入标题";
+      return false;
+    }
+    String imagePath = await apiClient.uploadImage(this._imageFile);
+    if (imagePath == null) {
+      errorHint = "图片上传失败, 请重试";
+      return false;
+    }
+    var data = await user.addTopic(title, this.tags, imagePath,
         schoolId: this.onlyInSchool ? user.userInfo.school.id : null);
-    return data;
+    if (!data["status"]) {
+      errorHint = '接口错误：' + data["error"];
+      return false;
+    } else {
+      return true;
+    }
   }
 }

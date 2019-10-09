@@ -1,6 +1,9 @@
+import 'package:finder/config/api_client.dart';
 import 'package:finder/models/activity_model.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ActivityDetailPage extends StatefulWidget {
   final ActivityModelData activity;
@@ -15,8 +18,25 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   List<IconData> collectIcons = [Icons.favorite_border, Icons.favorite];
   _ActivityDetailPageState(this.activity);
 
+  ///是否已收藏
+  bool isContain;
+
+  @override
+  void dispose() {
+    if (collectIcon == collectIcons[1]) {
+      apiClient.addCollection(type: ApiClient.ACTIVITY, id: activity.id);
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
+    if (user.collection['activity'].contains(activity.id)) {
+      collectIcon = collectIcons[1];
+    }
+    isContain = user.collection['activity'].contains(activity.id);
+
     var top = Align(
       child: Container(
         height: ScreenUtil().setHeight(460),
@@ -198,8 +218,12 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   setState(() {
                     if (collectIcon == collectIcons[0]) {
                       this.collectIcon = this.collectIcons[1];
+                      user.collection['activity'].add(activity.id);
                     } else {
                       this.collectIcon = collectIcons[0];
+                      if (user.collection['activity'].contains(activity.id)) {
+                        user.collection['activity'].remove(activity.id);
+                      }
                     }
                   });
                 },

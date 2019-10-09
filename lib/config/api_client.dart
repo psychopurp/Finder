@@ -10,6 +10,11 @@ class ApiClient {
 
   static Dio dio = new Dio(BaseOptions(baseUrl: baseURL));
 
+  static const int ACTIVITY = 1;
+  static const int TOPIC = 2;
+  static const int COMMENT = 3;
+  static const int RECRUIT = 4;
+
   //获得首页轮播图
   Future getHomePageBanner() async {
     try {
@@ -207,16 +212,19 @@ class ApiClient {
 
   ///用户发布活动
   Future addActivity(
-      {String sponser,
+      {String sponsor,
       String title,
       String place,
       String poster,
-      List<String> categories,
+      List<String> tags,
       String startTime,
       String endTime,
-      String description}) async {
+      int typeId = 0,
+      String description,
+      int associationId}) async {
     /**
-         *   sponsor: str
+    sponsor: str
+    association_id可以不给 给了是社团活动
     title: str
     place: str
     poster: str
@@ -224,6 +232,7 @@ class ApiClient {
     end_time: timestamp(str)
     description: str
     categories: list
+    type:int 是活动类型
          */
 
     var formData = {
@@ -233,8 +242,13 @@ class ApiClient {
       'start_time': startTime,
       'end_time': endTime,
       'description': description,
-      'categories': categories,
+      'tags': tags,
+      'type_id': typeId,
+      'sponsor': sponsor
     };
+    if (associationId != null) {
+      formData.addAll({'association_id': associationId});
+    }
     print(jsonEncode(formData));
     try {
       Response response =
@@ -243,6 +257,19 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('发布活动错误==========>$e');
+    }
+  }
+
+  ///删除活动
+  Future deleteActivity({int activityId}) async {
+    var formData = {'activity_id': activityId};
+    try {
+      Response response =
+          await dio.get('delete_activity/', queryParameters: formData);
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      print('删除活动错误==========>$e');
     }
   }
 
@@ -318,9 +345,30 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_collections/', queryParameters: formData);
+      print('用户收藏列表==========>${response.data}');
       return response.data;
     } catch (e) {
       print('获取用户收藏列表错误==========>$e');
+    }
+  }
+
+  ///用户收藏某个
+  Future addCollection({int type, int id}) async {
+    /**
+     *   type1234分别对应：
+    活动，话题，话题评论，招募
+    id是对应的被收藏东西的id
+     */
+
+    var formData = {'type': type, 'id': id};
+    print(formData);
+    try {
+      Response response =
+          await dio.post('add_collection/', data: jsonEncode(formData));
+      print('用户收藏成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('用户收藏错误==========>$e');
     }
   }
 
