@@ -1,8 +1,9 @@
-import 'dart:convert';
-
-import 'package:finder/provider/store.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:finder/pages/message_page/data_object.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+const double MessageHeight = 70;
+const double AvatarHeight = 54;
 
 class MessagePage extends StatefulWidget {
   @override
@@ -10,6 +11,24 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> {
+  DataObject data = DataObject();
+
+  void update() {
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    data.addListener(update);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    data.removeListener(update);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,11 +37,287 @@ class _MessagePageState extends State<MessagePage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: body,
+      body: Padding(
+        padding: EdgeInsets.only(left: 13, right: 13, top: 10),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            data.lastRequestTime = null;
+            data.getData();
+          },
+          child: body,
+        ),
+      ),
     );
   }
 
   Widget get body {
-//    return ListView.builder(itemBuilder: );
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return _generateOtherMessagePage("系统消息", Icons.computer, 1,
+              data: "Finders正式发布啦! 欢迎使用Finders软件! 谢谢!",
+              background: Color(0xFF0099FF));
+        } else if (index == 1) {
+          return _generateOtherMessagePage("提醒", Icons.error, 0,
+              background: Color(0xFFFF9933));
+        } else if (index == 2) {
+          return _generateOtherMessagePage("对Ta说", Icons.person, 0,
+              background: Color(0xFFFF6666));
+        }
+        return _generateUserMessage(index - 3);
+      },
+      itemCount: data.users.length + 3,
+    );
   }
+
+  Widget get pop => Builder(builder: (context) {
+        return Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              color: Theme.of(context).primaryColor),
+        );
+      });
+
+  Widget _generateOtherMessagePage(String title, IconData icon, int unReadCount,
+      {Color background = Colors.orange, String data, VoidCallback onPress}) {
+    Widget titleWidget = Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+      ),
+      textAlign: TextAlign.left,
+    );
+
+    return _withBottomBorder(
+      Row(
+        children: <Widget>[
+          Container(
+            width: AvatarHeight,
+            height: AvatarHeight,
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(AvatarHeight / 2),
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
+          Expanded(
+            flex: 1,
+            child: data != null
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      titleWidget,
+                      Padding(
+                        padding: EdgeInsets.all(3),
+                      ),
+                      Text(
+                        data,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          color: Color(0xFF777777),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    ],
+                  )
+                : titleWidget,
+          ),
+          unReadCount != 0
+              ? Stack(
+                  children: <Widget>[
+                    Icon(
+                      Icons.chevron_right,
+                      color: Color(0xBBBBBBBB),
+                      size: 30,
+                    ),
+                    Positioned(
+                      right: 1,
+                      top: 1,
+                      child: pop,
+                    )
+                  ],
+                )
+              : Icon(
+                  Icons.chevron_right,
+                  color: Color(0xBBBBBBBB),
+                  size: 30,
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _withBottomBorder(Widget child) {
+    return Column(
+      children: <Widget>[
+        Container(width: double.infinity, height: MessageHeight, child: child),
+        Padding(
+          padding: EdgeInsets.only(right: 10, left: 70),
+          child: Container(
+            color: Color(0xEEEEEEEE),
+            height: 1,
+            width: double.infinity,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _generateUserMessage(int index) {
+    List<UserMessageItem> items =
+        data.users[data.usersIndex[data.usersIndex.length - index - 1]];
+    UserMessageItem item = items.last;
+    int unReadCount = data.unReadCount(items);
+    UserProfile other;
+    if (item.sender == data.self) {
+      other = item.receiver;
+    } else {
+      other = item.sender;
+    }
+    Widget tips = Container(
+      width: unReadCount < 10 ? 20 : 24,
+      height: 20,
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        unReadCount < 100 ? "$unReadCount" : "99",
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+        ),
+      ),
+    );
+    return _withBottomBorder(
+      Row(
+        children: <Widget>[
+          Container(
+            width: AvatarHeight,
+            height: AvatarHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AvatarHeight / 2),
+            ),
+            child: CachedNetworkImage(
+              placeholder: (context, url) {
+                return Container(
+                  padding: EdgeInsets.all(10),
+                  child: CircularProgressIndicator(),
+                );
+              },
+              imageUrl: other.avatar,
+              errorWidget: (context, url, err) {
+                return Container(
+                  width: AvatarHeight,
+                  height: AvatarHeight,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AvatarHeight / 2),
+                    color: Colors.grey,
+                  ),
+                  child: Icon(
+                    Icons.cancel,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                );
+              },
+              imageBuilder: (context, imageProvider) {
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
+          Expanded(
+            flex: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(other.nickname),
+                Padding(
+                  padding: EdgeInsets.all(3),
+                ),
+                Text(
+                  item.content,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Color(0xFF777777),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              ],
+            ),
+          ),
+          Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(right: 10, top: 13, bottom: 5),
+                child: Text(
+                  getTimeString(item.time),
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+              unReadCount == 0 ? Container() : tips
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String getTimeString(DateTime time) {
+    Map<int, String> weekdayMap = {
+      1: "星期一",
+      2: "星期二",
+      3: "星期三",
+      4: "星期四",
+      5: "星期五",
+      6: "星期六",
+      7: "星期日"
+    };
+    DateTime now = DateTime.now();
+    if (now.year != time.year) {
+      return "${time.year}-${time.month}-${time.day}";
+    }
+    Duration month = Duration(days: 7);
+    Duration diff = now.difference(time);
+    if (diff.compareTo(month) > 0) {
+      return "${time.year}-${_addZero(time.month)}-${_addZero(time.day)}";
+    }
+    if (now.day == time.day) {
+      return "${_addZero(time.hour)}:${_addZero(time.minute)}";
+    }
+    if (now.add(Duration(days: -1)).day == time.day) {
+      return "昨天";
+    }
+    if (now.add(Duration(days: -2)).day == time.day) {
+      return "前天";
+    }
+    return weekdayMap[time.day];
+  }
+
+  String _addZero(int value) => value < 10 ? "0$value" : "$value";
 }

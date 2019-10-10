@@ -21,6 +21,9 @@ class DataObject implements Listenable {
   Map<String, List<SayToHeItem>> says = {};
   SharedPreferences prefs;
   List<VoidCallback> changeEvents;
+  List<String> usersIndex = [];
+  UserProfile loadUser;
+  UserProfile self;
   Dio dio = ApiClient.dio;
   int systemsCount = 0;
   int tipsCount = 0;
@@ -40,6 +43,33 @@ class DataObject implements Listenable {
       prefs = value;
     });
     load();
+    getSelf().then((status){
+      if(status){
+        getData();
+      }
+    });
+  }
+
+  void reset() async {
+    systems = [];
+    tips = [];
+    users = {};
+    says = {};
+    prefs.remove("messages");
+    lastRequestTime = null;
+    loadUser = self;
+  }
+
+  Future<bool> getSelf() async {
+    var userData = await apiClient.getUserProfile();
+    var user = userData['data'];
+    self = UserProfile.fromJson(user);
+    if (loadUser != null && loadUser != self) {
+      reset();
+      getData();
+      return false;
+    }
+    return true;
   }
 
   void onChange() {
@@ -48,33 +78,46 @@ class DataObject implements Listenable {
     }
   }
 
-  void getData() {
+  void getData() async {
+    print("Try Get Messages.");
     if (lastRequestTime == null) {
       lastRequestTime = DateTime.now().add(Duration(days: -1));
     }
+    DateTime reqTime = DateTime.now();
+    await getMessages(lastRequestTime.millisecondsSinceEpoch ~/ 1000);
+    lastRequestTime = reqTime;
   }
 
-  void getMessages(int start,
+  Future<void> getMessages(int start,
       {int end,
       bool isNotReadOnly,
-      bool isReceiveOnly = false,
+      bool isReceiveOnly,
       String sessionId}) async {
-    Response response = await dio.get("get_messages/", queryParameters: {
+    Map<String, dynamic> queryParameters = {
       "start": start,
-      "end": end,
-      "is_not_read_only": isNotReadOnly as int,
-      "is_receive_only": isReceiveOnly as int,
-      "session_id": sessionId
-    });
+    };
+    if (isNotReadOnly != null) {
+      queryParameters["isNotReadOnly"] = isNotReadOnly ? 1 : 0;
+    }
+    if (isReceiveOnly != null) {
+      queryParameters["isReceiveOnly"] = isReceiveOnly ? 1 : 0;
+    }
+    if (sessionId != null) {
+      queryParameters["sessionId"] = sessionId;
+    }
+    Response response =
+        await dio.get("get_messages/", queryParameters: queryParameters);
     Map<String, dynamic> data = response.data;
-    if (data["status"]) {
+//    print(data);
+    if (!data["status"]) {
       throw DioError(
           request: response.request,
           response: response,
           message: data["error"],
           type: DioErrorType.RESPONSE);
     } else
-      addAll(data["data"]);
+      addAll(List<Map<String, dynamic>>.generate(
+          data["data"].length, (index) => data["data"][index]));
   }
 
   int get allUnReadCount {
@@ -90,14 +133,15 @@ class DataObject implements Listenable {
   }
 
   void updateUsersCount() {
-    usersCount = _sum(users.entries.map(
-        (MapEntry<String, List<UserMessageItem>> item) =>
-            unReadCount(item.value)));
+    List<int> count = [];
+    users.forEach((key, value) => count.add(unReadCount(value)));
+    usersCount = _sum(count);
   }
 
   void updateSaysCount() {
-    saysCount = _sum(says.entries.map(
-        (MapEntry<String, List<SayToHeItem>> item) => unReadCount(item.value)));
+    List<int> count = [];
+    says.forEach((key, value) => count.add(unReadCount(value)));
+    usersCount = _sum(count);
   }
 
   int _sum(List<int> list) {
@@ -171,13 +215,16 @@ class DataObject implements Listenable {
       if (!users[messageItem.sessionId].contains(messageItem)) {
         //TODO 此写法没有优化, 可用二分查找优化
         users[messageItem.sessionId].add(messageItem);
+        usersIndex.remove(messageItem.sessionId);
+        usersIndex.add(messageItem.sessionId);
         change = true;
       }
     } else {
       change = true;
       users[messageItem.sessionId] = [messageItem];
+      usersIndex.add(messageItem.sessionId);
     }
-    if(change){
+    if (change) {
       updateUsersCount();
     }
     return change;
@@ -190,7 +237,7 @@ class DataObject implements Listenable {
       systems.add(messageItem);
       change = true;
     }
-    if(change){
+    if (change) {
       updateSystemsCount();
     }
     return change;
@@ -203,7 +250,7 @@ class DataObject implements Listenable {
       tips.add(messageItem);
       change = true;
     }
-    if(change){
+    if (change) {
       updateTipsCount();
     }
     return change;
@@ -221,7 +268,7 @@ class DataObject implements Listenable {
       change = true;
       says[messageItem.sessionId] = [messageItem];
     }
-    if(change){
+    if (change) {
       updateSaysCount();
     }
     return change;
@@ -229,13 +276,22 @@ class DataObject implements Listenable {
 
   String toJson() {
     Map<String, dynamic> result = {
-      'lastRequestTime': lastRequestTime.millisecondsSinceEpoch,
-      'systems': systems.map((item) => item.toJson()),
-      'tips': tips.map((item) => item.toJson()),
-      'users': users.map(
-          (key, value) => MapEntry(key, value.map((item) => item.toJson()))),
-      'says': says.map(
-          (key, value) => MapEntry(key, value.map((item) => item.toJson()))),
+      'lastRequestTime': lastRequestTime?.millisecondsSinceEpoch,
+      'systems': List<Map<String, dynamic>>.generate(
+          systems.length, (index) => systems[index].toJson()),
+      'tips': List<Map<String, dynamic>>.generate(
+          tips.length, (index) => tips[index].toJson()),
+      'users': users.map((key, value) =>
+          MapEntry<String, List<Map<String, dynamic>>>(
+              key,
+              List<Map<String, dynamic>>.generate(
+                  value.length, (index) => value[index].toJson()))),
+      'says': says.map((key, value) =>
+          MapEntry<String, List<Map<String, dynamic>>>(
+              key,
+              List<Map<String, dynamic>>.generate(
+                  value.length, (index) => value[index].toJson()))),
+      'user': self?.toJson()
     };
     return json.encode(result);
   }
@@ -243,7 +299,7 @@ class DataObject implements Listenable {
   void load() {
     if (prefs == null) return;
     var data = prefs.getString("messages");
-    if(data == null) return;
+    if (data == null) return;
     var map = json.decode(data);
     lastRequestTime =
         DateTime.fromMillisecondsSinceEpoch(map["lastRequestTime"]);
@@ -262,6 +318,7 @@ class DataObject implements Listenable {
             entity.key,
             List<SayToHeItem>.generate(map['says'].length,
                 (index) => SayToHeItem.fromJson(entity.value[index])))));
+    loadUser = UserProfile.fromJson(map["user"]);
   }
 
   void save() {
@@ -291,8 +348,8 @@ class Item {
   final int id;
 
   @override
-  bool operator ==(other) {
-    return id == other.id;
+  bool operator == (other) {
+    return other.runtimeType == this.runtimeType && id == other.id;
   }
 
   @override
@@ -303,10 +360,22 @@ class Item {
 
 class UserProfile extends Item implements ToJson {
   UserProfile({this.nickname, int id, this.avatar}) : super(id, false);
+  static Map<int, UserProfile> users = {};
 
   factory UserProfile.fromJson(Map<String, dynamic> map) {
-    return UserProfile(
-        nickname: map['nickname'], id: map['id'], avatar: map['avatar']);
+    String avatar = map["avatar"];
+    if (!avatar.startsWith("http")) {
+      avatar = ApiClient.host + avatar;
+    }
+    if (users.containsKey(map["id"])) {
+      UserProfile user = users[map["id"]];
+      user.avatar = avatar;
+      return user;
+    }
+    UserProfile user =
+        UserProfile(nickname: map['nickname'], id: map['id'], avatar: avatar);
+    users[user.id] = user;
+    return user;
   }
 
   final String nickname;
@@ -330,12 +399,14 @@ class UserMessageItem extends Item implements ToJson {
       : super(id, isRead);
 
   factory UserMessageItem.fromJson(Map<String, dynamic> map) {
+    UserProfile receiver = UserProfile.fromJson(map['receiver']);
     return UserMessageItem(
-        time: DateTime.fromMicrosecondsSinceEpoch(map['time']),
+        time: DateTime.fromMicrosecondsSinceEpoch(
+            (map['time'] * 1000000).toInt()),
         sender: UserProfile.fromJson(map['sender']),
-        receiver: UserProfile.fromJson(map['receiver']),
+        receiver: receiver,
         content: map["content"],
-        isRead: map["isRead"],
+        isRead: map["isRead"] && receiver == DataObject().self,
         sessionId: map["sessionId"],
         id: map["id"]);
   }
@@ -371,7 +442,8 @@ class SystemMessageItem extends Item implements ToJson {
 
   factory SystemMessageItem.fromJson(Map<String, dynamic> map) {
     return SystemMessageItem(
-        time: DateTime.fromMicrosecondsSinceEpoch(map['time'] * 1000),
+        time: DateTime.fromMicrosecondsSinceEpoch(
+            (map['time'] * 1000000).toInt()),
         content: map["content"],
         isRead: map["isRead"],
         id: map["id"],
@@ -385,7 +457,7 @@ class SystemMessageItem extends Item implements ToJson {
   @override
   Map<String, dynamic> toJson() {
     return {
-      "time": time.millisecondsSinceEpoch / 1000.0,
+      "time": time.millisecondsSinceEpoch / 1000,
       "content": content,
       "isRead": isRead,
       "id": id,
@@ -408,7 +480,8 @@ class SayToHeItem extends Item implements ToJson {
 
   factory SayToHeItem.fromJson(Map<String, dynamic> map) {
     return SayToHeItem(
-      time: DateTime.fromMicrosecondsSinceEpoch(map['time'] * 1000),
+      time:
+          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
       sender: UserProfile.fromJson(map['sender']),
       receiver: UserProfile.fromJson(map['receiver']),
       content: map["content"],
@@ -429,7 +502,7 @@ class SayToHeItem extends Item implements ToJson {
   @override
   Map<String, dynamic> toJson() {
     return {
-      "time": time.millisecondsSinceEpoch / 1000.0,
+      "time": time.millisecondsSinceEpoch / 1000,
       "sender": sender.toJson(),
       "receiver": receiver.toJson(),
       "content": content,
@@ -447,7 +520,8 @@ class TipItem extends Item implements ToJson {
 
   factory TipItem.fromJson(Map<String, dynamic> map) {
     return TipItem(
-      time: DateTime.fromMicrosecondsSinceEpoch(map['time'] * 1000),
+      time:
+          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
       content: map["content"],
       isRead: map["isRead"],
       id: map["id"],
@@ -462,7 +536,7 @@ class TipItem extends Item implements ToJson {
   @override
   Map<String, dynamic> toJson() {
     return {
-      "time": time.millisecondsSinceEpoch / 1000.0,
+      "time": time.millisecondsSinceEpoch / 1000,
       "content": content,
       "isRead": isRead,
       "id": id,
