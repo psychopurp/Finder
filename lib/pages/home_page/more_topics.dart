@@ -44,7 +44,7 @@ class _MoreTopicsState extends State<MoreTopics>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('more topics'),
+          title: Text('话题'),
           elevation: 0,
           centerTitle: true,
           bottom: new TabBar(
@@ -136,7 +136,7 @@ class _TopicsState extends State<Topics>
   @override
   void initState() {
     print('topics正在initstate');
-    _getInitialTopicsData(1);
+    _getInitialTopicsData(2);
     super.initState();
   }
 
@@ -155,8 +155,8 @@ class _TopicsState extends State<Topics>
       footer: MaterialFooter(),
       controller: _refreshController,
       onRefresh: () async {
-        await Future.delayed(Duration(seconds: 1), () {
-          setState(() {});
+        await Future.delayed(Duration(microseconds: 500), () {
+          _getInitialTopicsData(2);
         });
       },
       onLoad: () async {
@@ -177,10 +177,19 @@ class _TopicsState extends State<Topics>
     );
   }
 
+  ///初始话数据
   Future _getInitialTopicsData(int pageCount) async {
-    var topicsData = await apiClient.getTopics(page: pageCount);
-    // print(topicsData);
+    var topicsData = await apiClient.getTopics(page: 1);
     TopicModel topics = TopicModel.fromJson(topicsData);
+    for (int i = 2; i <= pageCount; i++) {
+      var topicsDataTemp = await apiClient.getTopics(page: i);
+      TopicModel topicsTemp = TopicModel.fromJson(topicsDataTemp);
+      topics.data.addAll(topicsTemp.data);
+    }
+
+    if (isSchoolTopics) {
+      topics.data.removeWhere((item) => item.school == null);
+    }
     // print('topicsData=======>${topicsData}');
     setState(() {
       this.topics = topics;
@@ -193,6 +202,9 @@ class _TopicsState extends State<Topics>
     var topicsData = await apiClient.getTopics(page: pageCount);
     // print(topicsData);
     TopicModel topics = TopicModel.fromJson(topicsData);
+    if (isSchoolTopics) {
+      topics.data.removeWhere((item) => item.school == null);
+    }
     // print('hasmore=======${topics.hasMore}');
     setState(() {
       this.topics.data.addAll(topics.data);

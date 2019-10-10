@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:finder/config/api_client.dart';
+import 'package:finder/models/activity_model.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -75,7 +76,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
   ///下拉选择活动类型
   int selectedActivityTypeValue;
 
-  List<ActivityTypesData> activityTypes = [];
+  List<ActivityTypesModelData> activityTypes = [];
 
   @override
   void dispose() {
@@ -653,7 +654,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
         place: place,
         poster: imagePath.split('/')[2],
         description: description,
-        typeId: this.selectedActivityTypeValue,
+        typeId: [this.selectedActivityTypeValue],
         startTime: getTime(
             month: startDateTime.month,
             day: startDateTime.day,
@@ -676,64 +677,13 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
   Future getActivityType() async {
     try {
       var response = await ApiClient.dio.get('get_activity_types/');
-      ActivityTypes activityTypes = ActivityTypes.fromJson(response.data);
+      ActivityTypesModel activityTypes =
+          ActivityTypesModel.fromJson(response.data);
       setState(() {
         this.activityTypes = activityTypes.data;
       });
     } catch (e) {
       print('获取错误==========>$e');
     }
-  }
-}
-
-///活动类型模型
-class ActivityTypes {
-  List<ActivityTypesData> data;
-  int totalPage;
-  bool status;
-  bool hasMore;
-
-  ActivityTypes({this.data, this.totalPage, this.status, this.hasMore});
-
-  ActivityTypes.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
-      data = new List<ActivityTypesData>();
-      json['data'].forEach((v) {
-        data.add(new ActivityTypesData.fromJson(v));
-      });
-    }
-    totalPage = json['total_page'];
-    status = json['status'];
-    hasMore = json['has_more'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
-    }
-    data['total_page'] = this.totalPage;
-    data['status'] = this.status;
-    data['has_more'] = this.hasMore;
-    return data;
-  }
-}
-
-class ActivityTypesData {
-  int id;
-  String name;
-
-  ActivityTypesData({this.id, this.name});
-
-  ActivityTypesData.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    return data;
   }
 }

@@ -11,7 +11,7 @@ import 'routers/routes.dart';
 import 'package:finder/provider/user_provider.dart';
 
 void main() {
-  Global.init().then((isLogin) => runApp(MyApp(
+  global.init().then((isLogin) => runApp(MyApp(
         isLogin: true,
       )));
 }
@@ -85,6 +85,7 @@ ThemeData _buildAppTheme() {
       // scaffoldBackgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
       accentIconTheme: base.accentIconTheme.copyWith(color: Colors.white),
       dividerColor: Color.fromARGB(255, 245, 241, 241),
+      // appBarTheme: base.appBarTheme.copyWith(color: Colors.white),
 
       // Icon的默认样式
       iconTheme:

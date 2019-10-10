@@ -1,0 +1,285 @@
+import 'package:finder/config/api_client.dart';
+import 'package:finder/models/recruit_model.dart';
+import 'package:finder/plugin/my_appbar.dart';
+import 'package:finder/public.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
+
+class RecruitPage extends StatefulWidget {
+  @override
+  _RecruitPageState createState() => _RecruitPageState();
+}
+
+class _RecruitPageState extends State<RecruitPage> {
+  RecruitModel recruits;
+  RecruitTypesModel recruitTypes;
+  EasyRefreshController _refreshController;
+
+  List<int> selectedTypeList = [];
+
+  @override
+  void initState() {
+    _refreshController = EasyRefreshController();
+    getRecruitsData().then((val) {
+      setState(() {
+        print(val['recruits']);
+        this.recruits = RecruitModel.fromJson(val['recruits']);
+        this.recruitTypes = RecruitTypesModel.fromJson(val['recruitTypes']);
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            '招募 · 寻你',
+            style: TextStyle(color: Colors.black),
+          ),
+          elevation: 0,
+          centerTitle: true,
+          actions: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+              child: MaterialButton(
+                onPressed: () {},
+                color: Theme.of(context).dividerColor,
+                minWidth: ScreenUtil().setWidth(130),
+                padding: EdgeInsets.only(right: 25),
+                // color: ActionColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                child: Icon(Icons.search),
+              ),
+            )
+          ],
+        ),
+        // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+        body: (this.recruits != null)
+            ? Container(
+                color: Colors.white.withOpacity(0.1),
+                child: Column(
+                  children: <Widget>[
+                    topTypesBanner(),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    recruitContent(),
+                  ],
+                ),
+              )
+            : Center(
+                child: CupertinoActivityIndicator(),
+              ));
+  }
+
+  ///招募类型
+  topTypesBanner() => Container(
+        width: ScreenUtil().setWidth(750),
+        height: ScreenUtil().setHeight(250),
+        // color: Colors.green,
+        decoration: BoxDecoration(color: Colors.white, boxShadow: [
+          BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.5, 1),
+              blurRadius: 2,
+              spreadRadius: 1)
+        ]),
+        padding: EdgeInsets.only(left: 20, right: 10, top: 5),
+        child: ListView(
+          children: <Widget>[
+            Wrap(
+              spacing: 10,
+              children: this.recruitTypes.data.map((val) {
+                return InkWell(
+                    onTap: () {
+                      setState(() {
+                        this.selectedTypeList.add(val.id);
+                      });
+                    },
+                    child: (this.selectedTypeList.contains(val.id))
+                        ? Chip(
+                            backgroundColor: Colors.blue,
+                            onDeleted: () {
+                              setState(() {
+                                this.selectedTypeList.remove(val.id);
+                              });
+                            },
+                            label: Text(
+                              val.name,
+                              style: TextStyle(color: Colors.white),
+                            ))
+                        : Chip(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            label: Text(
+                              val.name,
+                              style: TextStyle(color: Colors.white),
+                            )));
+              }).toList(),
+            ),
+          ],
+        ),
+      );
+
+  ///招募内容
+  recruitContent() => Container(
+      // color: Colors.amber,
+      height: ScreenUtil().setHeight(790),
+      width: ScreenUtil().setWidth(750),
+      child: EasyRefresh(
+          enableControlFinishLoad: true,
+          header: MaterialHeader(),
+          footer: MaterialFooter(),
+          controller: _refreshController,
+          onRefresh: () async {
+            await Future.delayed(Duration(seconds: 1), () {
+              setState(() {});
+            });
+          },
+          onLoad: () async {
+            // var data = await _getMore(this.pageCount);
+            // _refreshController.finishLoad(
+            //     success: true, noMore: (data.length == 0));
+          },
+          child: ListView(
+            children: this.recruits.data.map((item) {
+              return _singleItem(item);
+            }).toList(),
+          )));
+
+  Widget _singleItem(RecruitModelData recruit) {
+    return Align(
+      child: InkWell(
+        onTap: () {},
+        child: Container(
+          // height: ScreenUtil().setHeight(450),
+          margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+          width: ScreenUtil().setWidth(600),
+          decoration: BoxDecoration(
+              // color: Colors.cyan,
+              border: Border(
+                  bottom: BorderSide(color: Theme.of(context).dividerColor))),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                recruit.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: ScreenUtil().setSp(32)),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(10),
+              ),
+              Text(
+                recruit.sender.nickname,
+                style: TextStyle(fontSize: ScreenUtil().setSp(30)),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(20),
+              ),
+              Text(
+                recruit.introduction,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: ScreenUtil().setSp(25)),
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  margin: EdgeInsets.only(
+                    top: ScreenUtil().setHeight(20),
+                    bottom: ScreenUtil().setHeight(20),
+                  ),
+                  padding: EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                      // color: Colors.amber,
+                      border: Border.all(color: Color(0xFFF0AA89)),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: Text(
+                    "  详情  ",
+                    style: TextStyle(
+                        fontSize: ScreenUtil().setSp(22),
+                        color: Color(0xFFF0AA89)),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future getRecruitsData() async {
+    var formData = {
+      'recruits': await apiClient.getRecruits(),
+      'recruitTypes': (await ApiClient.dio.get('get_recruit_types/')).data
+    };
+    return formData;
+  }
+}
+
+class TopTypesBanner extends StatefulWidget implements PreferredSizeWidget {
+  final RecruitTypesModel recruitTypes;
+  TopTypesBanner({this.recruitTypes});
+  @override
+  _TopTypesBannerState createState() => _TopTypesBannerState();
+
+  @override
+  Size get preferredSize => Size.fromHeight(ScreenUtil().setHeight(200));
+}
+
+class _TopTypesBannerState extends State<TopTypesBanner> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // color: Colors.green,
+      // height: ScreenUtil().setHeight(200),
+      // width: ScreenUtil().setWidth(300),
+      child: Column(
+        children: <Widget>[
+          AppBar(
+            title: Text(
+              '招募',
+              style: TextStyle(color: Colors.black),
+            ),
+            elevation: 0,
+            centerTitle: true,
+            // bottom: TopTypesBanner(),
+          ),
+          topTypesBanner()
+        ],
+      ),
+    );
+  }
+
+  ///招募类型
+  topTypesBanner() => Container(
+        height: ScreenUtil().setHeight(220),
+        color: Colors.white,
+        padding: EdgeInsets.only(left: 20, right: 20, top: 5),
+        child: Wrap(
+          spacing: 10,
+          children: widget.recruitTypes.data.map((val) {
+            return Chip(
+                backgroundColor: Theme.of(context).primaryColor,
+                label: Text(
+                  val.name,
+                  style: TextStyle(color: Colors.white),
+                ));
+          }).toList(),
+        ),
+      );
+}

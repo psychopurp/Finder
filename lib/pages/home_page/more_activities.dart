@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:finder/config/global.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -18,9 +19,26 @@ class _MoreActivitiesState extends State<MoreActivities>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
 
+  ActivityTypesModel activityTypes;
+
   @override
   void initState() {
-    _tabController = new TabController(vsync: this, length: 4);
+    if (global.activityTypes != null) {
+      this.activityTypes = global.activityTypes;
+      _tabController = new TabController(
+          vsync: this, length: this.activityTypes.data.length);
+    } else {
+      ApiClient.dio.get('get_activity_types/').then((val) {
+        this.activityTypes = ActivityTypesModel.fromJson(val.data);
+        this
+            .activityTypes
+            .data
+            .insert(0, ActivityTypesModelData(id: -1, name: "全部"));
+        _tabController = new TabController(
+            vsync: this, length: this.activityTypes.data.length);
+      });
+    }
+
     super.initState();
   }
 
@@ -54,76 +72,43 @@ class _MoreActivitiesState extends State<MoreActivities>
             isScrollable: true,
             labelColor: Colors.black,
             indicatorColor: Colors.black,
-            tabs: <Widget>[
-              new Tab(
+            tabs: this.activityTypes.data.map((item) {
+              return Tab(
                 child: Text(
-                  '推荐',
+                  item.name,
                   style: TextStyle(
                       fontSize: ScreenUtil().setSp(30),
                       fontWeight: FontWeight.w500),
                 ),
-              ),
-              new Tab(
-                child: Text(
-                  '学术讲座',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              new Tab(
-                child: Text(
-                  '文娱活动',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              new Tab(
-                child: Text(
-                  '其他',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
+              );
+            }).toList(),
             controller: _tabController,
           ),
         ),
         backgroundColor: Colors.white,
         body: TabBarView(
           controller: _tabController,
-          children: <Widget>[
-            ChildActivities(
-              tagName: '推荐',
-            ),
-            ChildActivities(
-              tagName: '推荐',
-            ),
-            ChildActivities(
-              tagName: '推荐',
-            ),
-            ChildActivities(
-              tagName: '推荐',
-            ),
-          ],
+          children: this.activityTypes.data.map((item) {
+            return ChildActivities(
+              activityType: item,
+            );
+          }).toList(),
         ));
   }
 }
 
 class ChildActivities extends StatefulWidget {
-  final String tagName;
-  ChildActivities({this.tagName});
+  final ActivityTypesModelData activityType;
+  ChildActivities({this.activityType});
   @override
   _ChildActivitiesState createState() =>
-      _ChildActivitiesState(tagName: tagName);
+      _ChildActivitiesState(activityType: activityType);
 }
 
 class _ChildActivitiesState extends State<ChildActivities>
     with AutomaticKeepAliveClientMixin<ChildActivities> {
-  final String tagName;
-  _ChildActivitiesState({this.tagName});
+  final ActivityTypesModelData activityType;
+  _ChildActivitiesState({this.activityType});
 
   ActivityModel activities;
   int pageCount = 2;
@@ -134,7 +119,7 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   @override
   void initState() {
-    _getInitialActivitiesData(1);
+    _getInitialActivitiesData(2);
     super.initState();
   }
 
@@ -153,8 +138,8 @@ class _ChildActivitiesState extends State<ChildActivities>
       footer: MaterialFooter(),
       controller: _refreshController,
       onRefresh: () async {
-        await Future.delayed(Duration(seconds: 1), () {
-          setState(() {});
+        await Future.delayed(Duration(microseconds: 500), () {
+          _getInitialActivitiesData(2);
         });
       },
       onLoad: () async {
@@ -177,9 +162,28 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   Future _getInitialActivitiesData(int pageCount) async {
     var activityData = await apiClient.getActivities(page: 1);
-    // print(topicsData);
     ActivityModel activities = ActivityModel.fromJson(activityData);
-    print('activities=======>${activities.data}');
+    for (int i = 2; i <= pageCount; i++) {
+      var activitiesDataTemp = await apiClient.getActivities(page: i);
+      ActivityModel activityTemp = ActivityModel.fromJson(activitiesDataTemp);
+      activities.data.addAll(activityTemp.data);
+    }
+
+    if (this.activityType.name != "全部") {
+      print(this.activityType.name);
+      activities.data.removeWhere((item) {
+        print(item.types.contains(this.activityType));
+        bool isContain = false;
+        item.types.forEach((val) {
+          if (val.id == this.activityType.id) {
+            isContain = true;
+          }
+        });
+        return !isContain;
+      });
+    }
+
+    // print('activities=======>${activities.data}');
     setState(() {
       this.activities = activities;
       this.itemCount = activities.data.length;
@@ -189,9 +193,22 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   Future _getMore(int pageCount, BuildContext context) async {
     var activityData = await apiClient.getActivities(page: pageCount);
-    // print(topicsData);
     ActivityModel activities = ActivityModel.fromJson(activityData);
-    print('activities=======>${activities.toJson()}');
+
+    if (this.activityType.name != "全部") {
+      print(this.activityType.name);
+      activities.data.removeWhere((item) {
+        print(item.types.contains(this.activityType));
+        bool isContain = false;
+        item.types.forEach((val) {
+          if (val.id == this.activityType.id) {
+            isContain = true;
+          }
+        });
+        return !isContain;
+      });
+    }
+
     setState(() {
       this.activities.data.addAll(activities.data);
       this.itemCount = this.itemCount + activities.data.length;

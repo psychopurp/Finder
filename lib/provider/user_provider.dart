@@ -75,7 +75,7 @@ class UserProvider with ChangeNotifier {
       String startTime,
       String endTime,
       String description,
-      int typeId,
+      List<int> typeId,
       int associationId}) async {
     var data = await apiClient.addActivity(
         sponsor: sponsor,
