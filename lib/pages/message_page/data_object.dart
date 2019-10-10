@@ -43,8 +43,8 @@ class DataObject implements Listenable {
       prefs = value;
     });
     load();
-    getSelf().then((status){
-      if(status){
+    getSelf().then((status) {
+      if (status) {
         getData();
       }
     });
@@ -55,6 +55,7 @@ class DataObject implements Listenable {
     tips = [];
     users = {};
     says = {};
+    usersIndex = [];
     prefs.remove("messages");
     lastRequestTime = null;
     loadUser = self;
@@ -176,7 +177,8 @@ class DataObject implements Listenable {
   void addAll(List<Map<String, dynamic>> data) {
     bool change = false;
     for (var item in data) {
-      change = change || add(item, changeNow: false);
+      bool res = add(item, changeNow: false);
+      change = change || res;
     }
     if (change) {
       onChange();
@@ -213,7 +215,6 @@ class DataObject implements Listenable {
     bool change = false;
     if (users.containsKey(messageItem.sessionId)) {
       if (!users[messageItem.sessionId].contains(messageItem)) {
-        //TODO 此写法没有优化, 可用二分查找优化
         users[messageItem.sessionId].add(messageItem);
         usersIndex.remove(messageItem.sessionId);
         usersIndex.add(messageItem.sessionId);
@@ -291,7 +292,8 @@ class DataObject implements Listenable {
               key,
               List<Map<String, dynamic>>.generate(
                   value.length, (index) => value[index].toJson()))),
-      'user': self?.toJson()
+      'user': self?.toJson(),
+      'usersIndex': usersIndex
     };
     return json.encode(result);
   }
@@ -319,6 +321,7 @@ class DataObject implements Listenable {
             List<SayToHeItem>.generate(map['says'].length,
                 (index) => SayToHeItem.fromJson(entity.value[index])))));
     loadUser = UserProfile.fromJson(map["user"]);
+    usersIndex = map['usersIndex'];
   }
 
   void save() {
@@ -348,7 +351,7 @@ class Item {
   final int id;
 
   @override
-  bool operator == (other) {
+  bool operator ==(other) {
     return other.runtimeType == this.runtimeType && id == other.id;
   }
 
