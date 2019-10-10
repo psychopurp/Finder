@@ -6,6 +6,7 @@ class Routes {
   static String root = "/"; //首页
   static String serve = "/serve";
   static String login = '/login';
+
   //首页
   static String publishTopic = '/publishTopic'; //首页-- 发布话题
   static String publishActivity = '/publishActivity'; //首页 -- 发布活动
@@ -26,6 +27,10 @@ class Routes {
   static String treeHole = "/serve/treeHole"; //服务页面 -- 我·树洞
   //用户页
   static String userProfile = "/mine/userProfile"; //服务页面 -- 我·树洞
+
+  static String chat = "/message/chat";
+  static String systemMessage = "/message/systemMessage";
+  static String tips = "/message/tips";
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = Handler(
@@ -70,5 +75,8 @@ class Routes {
     //我的页
     router.define(userProfile,
         handler: userProfileHandler, transitionType: TransitionType.fadeIn);
+
+    router.define(chat,
+        handler: chatPageHandle, transitionType: TransitionType.cupertino);
   }
 }

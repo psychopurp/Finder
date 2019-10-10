@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:finder/pages/message_page/data_object.dart';
+import 'package:finder/plugin/avatar.dart';
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 
 const double MessageHeight = 70;
@@ -42,6 +44,7 @@ class _MessagePageState extends State<MessagePage> {
         child: RefreshIndicator(
           onRefresh: () async {
             data.lastRequestTime = null;
+            data.reset();
             data.getData();
           },
           child: body,
@@ -201,7 +204,7 @@ class _MessagePageState extends State<MessagePage> {
         ),
       ),
     );
-    return _withBottomBorder(
+    Widget child = _withBottomBorder(
       Row(
         children: <Widget>[
           Container(
@@ -210,41 +213,7 @@ class _MessagePageState extends State<MessagePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AvatarHeight / 2),
             ),
-            child: CachedNetworkImage(
-              placeholder: (context, url) {
-                return Container(
-                  padding: EdgeInsets.all(10),
-                  child: CircularProgressIndicator(),
-                );
-              },
-              imageUrl: other.avatar,
-              errorWidget: (context, url, err) {
-                return Container(
-                  width: AvatarHeight,
-                  height: AvatarHeight,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AvatarHeight / 2),
-                    color: Colors.grey,
-                  ),
-                  child: Icon(
-                    Icons.cancel,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                );
-              },
-              imageBuilder: (context, imageProvider) {
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(25)),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                );
-              },
-            ),
+            child: Avatar(url: other.avatar, avatarHeight: AvatarHeight,)
           ),
           Padding(
             padding: EdgeInsets.all(10),
@@ -285,6 +254,13 @@ class _MessagePageState extends State<MessagePage> {
           ),
         ],
       ),
+    );
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        Navigator.pushNamed(context, Routes.chat, arguments: other);
+      },
+      child: child,
     );
   }
 

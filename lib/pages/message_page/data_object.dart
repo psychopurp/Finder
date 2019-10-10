@@ -29,6 +29,7 @@ class DataObject implements Listenable {
   int tipsCount = 0;
   int usersCount = 0;
   int saysCount = 0;
+  bool init = false;
 
   factory DataObject({VoidCallback onChange}) {
     if (instance == null) {
@@ -43,6 +44,7 @@ class DataObject implements Listenable {
       prefs = value;
     });
     load();
+    init = true;
     getSelf().then((status) {
       if (status) {
         getData();
@@ -216,14 +218,18 @@ class DataObject implements Listenable {
     if (users.containsKey(messageItem.sessionId)) {
       if (!users[messageItem.sessionId].contains(messageItem)) {
         users[messageItem.sessionId].add(messageItem);
-        usersIndex.remove(messageItem.sessionId);
-        usersIndex.add(messageItem.sessionId);
+        if(init){
+          usersIndex.remove(messageItem.sessionId);
+          usersIndex.add(messageItem.sessionId);
+        }
         change = true;
       }
     } else {
       change = true;
       users[messageItem.sessionId] = [messageItem];
-      usersIndex.add(messageItem.sessionId);
+      if(init){
+        usersIndex.add(messageItem.sessionId);
+      }
     }
     if (change) {
       updateUsersCount();
