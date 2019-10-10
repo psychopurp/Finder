@@ -1,6 +1,7 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
+import 'package:finder/provider/store.dart';
 import 'package:finder/public.dart';
 
 import 'package:flutter/material.dart';
@@ -24,7 +25,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     print('homepage setstate');
-    _getHomePageData();
+    // _getHomePageData().then((val) {
+    //   setState(() {
+    //     this.formData = val;
+    //   });
+    // });
     super.initState();
   }
 
@@ -44,29 +49,34 @@ class _HomePageState extends State<HomePage> {
           elevation: 1,
           centerTitle: true,
         ),
+
         // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-        body: Hero(
-          tag: "login",
-          child: (this.formData != null)
-              ? Container(
-                  color: Colors.white.withOpacity(0.1),
-                  child: EasyRefresh(
-                    header: MaterialHeader(),
-                    onRefresh: () async {
-                      await Future.delayed(Duration(seconds: 1), () {
-                        setState(() {});
-                      });
-                    },
-                    child: ListView(
-                      children: <Widget>[
-                        HomePageBanner(this.formData['banner']),
-                        HomePageTopics(this.formData['topics']),
-                        HomePageActivities(this.formData['activities']),
-                      ],
-                    ),
+        body: FutureBuilder(
+          future: _getHomePageData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Container(
+                color: Colors.white.withOpacity(0.1),
+                child: EasyRefresh(
+                  header: MaterialHeader(),
+                  onRefresh: () async {
+                    await Future.delayed(Duration(seconds: 1), () {
+                      setState(() {});
+                    });
+                  },
+                  child: ListView(
+                    children: <Widget>[
+                      HomePageBanner(snapshot.data['banner']),
+                      HomePageTopics(snapshot.data['topics']),
+                      HomePageActivities(snapshot.data['activities']),
+                    ],
                   ),
-                )
-              : Center(child: CupertinoActivityIndicator()),
+                ),
+              );
+            } else {
+              return Center(child: CupertinoActivityIndicator());
+            }
+          },
         ));
   }
 
@@ -76,31 +86,23 @@ class _HomePageState extends State<HomePage> {
     return banner;
   }
 
-  Future _getTopicsData() async {
+  Future _getTopicsData(int pageCount) async {
     var topicsData = await apiClient.getTopics(page: 1);
-    var topicsData2 = await apiClient.getTopics(page: 2);
-    var topicsData3 = await apiClient.getTopics(page: 3);
-    var topicsData4 = await apiClient.getTopics(page: 4);
-    var topicsData5 = await apiClient.getTopics(page: 5);
-    var topicsData6 = await apiClient.getTopics(page: 6);
-    var topicsData7 = await apiClient.getTopics(page: 7);
     // print(topicsData);
     TopicModel topics = TopicModel.fromJson(topicsData);
-    topics.data.addAll(TopicModel.fromJson(topicsData2).data);
-    topics.data.addAll(TopicModel.fromJson(topicsData3).data);
-    topics.data.addAll(TopicModel.fromJson(topicsData4).data);
-    topics.data.addAll(TopicModel.fromJson(topicsData5).data);
-    topics.data.addAll(TopicModel.fromJson(topicsData6).data);
-    topics.data.addAll(TopicModel.fromJson(topicsData7).data);
-    // print('topicsData=======>${topicsData}');
+    for (int i = 2; i <= pageCount; i++) {
+      var topicsData2 = await apiClient.getTopics(page: i);
+      topics.data.addAll(TopicModel.fromJson(topicsData2).data);
+    }
     return topics;
   }
 
   Future _getAcitivitiesData() async {
     var activitiesData = await apiClient.getActivities(page: 1);
-
+    // print(activitiesData);
     ActivityModel activities = ActivityModel.fromJson(activitiesData);
     // print("activitiesData==========>$activitiesData");
+    // print(activities);
     return activities;
   }
 
@@ -108,12 +110,10 @@ class _HomePageState extends State<HomePage> {
   Future _getHomePageData() async {
     var formData = {
       'banner': await _getBannerData(),
-      'topics': await _getTopicsData(),
+      'topics': await _getTopicsData(3),
       'activities': await _getAcitivitiesData()
     };
     // print(formData);
-    setState(() {
-      this.formData = formData;
-    });
+    return formData;
   }
 }

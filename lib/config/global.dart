@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:finder/models/activity_model.dart';
+import 'package:finder/models/recruit_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
@@ -20,10 +22,12 @@ class Global {
 
   // 是否为release版
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
+  ActivityTypesModel activityTypes;
+  RecruitTypesModel recruitTypes;
 
   //初始化全局信息，会在APP启动时执行
   //返回 isLogin
-  static Future init() async {
+  Future init() async {
     print('...正在进行Global初始化...');
     _prefs = await SharedPreferences.getInstance();
     if (_prefs.getString('userToken') != null) {
@@ -34,6 +38,9 @@ class Global {
     //给请求头加上token
     ApiClient.init();
 
+    ///获取全局type
+    getGlobalData();
+
     //能获得用户信息说明token有效
     var data = await apiClient.getUserProfile();
     if (data['status'] == true) {
@@ -41,6 +48,18 @@ class Global {
       Global.isLogin = true;
     }
     return data['status'];
+  }
+
+  ///一些全局需要的参数，避免重复获取
+  Future getGlobalData() async {
+    var formData = {
+      'recruitTypes': (await ApiClient.dio.get('get_recruit_types/')).data,
+      'activityTypes': (await ApiClient.dio.get('get_activity_types/')).data,
+      // 'associationTypes':
+      //     (await ApiClient.dio.get('get_association_types/')).data,
+    };
+    this.activityTypes = ActivityTypesModel.fromJson(formData['activityTypes']);
+    this.recruitTypes = RecruitTypesModel.fromJson(formData['recruitTypes']);
   }
 
   //本地保存用户信息
@@ -55,3 +74,5 @@ class Global {
     _prefs.setString('userToken', token);
   }
 }
+
+Global global = new Global();

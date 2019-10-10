@@ -329,7 +329,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
     var data = await user.addTopic(title, this.tags, imagePath,
         schoolId: this.onlyInSchool ? user.userInfo.school.id : null);
     if (!data["status"]) {
-      errorHint = '接口错误：' + data["error"];
+      errorHint = '当前话题已存在！';
       return false;
     } else {
       return true;

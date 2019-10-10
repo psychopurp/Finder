@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'mine_page.dart';
 import 'serve_page.dart';
-import 'find_page.dart';
+import 'recruit_page.dart';
 import 'package:finder/public.dart';
-import 'login.dart';
 
 class IndexPage extends StatefulWidget {
   @override
@@ -19,7 +18,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
 
   var pages = [
     HomePage(),
-    FindPage(), FindPage(),
+    RecruitPage(), RecruitPage(),
     // LoginPage(),
     ServePage(),
     UserProfilePage(),

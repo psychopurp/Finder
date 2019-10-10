@@ -3,14 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
 
+// class HomePageTopics extends StatefulWidget {
+
+//   @override
+//   _HomePageTopicsState createState() {
+//     TopicModel schoolTopics = this.topics;
+//     schoolTopics.data.removeWhere((item) => item.school == null);
+//     return _HomePageTopicsState(schoolTopics: schoolTopics);
+//   }
+// }
+
 class HomePageTopics extends StatelessWidget {
-  final TopicModel topics;
   final double mainHeight = 560;
   final double titleHeight = 100;
+  final TopicModel topics;
+
   HomePageTopics(this.topics);
+
   @override
   Widget build(BuildContext context) {
-    // print(topics.data[0].toJson());
     return Container(
       height: ScreenUtil().setHeight(mainHeight),
       width: ScreenUtil().setWidth(710),
@@ -27,8 +38,11 @@ class HomePageTopics extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _title(context),
-          _topicsInSchoolPart(),
-          _topicsNotInSchoolPart()
+          TopicList(isSchoolTopics: true, topicsData: sortSchoolTopic(true)),
+          TopicList(
+            isSchoolTopics: false,
+            topicsData: sortSchoolTopic(false),
+          )
         ],
       ),
     );
@@ -103,40 +117,52 @@ class HomePageTopics extends StatelessWidget {
     );
   }
 
-  Widget _topicsInSchoolPart() {
+  List<TopicModelData> sortSchoolTopic(bool isSchoolTopics) {
+    List<TopicModelData> topics = [];
+    if (isSchoolTopics) {
+      for (var i = 0; i < this.topics.data.length; i++) {
+        if (this.topics.data[i].school != null) {
+          topics.add(this.topics.data[i]);
+        }
+      }
+      // this.topics.data.removeWhere((item) => item.school == null);
+    } else {
+      topics.addAll(this.topics.data);
+    }
+    return topics;
+  }
+}
+
+class TopicList extends StatelessWidget {
+  final bool isSchoolTopics;
+  final List<TopicModelData> topicsData;
+  TopicList({this.topicsData, this.isSchoolTopics});
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(220),
+      height: isSchoolTopics
+          ? ScreenUtil().setHeight(220)
+          : ScreenUtil().setHeight(240),
       width: ScreenUtil().setWidth(750),
       // color: Colors.green,
       child: ListView.builder(
-        padding: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+        padding: EdgeInsets.only(
+            top: isSchoolTopics
+                ? ScreenUtil().setHeight(0)
+                : ScreenUtil().setHeight(15)),
         scrollDirection: Axis.horizontal,
-        itemCount: this.topics.data.length,
+        itemCount: this.topicsData.length,
         itemBuilder: (context, index) {
-          return _singleItem(context, this.topics.data[index], index);
+          return _singleItem(
+              context, this.topicsData[index], index, isSchoolTopics);
         },
       ),
     );
   }
 
-  Widget _topicsNotInSchoolPart() {
-    return Container(
-      height: ScreenUtil().setHeight(240),
-      width: ScreenUtil().setWidth(750),
-      // color: Colors.blue,
-      child: ListView.builder(
-        padding: EdgeInsets.only(top: ScreenUtil().setHeight(15)),
-        scrollDirection: Axis.horizontal,
-        itemCount: this.topics.data.length,
-        itemBuilder: (context, index) {
-          return _singleItem(context, this.topics.data[index], index);
-        },
-      ),
-    );
-  }
-
-  _singleItem(BuildContext context, TopicModelData item, int index) {
-    bool isLastItem = (index == this.topics.data.length - 1);
+  _singleItem(
+      BuildContext context, TopicModelData item, int index, bool inSchool) {
+    bool isLastItem = (index == this.topicsData.length - 1);
 
     return CachedNetworkImage(
       imageUrl: item.image,
@@ -179,7 +205,7 @@ class HomePageTopics extends StatelessWidget {
                               // bottomLeft: Radius.circular(10),
                               bottomRight: Radius.circular(20))),
                       child: Text(
-                        '校内话题',
+                        inSchool ? '校内话题' : '校际话题',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: ScreenUtil().setSp(20)),

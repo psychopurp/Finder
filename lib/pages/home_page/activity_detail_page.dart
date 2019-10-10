@@ -25,7 +25,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   void dispose() {
     if (collectIcon == collectIcons[1]) {
       apiClient.addCollection(type: ApiClient.ACTIVITY, id: activity.id);
-    }
+    } else {}
     super.dispose();
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:finder/config/global.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -18,9 +19,22 @@ class _MoreActivitiesState extends State<MoreActivities>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
 
+  ActivityTypesModel activityTypes;
+
   @override
   void initState() {
-    _tabController = new TabController(vsync: this, length: 4);
+    if (global.activityTypes != null) {
+      this.activityTypes = global.activityTypes;
+      _tabController = new TabController(
+          vsync: this, length: this.activityTypes.data.length);
+    } else {
+      ApiClient.dio.get('get_activity_types/').then((val) {
+        this.activityTypes = ActivityTypesModel.fromJson(val.data);
+        _tabController = new TabController(
+            vsync: this, length: this.activityTypes.data.length);
+      });
+    }
+
     super.initState();
   }
 
@@ -54,60 +68,27 @@ class _MoreActivitiesState extends State<MoreActivities>
             isScrollable: true,
             labelColor: Colors.black,
             indicatorColor: Colors.black,
-            tabs: <Widget>[
-              new Tab(
+            tabs: this.activityTypes.data.map((item) {
+              return Tab(
                 child: Text(
-                  '推荐',
+                  item.name,
                   style: TextStyle(
                       fontSize: ScreenUtil().setSp(30),
                       fontWeight: FontWeight.w500),
                 ),
-              ),
-              new Tab(
-                child: Text(
-                  '学术讲座',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              new Tab(
-                child: Text(
-                  '文娱活动',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              new Tab(
-                child: Text(
-                  '其他',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
+              );
+            }).toList(),
             controller: _tabController,
           ),
         ),
         backgroundColor: Colors.white,
         body: TabBarView(
           controller: _tabController,
-          children: <Widget>[
-            ChildActivities(
-              tagName: '推荐',
-            ),
-            ChildActivities(
-              tagName: '推荐',
-            ),
-            ChildActivities(
-              tagName: '推荐',
-            ),
-            ChildActivities(
-              tagName: '推荐',
-            ),
-          ],
+          children: this.activityTypes.data.map((item) {
+            return ChildActivities(
+              tagName: item.name,
+            );
+          }).toList(),
         ));
   }
 }
@@ -179,7 +160,7 @@ class _ChildActivitiesState extends State<ChildActivities>
     var activityData = await apiClient.getActivities(page: 1);
     // print(topicsData);
     ActivityModel activities = ActivityModel.fromJson(activityData);
-    print('activities=======>${activities.data}');
+    // print('activities=======>${activities.data}');
     setState(() {
       this.activities = activities;
       this.itemCount = activities.data.length;
@@ -191,7 +172,7 @@ class _ChildActivitiesState extends State<ChildActivities>
     var activityData = await apiClient.getActivities(page: pageCount);
     // print(topicsData);
     ActivityModel activities = ActivityModel.fromJson(activityData);
-    print('activities=======>${activities.toJson()}');
+    // print('activities=======>${activities.toJson()}');
     setState(() {
       this.activities.data.addAll(activities.data);
       this.itemCount = this.itemCount + activities.data.length;
