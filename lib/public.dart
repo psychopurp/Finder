@@ -13,3 +13,11 @@ String getTime({int year, int month, int day}) {
   var date = time.toInt().toString();
   return date;
 }
+
+///时间戳转换成日期
+String timestampToDateTime(num time) {
+  num temp = time * 1000;
+  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(temp.toInt());
+
+  return dateTime.toString();
+}
