@@ -58,7 +58,8 @@ class Global {
       // 'associationTypes':
       //     (await ApiClient.dio.get('get_association_types/')).data,
     };
-    this.activityTypes = ActivityTypesModel.fromJson(formData['activityTypes']);
+    this.activityTypes = ActivityTypesModel.fromJson(formData['activityTypes'])
+      ..data.insert(0, ActivityTypesModelData(id: -1, name: "全部"));
     this.recruitTypes = RecruitTypesModel.fromJson(formData['recruitTypes']);
   }
 

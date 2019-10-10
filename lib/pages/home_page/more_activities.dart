@@ -30,6 +30,10 @@ class _MoreActivitiesState extends State<MoreActivities>
     } else {
       ApiClient.dio.get('get_activity_types/').then((val) {
         this.activityTypes = ActivityTypesModel.fromJson(val.data);
+        this
+            .activityTypes
+            .data
+            .insert(0, ActivityTypesModelData(id: -1, name: "全部"));
         _tabController = new TabController(
             vsync: this, length: this.activityTypes.data.length);
       });
@@ -86,7 +90,7 @@ class _MoreActivitiesState extends State<MoreActivities>
           controller: _tabController,
           children: this.activityTypes.data.map((item) {
             return ChildActivities(
-              tagName: item.name,
+              activityType: item,
             );
           }).toList(),
         ));
@@ -94,17 +98,17 @@ class _MoreActivitiesState extends State<MoreActivities>
 }
 
 class ChildActivities extends StatefulWidget {
-  final String tagName;
-  ChildActivities({this.tagName});
+  final ActivityTypesModelData activityType;
+  ChildActivities({this.activityType});
   @override
   _ChildActivitiesState createState() =>
-      _ChildActivitiesState(tagName: tagName);
+      _ChildActivitiesState(activityType: activityType);
 }
 
 class _ChildActivitiesState extends State<ChildActivities>
     with AutomaticKeepAliveClientMixin<ChildActivities> {
-  final String tagName;
-  _ChildActivitiesState({this.tagName});
+  final ActivityTypesModelData activityType;
+  _ChildActivitiesState({this.activityType});
 
   ActivityModel activities;
   int pageCount = 2;
@@ -115,7 +119,7 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   @override
   void initState() {
-    _getInitialActivitiesData(1);
+    _getInitialActivitiesData(2);
     super.initState();
   }
 
@@ -134,8 +138,8 @@ class _ChildActivitiesState extends State<ChildActivities>
       footer: MaterialFooter(),
       controller: _refreshController,
       onRefresh: () async {
-        await Future.delayed(Duration(seconds: 1), () {
-          setState(() {});
+        await Future.delayed(Duration(microseconds: 500), () {
+          _getInitialActivitiesData(2);
         });
       },
       onLoad: () async {
@@ -158,8 +162,27 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   Future _getInitialActivitiesData(int pageCount) async {
     var activityData = await apiClient.getActivities(page: 1);
-    // print(topicsData);
     ActivityModel activities = ActivityModel.fromJson(activityData);
+    for (int i = 2; i <= pageCount; i++) {
+      var activitiesDataTemp = await apiClient.getActivities(page: i);
+      ActivityModel activityTemp = ActivityModel.fromJson(activitiesDataTemp);
+      activities.data.addAll(activityTemp.data);
+    }
+
+    if (this.activityType.name != "全部") {
+      print(this.activityType.name);
+      activities.data.removeWhere((item) {
+        print(item.types.contains(this.activityType));
+        bool isContain = false;
+        item.types.forEach((val) {
+          if (val.id == this.activityType.id) {
+            isContain = true;
+          }
+        });
+        return !isContain;
+      });
+    }
+
     // print('activities=======>${activities.data}');
     setState(() {
       this.activities = activities;
@@ -170,9 +193,22 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   Future _getMore(int pageCount, BuildContext context) async {
     var activityData = await apiClient.getActivities(page: pageCount);
-    // print(topicsData);
     ActivityModel activities = ActivityModel.fromJson(activityData);
-    // print('activities=======>${activities.toJson()}');
+
+    if (this.activityType.name != "全部") {
+      print(this.activityType.name);
+      activities.data.removeWhere((item) {
+        print(item.types.contains(this.activityType));
+        bool isContain = false;
+        item.types.forEach((val) {
+          if (val.id == this.activityType.id) {
+            isContain = true;
+          }
+        });
+        return !isContain;
+      });
+    }
+
     setState(() {
       this.activities.data.addAll(activities.data);
       this.itemCount = this.itemCount + activities.data.length;
