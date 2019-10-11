@@ -1,11 +1,14 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/pages/message_page/data_object.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const double MessageHeight = 70;
 const double AvatarHeight = 54;
@@ -55,6 +58,7 @@ class _ChatPageState extends State<ChatPage> {
   int sendKey;
   Dio dio = ApiClient.dio;
   bool open = false;
+  EasyRefreshController _loadController;
 
   void update() {
     setState(() {});
@@ -62,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> moveToBottom(
       {Duration duration: const Duration(milliseconds: 600)}) async {
-    await _scrollController.animateTo(max(((messages.length - 5) * 70).toDouble(), 0),
+    await _scrollController.animateTo(0,
         duration: duration, curve: Curves.easeInOut);
   }
 
@@ -71,6 +75,7 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     data = DataObject();
     data.addListener(update);
+    data.getDataInterval(duration: Duration(seconds: 10));
     if (!data.users.containsKey(widget.sessionId)) {
       messages = [];
       needSync = true;
@@ -82,11 +87,9 @@ class _ChatPageState extends State<ChatPage> {
     _focusNode = FocusNode();
     sendKey = DateTime.now().millisecondsSinceEpoch;
     _scrollController = ScrollController();
-    Future.delayed(Duration(milliseconds: 200), () {
-      moveToBottom(duration: Duration(milliseconds: 300));
-    });
+    _loadController = EasyRefreshController();
     _focusNode.addListener(() {
-      if (_focusNode.hasFocus){
+      if (_focusNode.hasFocus) {
         open = true;
       }
       Future.delayed(Duration(seconds: 2), () {
@@ -104,6 +107,7 @@ class _ChatPageState extends State<ChatPage> {
     _textController.dispose();
     _focusNode.dispose();
     _scrollController.dispose();
+    data.getDataInterval();
     super.dispose();
   }
 
@@ -204,6 +208,57 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    double height = ScreenUtil.screenHeight / 3 - 80;
+    Widget messagesList;
+    if (messages.length * 70 < height) {
+      messagesList = RefreshIndicator(
+          onRefresh: () async {
+            await data.getData();
+          },
+          child: ListView.builder(
+            physics: AlwaysScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              UserMessageItem item = messages[index];
+              if (item.sender == data.self) {
+                return generateRightBubble(item);
+              } else {
+                return generateLeftBubble(item);
+              }
+            },
+            itemCount: messages.length,
+            controller: _scrollController,
+          ));
+    } else {
+      messagesList = EasyRefresh(
+          header: MaterialHeader(),
+          footer: MaterialFooter(),
+          controller: _loadController,
+          enableControlFinishLoad: true,
+          headerIndex: 0,
+          child: ListView.builder(
+            physics: AlwaysScrollableScrollPhysics(),
+            reverse: true,
+            itemBuilder: (context, index) {
+              UserMessageItem item = messages[messages.length - 1 - index];
+              if (item.sender == data.self) {
+                return timeDisplay(index, true, generateRightBubble(item));
+              } else {
+                return timeDisplay(index, true, generateLeftBubble(item));
+              }
+            },
+            itemCount: messages.length,
+            controller: _scrollController,
+          ),
+          onRefresh: () async {
+            await data.getData();
+          },
+          onLoad: () async {
+            await data.getHistoryUserMessages(widget.sessionId);
+            _loadController.finishLoad(
+                success: true,
+                noMore: (data.noMoreHistory.contains(widget.sessionId)));
+          });
+    }
     return Column(
       children: <Widget>[
         Expanded(
@@ -213,25 +268,7 @@ class _ChatPageState extends State<ChatPage> {
                   if (!open) _focusNode.unfocus();
                   return false;
                 },
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    await data.getData();
-                    await data.getHistoryUserMessages(widget.sessionId);
-                  },
-                  child: ListView.builder(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      UserMessageItem item = messages[index];
-                      if (item.sender == data.self) {
-                        return generateRightBubble(item);
-                      } else {
-                        return generateLeftBubble(item);
-                      }
-                    },
-                    itemCount: messages.length,
-                    controller: _scrollController,
-                  ),
-                ))),
+                child: messagesList)),
         Container(
           width: double.infinity,
           height: 55,
@@ -299,6 +336,42 @@ class _ChatPageState extends State<ChatPage> {
         )
       ],
     );
+  }
+
+  Widget timeDisplay(int index, bool reverse, Widget child) {
+    int last;
+    if (reverse) {
+      index = messages.length - 1 - index;
+    }
+    Widget text = Text(
+      getTimeString(messages[index].time),
+      style: TextStyle(
+        color: Color(0xFF999999),
+        fontSize: 11.3,
+      ),
+    );
+    if (index == 0) {
+      return Column(
+        children: <Widget>[
+          text,
+          child,
+        ],
+      );
+    } else {
+      last = index - 1;
+      UserMessageItem lastItem = messages[last];
+      UserMessageItem item = messages[index];
+      if (item.time.difference(lastItem.time).compareTo(Duration(minutes: 3)) >
+          0) {
+        return Column(
+          children: <Widget>[
+            text,
+            child,
+          ],
+        );
+      }
+    }
+    return child;
   }
 
   Widget generateLeftBubble(UserMessageItem item) {
@@ -387,6 +460,39 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+  String getTimeString(DateTime time) {
+    Map<int, String> weekdayMap = {
+      1: "星期一  ${_addZero(time.hour)}:${_addZero(time.minute)}",
+      2: "星期二  ${_addZero(time.hour)}:${_addZero(time.minute)}",
+      3: "星期三  ${_addZero(time.hour)}:${_addZero(time.minute)}",
+      4: "星期四  ${_addZero(time.hour)}:${_addZero(time.minute)}",
+      5: "星期五  ${_addZero(time.hour)}:${_addZero(time.minute)}",
+      6: "星期六  ${_addZero(time.hour)}:${_addZero(time.minute)}",
+      7: "星期日  ${_addZero(time.hour)}:${_addZero(time.minute)}"
+    };
+    DateTime now = DateTime.now();
+    if (now.year != time.year) {
+      return "${time.year}-${time.month}-${time.day} ${_addZero(time.hour)}:${_addZero(time.minute)}";
+    }
+    Duration month = Duration(days: 7);
+    Duration diff = now.difference(time);
+    if (diff.compareTo(month) > 0) {
+      return "${time.year}-${_addZero(time.month)}-${_addZero(time.day)}";
+    }
+    if (now.day == time.day) {
+      return "${_addZero(time.hour)}:${_addZero(time.minute)}";
+    }
+    if (now.add(Duration(days: -1)).day == time.day) {
+      return "昨天  ${_addZero(time.hour)}:${_addZero(time.minute)}";
+    }
+    if (now.add(Duration(days: -2)).day == time.day) {
+      return "前天  ${_addZero(time.hour)}:${_addZero(time.minute)}";
+    }
+    return weekdayMap[time.weekday];
+  }
+
+  String _addZero(int value) => value < 10 ? "0$value" : "$value";
 }
 
 class Bubble extends StatelessWidget {

@@ -40,8 +40,10 @@ class _MessagePageState extends State<MessagePage> {
         actions: <Widget>[
           MaterialButton(
             minWidth: 10,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
             child: Icon(Icons.clear_all, color: Colors.white),
-            onPressed: (){
+            onPressed: () {
               data.readAll();
             },
           )
@@ -216,13 +218,15 @@ class _MessagePageState extends State<MessagePage> {
       Row(
         children: <Widget>[
           Container(
-            width: AvatarHeight,
-            height: AvatarHeight,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AvatarHeight / 2),
-            ),
-            child: Avatar(url: other.avatar, avatarHeight: AvatarHeight,)
-          ),
+              width: AvatarHeight,
+              height: AvatarHeight,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AvatarHeight / 2),
+              ),
+              child: Avatar(
+                url: other.avatar,
+                avatarHeight: AvatarHeight,
+              )),
           Padding(
             padding: EdgeInsets.all(10),
           ),
