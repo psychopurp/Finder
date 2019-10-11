@@ -5,6 +5,7 @@ import 'package:finder/models/topic_comments_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final int topicId;
@@ -28,11 +29,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   @override
   void initState() {
-    getInitialData().then((val) {
-      setState(() {
-        this.topicComments = val;
-      });
-    });
+    getInitialData();
     super.initState();
   }
 
@@ -58,8 +55,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                 child: EasyRefresh(
                   header: MaterialHeader(),
                   onRefresh: () async {
-                    await Future.delayed(Duration(seconds: 1), () {
-                      setState(() {});
+                    await Future.delayed(Duration(microseconds: 200), () {
+                      getInitialData();
                     });
                   },
                   child: ListView(
@@ -166,45 +163,34 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                           ),
                         ],
                       ),
-                      InkWell(
-                        onTap: () {
-                          print(item.sender.nickname);
-                          setState(() {
-                            if (this.followList.contains(item.id)) {
-                              this.followList.remove(item.id);
-                            } else {
-                              this.followList.add(item.id);
-                            }
-                          });
-                        },
-                        child: Container(
-                          margin:
-                              EdgeInsets.only(right: ScreenUtil().setWidth(20)),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 4.0, horizontal: 5.0),
-                          decoration: BoxDecoration(
-                              color: (this.followList.contains(item.id))
-                                  ? Colors.cyan[300]
-                                  : Colors.cyan,
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Text(
-                            (this.followList.contains(item.id)) ? '已关注' : '+关注',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: ScreenUtil().setSp(40)),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                        vertical: ScreenUtil().setHeight(20)),
-                    height: 1,
+                  Divider(
+                    height: 30,
+                    thickness: 1,
                     color: Colors.black12,
                   ),
+                  // Container(
+                  //   child: Text(item.content),
+                  // ),
                   Container(
-                    child: Text(item.content),
+                    // color: Colors.amber,
+                    child: Html(
+                      data: """<p>${item.content}</P>
+                     <h1>Demo Page</h1>
+                      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" />
+                    <p>This is a <u>fantastic</u> nonexistent product that you should really really really consider buying!</p>
+                    <a href="https://github.com">https://github.com</a><br />
+                    <br />
+                    <h2>Pricing</h2>
+                    <p>Lorem ipsum <b>dolor</b> sit amet.</p>
+                    <center>
+                      This is some center text... <abbr>ABBR</abbr> and <acronym>ACRONYM</acronym>
+                    </center>""",
+                      onLinkTap: (url) {
+                        print(url);
+                      },
+                    ),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
@@ -299,7 +285,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   Future getInitialData() async {
     var data = await apiClient.getTopicComments(topicId: topicId, page: 1);
     var topicComments = TopicCommentsModel.fromJson(data);
-    print(data);
+    setState(() {
+      this.topicComments = topicComments;
+    });
     return topicComments;
   }
 }

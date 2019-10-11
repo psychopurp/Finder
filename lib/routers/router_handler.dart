@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:finder/models/activity_model.dart';
-import 'package:finder/models/topic_comments_model.dart';
+import 'package:finder/pages/home_page/publish_topic_comment.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +73,17 @@ var moreActivitiesHandler = Handler(
 var publishTopicHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return PublishTopicPage();
+});
+
+//首页 -- 发布话题评论
+var publishTopicCommentHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  String topicId = params['topicId']?.first;
+  String topicTitle = params['topicTitle']?.first;
+  return PublishTopicCommentPage(
+      // topicId: int.parse(topicId),
+      // topicTitle: topicTitle,
+      );
 });
 
 //首页 -- 发布活动

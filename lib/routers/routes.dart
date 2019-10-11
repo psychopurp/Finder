@@ -8,6 +8,7 @@ class Routes {
   static String login = '/login';
   //首页
   static String publishTopic = '/publishTopic'; //首页-- 发布话题
+  static String publishTopicComment = '/publishTopicComment'; //首页-- 发布话题
   static String publishActivity = '/publishActivity'; //首页 -- 发布活动
   static String moreTopics = '/home/moreTopics'; //首页 -- 更多话题
   static String moreActivities = '/home/moreActivities'; //首页 -- 更多活动
@@ -40,6 +41,9 @@ class Routes {
     //首页
     router.define(publishTopic,
         handler: publishTopicHandler, transitionType: TransitionType.material);
+    router.define(publishTopicComment,
+        handler: publishTopicCommentHandler,
+        transitionType: TransitionType.material);
     router.define(publishActivity,
         handler: publishActivityHandler, transitionType: TransitionType.fadeIn);
     router.define(login,

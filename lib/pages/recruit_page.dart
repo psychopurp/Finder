@@ -8,6 +8,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:finder/pages/recruit_page/recruit_search_page.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class RecruitPage extends StatefulWidget {
   @override
@@ -96,38 +97,36 @@ class _RecruitPageState extends State<RecruitPage> {
               spreadRadius: 1)
         ]),
         padding: EdgeInsets.only(left: 20, right: 10, top: 5),
-        child: ListView(
-          children: <Widget>[
-            Wrap(
-              spacing: 10,
-              children: this.recruitTypes.data.map((val) {
-                return InkWell(
-                    onTap: () {
-                      setState(() {
-                        this.selectedTypeList.add(val.id);
-                      });
-                    },
-                    child: (this.selectedTypeList.contains(val.id))
-                        ? Chip(
-                            backgroundColor: Colors.blue,
-                            onDeleted: () {
-                              setState(() {
-                                this.selectedTypeList.remove(val.id);
-                              });
-                            },
-                            label: Text(
-                              val.name,
-                              style: TextStyle(color: Colors.white),
-                            ))
-                        : Chip(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            label: Text(
-                              val.name,
-                              style: TextStyle(color: Colors.white),
-                            )));
-              }).toList(),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Wrap(
+            spacing: 10,
+            children: this.recruitTypes.data.map((val) {
+              return InkWell(
+                  onTap: () {
+                    setState(() {
+                      this.selectedTypeList.add(val.id);
+                    });
+                  },
+                  child: (this.selectedTypeList.contains(val.id))
+                      ? Chip(
+                          backgroundColor: Colors.blue,
+                          onDeleted: () {
+                            setState(() {
+                              this.selectedTypeList.remove(val.id);
+                            });
+                          },
+                          label: Text(
+                            val.name,
+                            style: TextStyle(color: Colors.white),
+                          ))
+                      : Chip(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          label: Text(
+                            val.name,
+                            style: TextStyle(color: Colors.white),
+                          )));
+            }).toList(),
+          ),
         ),
       );
 
