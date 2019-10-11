@@ -1,12 +1,13 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
 import 'package:finder/models/recruit_model.dart';
-import 'package:finder/plugin/my_appbar.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
+import 'package:finder/pages/recruit_page/recruit_search_page.dart';
 
 class RecruitPage extends StatefulWidget {
   @override
@@ -23,13 +24,8 @@ class _RecruitPageState extends State<RecruitPage> {
   @override
   void initState() {
     _refreshController = EasyRefreshController();
-    getRecruitsData().then((val) {
-      setState(() {
-        print(val['recruits']);
-        this.recruits = RecruitModel.fromJson(val['recruits']);
-        this.recruitTypes = RecruitTypesModel.fromJson(val['recruitTypes']);
-      });
-    });
+    recruitTypes = global.recruitTypes;
+    getRecruitsData();
     super.initState();
   }
 
@@ -53,7 +49,10 @@ class _RecruitPageState extends State<RecruitPage> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 14, horizontal: 10),
               child: MaterialButton(
-                onPressed: () {},
+                onPressed: () {
+                  showSearch(
+                      context: context, delegate: RecruitSearchDelegate());
+                },
                 color: Theme.of(context).dividerColor,
                 minWidth: ScreenUtil().setWidth(130),
                 padding: EdgeInsets.only(right: 25),
@@ -222,64 +221,35 @@ class _RecruitPageState extends State<RecruitPage> {
     );
   }
 
-  Future getRecruitsData() async {
+  Future getRecruitsData({int pageCount = 1, List<int> typesId}) async {
     var formData = {
       'recruits': await apiClient.getRecruits(),
-      'recruitTypes': (await ApiClient.dio.get('get_recruit_types/')).data
     };
+
+    setState(() {
+      this.recruits = RecruitModel.fromJson(formData['recruits']);
+    });
     return formData;
   }
-}
 
-class TopTypesBanner extends StatefulWidget implements PreferredSizeWidget {
-  final RecruitTypesModel recruitTypes;
-  TopTypesBanner({this.recruitTypes});
-  @override
-  _TopTypesBannerState createState() => _TopTypesBannerState();
+  Future getMore({int pageCount = 1, List<int> typesId}) async {
+    var formData = {
+      'recruits': await apiClient.getRecruits(),
+    };
 
-  @override
-  Size get preferredSize => Size.fromHeight(ScreenUtil().setHeight(200));
-}
+    // if(typesId!=null){
+    //   this.recruits.data.clear();
+    // }
+    // for (var typeId in typesId) {
+    //   var recruitsData =
+    //       await apiClient.getRecruits(page: pageCount, typeId: typeId);
+    //   RecruitModel recruits = RecruitModel.fromJson(recruitsData);
+    //   this.recruits.data.addAll(recruits.data);
+    // }
 
-class _TopTypesBannerState extends State<TopTypesBanner> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      // color: Colors.green,
-      // height: ScreenUtil().setHeight(200),
-      // width: ScreenUtil().setWidth(300),
-      child: Column(
-        children: <Widget>[
-          AppBar(
-            title: Text(
-              '招募',
-              style: TextStyle(color: Colors.black),
-            ),
-            elevation: 0,
-            centerTitle: true,
-            // bottom: TopTypesBanner(),
-          ),
-          topTypesBanner()
-        ],
-      ),
-    );
+    setState(() {
+      this.recruits = RecruitModel.fromJson(formData['recruits']);
+    });
+    return formData;
   }
-
-  ///招募类型
-  topTypesBanner() => Container(
-        height: ScreenUtil().setHeight(220),
-        color: Colors.white,
-        padding: EdgeInsets.only(left: 20, right: 20, top: 5),
-        child: Wrap(
-          spacing: 10,
-          children: widget.recruitTypes.data.map((val) {
-            return Chip(
-                backgroundColor: Theme.of(context).primaryColor,
-                label: Text(
-                  val.name,
-                  style: TextStyle(color: Colors.white),
-                ));
-          }).toList(),
-        ),
-      );
 }

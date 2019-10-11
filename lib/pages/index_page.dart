@@ -1,5 +1,6 @@
 import 'package:finder/pages/mine_page/user_profile_page.dart';
 import 'package:finder/routers/application.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
@@ -75,7 +76,57 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    Application.router.navigateTo(context, "/publishActivity");
+                    showCupertinoModalPopup(
+                        context: context,
+                        builder: (_) {
+                          return Container(
+                            alignment: Alignment.center,
+                            height: 200,
+                            width: 300,
+                            // color: Colors.amber,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                MaterialButton(
+                                  padding: EdgeInsets.all(15),
+                                  color: Colors.white,
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Application.router.navigateTo(
+                                        context, "/publishTopic",
+                                        transition: TransitionType.cupertino);
+                                  },
+                                  shape: CircleBorder(),
+                                  child: Text("话题"),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 28.0),
+                                  child: MaterialButton(
+                                    padding: EdgeInsets.all(15),
+                                    color: Colors.white,
+                                    onPressed: () {},
+                                    shape: CircleBorder(),
+                                    child: Text("招募"),
+                                  ),
+                                ),
+                                MaterialButton(
+                                  padding: EdgeInsets.all(15),
+                                  color: Colors.white,
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Application.router.navigateTo(
+                                        context, "/publishActivity",
+                                        transition: TransitionType.cupertino);
+                                  },
+                                  shape: CircleBorder(),
+                                  child: Text("活动"),
+                                ),
+                              ],
+                            ),
+                          );
+                        });
+                    // Application.router.navigateTo(context, "/publishActivity");
                   },
                 ),
               ),
@@ -96,9 +147,16 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
       children: <Widget>[
         Icon(
           iconData,
-          color: Colors.black,
+          color: isSelected ? Colors.black : Colors.black.withOpacity(0.5),
         ),
-        Text(title),
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'normal',
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.black : Colors.black.withOpacity(0.5),
+          ),
+        ),
       ],
     );
     var unSelectedWidget = Column(
@@ -113,27 +171,18 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     );
 
     return InkWell(
-        onTap: () {
-          Future.delayed(Duration(microseconds: 500), () {});
-          setState(() {
-            this._selectIndex = index;
-          });
-        },
-        child: IndexedStack(
-          index: isSelected ? 1 : 0,
-          children: <Widget>[
-            Container(
-              height: kBottomNavigationBarHeight,
-              width: ScreenUtil().setWidth(150),
-              child: unSelectedWidget,
-            ),
-            Container(
-              height: kBottomNavigationBarHeight,
-              width: ScreenUtil().setWidth(150),
-              child: selectedWidget,
-            ),
-          ],
-        ));
+      onTap: () {
+        Future.delayed(Duration(microseconds: 500), () {});
+        setState(() {
+          this._selectIndex = index;
+        });
+      },
+      child: Container(
+        height: kBottomNavigationBarHeight,
+        width: ScreenUtil().setWidth(150),
+        child: selectedWidget,
+      ),
+    );
     // child: !isSelected
     //     ? AnimatedSwitcher(
     //         transitionBuilder:
