@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:finder/config/api_client.dart';
 import 'package:finder/pages/message_page/data_object.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:flutter/material.dart';
@@ -25,14 +29,15 @@ class ChatRouter extends StatelessWidget {
         title: Text(other.nickname),
       ),
       backgroundColor: Color.fromARGB(249, 249, 249, 249),
-      body: ChatPage(sessionId),
+      body: ChatPage(sessionId, other),
     );
   }
 }
 
 class ChatPage extends StatefulWidget {
-  ChatPage(this.sessionId);
+  ChatPage(this.sessionId, this.other);
 
+  final UserProfile other;
   final String sessionId;
 
   @override
@@ -43,12 +48,19 @@ class _ChatPageState extends State<ChatPage> {
   DataObject data;
   List<UserMessageItem> messages;
   bool needSync = false;
-  TextEditingController _controller;
+  TextEditingController _textController;
+  ScrollController _scrollController;
   FocusNode _focusNode;
   int sendKey;
+  Dio dio = ApiClient.dio;
 
   void update() {
     setState(() {});
+  }
+
+  Future<void> moveToBottom() async {
+    await _scrollController.animateTo((messages.length * 70).toDouble(),
+        duration: Duration(seconds: 1), curve: Curves.easeInOut);
   }
 
   @override
@@ -62,17 +74,113 @@ class _ChatPageState extends State<ChatPage> {
     } else {
       messages = data.users[widget.sessionId];
     }
-    _controller = TextEditingController();
+    _textController = TextEditingController();
     _focusNode = FocusNode();
     sendKey = DateTime.now().millisecondsSinceEpoch;
+    _scrollController = ScrollController();
+//    _focusNode.addListener(() {
+//      if (!_focusNode.hasFocus) moveToBottom();
+//    });
   }
 
   @override
   void dispose() {
-    super.dispose();
     data.removeListener(update);
-    _controller.dispose();
+    _textController.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<bool> sendMessage() async {
+    String text = _textController.value.text;
+    if (text == null || text == "") return false;
+    await data.getData();
+    UserMessageItem item = UserMessageItem(
+        sessionId: widget.sessionId,
+        content: text,
+        sender: data.self,
+        receiver: widget.other,
+        sending: true,
+        time: DateTime.now(),
+        id: null,
+        isRead: true);
+    setState(() {
+      messages.add(item);
+    });
+    _textController.clear();
+    moveToBottom();
+    try {
+      Response response = await dio.post('send_user_message/',
+          data: json.encode({"receiver": widget.other.id, "content": text}));
+      var resData = response.data;
+      if (resData["status"]) {
+        setState(() {
+          item.id = resData["id"];
+          item.sending = false;
+          item.time = DateTime.fromMicrosecondsSinceEpoch(
+              (resData['time'] * 1000000).toInt());
+          messages.remove(item);
+          messages.add(item);
+        });
+        return true;
+      } else {
+        setState(() {
+          item.sending = false;
+          item.fail = true;
+          item.id = DataObject.failCount--;
+        });
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+      setState(() {
+        item.sending = false;
+        item.fail = true;
+        item.id = DataObject.failCount--;
+      });
+      return false;
+    }
+  }
+
+  Future<bool> reSend(UserMessageItem item) async {
+    setState(() {
+      item.sending = true;
+      item.fail = false;
+    });
+    try {
+      await data.getData();
+      Response response = await dio.post('send_user_message/',
+          data: json
+              .encode({"receiver": widget.other.id, "content": item.content}));
+      var resData = response.data;
+      if (resData["status"]) {
+        setState(() {
+          item.id = resData["id"];
+          item.sending = false;
+          item.time = DateTime.fromMicrosecondsSinceEpoch(
+              (resData['time'] * 1000000).toInt());
+          messages.remove(item);
+          messages.add(item);
+        });
+        return true;
+      } else {
+        setState(() {
+          item.sending = false;
+          item.fail = true;
+          item.id = DataObject.failCount--;
+        });
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+      setState(() {
+        item.sending = false;
+        item.fail = true;
+        item.id = DataObject.failCount--;
+      });
+      return false;
+    }
   }
 
   @override
@@ -80,25 +188,30 @@ class _ChatPageState extends State<ChatPage> {
     return Column(
       children: <Widget>[
         Expanded(
-          flex: 1,
-          child: NotificationListener(
-            onNotification: (notification){
-              _focusNode.unfocus();
-              return false;
-            },
-            child: ListView.builder(
-              itemBuilder: (context, index) {
-                UserMessageItem item = messages[index];
-                if (item.sender == data.self) {
-                  return generateRightBubble(item);
-                } else {
-                  return generateLeftBubble(item);
-                }
-              },
-              itemCount: messages.length,
-            ),
-          )
-        ),
+            flex: 1,
+            child: NotificationListener(
+                onNotification: (notification) {
+                  _focusNode.unfocus();
+                  return false;
+                },
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await data.getData();
+                    await data.getHistoryUserMessages(widget.sessionId);
+                  },
+                  child: ListView.builder(
+                    itemBuilder: (context, index) {
+                      UserMessageItem item = messages[index];
+                      if (item.sender == data.self) {
+                        return generateRightBubble(item);
+                      } else {
+                        return generateLeftBubble(item);
+                      }
+                    },
+                    itemCount: messages.length,
+                    controller: _scrollController,
+                  ),
+                ))),
         Container(
           width: double.infinity,
           height: 55,
@@ -111,7 +224,7 @@ class _ChatPageState extends State<ChatPage> {
                   padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                   child: TextField(
                     focusNode: _focusNode,
-                    controller: _controller,
+                    controller: _textController,
                     decoration: InputDecoration(
                       filled: true,
                       contentPadding:
@@ -147,6 +260,8 @@ class _ChatPageState extends State<ChatPage> {
                     setState(() {
                       sendKey = DateTime.now().millisecondsSinceEpoch;
                     });
+                    sendMessage();
+                    moveToBottom();
                   },
                   minWidth: 10,
                   splashColor: Color.fromARGB(88, 239, 239, 239),
@@ -192,6 +307,38 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget generateRightBubble(UserMessageItem item) {
+    Widget prefix = Container();
+    if (item.sending) {
+      prefix = Container(
+        margin: EdgeInsets.only(right: 10),
+        width: 15,
+        height: 15,
+        child: CircularProgressIndicator(),
+      );
+    }
+    if (item.fail) {
+      prefix = Builder(builder: (context) {
+        return MaterialButton(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          minWidth: 0,
+          padding: EdgeInsets.all(0),
+          onPressed: () {
+            reSend(item);
+          },
+          child: Container(
+            width: 25,
+            height: 25,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.5)),
+            child: Icon(
+              Icons.error,
+              size: 25,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        );
+      });
+    }
     return Container(
       width: double.infinity,
       height: 70,
@@ -199,6 +346,7 @@ class _ChatPageState extends State<ChatPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
+          prefix,
           Bubble(
             text: item.content,
             fromRight: true,

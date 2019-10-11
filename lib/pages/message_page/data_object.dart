@@ -30,6 +30,7 @@ class DataObject implements Listenable {
   int usersCount = 0;
   int saysCount = 0;
   bool init = false;
+  static int failCount = -1;
 
   factory DataObject({VoidCallback onChange}) {
     if (instance == null) {
@@ -81,7 +82,7 @@ class DataObject implements Listenable {
     }
   }
 
-  void getData() async {
+  Future<void> getData() async {
     print("Try Get Messages.");
     if (lastRequestTime == null) {
       lastRequestTime = DateTime.now().add(Duration(days: -1));
@@ -89,6 +90,38 @@ class DataObject implements Listenable {
     DateTime reqTime = DateTime.now();
     await getMessages(lastRequestTime.millisecondsSinceEpoch ~/ 1000);
     lastRequestTime = reqTime;
+  }
+
+  Future<void> getHistoryUserMessages(String sessionId) async {
+    if (!users.containsKey(sessionId)) return;
+    List<UserMessageItem> messages = users[sessionId];
+    DateTime endTime;
+    if (messages.length == 0)
+      endTime = DateTime.now();
+    else {
+      UserMessageItem first = messages[0];
+      endTime = first.time;
+    }
+    int end = endTime.millisecondsSinceEpoch ~/ 1000;
+    Map<String, dynamic> queryParameters = {
+      "end": end,
+      "sessionId": sessionId,
+    };
+    Response response =
+        await dio.get("get_history_message/", queryParameters: queryParameters);
+    Map<String, dynamic> data = response.data;
+//    print(data);
+    if (!data["status"]) {
+      throw DioError(
+          request: response.request,
+          response: response,
+          message: data["error"],
+          type: DioErrorType.RESPONSE);
+    } else
+      addAll(
+          List<Map<String, dynamic>>.generate(data["data"].length,
+              (index) => data["data"][data["data"].length - index - 1]),
+          addFirst: true);
   }
 
   Future<void> getMessages(int start,
@@ -176,10 +209,10 @@ class DataObject implements Listenable {
     return count;
   }
 
-  void addAll(List<Map<String, dynamic>> data) {
+  void addAll(List<Map<String, dynamic>> data, {bool addFirst: false}) {
     bool change = false;
     for (var item in data) {
-      bool res = add(item, changeNow: false);
+      bool res = add(item, changeNow: false, addFirst: addFirst);
       change = change || res;
     }
     if (change) {
@@ -187,24 +220,25 @@ class DataObject implements Listenable {
     }
   }
 
-  bool add(Map<String, dynamic> item, {bool changeNow: true}) {
+  bool add(Map<String, dynamic> item,
+      {bool changeNow: true, bool addFirst: false}) {
     bool change = false;
     switch (item["type"]) {
       case MessageType.UserToUser:
         UserMessageItem messageItem = UserMessageItem.fromJson(item);
-        change = addUserToUser(messageItem);
+        change = addUserToUser(messageItem, addFirst: addFirst);
         break;
       case MessageType.SystemMessage:
         SystemMessageItem messageItem = SystemMessageItem.fromJson(item);
-        change = addSystemMessage(messageItem);
+        change = addSystemMessage(messageItem, addFirst: addFirst);
         break;
       case MessageType.SayToHe:
         SayToHeItem messageItem = SayToHeItem.fromJson(item);
-        change = addSay(messageItem);
+        change = addSay(messageItem, addFirst: addFirst);
         break;
       case MessageType.Tips:
         TipItem messageItem = TipItem.fromJson(item);
-        change = addTip(messageItem);
+        change = addTip(messageItem, addFirst: addFirst);
         break;
     }
     if (change && changeNow) {
@@ -213,22 +247,28 @@ class DataObject implements Listenable {
     return change;
   }
 
-  bool addUserToUser(UserMessageItem messageItem) {
+  bool addUserToUser(UserMessageItem messageItem, {bool addFirst: false}) {
     bool change = false;
     if (users.containsKey(messageItem.sessionId)) {
       if (!users[messageItem.sessionId].contains(messageItem)) {
-        users[messageItem.sessionId].add(messageItem);
-        if(init){
-          usersIndex.remove(messageItem.sessionId);
-          usersIndex.add(messageItem.sessionId);
+        if (addFirst) {
+          users[messageItem.sessionId].insert(0, messageItem);
+        } else {
+          users[messageItem.sessionId].add(messageItem);
+          if (init) {
+            usersIndex.remove(messageItem.sessionId);
+            usersIndex.add(messageItem.sessionId);
+          }
         }
         change = true;
       }
     } else {
       change = true;
       users[messageItem.sessionId] = [messageItem];
-      if(init){
-        usersIndex.add(messageItem.sessionId);
+      if (!addFirst) {
+        if (init) {
+          usersIndex.add(messageItem.sessionId);
+        }
       }
     }
     if (change) {
@@ -237,11 +277,14 @@ class DataObject implements Listenable {
     return change;
   }
 
-  bool addSystemMessage(SystemMessageItem messageItem) {
+  bool addSystemMessage(SystemMessageItem messageItem, {bool addFirst: false}) {
     bool change = false;
     if (!systems.contains(messageItem)) {
       //TODO 此写法没有优化, 可用二分查找优化
-      systems.add(messageItem);
+      if (addFirst)
+        systems.insert(0, messageItem);
+      else
+        systems.add(messageItem);
       change = true;
     }
     if (change) {
@@ -250,11 +293,14 @@ class DataObject implements Listenable {
     return change;
   }
 
-  bool addTip(TipItem messageItem) {
+  bool addTip(TipItem messageItem, {bool addFirst: false}) {
     bool change = false;
     if (!tips.contains(messageItem)) {
       //TODO 此写法没有优化, 可用二分查找优化
-      tips.add(messageItem);
+      if (addFirst)
+        tips.insert(0, messageItem);
+      else
+        tips.add(messageItem);
       change = true;
     }
     if (change) {
@@ -263,12 +309,15 @@ class DataObject implements Listenable {
     return change;
   }
 
-  bool addSay(SayToHeItem messageItem) {
+  bool addSay(SayToHeItem messageItem, {bool addFirst: false}) {
     bool change = false;
     if (says.containsKey(messageItem.sessionId)) {
       if (!says[messageItem.sessionId].contains(messageItem)) {
         //TODO 此写法没有优化, 可用二分查找优化
-        says[messageItem.sessionId].add(messageItem);
+        if (addFirst)
+          says[messageItem.sessionId].insert(0, messageItem);
+        else
+          says[messageItem.sessionId].add(messageItem);
         change = true;
       }
     } else {
@@ -350,11 +399,11 @@ abstract class ToJson {
 }
 
 class Item {
-  Item(this.id, this.isRead);
+  Item(this.id, {this.isRead: true});
 
   bool isRead;
 
-  final int id;
+  int id;
 
   @override
   bool operator ==(other) {
@@ -368,7 +417,7 @@ class Item {
 }
 
 class UserProfile extends Item implements ToJson {
-  UserProfile({this.nickname, int id, this.avatar}) : super(id, false);
+  UserProfile({this.nickname, int id, this.avatar}) : super(id, isRead: false);
   static Map<int, UserProfile> users = {};
 
   factory UserProfile.fromJson(Map<String, dynamic> map) {
@@ -404,8 +453,9 @@ class UserMessageItem extends Item implements ToJson {
       this.content,
       int id,
       bool isRead,
-      this.sessionId})
-      : super(id, isRead);
+      this.sessionId,
+      this.sending = false})
+      : super(id, isRead: isRead);
 
   factory UserMessageItem.fromJson(Map<String, dynamic> map) {
     UserProfile receiver = UserProfile.fromJson(map['receiver']);
@@ -420,11 +470,13 @@ class UserMessageItem extends Item implements ToJson {
         id: map["id"]);
   }
 
-  final DateTime time;
+  DateTime time;
   final UserProfile sender;
   final UserProfile receiver;
   final String content;
   final String sessionId;
+  bool sending;
+  bool fail = false;
 
   @override
   Map<String, dynamic> toJson() {
@@ -447,7 +499,7 @@ class SystemMessageItem extends Item implements ToJson {
     this.content,
     this.isToAll,
     bool isRead,
-  }) : super(id, isRead);
+  }) : super(id, isRead: isRead);
 
   factory SystemMessageItem.fromJson(Map<String, dynamic> map) {
     return SystemMessageItem(
@@ -485,7 +537,7 @@ class SayToHeItem extends Item implements ToJson {
       int id,
       this.sender,
       this.isShowName})
-      : super(id, isRead);
+      : super(id, isRead: isRead);
 
   factory SayToHeItem.fromJson(Map<String, dynamic> map) {
     return SayToHeItem(
@@ -525,7 +577,7 @@ class SayToHeItem extends Item implements ToJson {
 
 class TipItem extends Item implements ToJson {
   TipItem({int id, this.content, bool isRead, this.time, this.jump})
-      : super(id, isRead);
+      : super(id, isRead: isRead);
 
   factory TipItem.fromJson(Map<String, dynamic> map) {
     return TipItem(
