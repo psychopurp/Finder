@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
-import 'package:flutter/material.dart';
 
 class ApiClient {
   static const host = "http://47.94.247.8";

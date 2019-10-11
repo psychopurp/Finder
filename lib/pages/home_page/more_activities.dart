@@ -198,7 +198,6 @@ class _ChildActivitiesState extends State<ChildActivities>
     if (this.activityType.name != "全部") {
       print(this.activityType.name);
       activities.data.removeWhere((item) {
-        print(item.types.contains(this.activityType));
         bool isContain = false;
         item.types.forEach((val) {
           if (val.id == this.activityType.id) {
@@ -252,13 +251,13 @@ class _ChildActivitiesState extends State<ChildActivities>
                       boxShadow: [
                         BoxShadow(
                             color: Colors.black38,
-                            offset: Offset(-3.0, 5.0),
-                            blurRadius: 10.0,
+                            offset: Offset(-1.0, 2.0),
+                            blurRadius: 2.0,
                             spreadRadius: 1.0),
                       ],
                       image: DecorationImage(
                         image: imageProvider,
-                        fit: BoxFit.fill,
+                        fit: BoxFit.cover,
                       ),
                     )),
                 Column(

@@ -1,3 +1,5 @@
+import 'package:finder/models/tag_model.dart';
+
 class RecruitModel {
   List<RecruitModelData> data;
   int totalPage;
@@ -36,9 +38,17 @@ class RecruitModelData {
   String title;
   String introduction;
   int id;
+  List<RecruitTypesModelData> types;
+  List<TagModel> tags;
 
   RecruitModelData(
-      {this.sender, this.time, this.title, this.introduction, this.id});
+      {this.sender,
+      this.time,
+      this.title,
+      this.introduction,
+      this.id,
+      this.tags,
+      this.types});
 
   RecruitModelData.fromJson(Map<String, dynamic> json) {
     sender =
@@ -47,6 +57,18 @@ class RecruitModelData {
     title = json['title'];
     introduction = json['introduction'];
     id = json['id'];
+    if (json['types'] != null) {
+      types = new List<RecruitTypesModelData>();
+      json['types'].forEach((v) {
+        types.add(new RecruitTypesModelData.fromJson(v));
+      });
+    }
+    if (json['tags'] != null) {
+      tags = new List<TagModel>();
+      json['tags'].forEach((v) {
+        tags.add(new TagModel.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -58,6 +80,12 @@ class RecruitModelData {
     data['title'] = this.title;
     data['introduction'] = this.introduction;
     data['id'] = this.id;
+    if (this.types != null) {
+      data['types'] = this.types.map((v) => v.toJson()).toList();
+    }
+    if (this.tags != null) {
+      data['tags'] = this.tags.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }

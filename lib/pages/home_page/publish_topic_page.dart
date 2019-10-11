@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class PublishTopicPage extends StatefulWidget {
   @override
@@ -207,7 +208,25 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
      */
     Future getImage() async {
       var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-      return image;
+      var cropImage = await ImageCropper.cropImage(
+          sourcePath: image.path,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
+          androidUiSettings: AndroidUiSettings(
+              toolbarTitle: '图片剪切',
+              toolbarColor: Theme.of(context).primaryColor,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false),
+          iosUiSettings: IOSUiSettings(
+            minimumAspectRatio: 1.0,
+          ));
+      return cropImage;
     }
 
     return Align(

@@ -56,13 +56,13 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   boxShadow: [
                     BoxShadow(
                         color: Colors.black38,
-                        offset: Offset(5.0, 8.0),
-                        blurRadius: 10.0,
+                        offset: Offset(-1.0, 2.0),
+                        blurRadius: 2.0,
                         spreadRadius: 1.0),
                   ],
                   image: DecorationImage(
                       image: CachedNetworkImageProvider(activity.poster),
-                      fit: BoxFit.fill)),
+                      fit: BoxFit.cover)),
             ),
             DefaultTextStyle(
               style: Theme.of(context).textTheme.body1,

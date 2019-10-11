@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RecruitSearch extends SearchDelegate<String> {
+class RecruitSearchDelegate extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -18,7 +18,9 @@ class RecruitSearch extends SearchDelegate<String> {
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: AnimatedIcon(
-          icon: AnimatedIcons.menu_arrow, progress: transitionAnimation),
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
       onPressed: () {
         if (query.isEmpty) {
           close(context, null);
@@ -32,13 +34,22 @@ class RecruitSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    // TODO: implement buildResults
     return null;
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // TODO: implement buildSuggestions
-    return null;
+    return Column(
+      children: <Widget>[
+        Chip(
+          label: Text('asfasf'),
+        )
+      ],
+    );
+  }
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    return super.appBarTheme(context);
   }
 }
