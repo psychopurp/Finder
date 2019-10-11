@@ -268,12 +268,21 @@ class _MessagePageState extends State<MessagePage> {
       ),
     );
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        Navigator.pushNamed(context, Routes.chat, arguments: other);
-      },
-      child: child,
-    );
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.pushNamed(context, Routes.chat, arguments: other);
+        },
+        child: Dismissible(
+          key: ValueKey(data.usersIndex[data.usersIndex.length - index - 1]),
+          child: child,
+          onDismissed: (direction) {
+            setState(() {
+              data.users
+                  .remove(data.usersIndex[data.usersIndex.length - 1 - index]);
+              data.usersIndex.removeAt(data.usersIndex.length - index - 1);
+            });
+          },
+        ));
   }
 
   String getTimeString(DateTime time) {

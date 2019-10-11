@@ -16,7 +16,10 @@ const double AvatarHeight = 54;
 class ChatRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    UserProfile other = ModalRoute.of(context).settings.arguments;
+    UserProfile other = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
     DataObject data = DataObject();
     int id1;
     int id2;
@@ -32,7 +35,7 @@ class ChatRouter extends StatelessWidget {
       appBar: AppBar(
         title: Text(other.nickname),
       ),
-      backgroundColor: Color.fromARGB(249, 249, 249, 249),
+      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       body: ChatPage(sessionId, other),
     );
   }
@@ -85,7 +88,9 @@ class _ChatPageState extends State<ChatPage> {
     }
     _textController = TextEditingController();
     _focusNode = FocusNode();
-    sendKey = DateTime.now().millisecondsSinceEpoch;
+    sendKey = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     _scrollController = ScrollController();
     _loadController = EasyRefreshController();
     _focusNode.addListener(() {
@@ -220,9 +225,9 @@ class _ChatPageState extends State<ChatPage> {
             itemBuilder: (context, index) {
               UserMessageItem item = messages[index];
               if (item.sender == data.self) {
-                return generateRightBubble(item);
+                return timeDisplay(index, false, generateRightBubble(item));
               } else {
-                return generateLeftBubble(item);
+                return timeDisplay(index, false, generateLeftBubble(item));
               }
             },
             itemCount: messages.length,
@@ -285,7 +290,7 @@ class _ChatPageState extends State<ChatPage> {
                     decoration: InputDecoration(
                       filled: true,
                       contentPadding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       fillColor: Color.fromARGB(255, 245, 241, 241),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -293,13 +298,6 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
-//                  child: TextField(
-//                    decoration: InputDecoration(
-//                      border: OutlineInputBorder(
-//                        borderRadius: BorderRadius.all(Radius.circular(30)),
-//                      ),
-//                    ),
-//                  ),
                 ),
               ),
               AnimatedSwitcher(
@@ -315,7 +313,9 @@ class _ChatPageState extends State<ChatPage> {
                   onPressed: () {
                     _focusNode.unfocus();
                     setState(() {
-                      sendKey = DateTime.now().millisecondsSinceEpoch;
+                      sendKey = DateTime
+                          .now()
+                          .millisecondsSinceEpoch;
                     });
                     sendMessage();
                     moveToBottom();
@@ -353,6 +353,7 @@ class _ChatPageState extends State<ChatPage> {
     if (index == 0) {
       return Column(
         children: <Widget>[
+          Padding(padding: EdgeInsets.all(5),),
           text,
           child,
         ],
@@ -377,7 +378,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget generateLeftBubble(UserMessageItem item) {
     return Container(
       width: double.infinity,
-      height: 70,
+      constraints: BoxConstraints(minHeight: 70),
       alignment: Alignment.centerLeft,
       child: Row(
         children: <Widget>[
@@ -426,7 +427,9 @@ class _ChatPageState extends State<ChatPage> {
             child: Icon(
               Icons.error,
               size: 25,
-              color: Theme.of(context).primaryColor,
+              color: Theme
+                  .of(context)
+                  .primaryColor,
             ),
           ),
         );
@@ -434,7 +437,8 @@ class _ChatPageState extends State<ChatPage> {
     }
     return Container(
       width: double.infinity,
-      height: 70,
+      constraints: BoxConstraints(minHeight: 50),
+      margin: EdgeInsets.symmetric(vertical: 12),
       alignment: Alignment.centerLeft,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -473,7 +477,8 @@ class _ChatPageState extends State<ChatPage> {
     };
     DateTime now = DateTime.now();
     if (now.year != time.year) {
-      return "${time.year}-${time.month}-${time.day} ${_addZero(time.hour)}:${_addZero(time.minute)}";
+      return "${time.year}-${time.month}-${time.day} ${_addZero(
+          time.hour)}:${_addZero(time.minute)}";
     }
     Duration month = Duration(days: 7);
     Duration diff = now.difference(time);
@@ -483,10 +488,14 @@ class _ChatPageState extends State<ChatPage> {
     if (now.day == time.day) {
       return "${_addZero(time.hour)}:${_addZero(time.minute)}";
     }
-    if (now.add(Duration(days: -1)).day == time.day) {
+    if (now
+        .add(Duration(days: -1))
+        .day == time.day) {
       return "昨天  ${_addZero(time.hour)}:${_addZero(time.minute)}";
     }
-    if (now.add(Duration(days: -2)).day == time.day) {
+    if (now
+        .add(Duration(days: -2))
+        .day == time.day) {
       return "前天  ${_addZero(time.hour)}:${_addZero(time.minute)}";
     }
     return weekdayMap[time.weekday];
@@ -496,11 +505,10 @@ class _ChatPageState extends State<ChatPage> {
 }
 
 class Bubble extends StatelessWidget {
-  Bubble(
-      {this.text,
-      this.fromRight = false,
-      this.style = const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      this.background = Colors.white});
+  Bubble({this.text,
+    this.fromRight = false,
+    this.style = const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+    this.background = Colors.white});
 
   final String text;
   final TextStyle style;
@@ -509,11 +517,12 @@ class Bubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int lines = text.length ~/ 15 + 1;
     Widget angle;
     if (!fromRight) {
       angle = Positioned(
         left: 5,
-        top: 10,
+        top: (lines * 20 + 8) / 2,
         child: Container(
           height: 15,
           width: 15,
@@ -527,7 +536,7 @@ class Bubble extends StatelessWidget {
     } else {
       angle = Positioned(
         right: 5,
-        top: 10,
+        top: (lines * 20 + 8) / 2,
         child: Container(
           height: 15,
           width: 15,
@@ -551,6 +560,7 @@ class Bubble extends StatelessWidget {
             color: background,
             borderRadius: BorderRadius.circular(16),
           ),
+          constraints: BoxConstraints(maxWidth: ScreenUtil.screenWidth / 4.5),
           child: Text(
             text,
             style: style,
