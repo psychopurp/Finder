@@ -182,13 +182,12 @@ class _ChildActivitiesState extends State<ChildActivities>
         return !isContain;
       });
     }
-
+    if (!mounted) return;
     // print('activities=======>${activities.data}');
     setState(() {
       this.activities = activities;
       this.itemCount = activities.data.length;
     });
-    return activities;
   }
 
   Future _getMore(int pageCount, BuildContext context) async {
@@ -208,12 +207,16 @@ class _ChildActivitiesState extends State<ChildActivities>
       });
     }
 
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
     setState(() {
       this.activities.data.addAll(activities.data);
       this.itemCount = this.itemCount + activities.data.length;
       this.pageCount++;
     });
-    return activities.data;
   }
 
   _singleItem(BuildContext context, ActivityModelData item, int index) {

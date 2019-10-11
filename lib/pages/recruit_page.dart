@@ -224,18 +224,17 @@ class _RecruitPageState extends State<RecruitPage> {
     var formData = {
       'recruits': await apiClient.getRecruits(),
     };
-
+    if (!mounted) return;
     setState(() {
       this.recruits = RecruitModel.fromJson(formData['recruits']);
     });
-    return formData;
   }
 
   Future getMore({int pageCount = 1, List<int> typesId}) async {
     var formData = {
       'recruits': await apiClient.getRecruits(),
     };
-
+    if (!mounted) return;
     // if(typesId!=null){
     //   this.recruits.data.clear();
     // }
@@ -249,6 +248,5 @@ class _RecruitPageState extends State<RecruitPage> {
     setState(() {
       this.recruits = RecruitModel.fromJson(formData['recruits']);
     });
-    return formData;
   }
 }

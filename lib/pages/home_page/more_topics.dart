@@ -191,11 +191,11 @@ class _TopicsState extends State<Topics>
       topics.data.removeWhere((item) => item.school == null);
     }
     // print('topicsData=======>${topicsData}');
+    if (!mounted) return;
     setState(() {
       this.topics = topics;
       this.itemCount = topics.data.length;
     });
-    return topics;
   }
 
   Future _getMore(int pageCount) async {
@@ -206,12 +206,12 @@ class _TopicsState extends State<Topics>
       topics.data.removeWhere((item) => item.school == null);
     }
     // print('hasmore=======${topics.hasMore}');
+    if (!mounted) return;
     setState(() {
       this.topics.data.addAll(topics.data);
       this.itemCount = this.itemCount + topics.data.length;
       this.pageCount++;
     });
-    return topics.data;
   }
 
   _singleItem(BuildContext context, TopicModelData item, int index) {
