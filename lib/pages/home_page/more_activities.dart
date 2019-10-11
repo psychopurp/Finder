@@ -198,7 +198,6 @@ class _ChildActivitiesState extends State<ChildActivities>
     if (this.activityType.name != "全部") {
       print(this.activityType.name);
       activities.data.removeWhere((item) {
-        print(item.types.contains(this.activityType));
         bool isContain = false;
         item.types.forEach((val) {
           if (val.id == this.activityType.id) {

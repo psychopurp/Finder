@@ -34,13 +34,11 @@ class RecruitSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    // TODO: implement buildResults
     return null;
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // TODO: implement buildSuggestions
     return Column(
       children: <Widget>[
         Chip(
@@ -52,7 +50,6 @@ class RecruitSearchDelegate extends SearchDelegate<String> {
 
   @override
   ThemeData appBarTheme(BuildContext context) {
-    // TODO: implement appBarTheme
     return super.appBarTheme(context);
   }
 }

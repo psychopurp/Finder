@@ -1,4 +1,3 @@
-import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 
 class MyAppBar extends StatelessWidget {

@@ -105,7 +105,13 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                                   child: MaterialButton(
                                     padding: EdgeInsets.all(15),
                                     color: Colors.white,
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Application.router.navigateTo(
+                                        context,
+                                        "/publishTopicComment",
+                                      );
+                                    },
                                     shape: CircleBorder(),
                                     child: Text("招募"),
                                   ),
