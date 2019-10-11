@@ -55,7 +55,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
   }
 
   Future<void> getHeSheSays({bool delay: false}) async {
-    if(delay){
+    if (delay) {
       await Future.delayed(Duration(milliseconds: 100));
     }
     int timestamp = this._time.millisecondsSinceEpoch ~/ 1000;
@@ -93,7 +93,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
   }
 
   Future<void> getLeadHeSheSays({bool delay: false}) async {
-    if(delay){
+    if (delay) {
       await Future.delayed(Duration(milliseconds: 100));
     }
     try {
@@ -281,6 +281,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
     );
     if (bannerData.length == 0 && child == null) {
       child = ListView.builder(
+        physics: AlwaysScrollableScrollPhysics(),
         controller: _scrollController,
         itemBuilder: (context, index) {
           if (index == data.length) {
@@ -297,6 +298,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
     }
     if (child == null)
       child = ListView.builder(
+        physics: AlwaysScrollableScrollPhysics(),
         controller: _scrollController,
         itemBuilder: (context, index) {
           if (index == 0) {
@@ -682,7 +684,8 @@ class HeSheSayItem {
     int likeCount = map["like"];
     bool isLike = map["isLike"];
     int id = map["id"];
-    String time = map["time"].toString();
+    DateTime time =
+        DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt());
     return HeSheSayItem(
         authorName: authorName,
         authorAvatar: authorAvatar,
@@ -705,7 +708,7 @@ class HeSheSayItem {
   bool isLike;
   int likeCount;
   String image;
-  final String time;
+  final DateTime time;
 }
 
 typedef TimeSelectedCallback = void Function(DateTime time);

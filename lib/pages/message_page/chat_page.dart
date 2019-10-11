@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
@@ -53,14 +54,16 @@ class _ChatPageState extends State<ChatPage> {
   FocusNode _focusNode;
   int sendKey;
   Dio dio = ApiClient.dio;
+  bool open = false;
 
   void update() {
     setState(() {});
   }
 
-  Future<void> moveToBottom() async {
-    await _scrollController.animateTo((messages.length * 70).toDouble(),
-        duration: Duration(seconds: 1), curve: Curves.easeInOut);
+  Future<void> moveToBottom(
+      {Duration duration: const Duration(milliseconds: 600)}) async {
+    await _scrollController.animateTo(max(((messages.length - 5) * 70).toDouble(), 0),
+        duration: duration, curve: Curves.easeInOut);
   }
 
   @override
@@ -73,14 +76,26 @@ class _ChatPageState extends State<ChatPage> {
       needSync = true;
     } else {
       messages = data.users[widget.sessionId];
+      data.readUserMessagesBySessionId(widget.sessionId);
     }
     _textController = TextEditingController();
     _focusNode = FocusNode();
     sendKey = DateTime.now().millisecondsSinceEpoch;
     _scrollController = ScrollController();
-//    _focusNode.addListener(() {
-//      if (!_focusNode.hasFocus) moveToBottom();
-//    });
+    Future.delayed(Duration(milliseconds: 200), () {
+      moveToBottom(duration: Duration(milliseconds: 300));
+    });
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus){
+        open = true;
+      }
+      Future.delayed(Duration(seconds: 2), () {
+        open = false;
+      });
+      Future.delayed(Duration(milliseconds: 500), () {
+        moveToBottom();
+      });
+    });
   }
 
   @override
@@ -107,6 +122,10 @@ class _ChatPageState extends State<ChatPage> {
         isRead: true);
     setState(() {
       messages.add(item);
+      if (needSync) {
+        data.users[widget.sessionId] = messages;
+        needSync = false;
+      }
     });
     _textController.clear();
     moveToBottom();
@@ -121,7 +140,7 @@ class _ChatPageState extends State<ChatPage> {
           item.time = DateTime.fromMicrosecondsSinceEpoch(
               (resData['time'] * 1000000).toInt());
           messages.remove(item);
-          messages.add(item);
+          data.addUserToUser(item);
         });
         return true;
       } else {
@@ -161,7 +180,7 @@ class _ChatPageState extends State<ChatPage> {
           item.time = DateTime.fromMicrosecondsSinceEpoch(
               (resData['time'] * 1000000).toInt());
           messages.remove(item);
-          messages.add(item);
+          data.addUserToUser(item);
         });
         return true;
       } else {
@@ -191,7 +210,7 @@ class _ChatPageState extends State<ChatPage> {
             flex: 1,
             child: NotificationListener(
                 onNotification: (notification) {
-                  _focusNode.unfocus();
+                  if (!open) _focusNode.unfocus();
                   return false;
                 },
                 child: RefreshIndicator(
@@ -200,6 +219,7 @@ class _ChatPageState extends State<ChatPage> {
                     await data.getHistoryUserMessages(widget.sessionId);
                   },
                   child: ListView.builder(
+                    physics: AlwaysScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       UserMessageItem item = messages[index];
                       if (item.sender == data.self) {
@@ -310,7 +330,7 @@ class _ChatPageState extends State<ChatPage> {
     Widget prefix = Container();
     if (item.sending) {
       prefix = Container(
-        margin: EdgeInsets.only(right: 10),
+        margin: EdgeInsets.only(right: 15),
         width: 15,
         height: 15,
         child: CircularProgressIndicator(),

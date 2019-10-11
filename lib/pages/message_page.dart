@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:finder/pages/message_page/data_object.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/routers/routes.dart';
@@ -38,6 +37,15 @@ class _MessagePageState extends State<MessagePage> {
         title: Text("消息"),
         elevation: 0,
         centerTitle: true,
+        actions: <Widget>[
+          MaterialButton(
+            minWidth: 10,
+            child: Icon(Icons.clear_all, color: Colors.white),
+            onPressed: (){
+              data.readAll();
+            },
+          )
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.only(left: 13, right: 13, top: 10),
@@ -292,7 +300,7 @@ class _MessagePageState extends State<MessagePage> {
     if (now.add(Duration(days: -2)).day == time.day) {
       return "前天";
     }
-    return weekdayMap[time.day];
+    return weekdayMap[time.weekday];
   }
 
   String _addZero(int value) => value < 10 ? "0$value" : "$value";

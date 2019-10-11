@@ -92,6 +92,84 @@ class DataObject implements Listenable {
     lastRequestTime = reqTime;
   }
 
+  Future<void> readUserMessagesBySessionId(String sessionId) async {
+    if (!users.containsKey(sessionId)) return;
+    bool value = true;
+    users[sessionId].forEach((item) {
+      value = value && item.isRead;
+    });
+    if (value) return;
+    Response response = await dio.post('read_message_by_session/', data: {
+      "sessionId": sessionId,
+    });
+    print(response.data);
+    if (response.data["status"]) {
+      users[sessionId].forEach((item) {
+        item.isRead = true;
+      });
+      updateUsersCount();
+      onChange();
+    }
+  }
+
+  Future<void> readSayToHeMessagesBySessionId(String sessionId) async {
+    if (!users.containsKey(sessionId)) return;
+    bool value = true;
+    says[sessionId].forEach((item) {
+      value = value && item.isRead;
+    });
+    if (value) return;
+    Response response = await dio.post('read_message_by_session/', data: {
+      "sessionId": sessionId,
+    });
+    if (response.data["status"]) {
+      says[sessionId].forEach((item) {
+        item.isRead = true;
+      });
+      updateSaysCount();
+      onChange();
+    }
+  }
+
+  Future<void> readMessage(Item item) async {
+    Response response = await dio.post('read_message/', data: {
+      "id": item.id,
+    });
+    if (response.data["status"]) {
+      item.isRead = true;
+      updateTipsCount();
+      updateSystemsCount();
+      onChange();
+    }
+  }
+
+  Future<void> readAll() async {
+    Response response = await dio.post("read_all_messages/");
+    if (response.data["status"]) {
+      users.forEach((key, value) {
+        value.forEach((item) {
+          item.isRead = true;
+        });
+      });
+      says.forEach((key, value) {
+        value.forEach((item) {
+          item.isRead = true;
+        });
+      });
+      systems.forEach((item) {
+        item.isRead = true;
+      });
+      tips.forEach((item) {
+        item.isRead = true;
+      });
+      updateSystemsCount();
+      updateTipsCount();
+      updateSaysCount();
+      updateUsersCount();
+      onChange();
+    }
+  }
+
   Future<void> getHistoryUserMessages(String sessionId) async {
     if (!users.containsKey(sessionId)) return;
     List<UserMessageItem> messages = users[sessionId];
@@ -108,7 +186,7 @@ class DataObject implements Listenable {
       "sessionId": sessionId,
     };
     Response response =
-        await dio.get("get_history_message/", queryParameters: queryParameters);
+    await dio.get("get_history_message/", queryParameters: queryParameters);
     Map<String, dynamic> data = response.data;
 //    print(data);
     if (!data["status"]) {
@@ -120,15 +198,15 @@ class DataObject implements Listenable {
     } else
       addAll(
           List<Map<String, dynamic>>.generate(data["data"].length,
-              (index) => data["data"][data["data"].length - index - 1]),
+                  (index) => data["data"][data["data"].length - index - 1]),
           addFirst: true);
   }
 
   Future<void> getMessages(int start,
       {int end,
-      bool isNotReadOnly,
-      bool isReceiveOnly,
-      String sessionId}) async {
+        bool isNotReadOnly,
+        bool isReceiveOnly,
+        String sessionId}) async {
     Map<String, dynamic> queryParameters = {
       "start": start,
     };
@@ -142,7 +220,7 @@ class DataObject implements Listenable {
       queryParameters["sessionId"] = sessionId;
     }
     Response response =
-        await dio.get("get_messages/", queryParameters: queryParameters);
+    await dio.get("get_messages/", queryParameters: queryParameters);
     Map<String, dynamic> data = response.data;
 //    print(data);
     if (!data["status"]) {
@@ -361,20 +439,24 @@ class DataObject implements Listenable {
     lastRequestTime =
         DateTime.fromMillisecondsSinceEpoch(map["lastRequestTime"]);
     systems = List<SystemMessageItem>.generate(map['system'].length,
-        (index) => SystemMessageItem.fromJson(map['system'][index]));
+            (index) => SystemMessageItem.fromJson(map['system'][index]));
     tips = List<TipItem>.generate(
         map['tips'].length, (index) => TipItem.fromJson(map['tips'][index]));
     users = Map<String, List<UserMessageItem>>.fromEntries(map['users']
         .entries
-        .map((entity) => MapEntry<String, List<UserMessageItem>>(
+        .map((entity) =>
+        MapEntry<String, List<UserMessageItem>>(
             entity.key,
             List<UserMessageItem>.generate(map['users'].length,
-                (index) => UserMessageItem.fromJson(entity.value[index])))));
+                    (index) =>
+                    UserMessageItem.fromJson(entity.value[index])))));
     says = Map<String, List<SayToHeItem>>.fromEntries(map['says'].entries.map(
-        (entity) => MapEntry<String, List<SayToHeItem>>(
-            entity.key,
-            List<SayToHeItem>.generate(map['says'].length,
-                (index) => SayToHeItem.fromJson(entity.value[index])))));
+            (entity) =>
+            MapEntry<String, List<SayToHeItem>>(
+                entity.key,
+                List<SayToHeItem>.generate(map['says'].length,
+                        (index) =>
+                        SayToHeItem.fromJson(entity.value[index])))));
     loadUser = UserProfile.fromJson(map["user"]);
     usersIndex = map['usersIndex'];
   }
@@ -407,7 +489,7 @@ class Item {
 
   @override
   bool operator ==(other) {
-    return other.runtimeType == this.runtimeType && id == other.id;
+    return (other.runtimeType == this.runtimeType) && (id == other.id);
   }
 
   @override
@@ -431,7 +513,7 @@ class UserProfile extends Item implements ToJson {
       return user;
     }
     UserProfile user =
-        UserProfile(nickname: map['nickname'], id: map['id'], avatar: avatar);
+    UserProfile(nickname: map['nickname'], id: map['id'], avatar: avatar);
     users[user.id] = user;
     return user;
   }
@@ -446,15 +528,14 @@ class UserProfile extends Item implements ToJson {
 }
 
 class UserMessageItem extends Item implements ToJson {
-  UserMessageItem(
-      {this.time,
-      this.sender,
-      this.receiver,
-      this.content,
-      int id,
-      bool isRead,
-      this.sessionId,
-      this.sending = false})
+  UserMessageItem({this.time,
+    this.sender,
+    this.receiver,
+    this.content,
+    int id,
+    bool isRead,
+    this.sessionId,
+    this.sending = false})
       : super(id, isRead: isRead);
 
   factory UserMessageItem.fromJson(Map<String, dynamic> map) {
@@ -465,7 +546,7 @@ class UserMessageItem extends Item implements ToJson {
         sender: UserProfile.fromJson(map['sender']),
         receiver: receiver,
         content: map["content"],
-        isRead: map["isRead"] && receiver == DataObject().self,
+        isRead: !(!map["isRead"] && receiver == DataObject().self),
         sessionId: map["sessionId"],
         id: map["id"]);
   }
@@ -528,21 +609,20 @@ class SystemMessageItem extends Item implements ToJson {
 }
 
 class SayToHeItem extends Item implements ToJson {
-  SayToHeItem(
-      {this.time,
-      this.content,
-      this.receiver,
-      bool isRead,
-      this.sessionId,
-      int id,
-      this.sender,
-      this.isShowName})
+  SayToHeItem({this.time,
+    this.content,
+    this.receiver,
+    bool isRead,
+    this.sessionId,
+    int id,
+    this.sender,
+    this.isShowName})
       : super(id, isRead: isRead);
 
   factory SayToHeItem.fromJson(Map<String, dynamic> map) {
     return SayToHeItem(
       time:
-          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
+      DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
       sender: UserProfile.fromJson(map['sender']),
       receiver: UserProfile.fromJson(map['receiver']),
       content: map["content"],
@@ -582,7 +662,7 @@ class TipItem extends Item implements ToJson {
   factory TipItem.fromJson(Map<String, dynamic> map) {
     return TipItem(
       time:
-          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
+      DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
       content: map["content"],
       isRead: map["isRead"],
       id: map["id"],

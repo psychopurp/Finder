@@ -200,7 +200,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                         padding: EdgeInsets.all(3),
                       ),
                       Text(
-                        item.time,
+                        getTimeString(item.time),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -322,4 +322,37 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
       ),
     );
   }
+
+  String getTimeString(DateTime time) {
+    Map<int, String> weekdayMap = {
+      1: "星期一",
+      2: "星期二",
+      3: "星期三",
+      4: "星期四",
+      5: "星期五",
+      6: "星期六",
+      7: "星期日"
+    };
+    DateTime now = DateTime.now();
+    if (now.year != time.year) {
+      return "${time.year}-${time.month}-${time.day}";
+    }
+    Duration month = Duration(days: 7);
+    Duration diff = now.difference(time);
+    if (diff.compareTo(month) > 0) {
+      return "${time.year}-${_addZero(time.month)}-${_addZero(time.day)}";
+    }
+    if (now.day == time.day) {
+      return "${_addZero(time.hour)}:${_addZero(time.minute)}";
+    }
+    if (now.add(Duration(days: -1)).day == time.day) {
+      return "昨天";
+    }
+    if (now.add(Duration(days: -2)).day == time.day) {
+      return "前天";
+    }
+    return weekdayMap[time.weekday];
+  }
+
+  String _addZero(int value) => value < 10 ? "0$value" : "$value";
 }
