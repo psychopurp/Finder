@@ -1,4 +1,5 @@
 import 'package:finder/pages/mine_page/user_profile_page.dart';
+import 'package:finder/pages/register_page.dart';
 import 'package:finder/routers/application.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +23,8 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     RecruitPage(), RecruitPage(),
     // LoginPage(),
     ServePage(),
-    UserProfilePage(),
+    RegisterPage(),
+    // UserProfilePage(),
   ];
 
   @override

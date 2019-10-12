@@ -26,7 +26,10 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   @override
   void initState() {
     _contentFocusNode = FocusNode();
-    _contentController = TextEditingController();
+    _contentController = TextEditingController()
+      ..addListener(() {
+        print(_contentController.text);
+      });
     wrapList.add(addImage());
     super.initState();
   }
@@ -49,9 +52,16 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
       body: Container(
         // height: ScreenUtil().setHeight(800),
         // width: ScreenUtil().setWidth(750),
-        color: Colors.amber,
+        // color: Colors.amber,
         child: ListView(
           children: <Widget>[
+            Container(
+              height: ScreenUtil().setHeight(500),
+              // child: Html(
+              child: Text(_contentController.text),
+              // ),
+            ),
+
             Container(
               width: ScreenUtil().setWidth(420),
               // color: Colors.amber,
