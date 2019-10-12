@@ -9,6 +9,7 @@ import 'mine_page.dart';
 import 'serve_page.dart';
 import 'recruit_page.dart';
 import 'package:finder/public.dart';
+import 'package:finder/pages/web_view.dart';
 
 class IndexPage extends StatefulWidget {
   @override
@@ -23,7 +24,8 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     RecruitPage(), RecruitPage(),
     // LoginPage(),
     ServePage(),
-    RegisterPage(),
+    // RegisterPage(),
+    WebViewExample()
     // UserProfilePage(),
   ];
 

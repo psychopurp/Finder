@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:finder/config/api_client.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -167,89 +169,16 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
       ),
     );
   }
-}
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => new _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  List<Asset> images = List<Asset>();
-  String _error = 'No Error Dectected';
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Widget buildGridView() {
-    return GridView.count(
-      crossAxisCount: 3,
-      children: List.generate(images.length, (index) {
-        Asset asset = images[index];
-        return AssetThumb(
-          asset: asset,
-          width: 300,
-          height: 300,
-        );
-      }),
-    );
-  }
-
-  Future<void> loadAssets() async {
-    List<Asset> resultList = List<Asset>();
-    String error = 'No Error Dectected';
-
-    try {
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 10,
-        enableCamera: true,
-        selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-        materialOptions: MaterialOptions(
-          selectionLimitReachedText: '请选择一张图片',
-          textOnNothingSelected: '请至少选择一张图片',
-          actionBarColor: "#000000",
-          statusBarColor: '#999999',
-          actionBarTitle: "相册",
-          allViewTitle: "全部图片",
-          useDetailsView: true,
-          selectCircleStrokeColor: "#000000",
-        ),
-      );
-      for (var r in resultList) {
-        var t = await r.filePath;
-        print(t);
-      }
-    } on Exception catch (e) {
-      error = e.toString();
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      images = resultList;
-      _error = error;
+  Future<bool> publishTopicComment(UserProvider user) async {
+    List<String> imageString = [];
+    this.images.forEach((image) async {
+      String path = await image.filePath;
+      String imagePath = await user.uploadImage(File(path));
+      imageString.add(imagePath);
     });
-  }
+    String text = _contentController.text;
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Center(child: Text('Error: $_error')),
-        RaisedButton(
-          child: Text("Pick images"),
-          onPressed: loadAssets,
-        ),
-        Expanded(
-          child: buildGridView(),
-        )
-      ],
-    );
+    return true;
   }
 }

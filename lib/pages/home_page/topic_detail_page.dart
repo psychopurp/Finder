@@ -24,19 +24,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   final String topicTitle;
   _TopicDetailPageState({this.topicId, this.topicImage, this.topicTitle});
 
-  ///测试部分
-  List<String> images = [
-    'https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s8rl7j20c808fdha.jpg',
-    'https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s7n8fj20u00kpdj7.jpg',
-    'https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s8rl7j20c808fdha.jpg',
-    'https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s7n8fj20u00kpdj7.jpg',
-    'https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s8rl7j20c808fdha.jpg',
-    'https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s7n8fj20u00kpdj7.jpg',
-  ];
-  String content = '''
-【学术研究显示：#移动支付让人们花钱更多#， 用途更多元[话筒]】最新发布的一项学术研究表明：#移动支付能降低恩格尔系数#，促进居民消费，还推动消费结构升级。尤其对农村地区消费的影响更大。移动支付有助于释放低收入家庭消费潜力，促进中等收入家庭消费结构优化升级。
-  ''';
-
   TopicCommentsModel topicComments;
   var followList = [];
 
@@ -192,63 +179,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                     child: SingleChildScrollView(
                       child: Html(
                         data: '''
-                        <head>
-    <style type="text/css">
-        body {
-            background-color: yellow;
-        }
 
-        p {
-            color: blue;
-        }
-
-        li {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            float: left;
-        }
-
-        div.item {
-            color: #000;
-        }
-
-        div.item-image {
-            padding-right: 5px;
-            padding-bottom: 5px;
-        }
-
-        .img {
-            width: 200px;
-            height: 200px;
-            alt: "this is a pic";
-        }
-    </style>
-</head>
-                        <div class="item"></div>
-    <ul style="float: left;">
-        <li>
-            <div class="item-image">
-                <img src="https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s7n8fj20u00kpdj7.jpg" class="img" />
-            </div>
-        </li>
-        <li>
-            <div class="item-image">
-                <img src="https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s7n8fj20u00kpdj7.jpg" class="img" />
-            </div>
-        </li>
-        <li>
-            <div class="item-image">
-                <img src="https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s7n8fj20u00kpdj7.jpg" class="img" />
-            </div>
-        </li>
-        <li>
-            <div class="item-image">
-                <img src="https://wx2.sinaimg.cn/orj360/6148b630ly1g7vc3s7n8fj20u00kpdj7.jpg" class="img" />
-            </div>
-        </li>
-    </ul>
-    </div>
     ''',
                         onLinkTap: (url) {
                           print(url);
