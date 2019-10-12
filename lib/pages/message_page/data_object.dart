@@ -24,6 +24,7 @@ class DataObject implements Listenable {
   List<VoidCallback> changeEvents;
   List<String> usersIndex = [];
   Set<String> noMoreHistory = Set<String>();
+  bool noMoreHistoryMessage = false;
   UserProfile loadUser;
   UserProfile self;
   Dio dio = ApiClient.dio;
@@ -42,18 +43,16 @@ class DataObject implements Listenable {
     return instance;
   }
 
-  getDataInterval({Duration duration: const Duration(minutes: 1)}){
-    if(_timer!=null){
+  getDataInterval({Duration duration: const Duration(seconds: 30)}) {
+    if (_timer != null) {
       cancelTimer();
     }
-    _timer = Timer.periodic(duration, (t){
-      print(t);
-      print("timer");
+    _timer = Timer.periodic(duration, (t) {
       getData();
     });
   }
 
-  cancelTimer(){
+  cancelTimer() {
     _timer?.cancel();
     _timer = null;
   }
@@ -110,7 +109,7 @@ class DataObject implements Listenable {
     }
     DateTime reqTime = DateTime.now();
     await getMessages(lastRequestTime.millisecondsSinceEpoch ~/ 1000);
-    lastRequestTime = reqTime;
+    lastRequestTime = reqTime.subtract(Duration(seconds: 10));
   }
 
   Future<void> readUserMessagesBySessionId(String sessionId) async {
@@ -129,6 +128,23 @@ class DataObject implements Listenable {
         item.isRead = true;
       });
       updateUsersCount();
+      onChange();
+    }
+  }
+
+  Future<void> readSystemMessages() async {
+    bool value = true;
+    systems.forEach((item) {
+      value = value && item.isRead;
+    });
+    if (value) return;
+    Response response = await dio.post('read_system_messages/');
+    print(response.data);
+    if (response.data["status"]) {
+      systems.forEach((item) {
+        item.isRead = true;
+      });
+      updateSystemsCount();
       onChange();
     }
   }
@@ -191,9 +207,42 @@ class DataObject implements Listenable {
     }
   }
 
+  Future<void> getHistorySystemMessage() async {
+    if (noMoreHistoryMessage) return;
+    List<SystemMessageItem> messages = systems;
+    DateTime endTime;
+    if (messages.length == 0)
+      endTime = DateTime.now();
+    else {
+      SystemMessageItem first = messages[0];
+      endTime = first.time;
+    }
+    int end = endTime.millisecondsSinceEpoch ~/ 1000;
+    Map<String, dynamic> queryParameters = {
+      "end": end,
+    };
+    Response response = await dio.get("get_history_system_message/",
+        queryParameters: queryParameters);
+    Map<String, dynamic> data = response.data;
+    if (!data["status"]) {
+      throw DioError(
+          request: response.request,
+          response: response,
+          message: data["error"],
+          type: DioErrorType.RESPONSE);
+    } else {
+      if (data['data'].length == 0) {
+        noMoreHistoryMessage = true;
+      } else
+        addAll(
+            List<Map<String, dynamic>>.generate(data["data"].length,
+                (index) => data["data"][data["data"].length - index - 1]),
+            addFirst: true);
+    }
+  }
+
   Future<void> getHistoryUserMessages(String sessionId) async {
     print(noMoreHistory);
-    if (!users.containsKey(sessionId)) return;
     if (noMoreHistory.contains(sessionId)) return;
     List<UserMessageItem> messages = users[sessionId];
     DateTime endTime;
@@ -601,13 +650,15 @@ class UserMessageItem extends Item implements ToJson {
 }
 
 class SystemMessageItem extends Item implements ToJson {
-  SystemMessageItem({
-    int id,
-    this.time,
-    this.content,
-    this.isToAll,
-    bool isRead,
-  }) : super(id, isRead: isRead);
+  SystemMessageItem(
+      {int id,
+      this.time,
+      this.content,
+      this.isToAll,
+      bool isRead,
+      this.receive = true,
+      this.sending = false})
+      : super(id, isRead: isRead);
 
   factory SystemMessageItem.fromJson(Map<String, dynamic> map) {
     return SystemMessageItem(
@@ -616,12 +667,16 @@ class SystemMessageItem extends Item implements ToJson {
         content: map["content"],
         isRead: map["isRead"],
         id: map["id"],
-        isToAll: map["isToAll"]);
+        isToAll: map["isToAll"],
+        receive: map["receive"]);
   }
 
-  final DateTime time;
+  DateTime time;
   final String content;
   final bool isToAll;
+  final bool receive;
+  bool sending;
+  bool fail = false;
 
   @override
   Map<String, dynamic> toJson() {
@@ -644,6 +699,7 @@ class SayToHeItem extends Item implements ToJson {
       this.sessionId,
       int id,
       this.sender,
+      this.sending = false,
       this.isShowName})
       : super(id, isRead: isRead);
 
@@ -661,12 +717,14 @@ class SayToHeItem extends Item implements ToJson {
     );
   }
 
-  final DateTime time;
+  DateTime time;
   final UserProfile sender;
   final UserProfile receiver;
   final String content;
   final bool isShowName;
   final String sessionId;
+  bool sending;
+  bool fail = false;
 
   @override
   Map<String, dynamic> toJson() {

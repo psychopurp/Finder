@@ -67,9 +67,11 @@ class _MessagePageState extends State<MessagePage> {
     return ListView.builder(
       itemBuilder: (context, index) {
         if (index == 0) {
-          return _generateOtherMessagePage("系统消息", Icons.computer, 1,
-              data: "Finders正式发布啦! 欢迎使用Finders软件! 谢谢!",
-              background: Color(0xFF0099FF));
+          return _generateOtherMessagePage(
+              "系统消息", Icons.computer, data.systemsCount,
+              data: data.systems.length == 0 ? "" : data.systems.last.content,
+              background: Color(0xFF0099FF),
+              url: Routes.systemMessage);
         } else if (index == 1) {
           return _generateOtherMessagePage("提醒", Icons.error, 0,
               background: Color(0xFFFF9933));
@@ -94,7 +96,10 @@ class _MessagePageState extends State<MessagePage> {
       });
 
   Widget _generateOtherMessagePage(String title, IconData icon, int unReadCount,
-      {Color background = Colors.orange, String data, VoidCallback onPress}) {
+      {Color background = Colors.orange,
+      String data,
+      VoidCallback onPress,
+      String url}) {
     Widget titleWidget = Text(
       title,
       style: TextStyle(
@@ -103,7 +108,7 @@ class _MessagePageState extends State<MessagePage> {
       textAlign: TextAlign.left,
     );
 
-    return _withBottomBorder(
+    Widget child = _withBottomBorder(
       Row(
         children: <Widget>[
           Container(
@@ -168,6 +173,13 @@ class _MessagePageState extends State<MessagePage> {
                 ),
         ],
       ),
+    );
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        Navigator.pushNamed(context, url);
+      },
+      child: child,
     );
   }
 

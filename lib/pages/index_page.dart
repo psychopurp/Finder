@@ -257,7 +257,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
 
     return GestureDetector(
       onTap: () {
-        Future.delayed(Duration(microseconds: 500), () {});
+//        Future.delayed(Duration(microseconds: 500), () {});
         setState(() {
           this._selectIndex = index;
         });

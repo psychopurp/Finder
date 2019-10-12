@@ -82,5 +82,7 @@ class Routes {
 
     router.define(chat,
         handler: chatPageHandle, transitionType: TransitionType.cupertino);
+    router.define(systemMessage,
+        handler: systemMessageHandle, transitionType: TransitionType.cupertino);
   }
 }
