@@ -1,3 +1,4 @@
+import 'package:finder/pages/message_page/data_object.dart';
 import 'package:finder/pages/mine_page/user_profile_page.dart';
 import 'package:finder/pages/register_page.dart';
 import 'package:finder/routers/application.dart';
@@ -5,6 +6,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'message_page.dart';
 import 'mine_page.dart';
 import 'serve_page.dart';
 import 'recruit_page.dart';
@@ -23,17 +25,40 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     HomePage(),
     RecruitPage(), RecruitPage(),
     // LoginPage(),
+    MessagePage(),
     ServePage(),
-    // RegisterPage(),
-    WebViewExample()
-    // UserProfilePage(),
+//    UserProfilePage(),
   ];
+
+  void update() {
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    DataObject().addListener(update);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    DataObject().removeListener(update);
+  }
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Scaffold(
       primary: false,
+//      body: AnimatedSwitcher(
+//        duration: Duration(seconds: 1),
+//        transitionBuilder: (context, animate) => SlideTransition(
+//          child: pages[_selectIndex],
+//          position: Tween(begin: Offset(-1, 0), end: Offset(0, 0)).animate(animate),
+//        ),
+//        child: pages[_selectIndex],
+//      ), // 切换动画
       body: pages[_selectIndex],
       bottomNavigationBar: SafeArea(
         child: BottomAppBar(
@@ -46,8 +71,8 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              _singleButton(IconData(0xe688, fontFamily: 'myIcon'), 'Home', 0),
-              _singleButton(IconData(0xe631, fontFamily: 'myIcon'), 'Find', 1),
+              _singleButton(IconData(0xe688, fontFamily: 'myIcon'), '首页', 0),
+              _singleButton(IconData(0xe631, fontFamily: 'myIcon'), '寻你', 1),
               Container(
                 height: kBottomNavigationBarHeight - 6,
                 alignment: Alignment.center,
@@ -140,9 +165,11 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                   },
                 ),
               ),
-              _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), 'Serve', 3),
-              _singleButton(
-                  IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),
+              _singleButton(IconData(0xe879, fontFamily: 'myIcon'), '消息', 3,
+                  withTips: true, count: DataObject().allUnReadCount),
+              _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), '广场', 4),
+//              _singleButton(
+//                  IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),
             ],
           ),
         ),
@@ -150,69 +177,113 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     );
   }
 
-  _singleButton(IconData iconData, String title, int index) {
+  _singleButton(IconData iconData, String title, int index,
+      {bool withTips = false, int count = 0}) {
     bool isSelected = (this._selectIndex == index) ? true : false;
-    var selectedWidget = Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        Icon(
-          iconData,
-          color: isSelected ? Colors.black : Colors.black.withOpacity(0.5),
+    Widget currentWidget;
+
+    Color selectedColor = Theme.of(context).primaryColor;
+    Color unSelectedColor = Colors.black.withOpacity(0.5);
+    if (isSelected) {
+      currentWidget = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            iconData,
+            color: selectedColor,
+            size: 28,
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: selectedColor,
+            ),
+          ),
+        ],
+      );
+    } else {
+      currentWidget = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            iconData,
+            color: unSelectedColor,
+            size: 28,
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: unSelectedColor,
+            ),
+          ),
+        ],
+      );
+    }
+    currentWidget = Container(
+      child: currentWidget,
+      width: double.infinity,
+      color: Colors.white,
+    );
+    if (withTips && count != 0) {
+      Widget tips = Container(
+        width: count < 100 ? 28 : 35,
+        height: 20,
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(10),
         ),
-        Text(
-          title,
+        alignment: Alignment.center,
+        child: Text(
+          count < 1000 ? "$count" : "999",
           style: TextStyle(
-            fontFamily: 'normal',
-            fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.black : Colors.black.withOpacity(0.5),
+            color: Colors.white,
+            fontSize: 14,
           ),
         ),
-      ],
-    );
-    var unSelectedWidget = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          iconData,
-          color: Colors.black.withOpacity(0.5),
-        ),
-        Container(),
-      ],
-    );
+      );
+      currentWidget = Stack(
+        children: <Widget>[
+          Center(
+            child: currentWidget,
+          ),
+          Positioned(
+            right: count < 100 ? 10 : 0,
+            top: 3,
+            child: tips,
+          )
+        ],
+      );
+    }
 
-    return InkWell(
+    return GestureDetector(
       onTap: () {
-        Future.delayed(Duration(microseconds: 500), () {});
+//        Future.delayed(Duration(microseconds: 500), () {});
         setState(() {
           this._selectIndex = index;
         });
       },
-      child: Container(
-        height: kBottomNavigationBarHeight,
-        width: ScreenUtil().setWidth(150),
-        child: selectedWidget,
+      child: AnimatedSwitcher(
+        transitionBuilder: (Widget child, Animation<double> animation) =>
+            isSelected
+                ? ScaleTransition(
+                    child: child,
+                    scale: animation,
+                  )
+                : FadeTransition(
+                    child: child,
+                    opacity: animation,
+                  ),
+        duration: Duration(milliseconds: 200),
+        child: Container(
+          key: ValueKey(isSelected),
+          height: kBottomNavigationBarHeight,
+          width: ScreenUtil().setWidth(150),
+          // color: isSelected ? Colors.amber : Colors.cyan,
+          child: currentWidget,
+        ),
       ),
     );
-    // child: !isSelected
-    //     ? AnimatedSwitcher(
-    //         transitionBuilder:
-    //             (Widget child, Animation<double> animation) =>
-    //                 ScaleTransition(child: child, scale: animation),
-    //         duration: Duration(milliseconds: 300),
-    //         child: Container(
-    //           key: ValueKey(currentWidget),
-    //           height: kBottomNavigationBarHeight,
-    //           width: ScreenUtil().setWidth(150),
-    //           // color: isSelected ? Colors.amber : Colors.cyan,
-    //           child: currentWidget,
-    //         ),
-    //       )
-    //     : Container(
-    //         key: ValueKey(currentWidget),
-    //         height: kBottomNavigationBarHeight,
-    //         width: ScreenUtil().setWidth(150),
-    //         // color: isSelected ? Colors.amber : Colors.cyan,
-    //         child: currentWidget,
-    //       ));
   }
 }

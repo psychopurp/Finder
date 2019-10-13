@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:finder/models/activity_model.dart';
+import 'package:finder/pages/message_page/chat_page.dart';
 import 'package:finder/pages/home_page/publish_topic_comment.dart';
+import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -142,4 +144,13 @@ var treeHoleHandler = Handler(
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return UserProfilePage();
+});
+
+var chatPageHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return ChatRouter();
+});
+var systemMessageHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return SystemMessagePage();
 });
