@@ -7,6 +7,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:finder/public.dart';
+import 'package:provider/provider.dart';
 
 class PublishTopicCommentPage extends StatefulWidget {
   final int topicId;
@@ -22,7 +23,6 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   FocusNode _contentFocusNode;
   List<Widget> wrapList = [];
   List<Asset> images = [];
-  List<File> imageFiles = [];
   String error = "";
 
   @override
@@ -45,11 +45,53 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        // title: Text(widget.topicTitle),
+        title: Text(widget.topicTitle + widget.topicId.toString()),
         elevation: 0,
+        actions: <Widget>[
+          FlatButton(
+            color: Colors.yellow,
+            highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
+            onPressed: () async {
+              showDialog(
+                context: context,
+                barrierDismissible: false, //点击遮罩不关闭对话框
+                builder: (context) {
+                  return AlertDialog(
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        CircularProgressIndicator(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 26.0),
+                          child: Text("正在发布，请稍后..."),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+              bool status = await publishTopicComment(user);
+              // print(status);
+              // Navigator.pop(context);
+              // if (!status) {
+              //   handleError();
+              // } else {
+              //   handleSuccess();
+              // }
+            },
+            child: Text(
+              '发布',
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontFamily: "Poppins",
+                  fontSize: ScreenUtil().setSp(30)),
+            ),
+          )
+        ],
       ),
       body: Container(
         // height: ScreenUtil().setHeight(800),
@@ -119,7 +161,6 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
     Future<void> loadAssets() async {
       List<Asset> resultList = List<Asset>();
       String error = 'No Error Dectected';
-      List<File> files = [];
       try {
         resultList = await MultiImagePicker.pickImages(
           maxImages: 10,
@@ -137,11 +178,6 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
             selectCircleStrokeColor: "#000000",
           ),
         );
-
-        resultList.forEach((image) async {
-          String path = await image.filePath;
-          files.add(File(path));
-        });
       } on Exception catch (e) {
         error = e.toString();
       }
@@ -149,7 +185,6 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
 
       setState(() {
         images = resultList;
-        this.imageFiles = files;
         error = error;
       });
     }
@@ -172,13 +207,23 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
 
   Future<bool> publishTopicComment(UserProvider user) async {
     List<String> imageString = [];
-    this.images.forEach((image) async {
+    for (var image in this.images) {
       String path = await image.filePath;
-      String imagePath = await user.uploadImage(File(path));
+      String imagePath = ApiClient.host + await user.uploadImage(File(path));
       imageString.add(imagePath);
-    });
+    }
+
     String text = _contentController.text;
 
+    ///如果啥内容没有
+    if (imageString.length == 0 && (text == null || text == "")) {
+      error = "请填写内容";
+      return false;
+    }
+    String content = contentToJson(images: imageString, text: text);
+    var data =
+        await user.addTopicComment(topicId: widget.topicId, content: content);
+    print(data);
     return true;
   }
 }

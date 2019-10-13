@@ -44,12 +44,13 @@ class EditorPageState extends State<EditorPage> {
       focusNode: _focusNode,
       controller: _controller,
       imageDelegate: MyAppZefyrImageDelegate(),
-      toolbarDelegate: MyAppZefyrToolBarDelegate(),
+      // toolbarDelegate: MyAppZefyrToolBarDelegate(),
     );
 
     // ... do more with this page's layout
     return ZefyrScaffold(
         child: Container(
+      padding: EdgeInsets.only(top: 100),
       // ... customize
       child: editor,
     ));

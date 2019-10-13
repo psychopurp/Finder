@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:finder/config/api_client.dart';
 import 'package:finder/public.dart';
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,14 +41,19 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Container(
-            alignment: Alignment.center,
-            child: Text("+ 参与话题"),
-            width: ScreenUtil().setWidth(270),
+          title: MaterialButton(
+            onPressed: () {
+              Application.router.navigateTo(context,
+                  '/publishTopicComment?topicId=${topicId.toString()}&&topicTitle=${Uri.encodeComponent(topicTitle)}');
+            },
+            child: Text(
+              "+ 参与话题",
+              style: TextStyle(color: Colors.white),
+            ),
+            // color: Colors.yellow,
+            shape: StadiumBorder(side: BorderSide(color: Colors.white)),
+            minWidth: ScreenUtil().setWidth(100),
             height: ScreenUtil().setHeight(70),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.white, width: 1.5)),
           ),
           elevation: 0,
         ),
@@ -145,6 +153,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                       Row(
                         children: <Widget>[
                           CircleAvatar(
+                            backgroundColor: Colors.yellow,
                             radius: 20.0,
                             backgroundImage: CachedNetworkImageProvider(
                               item.sender.avatar,
@@ -170,26 +179,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                     thickness: 1,
                     color: Colors.black12,
                   ),
-                  // Container(
-                  //   child: Text(item.content),
-                  // ),
-                  Container(
-                    // color: Colors.amber,
-                    height: ScreenUtil().setHeight(400),
-                    child: SingleChildScrollView(
-                      child: Html(
-                        data: '''
-
-    ''',
-                        onLinkTap: (url) {
-                          print(url);
-                        },
-                        onImageTap: (url) {
-                          print(url);
-                        },
-                      ),
-                    ),
-                  ),
+                  contentPart(item.content),
                   Container(
                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
                     height: 1,
@@ -227,9 +217,55 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         .toList();
     return Align(
       child: Container(
-        width: ScreenUtil().setWidth(750),
+        // width: ScreenUtil().setWidth(750),
         // color: Colors.black26,
         child: Column(children: children),
+      ),
+    );
+  }
+
+  ///话题评论--内容部分
+  Widget contentPart(String content) {
+    var json = jsonDecode(content);
+    List images = json['images'];
+    String text = json['text'];
+
+    return Container(
+      // color: Colors.amber,
+      // height: ScreenUtil().setHeight(400),
+      width: ScreenUtil().setWidth(750),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            text,
+            style: TextStyle(
+                fontFamily: 'normal', fontSize: ScreenUtil().setSp(30)),
+          ),
+          Container(
+            color: Colors.white,
+            child: Wrap(
+              spacing: 5,
+              runSpacing: 5,
+              children: images.map((image) {
+                return CachedNetworkImage(
+                  imageUrl: image,
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  imageBuilder: (content, imageProvider) => InkWell(
+                    onTap: () {},
+                    child: Container(
+                      height: ScreenUtil().setHeight(200),
+                      width: ScreenUtil().setWidth(200),
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: imageProvider, fit: BoxFit.fill)),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          )
+        ],
       ),
     );
   }

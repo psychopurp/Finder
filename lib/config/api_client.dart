@@ -210,6 +210,31 @@ class ApiClient {
     }
   }
 
+  ///用户发布话题评论
+  Future addTopicComment(
+      {int topicId, String content, int referComment}) async {
+    /**
+     * description: 
+    评论不写refer_comment，回复要写
+     topic: int
+    content: str
+    refer_comment: int
+     */
+    var formData = {"topic_id": topicId, "content": content};
+    if (referComment != null) {
+      formData.addAll({"refer_comment": referComment});
+    }
+    print(jsonEncode(formData));
+    try {
+      Response response =
+          await dio.post('add_topic_comment/', data: jsonEncode(formData));
+      print('发布话题评论成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('发布话题评论错误==========>$e');
+    }
+  }
+
   ///用户发布活动
   Future addActivity(
       {String sponsor,

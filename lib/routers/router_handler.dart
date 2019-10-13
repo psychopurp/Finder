@@ -81,9 +81,9 @@ var publishTopicCommentHandler = Handler(
   String topicId = params['topicId']?.first;
   String topicTitle = params['topicTitle']?.first;
   return PublishTopicCommentPage(
-      // topicId: int.parse(topicId),
-      // topicTitle: topicTitle,
-      );
+    topicId: int.parse(topicId),
+    topicTitle: topicTitle,
+  );
 });
 
 //首页 -- 发布活动
