@@ -38,42 +38,58 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    var joinTopicButtton = Padding(
+        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(270)),
+        child: MaterialButton(
+          onPressed: () {
+            Application.router.navigateTo(context,
+                '/publishTopicComment?topicId=${topicId.toString()}&&topicTitle=${Uri.encodeComponent(topicTitle)}');
+          },
+          child: Text(
+            "+ 参与话题",
+            style: TextStyle(color: Colors.white),
+          ),
+          highlightElevation: 5,
+          color: Theme.of(context).primaryColor,
+          shape: StadiumBorder(side: BorderSide(color: Colors.white)),
+          // minWidth: ScreenUtil().setWidth(100),
+          height: ScreenUtil().setHeight(70),
+        ));
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: MaterialButton(
-            onPressed: () {
-              Application.router.navigateTo(context,
-                  '/publishTopicComment?topicId=${topicId.toString()}&&topicTitle=${Uri.encodeComponent(topicTitle)}');
-            },
-            child: Text(
-              "+ 参与话题",
-              style: TextStyle(color: Colors.white),
-            ),
-            // color: Colors.yellow,
-            shape: StadiumBorder(side: BorderSide(color: Colors.white)),
-            minWidth: ScreenUtil().setWidth(100),
-            height: ScreenUtil().setHeight(70),
-          ),
+          // title:
           elevation: 0,
         ),
         body: (this.topicComments != null)
-            ? Container(
-                color: Colors.black12.withOpacity(0.1),
-                child: EasyRefresh(
-                  header: MaterialHeader(),
-                  onRefresh: () async {
-                    await Future.delayed(Duration(microseconds: 200), () {
-                      getInitialData();
-                    });
-                  },
-                  child: ListView(
-                    children: <Widget>[
-                      topImage(),
-                      commentsPart(),
-                    ],
+            ? Stack(
+                children: <Widget>[
+                  Container(
+                    color: Theme.of(context).dividerColor,
+                    child: EasyRefresh(
+                      header: MaterialHeader(),
+                      onRefresh: () async {
+                        await Future.delayed(Duration(microseconds: 200), () {
+                          getInitialData();
+                        });
+                      },
+                      child: ListView(
+                        padding: EdgeInsets.only(bottom: 50),
+                        children: <Widget>[
+                          topImage(),
+                          commentsPart(),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 10,
+                    child: joinTopicButtton,
+                  )
+                ],
               )
             : Center(child: CupertinoActivityIndicator()));
   }
@@ -153,7 +169,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                       Row(
                         children: <Widget>[
                           CircleAvatar(
-                            backgroundColor: Colors.yellow,
+                            backgroundColor: Theme.of(context).dividerColor,
                             radius: 20.0,
                             backgroundImage: CachedNetworkImageProvider(
                               item.sender.avatar,
@@ -240,7 +256,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           Text(
             text,
             style: TextStyle(
-                fontFamily: 'normal', fontSize: ScreenUtil().setSp(30)),
+                fontWeight: FontWeight.w500,
+                fontFamily: 'normal',
+                fontSize: ScreenUtil().setSp(30)),
           ),
           Container(
             color: Colors.white,

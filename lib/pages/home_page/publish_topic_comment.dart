@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as prefix0;
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:finder/public.dart';
 import 'package:provider/provider.dart';
+import 'package:photo_view/photo_view.dart';
 
 class PublishTopicCommentPage extends StatefulWidget {
   final int topicId;
@@ -23,7 +26,9 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   FocusNode _contentFocusNode;
   List<Widget> wrapList = [];
   List<Asset> images = [];
+  List<File> imageFiles = [];
   String error = "";
+  static const double imageWidth = 220;
 
   @override
   void initState() {
@@ -32,7 +37,6 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
       ..addListener(() {
         print(_contentController.text);
       });
-    wrapList.add(addImage());
     super.initState();
   }
 
@@ -46,14 +50,15 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
+    print('painte');
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(widget.topicTitle + widget.topicId.toString()),
+        title: Text(widget.topicTitle),
         elevation: 0,
         actions: <Widget>[
           FlatButton(
-            color: Colors.yellow,
+            // color: Colors.yellow,
             highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
             onPressed: () async {
               showDialog(
@@ -76,18 +81,18 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
               );
               bool status = await publishTopicComment(user);
               // print(status);
-              // Navigator.pop(context);
-              // if (!status) {
-              //   handleError();
-              // } else {
-              //   handleSuccess();
-              // }
+              Navigator.pop(context);
+              if (!status) {
+                // handleError();
+              } else {
+                handleSuccess();
+              }
             },
             child: Text(
               '发布',
               style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontFamily: "Poppins",
+                  color: Colors.white,
+                  fontFamily: "normal",
                   fontSize: ScreenUtil().setSp(30)),
             ),
           )
@@ -96,20 +101,15 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
       body: Container(
         // height: ScreenUtil().setHeight(800),
         // width: ScreenUtil().setWidth(750),
-        // color: Colors.amber,
-        child: ListView(
+        // color: Theme.of(context).dividerColor,
+        child: Column(
           children: <Widget>[
+            ///content
             Container(
-              height: ScreenUtil().setHeight(500),
-              // child: Html(
-              child: Text(_contentController.text),
-              // ),
-            ),
-
-            Container(
-              width: ScreenUtil().setWidth(420),
-              // color: Colors.amber,
+              width: ScreenUtil().setWidth(750),
+              color: Colors.white,
               child: TextField(
+                style: TextStyle(fontFamily: 'normal', fontSize: 18),
                 cursorColor: Theme.of(context).primaryColor,
                 controller: _contentController,
                 focusNode: _contentFocusNode,
@@ -117,39 +117,84 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
                 decoration: InputDecoration(
                   // labelText: '活动名称',
                   filled: true,
-                  hintText: '请输入活动名称',
+                  hintText: '你的想法是 ?',
                   fillColor: Colors.white,
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(12),
                 ),
                 // expands: true,
                 minLines: 3,
-                maxLines: null,
+                maxLines: 8,
                 maxLengthEnforced: true,
                 maxLength: 1000,
               ),
             ),
 
-            Container(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                // width: ScreenUtil().setWidth(420),
-                // height: ScreenUtil().setHeight(500),
-                color: Colors.cyan,
-                child: Wrap(
-                    spacing: 5,
-                    runSpacing: 5,
-                    children: this.images.map((image) {
-                      return Container(
-                        child: AssetThumb(
-                          asset: image,
-                          width: ScreenUtil().setWidth(200).toInt(),
-                          height: ScreenUtil().setHeight(200).toInt(),
-                        ),
-                      );
-                    }).toList()
-                      ..add(addImage())))
+            ///图片添加框
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                    padding: EdgeInsets.only(
+                        top: 10, bottom: 20, left: ScreenUtil().setWidth(25)),
+                    width: ScreenUtil().setWidth(750),
+                    // height: ScreenUtil().setHeight(500),
+                    color: Colors.white,
+                    child: Wrap(
+                        spacing: 10,
+                        runSpacing: 5,
+                        children: this.imageFiles.map((image) {
+                          return Container(
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    fullscreenDialog: false,
+                                    builder: (_) {
+                                      return Container(
+                                        constraints: BoxConstraints.expand(
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height,
+                                        ),
+                                        child: PhotoView(
+                                          imageProvider: FileImage(image),
+                                          minScale: 0.2,
+                                          maxScale: 0.5,
+                                          heroAttributes:
+                                              const PhotoViewHeroAttributes(
+                                                  tag: "someTag"),
+                                        ),
+                                      );
+                                    }));
+                              },
+                              child: Container(
+                                width: ScreenUtil().setWidth(imageWidth),
+                                height: ScreenUtil().setHeight(imageWidth),
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: FileImage(image),
+                                        fit: BoxFit.cover)),
+                                // AssetThumb(
+                                //   quality: 100,
+                                //   asset: image,
+                                //   width: ScreenUtil().setWidth(imageWidth).toInt(),
+                                //   height:
+                                //       ScreenUtil().setHeight(imageWidth).toInt(),
+                                // ),
+                              ),
+                            ),
+                          );
+                        }).toList()
+                          ..add(addImage()))),
+              ),
+            ),
 
-            // MyApp(),
+            ///菜单栏
+            Container(
+              height: ScreenUtil().setHeight(100),
+              width: ScreenUtil().setWidth(750),
+              color: Colors.amber,
+              child: Text('toolbar'),
+            )
           ],
         ),
       ),
@@ -163,7 +208,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
       String error = 'No Error Dectected';
       try {
         resultList = await MultiImagePicker.pickImages(
-          maxImages: 10,
+          maxImages: 30,
           enableCamera: true,
           selectedAssets: images,
           cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
@@ -183,26 +228,45 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
       }
       if (!mounted) return;
 
+      List<File> files = this.imageFiles;
+      for (var r in resultList) {
+        var t = await r.filePath;
+        files.add(File(t));
+      }
+
       setState(() {
+        this.imageFiles = files;
         images = resultList;
         error = error;
       });
     }
 
     return Container(
-      child: InkWell(
-        onTap: () {
-          print('tapped');
+      child: MaterialButton(
+        onPressed: () {
           loadAssets();
         },
-        child: Container(
-          width: ScreenUtil().setWidth(200),
-          height: ScreenUtil().setHeight(200),
-          color: Colors.grey,
-          child: Icon(Icons.add),
-        ),
+        minWidth: ScreenUtil().setWidth(imageWidth),
+        height: ScreenUtil().setHeight(imageWidth),
+        shape: RoundedRectangleBorder(side: BorderSide(color: Colors.white)),
+        elevation: 0,
+        highlightElevation: 0,
+        color: Theme.of(context).dividerColor,
+        child: Icon(Icons.add),
       ),
     );
+  }
+
+  void handleSuccess() {
+    Navigator.pop(context);
+    Fluttertoast.showToast(
+        msg: "参与话题成功",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: Theme.of(context).dividerColor,
+        textColor: Colors.black,
+        fontSize: 16.0);
   }
 
   Future<bool> publishTopicComment(UserProvider user) async {
