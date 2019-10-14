@@ -40,6 +40,7 @@ dependencies:
   multi_image_picker: ^4.5.8
   photo_view: ^0.5.0
   zefyr: ^0.8.0
+  extended_image: ^0.6.3
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +92,19 @@ flutter:
         - asset: assets/font/Yellowtail/Yellowtail-Regular.ttf
           #       - asset: fonts/TrajanPro_Bold.ttf
           weight: 600
+    - family: Montserrat
+      fonts:
+        - asset: assets/font/montserrat/Montserrat-Regular.ttf
+        - asset: assets/font/montserrat/Montserrat-Medium.ttf
+          weight: 400
+        - asset: assets/font/montserrat/Montserrat-Italic.ttf
+          style: italic
+        - asset: assets/font/montserrat/Montserrat-Light.ttf
+          weight: 200
+        - asset: assets/font/montserrat/Montserrat-SemiBold.ttf
+          weight: 500
+        - asset: assets/font/montserrat/Montserrat-Bold.ttf
+          weight: 700
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

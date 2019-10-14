@@ -1,5 +1,6 @@
 import 'package:finder/pages/message_page/data_object.dart';
 import 'package:finder/pages/mine_page/user_profile_page.dart';
+import 'package:finder/pages/profile_drawer.dart';
 import 'package:finder/pages/register_page.dart';
 import 'package:finder/routers/application.dart';
 import 'package:fluro/fluro.dart';
@@ -51,6 +52,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Scaffold(
       primary: false,
+      drawer: ProfileDrawer(),
 //      body: AnimatedSwitcher(
 //        duration: Duration(seconds: 1),
 //        transitionBuilder: (context, animate) => SlideTransition(

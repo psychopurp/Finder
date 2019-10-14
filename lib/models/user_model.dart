@@ -1,3 +1,5 @@
+import 'package:finder/config/api_client.dart';
+
 class UserModel {
   String nickname;
   String phone;
@@ -18,7 +20,7 @@ class UserModel {
   UserModel.fromJson(Map<String, dynamic> json) {
     nickname = json['nickname'];
     phone = json['phone'];
-    avatar = json['avatar'];
+    avatar = ApiClient.host + json['avatar'];
     introduction = json['introduction'];
     birthday = json["birthday"];
     major = json['major'];

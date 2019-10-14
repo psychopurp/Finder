@@ -125,7 +125,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Container buildUserBackground(UserModel user, BuildContext context) {
+  Widget buildUserBackground(UserModel user, BuildContext context) {
     return Container(
       height: ScreenUtil().setHeight(650),
       width: ScreenUtil().setWidth(750),
@@ -187,48 +187,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  _backGround(UserModel user) {
-    return Container(
-      height: ScreenUtil().setHeight(800),
-      color: Colors.cyan,
-      child: Stack(
-        alignment: Alignment.topCenter,
-        children: <Widget>[
-          ClipPath(
-            clipBehavior: Clip.hardEdge,
-            clipper: BackGroundClipper(),
-            child: Container(
-              color: Theme.of(context).primaryColor,
-              height: ScreenUtil().setHeight(700),
-              width: ScreenUtil().setWidth(750),
-            ),
-          ),
-          Container(
-              // margin: EdgeInsets.only(top: 100),
-              child: CircleAvatar(
-            radius: 50,
-            backgroundImage: CachedNetworkImageProvider(user.avatar),
-          )),
-        ],
-      ),
-    );
-  }
-
   Widget _userAvatar(UserModel user) {
     return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-        height: ScreenUtil().setHeight(200),
-        width: ScreenUtil().setWidth(200),
-        decoration: BoxDecoration(
-            // shape: CircleBorder(),
-            border: Border.all(color: Colors.white, width: 3),
-            borderRadius: BorderRadius.all(Radius.circular(50)),
-            image: DecorationImage(
-                image: CachedNetworkImageProvider(user.avatar))),
-      ),
-    );
+        alignment: Alignment.topCenter,
+        child: Hero(
+          tag: 'profile',
+          child: Container(
+            // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+            height: ScreenUtil().setHeight(200),
+            width: ScreenUtil().setWidth(200),
+            decoration: BoxDecoration(
+                // shape: CircleBorder(),
+                border: Border.all(color: Colors.white, width: 3),
+                borderRadius: BorderRadius.all(Radius.circular(50)),
+                image: DecorationImage(
+                    image: CachedNetworkImageProvider(user.avatar))),
+          ),
+        ));
   }
 }
 

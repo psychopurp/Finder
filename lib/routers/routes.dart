@@ -27,7 +27,7 @@ class Routes {
   static String psychoTest = "/serve/psychoTest"; //服务页面 -- 心理测试
   static String treeHole = "/serve/treeHole"; //服务页面 -- 我·树洞
   //用户页
-  static String userProfile = "/mine/userProfile"; //服务页面 -- 我·树洞
+  static String userProfile = "/userProfile"; //个人详情页
 
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
