@@ -32,6 +32,8 @@ class Routes {
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
   static String tips = "/message/tips";
+  static String sayToHe = "/message/say_to_he";
+  static String sayToHeChat = "/message/say_to_he_chat";
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = Handler(
@@ -84,5 +86,11 @@ class Routes {
         handler: chatPageHandle, transitionType: TransitionType.cupertino);
     router.define(systemMessage,
         handler: systemMessageHandle, transitionType: TransitionType.cupertino);
+    router.define(tips,
+        handler: tipsHandle, transitionType: TransitionType.cupertino);
+    router.define(sayToHe,
+        handler: sayToHeHandle, transitionType: TransitionType.cupertino);
+    router.define(sayToHeChat,
+        handler: sayToHeChatHandle, transitionType: TransitionType.cupertino);
   }
 }

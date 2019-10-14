@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/pages/message_page/chat_page.dart';
 import 'package:finder/pages/home_page/publish_topic_comment.dart';
+import 'package:finder/pages/message_page/say_to_he_chat_page.dart';
+import 'package:finder/pages/message_page/say_to_he_list_page.dart';
 import 'package:finder/pages/message_page/system_message_page.dart';
+import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -153,4 +156,16 @@ var chatPageHandle = Handler(
 var systemMessageHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return SystemMessagePage();
+});
+var tipsHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return TipsPage();
+});
+var sayToHeHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return SayToHePage();
+});
+var sayToHeChatHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return SayToHeChatRoute();
 });

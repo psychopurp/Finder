@@ -23,6 +23,7 @@ class DataObject implements Listenable {
   SharedPreferences prefs;
   List<VoidCallback> changeEvents;
   List<String> usersIndex = [];
+  List<String> saysIndex = [];
   Set<String> noMoreHistory = Set<String>();
   bool noMoreHistoryMessage = false;
   UserProfile loadUser;
@@ -78,6 +79,7 @@ class DataObject implements Listenable {
     users = {};
     says = {};
     usersIndex = [];
+    saysIndex = [];
     noMoreHistory = Set();
     prefs.remove("messages");
     lastRequestTime = null;
@@ -466,16 +468,21 @@ class DataObject implements Listenable {
     bool change = false;
     if (says.containsKey(messageItem.sessionId)) {
       if (!says[messageItem.sessionId].contains(messageItem)) {
-        //TODO 此写法没有优化, 可用二分查找优化
-        if (addFirst)
+        if (addFirst) {
           says[messageItem.sessionId].insert(0, messageItem);
-        else
+        } else {
           says[messageItem.sessionId].add(messageItem);
+          if (init) {
+            saysIndex.remove(messageItem.sessionId);
+            saysIndex.add(messageItem.sessionId);
+          }
+        }
         change = true;
       }
     } else {
       change = true;
       says[messageItem.sessionId] = [messageItem];
+      saysIndex.add(messageItem.sessionId);
     }
     if (change) {
       updateSaysCount();
@@ -502,6 +509,7 @@ class DataObject implements Listenable {
                   value.length, (index) => value[index].toJson()))),
       'user': self?.toJson(),
       'usersIndex': usersIndex,
+      'saysIndex': saysIndex,
       "noMoreHistory": noMoreHistory.toList()
     };
     return json.encode(result);
@@ -531,6 +539,7 @@ class DataObject implements Listenable {
                 (index) => SayToHeItem.fromJson(entity.value[index])))));
     loadUser = UserProfile.fromJson(map["user"]);
     usersIndex = map['usersIndex'];
+    saysIndex = map['saaysIndex'];
     noMoreHistory = List<String>.generate(
             map["noMoreHistory"].length, (index) => map["noMoreHistory"][index])
         .toSet();

@@ -151,10 +151,11 @@ class _PublishPageState extends State<PublishPage>
       return false;
     }
     try {
-      var response = await dio.post("add_he_she_say/",
+      var response = await dio.post("send_say_to_he/",
           data: json.encode({
             "content": content,
             "is_show_name": !nameLess,
+            "id": id,
           }));
       var data = response.data;
       if (!data["status"]) {
