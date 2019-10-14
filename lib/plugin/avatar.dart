@@ -46,7 +46,7 @@ class Avatar extends StatelessWidget{
     );
   }
 
-  static String getAvatarUrl(String url){
+  static String getImageUrl(String url){
     String baseUrl = ApiClient.host;
     if(url.startsWith("http")){
       return url;

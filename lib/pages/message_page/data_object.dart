@@ -587,7 +587,7 @@ class UserProfile extends Item implements ToJson {
   UserProfile({this.nickname, int id, this.avatar}) : super(id, isRead: false);
   static Map<int, UserProfile> users = {};
   factory UserProfile.fromJson(Map<String, dynamic> map) {
-    String avatar = Avatar.getAvatarUrl(map["avatar"]);
+    String avatar = Avatar.getImageUrl(map["avatar"]);
     if (users.containsKey(map["id"])) {
       UserProfile user = users[map["id"]];
       user.avatar = avatar;

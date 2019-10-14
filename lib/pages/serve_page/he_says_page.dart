@@ -672,12 +672,12 @@ class HeSheSayItem {
 
   factory HeSheSayItem.fromJson(Map<String, dynamic> map) {
     Map<String, dynamic> author = map["author"];
-    String authorAvatar = Avatar.getAvatarUrl(author["avatar"]);
+    String authorAvatar = Avatar.getImageUrl(author["avatar"]);
     int authorId = author["id"];
     String authorName = author["nickname"];
     String title = map["title"];
     String content = map["content"];
-    String image = Avatar.getAvatarUrl(map["image"]);
+    String image = Avatar.getImageUrl(map["image"]);
     int likeCount = map["like"];
     bool isLike = map["isLike"];
     int id = map["id"];
