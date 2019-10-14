@@ -135,6 +135,25 @@ class DataObject implements Listenable {
     }
   }
 
+  Future<void> readSaysBySessionId(String sessionId) async {
+    if (!users.containsKey(sessionId)) return;
+    bool value = true;
+    says[sessionId].forEach((item) {
+      value = value && item.isRead;
+    });
+    if (value) return;
+    Response response = await dio.post('read_message_by_session/', data: {
+      "sessionId": sessionId,
+    });
+    if (response.data["status"]) {
+      says[sessionId].forEach((item) {
+        item.isRead = true;
+      });
+      updateSaysCount();
+      onChange();
+    }
+  }
+
   Future<void> readSystemMessages() async {
     bool value = true;
     systems.forEach((item) {
@@ -179,6 +198,28 @@ class DataObject implements Listenable {
       item.isRead = true;
       updateTipsCount();
       updateSystemsCount();
+      onChange();
+    }
+  }
+
+  Future<void> readTips() async {
+    Response response = await dio.post("read_tips/");
+    if (response.data["status"]) {
+      tips.forEach((item) {
+        item.isRead = true;
+      });
+      updateTipsCount();
+      onChange();
+    }
+  }
+
+  Future<void> readSays() async {
+    Response response = await dio.post("read_says/");
+    if (response.data["status"]) {
+      tips.forEach((item) {
+        item.isRead = true;
+      });
+      updateTipsCount();
       onChange();
     }
   }
@@ -586,6 +627,7 @@ class Item {
 class UserProfile extends Item implements ToJson {
   UserProfile({this.nickname, int id, this.avatar}) : super(id, isRead: false);
   static Map<int, UserProfile> users = {};
+
   factory UserProfile.fromJson(Map<String, dynamic> map) {
     String avatar = Avatar.getImageUrl(map["avatar"]);
     if (users.containsKey(map["id"])) {

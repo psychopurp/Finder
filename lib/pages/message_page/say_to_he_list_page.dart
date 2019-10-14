@@ -45,7 +45,7 @@ class _SayToHePageState extends State<SayToHePage> {
             highlightColor: Colors.transparent,
             child: Icon(Icons.clear_all, color: Colors.white),
             onPressed: () {
-              data.readAll();
+              data.readSays();
             },
           )
         ],

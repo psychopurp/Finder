@@ -42,7 +42,7 @@ class _TipsPageState extends State<TipsPage> {
             highlightColor: Colors.transparent,
             child: Icon(Icons.clear_all, color: Colors.white),
             onPressed: () {
-              data.readAll();
+              data.readTips();
             },
           )
         ],
@@ -159,6 +159,7 @@ class _TipsPageState extends State<TipsPage> {
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
+          data.readOne(item);
           Navigator.pushNamed(context, jump);
         },
         child: Dismissible(

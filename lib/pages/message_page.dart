@@ -131,7 +131,7 @@ class _MessagePageState extends State<MessagePage> {
           ),
           Expanded(
             flex: 1,
-            child: data != null
+            child: data != null && data != ""
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,

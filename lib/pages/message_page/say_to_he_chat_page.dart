@@ -62,7 +62,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
   bool focus = false;
 
   void update() {
-    data.readUserMessagesBySessionId(widget.sessionId);
+    data.readSaysBySessionId(widget.sessionId);
     setState(() {});
   }
 
