@@ -65,6 +65,14 @@ class UserProvider with ChangeNotifier {
     return data;
   }
 
+  ///用户发布话题评论
+  Future addTopicComment(
+      {int topicId, String content, int referComment}) async {
+    var data = await apiClient.addTopicComment(
+        topicId: topicId, content: content, referComment: referComment);
+    return data;
+  }
+
   ///用户发布活动
   Future addActivity(
       {String sponsor,

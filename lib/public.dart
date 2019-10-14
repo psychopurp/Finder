@@ -1,5 +1,7 @@
 library public;
 
+import 'dart:convert';
+
 //util
 export 'package:flutter_screenutil/flutter_screenutil.dart';
 export 'package:cached_network_image/cached_network_image.dart';
@@ -19,6 +21,11 @@ String timestampToDateTime(num time) {
   num temp = time * 1000;
   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(temp.toInt());
   // print(dateTime);
-
   return dateTime.toString();
+}
+
+///content转换成html
+String contentToJson({List<String> images, String text}) {
+  var formData = {'images': images, 'text': text};
+  return jsonEncode(formData);
 }

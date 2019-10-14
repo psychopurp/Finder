@@ -141,6 +141,7 @@ class _ChildActivitiesState extends State<ChildActivities>
         await Future.delayed(Duration(microseconds: 500), () {
           _getInitialActivitiesData(2);
         });
+        _refreshController.resetLoadState();
       },
       onLoad: () async {
         var data = await _getMore(this.pageCount, context);
@@ -182,13 +183,13 @@ class _ChildActivitiesState extends State<ChildActivities>
         return !isContain;
       });
     }
-
+    if (!mounted) return;
     // print('activities=======>${activities.data}');
     setState(() {
+      this.pageCount = pageCount;
       this.activities = activities;
       this.itemCount = activities.data.length;
     });
-    return activities;
   }
 
   Future _getMore(int pageCount, BuildContext context) async {

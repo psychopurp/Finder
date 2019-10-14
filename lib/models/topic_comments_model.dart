@@ -1,3 +1,5 @@
+import 'package:finder/config/api_client.dart';
+
 class TopicCommentsModel {
   List<TopicCommentsModelData> data;
   int totalPage;
@@ -79,7 +81,7 @@ class Sender {
 
   Sender.fromJson(Map<String, dynamic> json) {
     nickname = json['nickname'];
-    avatar = json['avatar'];
+    avatar = ApiClient.host + json['avatar'];
     id = json['id'];
   }
 

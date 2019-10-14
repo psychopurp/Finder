@@ -158,6 +158,7 @@ class _TopicsState extends State<Topics>
         await Future.delayed(Duration(microseconds: 500), () {
           _getInitialTopicsData(2);
         });
+        _refreshController.resetLoadState();
       },
       onLoad: () async {
         var data = await _getMore(this.pageCount);
@@ -191,11 +192,12 @@ class _TopicsState extends State<Topics>
       topics.data.removeWhere((item) => item.school == null);
     }
     // print('topicsData=======>${topicsData}');
+    if (!mounted) return;
     setState(() {
+      this.pageCount = pageCount;
       this.topics = topics;
       this.itemCount = topics.data.length;
     });
-    return topics;
   }
 
   Future _getMore(int pageCount) async {
@@ -205,7 +207,7 @@ class _TopicsState extends State<Topics>
     if (isSchoolTopics) {
       topics.data.removeWhere((item) => item.school == null);
     }
-    // print('hasmore=======${topics.hasMore}');
+
     setState(() {
       this.topics.data.addAll(topics.data);
       this.itemCount = this.itemCount + topics.data.length;
