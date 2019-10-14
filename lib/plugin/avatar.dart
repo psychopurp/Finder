@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:finder/config/api_client.dart';
 import 'package:flutter/material.dart';
 
 class Avatar extends StatelessWidget{
@@ -43,5 +44,13 @@ class Avatar extends StatelessWidget{
         );
       },
     );
+  }
+
+  static String getAvatarUrl(String url){
+    String baseUrl = ApiClient.host;
+    if(url.startsWith("http")){
+      return url;
+    }
+    else return baseUrl + url;
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -585,12 +586,8 @@ class Item {
 class UserProfile extends Item implements ToJson {
   UserProfile({this.nickname, int id, this.avatar}) : super(id, isRead: false);
   static Map<int, UserProfile> users = {};
-
   factory UserProfile.fromJson(Map<String, dynamic> map) {
-    String avatar = map["avatar"];
-    if (!avatar.startsWith("http")) {
-      avatar = ApiClient.host + avatar;
-    }
+    String avatar = Avatar.getAvatarUrl(map["avatar"]);
     if (users.containsKey(map["id"])) {
       UserProfile user = users[map["id"]];
       user.avatar = avatar;

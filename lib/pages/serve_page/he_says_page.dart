@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/avatar.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -102,12 +103,8 @@ class _HeSaysPageState extends State<HeSaysPage> {
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
-          bannerData = List.generate(result["data"].length, (index) {
-            var item = HeSheSayItem.fromJson(result["data"][index]);
-            item.image = ApiClient.host + item.image;
-            item.authorAvatar = ApiClient.host + item.authorAvatar;
-            return item;
-          });
+          bannerData = List.generate(result["data"].length,
+              (index) => HeSheSayItem.fromJson(result["data"][index]));
         });
       }
     } on DioError catch (e) {
@@ -675,12 +672,12 @@ class HeSheSayItem {
 
   factory HeSheSayItem.fromJson(Map<String, dynamic> map) {
     Map<String, dynamic> author = map["author"];
-    String authorAvatar = author["avatar"];
+    String authorAvatar = Avatar.getAvatarUrl(author["avatar"]);
     int authorId = author["id"];
     String authorName = author["nickname"];
     String title = map["title"];
     String content = map["content"];
-    String image = map["image"];
+    String image = Avatar.getAvatarUrl(map["image"]);
     int likeCount = map["like"];
     bool isLike = map["isLike"];
     int id = map["id"];
