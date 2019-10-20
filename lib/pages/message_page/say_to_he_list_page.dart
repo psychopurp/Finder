@@ -1,17 +1,18 @@
-import 'package:finder/pages/message_page/data_object.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 
+import 'data_object.dart';
+
 const double MessageHeight = 70;
 const double AvatarHeight = 54;
 
-class MessagePage extends StatefulWidget {
+class SayToHePage extends StatefulWidget {
   @override
-  _MessagePageState createState() => _MessagePageState();
+  _SayToHePageState createState() => _SayToHePageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _SayToHePageState extends State<SayToHePage> {
   DataObject data = DataObject();
 
   void update() {
@@ -34,7 +35,7 @@ class _MessagePageState extends State<MessagePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("消息"),
+        title: Text("对Ta说"),
         elevation: 0,
         centerTitle: true,
         actions: <Widget>[
@@ -44,7 +45,7 @@ class _MessagePageState extends State<MessagePage> {
             highlightColor: Colors.transparent,
             child: Icon(Icons.clear_all, color: Colors.white),
             onPressed: () {
-              data.readAll();
+              data.readSays();
             },
           )
         ],
@@ -53,8 +54,6 @@ class _MessagePageState extends State<MessagePage> {
         padding: EdgeInsets.only(left: 13, right: 13, top: 10),
         child: RefreshIndicator(
           onRefresh: () async {
-            data.lastRequestTime = null;
-            data.reset();
             data.getData();
           },
           child: body,
@@ -66,122 +65,9 @@ class _MessagePageState extends State<MessagePage> {
   Widget get body {
     return ListView.builder(
       itemBuilder: (context, index) {
-        if (index == 0) {
-          return _generateOtherMessagePage(
-              "系统消息", Icons.computer, data.systemsCount,
-              data: data.systems.length == 0 ? "" : data.systems.last.content,
-              background: Color(0xFF0099FF),
-              url: Routes.systemMessage);
-        } else if (index == 1) {
-          return _generateOtherMessagePage("提醒", Icons.error, data.tipsCount,
-              data: data.tips.length == 0 ? "" : data.tips.last.content,
-              background: Color(0xFFFF9933),
-              url: Routes.tips);
-        } else if (index == 2) {
-          return _generateOtherMessagePage("对Ta说", Icons.person, data.saysCount,
-              background: Color(0xFFFF6666), url: Routes.sayToHe);
-        }
-        return _generateUserMessage(index - 3);
+        return _generateSayToHe(index);
       },
-      itemCount: data.users.length + 3,
-    );
-  }
-
-  Widget get pop => Builder(builder: (context) {
-        return Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              color: Theme.of(context).primaryColor),
-        );
-      });
-
-  Widget _generateOtherMessagePage(String title, IconData icon, int unReadCount,
-      {Color background = Colors.orange,
-      String data,
-      VoidCallback onPress,
-      String url}) {
-    Widget titleWidget = Text(
-      title,
-      style: TextStyle(
-        fontSize: 16,
-      ),
-      textAlign: TextAlign.left,
-    );
-
-    Widget child = _withBottomBorder(
-      Row(
-        children: <Widget>[
-          Container(
-            width: AvatarHeight,
-            height: AvatarHeight,
-            decoration: BoxDecoration(
-              color: background,
-              borderRadius: BorderRadius.circular(AvatarHeight / 2),
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(10),
-          ),
-          Expanded(
-            flex: 1,
-            child: data != null && data != ""
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      titleWidget,
-                      Padding(
-                        padding: EdgeInsets.all(3),
-                      ),
-                      Text(
-                        data,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          color: Color(0xFF777777),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    ],
-                  )
-                : titleWidget,
-          ),
-          unReadCount != 0
-              ? Stack(
-                  children: <Widget>[
-                    Icon(
-                      Icons.chevron_right,
-                      color: Color(0xBBBBBBBB),
-                      size: 30,
-                    ),
-                    Positioned(
-                      right: 1,
-                      top: 1,
-                      child: pop,
-                    )
-                  ],
-                )
-              : Icon(
-                  Icons.chevron_right,
-                  color: Color(0xBBBBBBBB),
-                  size: 30,
-                ),
-        ],
-      ),
-    );
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        Navigator.pushNamed(context, url);
-      },
-      child: child,
+      itemCount: data.says.length,
     );
   }
 
@@ -201,10 +87,10 @@ class _MessagePageState extends State<MessagePage> {
     );
   }
 
-  Widget _generateUserMessage(int index) {
-    List<UserMessageItem> items =
-        data.users[data.usersIndex[data.usersIndex.length - index - 1]];
-    UserMessageItem item = items.last;
+  Widget _generateSayToHe(int index) {
+    List<SayToHeItem> items =
+        data.says[data.saysIndex[data.saysIndex.length - index - 1]];
+    SayToHeItem item = items.last;
     int unReadCount = data.unReadCount(items);
     UserProfile other;
     if (item.sender == data.self) {
@@ -284,16 +170,19 @@ class _MessagePageState extends State<MessagePage> {
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          Navigator.pushNamed(context, Routes.chat, arguments: other);
+          Navigator.pushNamed(context, Routes.sayToHeChat, arguments: {
+            "other": other,
+            "sessionId": data.saysIndex[data.saysIndex.length - 1 - index]
+          });
         },
         child: Dismissible(
-          key: ValueKey(data.usersIndex[data.usersIndex.length - index - 1]),
+          key: ValueKey(data.saysIndex[data.saysIndex.length - index - 1]),
           child: child,
           onDismissed: (direction) {
             setState(() {
-              data.users
-                  .remove(data.usersIndex[data.usersIndex.length - 1 - index]);
-              data.usersIndex.removeAt(data.usersIndex.length - index - 1);
+              data.says
+                  .remove(data.saysIndex[data.saysIndex.length - 1 - index]);
+              data.saysIndex.removeAt(data.saysIndex.length - index - 1);
             });
           },
         ));

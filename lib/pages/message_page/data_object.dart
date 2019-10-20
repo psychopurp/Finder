@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +24,7 @@ class DataObject implements Listenable {
   SharedPreferences prefs;
   List<VoidCallback> changeEvents;
   List<String> usersIndex = [];
+  List<String> saysIndex = [];
   Set<String> noMoreHistory = Set<String>();
   bool noMoreHistoryMessage = false;
   UserProfile loadUser;
@@ -78,6 +80,7 @@ class DataObject implements Listenable {
     users = {};
     says = {};
     usersIndex = [];
+    saysIndex = [];
     noMoreHistory = Set();
     prefs.remove("messages");
     lastRequestTime = null;
@@ -132,6 +135,25 @@ class DataObject implements Listenable {
     }
   }
 
+  Future<void> readSaysBySessionId(String sessionId) async {
+    if (!users.containsKey(sessionId)) return;
+    bool value = true;
+    says[sessionId].forEach((item) {
+      value = value && item.isRead;
+    });
+    if (value) return;
+    Response response = await dio.post('read_message_by_session/', data: {
+      "sessionId": sessionId,
+    });
+    if (response.data["status"]) {
+      says[sessionId].forEach((item) {
+        item.isRead = true;
+      });
+      updateSaysCount();
+      onChange();
+    }
+  }
+
   Future<void> readSystemMessages() async {
     bool value = true;
     systems.forEach((item) {
@@ -176,6 +198,28 @@ class DataObject implements Listenable {
       item.isRead = true;
       updateTipsCount();
       updateSystemsCount();
+      onChange();
+    }
+  }
+
+  Future<void> readTips() async {
+    Response response = await dio.post("read_tips/");
+    if (response.data["status"]) {
+      tips.forEach((item) {
+        item.isRead = true;
+      });
+      updateTipsCount();
+      onChange();
+    }
+  }
+
+  Future<void> readSays() async {
+    Response response = await dio.post("read_says/");
+    if (response.data["status"]) {
+      tips.forEach((item) {
+        item.isRead = true;
+      });
+      updateTipsCount();
       onChange();
     }
   }
@@ -466,16 +510,21 @@ class DataObject implements Listenable {
     bool change = false;
     if (says.containsKey(messageItem.sessionId)) {
       if (!says[messageItem.sessionId].contains(messageItem)) {
-        //TODO 此写法没有优化, 可用二分查找优化
-        if (addFirst)
+        if (addFirst) {
           says[messageItem.sessionId].insert(0, messageItem);
-        else
+        } else {
           says[messageItem.sessionId].add(messageItem);
+          if (init) {
+            saysIndex.remove(messageItem.sessionId);
+            saysIndex.add(messageItem.sessionId);
+          }
+        }
         change = true;
       }
     } else {
       change = true;
       says[messageItem.sessionId] = [messageItem];
+      saysIndex.add(messageItem.sessionId);
     }
     if (change) {
       updateSaysCount();
@@ -502,6 +551,7 @@ class DataObject implements Listenable {
                   value.length, (index) => value[index].toJson()))),
       'user': self?.toJson(),
       'usersIndex': usersIndex,
+      'saysIndex': saysIndex,
       "noMoreHistory": noMoreHistory.toList()
     };
     return json.encode(result);
@@ -531,6 +581,7 @@ class DataObject implements Listenable {
                 (index) => SayToHeItem.fromJson(entity.value[index])))));
     loadUser = UserProfile.fromJson(map["user"]);
     usersIndex = map['usersIndex'];
+    saysIndex = map['saaysIndex'];
     noMoreHistory = List<String>.generate(
             map["noMoreHistory"].length, (index) => map["noMoreHistory"][index])
         .toSet();
@@ -578,10 +629,7 @@ class UserProfile extends Item implements ToJson {
   static Map<int, UserProfile> users = {};
 
   factory UserProfile.fromJson(Map<String, dynamic> map) {
-    String avatar = map["avatar"];
-    if (!avatar.startsWith("http")) {
-      avatar = ApiClient.host + avatar;
-    }
+    String avatar = Avatar.getImageUrl(map["avatar"]);
     if (users.containsKey(map["id"])) {
       UserProfile user = users[map["id"]];
       user.avatar = avatar;
