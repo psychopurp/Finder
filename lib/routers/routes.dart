@@ -26,6 +26,7 @@ class Routes {
   static String selectCourse = "/serve/selectCourse"; //服务页面 -- 选课指南
   static String psychoTest = "/serve/psychoTest"; //服务页面 -- 心理测试
   static String treeHole = "/serve/treeHole"; //服务页面 -- 我·树洞
+  static String internship = "/serve/internship"; //服务页面 -- 我·树洞
   //用户页
   static String userProfile = "/mine/userProfile"; //服务页面 -- 我·树洞
 
@@ -77,6 +78,7 @@ class Routes {
     router.define(selectCourse, handler: selectCourseHandler);
     router.define(psychoTest, handler: psychoTestHandler);
     router.define(treeHole, handler: treeHoleHandler);
+    router.define(internship, handler: internshipHandler);
 
     //我的页
     router.define(userProfile,

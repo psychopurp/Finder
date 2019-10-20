@@ -52,6 +52,13 @@ class _ServePageState extends State<ServePage> {
       'color': Colors.green,
       'url': Routes.treeHole
     },
+    {
+      'name': '实习',
+      'preIcon': IconData(0xe60b, fontFamily: 'myIcon'),
+      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
+      'color': Colors.red,
+      'url': Routes.internship
+    },
   ];
 
   @override
