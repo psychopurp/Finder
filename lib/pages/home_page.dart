@@ -1,7 +1,6 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
-import 'package:finder/provider/store.dart';
 import 'package:finder/public.dart';
 
 import 'package:flutter/material.dart';
@@ -38,6 +37,10 @@ class _HomePageState extends State<HomePage> {
     // final user = Provider.of<UserProvider>(context);
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(IconData(0xe66d, fontFamily: 'myIcon')),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
           title: Text(
             'Finders',
             style: TextStyle(

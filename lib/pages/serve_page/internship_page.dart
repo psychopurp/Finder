@@ -41,7 +41,6 @@ class _InternshipPageState extends State<InternshipPage> {
     );
   }
 
-
   Future<void> getLeadHeSheSays({bool delay: false}) async {
     if (delay) {
       await Future.delayed(Duration(milliseconds: 100));
@@ -53,7 +52,7 @@ class _InternshipPageState extends State<InternshipPage> {
       if (result["status"]) {
         setState(() {
           bannerData = List.generate(result["data"].length,
-                  (index) => InternshipItem.fromJson(result["data"][index]));
+              (index) => InternshipItem.fromJson(result["data"][index]));
         });
       }
     } on DioError catch (e) {
@@ -63,12 +62,10 @@ class _InternshipPageState extends State<InternshipPage> {
       });
     }
   }
-
 }
 
-
-class InternshipItem{
-  factory InternshipItem.fromJson(Map<String, dynamic> map){
-
+class InternshipItem {
+  factory InternshipItem.fromJson(Map<String, dynamic> map) {
+    return null;
   }
 }

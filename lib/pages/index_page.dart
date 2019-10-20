@@ -1,18 +1,14 @@
 import 'package:finder/pages/message_page/data_object.dart';
-import 'package:finder/pages/mine_page/user_profile_page.dart';
 import 'package:finder/pages/profile_drawer.dart';
-import 'package:finder/pages/register_page.dart';
 import 'package:finder/routers/application.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'message_page.dart';
-import 'mine_page.dart';
 import 'serve_page.dart';
 import 'recruit_page.dart';
 import 'package:finder/public.dart';
-import 'package:finder/pages/web_view.dart';
 
 class IndexPage extends StatefulWidget {
   @override

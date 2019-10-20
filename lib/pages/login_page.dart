@@ -5,7 +5,6 @@ import 'package:finder/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/pages/index_page.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:finder/plugin/animated_button.dart';
 
 typedef MyCallBackFuture = Future Function();
 

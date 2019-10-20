@@ -7,39 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_html/flutter_html.dart';
 
-class TopicDetailPage extends StatefulWidget {
+class TopicDetailPage extends StatelessWidget {
   final int topicId;
   final String topicImage;
   final String topicTitle;
   TopicDetailPage({this.topicId, this.topicImage, this.topicTitle});
 
   @override
-  _TopicDetailPageState createState() => _TopicDetailPageState(
-      topicId: topicId, topicImage: topicImage, topicTitle: topicTitle);
-}
-
-class _TopicDetailPageState extends State<TopicDetailPage> {
-  final int topicId;
-  final String topicImage;
-  final String topicTitle;
-  _TopicDetailPageState({this.topicId, this.topicImage, this.topicTitle});
-
-  TopicCommentsModel topicComments;
-  var followList = [];
-
-  @override
-  void initState() {
-    getInitialData();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     var joinTopicButtton = Padding(
-        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(270)),
+        padding: EdgeInsets.symmetric(horizontal: 120),
         child: MaterialButton(
           onPressed: () {
             Application.router.navigateTo(context,
@@ -57,41 +38,64 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         ));
 
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          // title:
-          elevation: 0,
+      body: NestedScrollView(
+        headerSliverBuilder: _sliverBuilder,
+        body: TopicComments(
+          topicId: topicId,
         ),
-        body: (this.topicComments != null)
-            ? Stack(
-                children: <Widget>[
-                  Container(
-                    color: Theme.of(context).dividerColor,
-                    child: EasyRefresh(
-                      header: MaterialHeader(),
-                      onRefresh: () async {
-                        await Future.delayed(Duration(microseconds: 200), () {
-                          getInitialData();
-                        });
-                      },
-                      child: ListView(
-                        padding: EdgeInsets.only(bottom: 50),
-                        children: <Widget>[
-                          topImage(),
-                          commentsPart(),
-                        ],
-                      ),
-                    ),
+      ),
+    );
+  }
+
+  List<Widget> _sliverBuilder(BuildContext context, bool innerBoxIsScrolled) {
+    return <Widget>[
+      SliverAppBar(
+        // automaticallyImplyLeading: false,
+        backgroundColor: Colors.black,
+        centerTitle: true, //标题居中
+        expandedHeight: 200.0, //展开高度200
+        floating: true, //不随着滑动隐藏标题
+        snap: true,
+        pinned: true, //固定在顶部
+        // forceElevated: innerBoxIsScrolled,
+        flexibleSpace: FlexibleSpaceBar(
+            titlePadding: EdgeInsets.only(
+              left: 50,
+              right: 50,
+            ),
+            centerTitle: true,
+            title: Container(
+              padding: EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 18),
+              // alignment: Alignment.center,
+              // color: Colors.amber,
+              child: Text(
+                this.topicTitle,
+                softWrap: true,
+                maxLines: 2,
+                style: TextStyle(
+                  fontSize: ScreenUtil().setSp(22),
+                ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            background: Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                CachedNetworkImage(
+                  imageUrl: topicImage,
+                  fit: BoxFit.fill,
+                ),
+                Opacity(
+                  opacity: 0.35,
+                  child: Container(
+                    color: Colors.black,
                   ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 10,
-                    child: joinTopicButtton,
-                  )
-                ],
-              )
-            : Center(child: CupertinoActivityIndicator()));
+                )
+              ],
+            )),
+      )
+    ];
   }
 
   Widget topImage() {
@@ -112,7 +116,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           child: Stack(
             children: <Widget>[
               Opacity(
-                opacity: 0.1,
+                opacity: 0.35,
                 child: Container(
                   // width: ScreenUtil().setWidth(750),
                   decoration: BoxDecoration(
@@ -144,98 +148,143 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       errorWidget: (context, url, error) => Icon(Icons.error),
     );
   }
+}
 
-  Widget commentsPart() {
-    var children = this
-        .topicComments
-        .data
-        .map((item) => Container(
-              // height: ScreenUtil().setHeight(400),
-              // width: ScreenUtil().setWidth(400),
-              padding: EdgeInsets.only(
-                  left: ScreenUtil().setWidth(45),
-                  right: ScreenUtil().setWidth(45),
-                  top: ScreenUtil().setWidth(20)),
-              color: Colors.white,
-              margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
+class TopicComments extends StatefulWidget {
+  final int topicId;
+  TopicComments({this.topicId});
+  @override
+  _TopicCommentsState createState() => _TopicCommentsState();
+}
+
+class _TopicCommentsState extends State<TopicComments> {
+  EasyRefreshController _refreshController;
+  TopicCommentsModel topicComments;
+  var followList = [];
+
+  @override
+  void initState() {
+    _refreshController = EasyRefreshController();
+    getInitialData();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return EasyRefresh.custom(
+      enableControlFinishLoad: true,
+      header: MaterialHeader(),
+      footer: MaterialFooter(),
+      controller: _refreshController,
+      onRefresh: () async {
+        await Future.delayed(Duration(microseconds: 500), () {
+          // _getInitialTopicsData(2);
+        });
+        _refreshController.resetLoadState();
+      },
+      onLoad: () async {
+        // var data = await _getMore(this.pageCount);
+        // _refreshController.finishLoad(
+        // success: true, noMore: (data.length == 0));
+      },
+      slivers: <Widget>[
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              return _singleItem(this.topicComments.data[index]);
+            },
+            childCount: this.topicComments.data.length,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _singleItem(TopicCommentsModelData item) {
+    return Container(
+      // height: ScreenUtil().setHeight(400),
+      // width: ScreenUtil().setWidth(400),
+      padding: EdgeInsets.only(
+          left: ScreenUtil().setWidth(45),
+          right: ScreenUtil().setWidth(45),
+          top: ScreenUtil().setWidth(20)),
+      // color: Colors.white,
+      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Row(
                 children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          CircleAvatar(
-                            backgroundColor: Theme.of(context).dividerColor,
-                            radius: 20.0,
-                            backgroundImage: CachedNetworkImageProvider(
-                              item.sender.avatar,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                left: ScreenUtil().setWidth(20)),
-                            child: Text(
-                              item.sender.nickname,
-                              style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w200,
-                                  fontSize: ScreenUtil().setSp(35)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  CircleAvatar(
+                    backgroundColor: Theme.of(context).dividerColor,
+                    radius: 20.0,
+                    backgroundImage: CachedNetworkImageProvider(
+                      item.sender.avatar,
+                    ),
                   ),
-                  Divider(
-                    height: 30,
-                    thickness: 1,
-                    color: Colors.black12,
-                  ),
-                  contentPart(item.content),
-                  Container(
-                    margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
-                    height: 1,
-                    color: Colors.black12,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      _singleButtonItem(
-                          Icon(
-                            IconData(0xe646, fontFamily: 'myIcon'),
-                            color: Colors.black,
-                          ),
-                          '收藏数',
-                          '收藏'),
-                      _singleButtonItem(
-                          Icon(
-                            IconData(0xe60d, fontFamily: 'myIcon'),
-                            color: Colors.black,
-                          ),
-                          '收藏数',
-                          '评论'),
-                      _singleButtonItem(
-                          Icon(
-                            IconData(0xe6b4, fontFamily: 'myIcon'),
-                            color: Colors.black,
-                          ),
-                          '收藏数',
-                          '点赞'),
-                    ],
+                  Padding(
+                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
+                    child: Text(
+                      item.sender.nickname,
+                      style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w200,
+                          fontSize: ScreenUtil().setSp(35)),
+                    ),
                   ),
                 ],
               ),
-            ))
-        .toList();
-    return Align(
-      child: Container(
-        // width: ScreenUtil().setWidth(750),
-        // color: Colors.black26,
-        child: Column(children: children),
+            ],
+          ),
+          Divider(
+            height: 30,
+            thickness: 1,
+            color: Colors.black12,
+          ),
+          contentPart(item.content),
+          Container(
+            margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
+            height: 1,
+            color: Colors.black12,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _singleButtonItem(
+                  Icon(
+                    IconData(0xe646, fontFamily: 'myIcon'),
+                    color: Colors.black,
+                  ),
+                  '收藏数',
+                  '收藏'),
+              _singleButtonItem(
+                  Icon(
+                    IconData(0xe60d, fontFamily: 'myIcon'),
+                    color: Colors.black,
+                  ),
+                  '收藏数',
+                  '评论'),
+              _singleButtonItem(
+                  Icon(
+                    IconData(0xe6b4, fontFamily: 'myIcon'),
+                    color: Colors.black,
+                  ),
+                  '收藏数',
+                  '点赞'),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -335,11 +384,13 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   }
 
   Future getInitialData() async {
-    var data = await apiClient.getTopicComments(topicId: topicId, page: 1);
+    var data =
+        await apiClient.getTopicComments(topicId: widget.topicId, page: 1);
     var topicComments = TopicCommentsModel.fromJson(data);
+
+    if (!mounted) return;
     setState(() {
       this.topicComments = topicComments;
     });
-    return topicComments;
   }
 }

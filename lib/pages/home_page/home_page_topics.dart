@@ -3,19 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
 
-// class HomePageTopics extends StatefulWidget {
-
-//   @override
-//   _HomePageTopicsState createState() {
-//     TopicModel schoolTopics = this.topics;
-//     schoolTopics.data.removeWhere((item) => item.school == null);
-//     return _HomePageTopicsState(schoolTopics: schoolTopics);
-//   }
-// }
-
 class HomePageTopics extends StatelessWidget {
-  final double mainHeight = 560;
-  final double titleHeight = 100;
+  final double mainHeight = 270;
+  final double titleHeight = 40;
   final TopicModel topics;
 
   HomePageTopics(this.topics);
@@ -23,17 +13,16 @@ class HomePageTopics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(mainHeight),
-      width: ScreenUtil().setWidth(710),
+      height: mainHeight,
       // margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
       decoration: BoxDecoration(
-        color: Colors.white,
-        // borderRadius: BorderRadius.only(
-        //     topLeft: Radius.circular(20),
-        //     topRight: Radius.circular(20),
-        //     bottomLeft: Radius.circular(10),
-        //     bottomRight: Radius.circular(10))
-      ),
+          // color: Colors.amber,
+          // borderRadius: BorderRadius.only(
+          //     topLeft: Radius.circular(20),
+          //     topRight: Radius.circular(20),
+          //     bottomLeft: Radius.circular(10),
+          //     bottomRight: Radius.circular(10))
+          ),
       // color: Colors.white,
       child: Column(
         children: <Widget>[
@@ -50,9 +39,8 @@ class HomePageTopics extends StatelessWidget {
 
   Widget _title(context) {
     return Container(
-      height: ScreenUtil().setHeight(titleHeight),
-      width: ScreenUtil().setWidth(750),
-      // color: Colors.amber,
+      height: titleHeight,
+      // color: Colors.blue,
       child: Row(
         children: <Widget>[
           Container(
@@ -134,6 +122,9 @@ class HomePageTopics extends StatelessWidget {
 }
 
 class TopicList extends StatelessWidget {
+  final double topicHeight = 100;
+  final double topicWidth = 160;
+
   final bool isSchoolTopics;
   final List<TopicModelData> topicsData;
   TopicList({this.topicsData, this.isSchoolTopics});
@@ -174,8 +165,8 @@ class TopicList extends StatelessWidget {
         child: Align(
           alignment: Alignment.topCenter,
           child: Container(
-            height: ScreenUtil().setHeight(220),
-            width: ScreenUtil().setWidth(320),
+            height: topicHeight,
+            width: topicWidth,
             margin: isLastItem
                 ? EdgeInsets.only(
                     left: ScreenUtil().setWidth(20),
@@ -212,7 +203,7 @@ class TopicList extends StatelessWidget {
                       ),
                     )),
                 Opacity(
-                  opacity: 0.1,
+                  opacity: 0.35,
                   child: Container(
                     // width: ScreenUtil().setWidth(750),
                     decoration: BoxDecoration(
@@ -230,8 +221,9 @@ class TopicList extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: 'Montserrat',
                       fontSize: ScreenUtil().setSp(28),
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                   ),
