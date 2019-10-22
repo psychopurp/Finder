@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/avatar.dart';
+import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +14,44 @@ import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_html/flutter_html.dart';
 
-class TopicDetailPage extends StatelessWidget {
+class TopicDetailPage extends StatefulWidget {
   final int topicId;
   final String topicImage;
   final String topicTitle;
   TopicDetailPage({this.topicId, this.topicImage, this.topicTitle});
+
+  @override
+  _TopicDetailPageState createState() => _TopicDetailPageState();
+}
+
+class _TopicDetailPageState extends State<TopicDetailPage> {
+  ScrollController _controller;
+  double titileOpacity = 0;
+
+  @override
+  void initState() {
+    _controller = ScrollController()
+      ..addListener(() {
+        // print(_controller.offset);
+        if (_controller.offset < 195 && _controller.offset > 108) {
+          setState(() {
+            titileOpacity = (_controller.offset / 100) % 1;
+          });
+        } else if (_controller.offset < 80) {
+          setState(() {
+            titileOpacity = 0;
+          });
+        }
+        // print(titileOpacity);
+      });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +60,7 @@ class TopicDetailPage extends StatelessWidget {
         child: MaterialButton(
           onPressed: () {
             Application.router.navigateTo(context,
-                '/publishTopicComment?topicId=${topicId.toString()}&&topicTitle=${Uri.encodeComponent(topicTitle)}');
+                '/publishTopicComment?topicId=${widget.topicId.toString()}&&topicTitle=${Uri.encodeComponent(widget.topicTitle)}');
           },
           child: Text(
             "+ 参与话题",
@@ -38,11 +74,22 @@ class TopicDetailPage extends StatelessWidget {
         ));
 
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: _sliverBuilder,
-        body: TopicComments(
-          topicId: topicId,
-        ),
+      body: Stack(
+        children: <Widget>[
+          NestedScrollView(
+            controller: _controller,
+            headerSliverBuilder: _sliverBuilder,
+            body: TopicComments(
+              topicId: widget.topicId,
+            ),
+          ),
+          Positioned(
+            child: joinTopicButtton,
+            bottom: 20,
+            left: 0,
+            right: 0,
+          )
+        ],
       ),
     );
   }
@@ -51,11 +98,19 @@ class TopicDetailPage extends StatelessWidget {
     return <Widget>[
       SliverAppBar(
         // automaticallyImplyLeading: false,
-        backgroundColor: Colors.black,
+        elevation: 5,
+        backgroundColor: Colors.white,
+        title: Text(
+          this.widget.topicTitle,
+          style: TextStyle(
+              fontSize: ScreenUtil().setSp(30),
+              color: Colors.black.withOpacity(titileOpacity)),
+        ),
+        iconTheme: IconThemeData(color: Colors.black),
         centerTitle: true, //标题居中
         expandedHeight: 200.0, //展开高度200
-        floating: true, //不随着滑动隐藏标题
-        snap: true,
+        // floating: true, //不随着滑动隐藏标题
+        // snap: true,
         pinned: true, //固定在顶部
         // forceElevated: innerBoxIsScrolled,
         flexibleSpace: FlexibleSpaceBar(
@@ -69,10 +124,11 @@ class TopicDetailPage extends StatelessWidget {
               // alignment: Alignment.center,
               // color: Colors.amber,
               child: Text(
-                this.topicTitle,
+                this.widget.topicTitle,
                 softWrap: true,
                 maxLines: 2,
                 style: TextStyle(
+                  color: Colors.white.withOpacity(1 - titileOpacity),
                   fontSize: ScreenUtil().setSp(22),
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -83,7 +139,7 @@ class TopicDetailPage extends StatelessWidget {
               fit: StackFit.expand,
               children: <Widget>[
                 CachedNetworkImage(
-                  imageUrl: topicImage,
+                  imageUrl: widget.topicImage,
                   fit: BoxFit.fill,
                 ),
                 Opacity(
@@ -100,7 +156,7 @@ class TopicDetailPage extends StatelessWidget {
 
   Widget topImage() {
     return CachedNetworkImage(
-      imageUrl: this.topicImage,
+      imageUrl: this.widget.topicImage,
       imageBuilder: (context, imageProvider) => Align(
         alignment: Alignment.topCenter,
         child: Container(
@@ -129,7 +185,7 @@ class TopicDetailPage extends StatelessWidget {
                 // color: Colors.blue,
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  this.topicTitle,
+                  this.widget.topicTitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -161,12 +217,19 @@ class _TopicCommentsState extends State<TopicComments> {
   EasyRefreshController _refreshController;
   TopicCommentsModel topicComments;
   var followList = [];
+  int pageCount = 2;
 
   @override
   void initState() {
     _refreshController = EasyRefreshController();
     getInitialData();
     super.initState();
+  }
+
+  @override
+  void deactivate() {
+    getInitialData();
+    super.deactivate();
   }
 
   @override
@@ -177,61 +240,57 @@ class _TopicCommentsState extends State<TopicComments> {
 
   @override
   Widget build(BuildContext context) {
-    return EasyRefresh.custom(
-      enableControlFinishLoad: true,
-      header: MaterialHeader(),
-      footer: MaterialFooter(),
-      controller: _refreshController,
-      onRefresh: () async {
-        await Future.delayed(Duration(microseconds: 500), () {
-          // _getInitialTopicsData(2);
-        });
-        _refreshController.resetLoadState();
-      },
-      onLoad: () async {
-        // var data = await _getMore(this.pageCount);
-        // _refreshController.finishLoad(
-        // success: true, noMore: (data.length == 0));
-      },
-      slivers: <Widget>[
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return _singleItem(this.topicComments.data[index]);
-            },
-            childCount: this.topicComments.data.length,
-          ),
-        ),
-      ],
-    );
+    return EasyRefresh(
+        enableControlFinishLoad: true,
+        header: MaterialHeader(),
+        footer: MaterialFooter(),
+        topBouncing: false,
+        bottomBouncing: false,
+        controller: _refreshController,
+        onLoad: () async {
+          var data = await getMore(this.pageCount);
+          _refreshController.finishLoad(
+              success: true, noMore: (data.length == 0));
+        },
+        child: (this.topicComments != null)
+            ? Container(
+                // color: Colors.white,
+                padding: EdgeInsets.only(top: 10),
+                child: Column(
+                  children: this.topicComments.data.map((item) {
+                    return _singleItem(item);
+                  }).toList(),
+                ),
+              )
+            : Container(
+                alignment: Alignment.center,
+                height: 400,
+                child: CupertinoActivityIndicator(),
+              ));
   }
 
   Widget _singleItem(TopicCommentsModelData item) {
     return Container(
-      // height: ScreenUtil().setHeight(400),
-      // width: ScreenUtil().setWidth(400),
       padding: EdgeInsets.only(
-          left: ScreenUtil().setWidth(45),
-          right: ScreenUtil().setWidth(45),
+          left: ScreenUtil().setWidth(35),
+          right: ScreenUtil().setWidth(35),
           top: ScreenUtil().setWidth(20)),
-      // color: Colors.white,
-      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
+      // color: Colors.amber,
+      margin: EdgeInsets.only(bottom: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          ///头部
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor: Theme.of(context).dividerColor,
-                    radius: 20.0,
-                    backgroundImage: CachedNetworkImageProvider(
-                      item.sender.avatar,
-                    ),
+                  Avatar(
+                    url: item.sender.avatar,
+                    avatarHeight: ScreenUtil().setHeight(90),
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
@@ -247,16 +306,13 @@ class _TopicCommentsState extends State<TopicComments> {
               ),
             ],
           ),
-          Divider(
-            height: 30,
-            thickness: 1,
-            color: Colors.black12,
+          SizedBox(
+            height: 15,
           ),
           contentPart(item.content),
-          Container(
-            margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
-            height: 1,
+          Divider(
             color: Colors.black12,
+            thickness: 0.4,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -291,9 +347,14 @@ class _TopicCommentsState extends State<TopicComments> {
 
   ///话题评论--内容部分
   Widget contentPart(String content) {
+    bool isSinglePic = false;
     var json = jsonDecode(content);
-    List images = json['images'];
+    List imagesJson = json['images'];
+    List<String> images = [];
     String text = json['text'];
+    imagesJson.forEach((i) {
+      images.add(i);
+    });
 
     return Container(
       // color: Colors.amber,
@@ -304,29 +365,59 @@ class _TopicCommentsState extends State<TopicComments> {
         children: <Widget>[
           Text(
             text,
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontFamily: 'normal',
                 fontSize: ScreenUtil().setSp(30)),
           ),
+          SizedBox(
+            height: (text == "" || text == null) ? 0 : 10,
+          ),
           Container(
-            color: Colors.white,
+            width: ScreenUtil().setWidth(680),
+            // color: Colors.green,
             child: Wrap(
-              spacing: 5,
+              spacing: ScreenUtil().setWidth(10),
               runSpacing: 5,
-              children: images.map((image) {
+              children: images.asMap().keys.map((index) {
+                isSinglePic = (images.length == 1) ? true : false;
+                var _singlePic = Container(
+                  child: CachedNetworkImage(
+                    imageUrl: images[index],
+                    fit: BoxFit.fitWidth,
+                    placeholder: (context, _) {
+                      return Center(
+                        child: CupertinoActivityIndicator(),
+                      );
+                    },
+                  ),
+                  constraints: BoxConstraints(maxHeight: 400, minWidth: 400),
+                );
                 return CachedNetworkImage(
-                  imageUrl: image,
+                  imageUrl: images[index],
                   errorWidget: (context, url, error) => Icon(Icons.error),
                   imageBuilder: (content, imageProvider) => InkWell(
-                    onTap: () {},
-                    child: Container(
-                      height: ScreenUtil().setHeight(200),
-                      width: ScreenUtil().setWidth(200),
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: imageProvider, fit: BoxFit.fill)),
-                    ),
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          fullscreenDialog: false,
+                          builder: (_) {
+                            return PicSwiper(
+                              index: index,
+                              pics: images,
+                            );
+                          }));
+                    },
+                    child: (isSinglePic)
+                        ? _singlePic
+                        : Container(
+                            height: ScreenUtil().setHeight(220),
+                            width: ScreenUtil().setWidth(220),
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: imageProvider, fit: BoxFit.fill)),
+                          ),
                   ),
                 );
               }).toList(),
@@ -391,6 +482,20 @@ class _TopicCommentsState extends State<TopicComments> {
     if (!mounted) return;
     setState(() {
       this.topicComments = topicComments;
+      this.pageCount = 2;
+      this._refreshController.resetLoadState();
     });
+  }
+
+  Future getMore(int pageCount) async {
+    var data = await apiClient.getTopicComments(
+        topicId: widget.topicId, page: pageCount);
+    TopicCommentsModel comments = TopicCommentsModel.fromJson(data);
+
+    setState(() {
+      this.topicComments.data.addAll(comments.data);
+      this.pageCount++;
+    });
+    return comments.data;
   }
 }
