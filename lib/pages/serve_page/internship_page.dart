@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,28 +62,18 @@ class _InternshipPageState extends State<InternshipPage> {
 
   Widget get body {
     Widget child;
+    List<Widget> preItems = [];
     if (_bannerData.length == 0 && _data.length == 0) {
       child = Center(
         child: Text("暂时没有数据"),
       );
-    } else if (_bannerData.length == 0) {
-      child = ListView.builder(
-        physics: AlwaysScrollableScrollPhysics(),
-        itemBuilder: (context, index) => getItem(index),
-        itemCount: _data.length,
-        padding: EdgeInsets.only(top: 5),
-      );
     } else {
-      child = ListView.builder(
-        physics: AlwaysScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return banner;
-          }
-          return getItem(index - 1);
-        },
-        itemCount: _data.length + 1,
+      if (_bannerData.length != 0) {
+        preItems.add(banner);
+      }
+      child = Padding(
         padding: EdgeInsets.only(top: 5),
+        child: listBuilder(preItems, getItem, _data.length),
       );
     }
     return RefreshIndicator(
