@@ -12,7 +12,9 @@ class Avatar extends StatelessWidget {
     return CachedNetworkImage(
       placeholder: (context, url) {
         return Container(
-          padding: EdgeInsets.all(10),
+          width: avatarHeight,
+          height: avatarHeight,
+          alignment: Alignment.center,
           child: CircularProgressIndicator(),
         );
       },

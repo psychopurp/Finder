@@ -258,15 +258,15 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   }
 
   void handleSuccess() {
-    Navigator.pop(context);
     Fluttertoast.showToast(
         msg: "参与话题成功",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIos: 1,
-        backgroundColor: Theme.of(context).dividerColor,
+        backgroundColor: Theme.of(context).dividerColor.withOpacity(0.5),
         textColor: Colors.black,
-        fontSize: 16.0);
+        fontSize: 14.0);
+    Navigator.pop(context);
   }
 
   Future<bool> publishTopicComment(UserProvider user) async {

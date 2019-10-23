@@ -4,7 +4,7 @@ import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
 
 class HomePageTopics extends StatelessWidget {
-  final double mainHeight = 270;
+  final double mainHeight = 260;
   final double titleHeight = 40;
   final TopicModel topics;
 
@@ -16,13 +16,13 @@ class HomePageTopics extends StatelessWidget {
       height: mainHeight,
       // margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
       decoration: BoxDecoration(
-          // color: Colors.amber,
-          // borderRadius: BorderRadius.only(
-          //     topLeft: Radius.circular(20),
-          //     topRight: Radius.circular(20),
-          //     bottomLeft: Radius.circular(10),
-          //     bottomRight: Radius.circular(10))
-          ),
+        color: Colors.white,
+        // borderRadius: BorderRadius.only(
+        //     topLeft: Radius.circular(20),
+        //     topRight: Radius.circular(20),
+        //     bottomLeft: Radius.circular(10),
+        //     bottomRight: Radius.circular(10))
+      ),
       // color: Colors.white,
       child: Column(
         children: <Widget>[
@@ -131,16 +131,10 @@ class TopicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: isSchoolTopics
-          ? ScreenUtil().setHeight(220)
-          : ScreenUtil().setHeight(240),
+      height: isSchoolTopics ? 110 : 105,
       width: ScreenUtil().setWidth(750),
-      // color: Colors.green,
+      // color: isSchoolTopics ? Colors.green : Colors.yellow,
       child: ListView.builder(
-        padding: EdgeInsets.only(
-            top: isSchoolTopics
-                ? ScreenUtil().setHeight(0)
-                : ScreenUtil().setHeight(15)),
         scrollDirection: Axis.horizontal,
         itemCount: this.topicsData.length,
         itemBuilder: (context, index) {
