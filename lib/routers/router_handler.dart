@@ -9,6 +9,7 @@ import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
+import 'package:finder/pages/serve_page/internship_page/company_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/serve_page/lost_found_page.dart';
@@ -146,6 +147,10 @@ var treeHoleHandler = Handler(
 var internshipHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return InternshipPage();
+});
+var internshipCompanyHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return CompanyRoute();
 });
 
 //用户详情页

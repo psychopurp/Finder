@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/provider/user_provider.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/pages/index_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -44,6 +45,10 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
+    Future<void>.delayed(Duration(milliseconds: 200), () {
+      SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark));
+    });
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     final user = Provider.of<UserProvider>(context);
 
