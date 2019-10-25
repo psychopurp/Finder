@@ -27,6 +27,8 @@ class _InternshipPageState extends State<InternshipPage> {
   static InternshipSmallType _nowSmallType;
   int _nowPage = 1;
   bool isShow = true;
+  bool loading = true;
+  bool moreThanMoment = false;
 
   @override
   void initState() {
@@ -34,6 +36,11 @@ class _InternshipPageState extends State<InternshipPage> {
     getRecommend();
     getBigTypes();
     getInternships();
+    Future.delayed(Duration(milliseconds: 500), (){
+      setState(() {
+        moreThanMoment = true;
+      });
+    });
   }
 
   @override
@@ -45,7 +52,7 @@ class _InternshipPageState extends State<InternshipPage> {
 
   @override
   Widget build(BuildContext context) {
-    if(isShow){
+    if (isShow) {
       Future<void>.delayed(Duration(milliseconds: 200), () {
         SystemChrome.setSystemUIOverlayStyle(
             SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark));
@@ -74,7 +81,26 @@ class _InternshipPageState extends State<InternshipPage> {
   Widget get body {
     Widget child;
     List<Widget> preItems = [];
-    if (_bannerData.length == 0 && _data.length == 0) {
+    if (loading || !moreThanMoment) {
+      child = Center(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            Container(
+              height: 50,
+              width: 50,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+            ),
+            Text("加载中...")
+          ],
+        ),
+      );
+    } else if (_bannerData.length == 0 && _data.length == 0) {
       child = Center(
         child: Text("暂时没有数据"),
       );
@@ -88,9 +114,17 @@ class _InternshipPageState extends State<InternshipPage> {
         child: listBuilder(preItems, getItem, _data.length),
       );
     }
-    return RefreshIndicator(
-      child: child,
-      onRefresh: () async {},
+
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 1000),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(child: child, opacity: CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+      },
+      child: RefreshIndicator(
+        key: ValueKey(child),
+        child: child,
+        onRefresh: () async {},
+      ),
     );
   }
 
@@ -166,7 +200,7 @@ class _InternshipPageState extends State<InternshipPage> {
                 onPressed: () async {
                   isShow = false;
                   await Navigator.of(context)
-                      .pushNamed(Routes.internshipCompany, arguments: company);
+                      .pushNamed(Routes.internshipCompany, arguments: item);
                   isShow = true;
                 },
                 padding: EdgeInsets.all(0),
@@ -175,35 +209,38 @@ class _InternshipPageState extends State<InternshipPage> {
                     Container(
                       width: 50,
                       height: 50,
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) {
-                          return Container(
-                            padding: EdgeInsets.all(10),
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        imageUrl: company.image,
-                        errorWidget: (context, url, err) {
-                          return Container(
-                            child: Icon(
-                              Icons.cancel,
-                              size: 50,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
-                        imageBuilder: (context, imageProvider) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(25)),
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
+                      child: Hero(
+                        tag: "${company.name}-${item.id}",
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) {
+                            return Container(
+                              padding: EdgeInsets.all(10),
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          imageUrl: company.image,
+                          errorWidget: (context, url, err) {
+                            return Container(
+                              child: Icon(
+                                Icons.cancel,
+                                size: 50,
+                                color: Colors.grey,
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                          imageBuilder: (context, imageProvider) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(25)),
+                                image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                     Padding(
@@ -393,11 +430,11 @@ class _InternshipPageState extends State<InternshipPage> {
       print(e);
       print(url);
     }
+    loading = false;
   }
 
   Future<void> onSearch(String queryStr) async {
     queryStr = queryStr.trim();
-    if (queryStr == '') return;
     _nowPage = 1;
     _data = [];
     _nowSmallType = null;

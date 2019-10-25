@@ -80,7 +80,7 @@ class Routes {
     router.define(psychoTest, handler: psychoTestHandler);
     router.define(treeHole, handler: treeHoleHandler);
     router.define(internship, handler: internshipHandler);
-    router.define(internshipCompany, handler: internshipCompanyHandler);
+    router.define(internshipCompany, handler: internshipCompanyHandler, transitionType: TransitionType.cupertino);
 
     //我的页
     router.define(userProfile,
