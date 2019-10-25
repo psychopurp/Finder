@@ -74,6 +74,15 @@ class Global {
     }
     _prefs.setString('userToken', token);
   }
+
+  static Future<bool> save(String key, String value) async {
+    bool isSave = await _prefs.setString(key, value);
+    return isSave;
+  }
+
+  static String getString(String key) {
+    return _prefs.getString(key);
+  }
 }
 
 Global global = new Global();
