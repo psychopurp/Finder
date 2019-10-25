@@ -1,5 +1,6 @@
 import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/login_page.dart';
+import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -35,20 +36,23 @@ class MyApp extends StatelessWidget {
             builder: (_) => UserProvider(),
           )
         ],
-        child: MaterialApp(
-          localizationsDelegates: [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: [
-            const Locale('zh', 'CH'),
-            const Locale('en', 'US'),
-          ],
-          onGenerateRoute: Application.router.generator,
-          theme: _buildAppTheme(),
-          title: 'Finder',
-          debugShowCheckedModeBanner: false,
-          home: isLogin ? IndexPage() : LoginPage(),
+        child: BotToastInit(
+          child: MaterialApp(
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: [
+              const Locale('zh', 'CH'),
+              const Locale('en', 'US'),
+            ],
+            navigatorObservers: [BotToastNavigatorObserver()],
+            onGenerateRoute: Application.router.generator,
+            theme: _buildAppTheme(),
+            title: 'Finder',
+            debugShowCheckedModeBanner: false,
+            home: isLogin ? IndexPage() : LoginPage(),
+          ),
         ));
   }
 }

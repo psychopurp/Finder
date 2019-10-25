@@ -95,7 +95,9 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                   );
                 },
               );
+              // bool status = true;
               bool status = await publishTopic(user);
+              // await Future.delayed(Duration(seconds: 3), () {});
               // print(status);
               Navigator.pop(context);
               if (!status) {
@@ -307,15 +309,14 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
 
   void handleSuccess() {
     Navigator.pop(context);
-    Fluttertoast.showToast(
-        msg: "创建活动成功",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: Theme.of(context).dividerColor,
-        textColor: Colors.black,
-        fontSize: 16.0);
-    Application.router.navigateTo(context, '/home/moreTopics');
+    BotToast.showText(
+        text: '创建话题成功',
+        duration: Duration(milliseconds: 2000),
+        align: Alignment(0, 0.3),
+        textStyle:
+            TextStyle(fontFamily: 'normal', color: Colors.white, fontSize: 17));
+
+    Application.router.navigateTo(context, Routes.moreTopics);
   }
 
   void handleError() {

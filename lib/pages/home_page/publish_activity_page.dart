@@ -131,8 +131,9 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                   );
                 },
               );
+              // bool status = true;
               bool status = await publishActivity(user);
-              print(status);
+              // await Future.delayed(Duration(seconds: 3), () {});
 
               Navigator.pop(context);
               if (!status) {
@@ -614,15 +615,13 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
 
   void handleSuccess() {
     Navigator.pop(context);
-    Fluttertoast.showToast(
-        msg: "创建活动成功",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: inputColor,
-        textColor: Colors.black,
-        fontSize: 16.0);
-    Application.router.navigateTo(context, '/home/moreActivities');
+    BotToast.showText(
+        text: '创建活动成功',
+        duration: Duration(milliseconds: 2000),
+        align: Alignment(0, 0.3),
+        textStyle:
+            TextStyle(fontFamily: 'normal', color: Colors.white, fontSize: 17));
+    Application.router.navigateTo(context, Routes.moreActivities);
   }
 
   void handleError() {

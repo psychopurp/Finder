@@ -9,6 +9,8 @@ export 'package:image_picker/image_picker.dart';
 export 'package:fluttertoast/fluttertoast.dart';
 export 'package:finder/routers/routes.dart';
 export 'package:finder/plugin/avatar.dart';
+export 'package:bot_toast/bot_toast.dart';
+export 'package:finder/plugin/dialog.dart';
 
 //日期转化成时间戳工具
 String getTime({int year, int month, int day}) {

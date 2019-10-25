@@ -78,9 +78,7 @@ class _RecruitPageState extends State<RecruitPage> {
                   ],
                 ),
               )
-            : Center(
-                child: CupertinoActivityIndicator(),
-              ));
+            : FinderDialog.showLoading());
   }
 
   ///招募类型
