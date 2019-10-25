@@ -484,9 +484,17 @@ class _TopicCommentsState extends State<TopicComments> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Avatar(
-                    url: item.sender.avatar,
-                    avatarHeight: ScreenUtil().setHeight(90),
+                  InkWell(
+                    onTap: () {
+                      var senderData = jsonEncode(item.sender.toJson());
+
+                      Application.router.navigateTo(context,
+                          "${Routes.userProfile}?senderData=${Uri.encodeComponent(senderData)}");
+                    },
+                    child: Avatar(
+                      url: item.sender.avatar,
+                      avatarHeight: ScreenUtil().setHeight(90),
+                    ),
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),

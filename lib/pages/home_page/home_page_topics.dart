@@ -6,7 +6,7 @@ import 'package:finder/public.dart';
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
   static double mainHeight = ScreenUtil().setHeight(500);
-  static double titleHeight = ScreenUtil().setHeight(80);
+  static double titleHeight = ScreenUtil().setHeight(100);
   HomePageTopics(this.topics);
 
   @override
@@ -100,6 +100,7 @@ class HomePageTopics extends StatelessWidget {
     List<TopicModelData> topics = [];
     if (isSchoolTopics) {
       for (var i = 0; i < this.topics.data.length; i++) {
+        // print(this.topics.data[i].school);
         if (this.topics.data[i].school != null) {
           topics.add(this.topics.data[i]);
         }

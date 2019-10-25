@@ -1,12 +1,17 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/models/user_model.dart';
+import 'package:finder/plugin/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/plugin/my_appbar.dart';
 
+///用户信息详情页
 class UserProfilePage extends StatefulWidget {
+  final Sender sender;
+  UserProfilePage({this.sender});
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -14,69 +19,75 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
-    apiClient.getFollowUsers();
-    apiClient.getCollections(page: 1);
-    apiClient.getFanUsers();
+    // apiClient.getFollowUsers();
+    // apiClient.getCollections(page: 1);
+    // apiClient.getFanUsers();
+    print(widget.sender.avatar);
     return Scaffold(
-      body: Consumer<UserProvider>(builder: (context, user, child) {
-        print(user.collection);
-        return SafeArea(
-          top: false,
-          child: Container(
-            child: MyAppBar(
-              appbar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-              ),
-              child: ListView(
-                padding: EdgeInsets.all(0),
-                children: <Widget>[
-                  buildUserBackground(user.userInfo, context),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe6e0, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '收藏',
-                            '收藏'),
-                        // VerticalDivider(),
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe879, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '小F',
-                            '收藏'),
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe654, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '设置',
-                            '评论'),
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe879, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '消息',
-                            '点赞'),
-                      ],
+        body: SafeArea(
+            top: false,
+            child: Container(
+              color: Colors.amber,
+              child: MyAppBar(
+                appbar: AppBar(
+                  title: Text(widget.sender.nickname),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
+                child: ListView(
+                  padding: EdgeInsets.all(0),
+                  children: <Widget>[
+                    // buildUserBackground(this.widget.sender, context),
+                    Align(
+                      child: Container(
+                        child: Avatar(
+                          url: widget.sender.avatar,
+                          avatarHeight: 200,
+                        ),
+                      ),
                     ),
-                  ),
-                  // buildUserBackground(user.userInfo, context),
-                  // buildUserBackground(user.userInfo, context),
-                ],
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _singleButtonItem(
+                              Icon(
+                                IconData(0xe6e0, fontFamily: 'myIcon'),
+                                color: Colors.black,
+                              ),
+                              '收藏',
+                              '收藏'),
+                          // VerticalDivider(),
+                          _singleButtonItem(
+                              Icon(
+                                IconData(0xe879, fontFamily: 'myIcon'),
+                                color: Colors.black,
+                              ),
+                              '小F',
+                              '收藏'),
+                          _singleButtonItem(
+                              Icon(
+                                IconData(0xe654, fontFamily: 'myIcon'),
+                                color: Colors.black,
+                              ),
+                              '设置',
+                              '评论'),
+                          _singleButtonItem(
+                              Icon(
+                                IconData(0xe879, fontFamily: 'myIcon'),
+                                color: Colors.black,
+                              ),
+                              '消息',
+                              '点赞'),
+                        ],
+                      ),
+                    ),
+                    // buildUserBackground(user.userInfo, context),
+                    // buildUserBackground(user.userInfo, context),
+                  ],
+                ),
               ),
-            ),
-          ),
-        );
-      }),
-    );
+            )));
   }
 
   _singleButtonItem(Icon icon, String count, item) {
@@ -189,21 +200,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget _userAvatar(UserModel user) {
     return Align(
-        alignment: Alignment.topCenter,
-        child: Hero(
-          tag: 'profile',
-          child: Container(
-            // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-            height: ScreenUtil().setHeight(200),
-            width: ScreenUtil().setWidth(200),
-            decoration: BoxDecoration(
-                // shape: CircleBorder(),
-                border: Border.all(color: Colors.white, width: 3),
-                borderRadius: BorderRadius.all(Radius.circular(50)),
-                image: DecorationImage(
-                    image: CachedNetworkImageProvider(user.avatar))),
-          ),
-        ));
+      alignment: Alignment.topCenter,
+      child: Container(
+        // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+        height: ScreenUtil().setHeight(200),
+        width: ScreenUtil().setWidth(200),
+        decoration: BoxDecoration(
+            // shape: CircleBorder(),
+            border: Border.all(color: Colors.white, width: 3),
+            borderRadius: BorderRadius.all(Radius.circular(50)),
+            image: DecorationImage(
+                image: CachedNetworkImageProvider(user.avatar))),
+      ),
+    );
   }
 }
 

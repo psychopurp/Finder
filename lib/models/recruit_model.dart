@@ -1,4 +1,5 @@
 import 'package:finder/models/tag_model.dart';
+import 'package:finder/models/topic_comments_model.dart';
 
 class RecruitModel {
   List<RecruitModelData> data;
@@ -86,28 +87,6 @@ class RecruitModelData {
     if (this.tags != null) {
       data['tags'] = this.tags.map((v) => v.toJson()).toList();
     }
-    return data;
-  }
-}
-
-class Sender {
-  int id;
-  String nickname;
-  String avatar;
-
-  Sender({this.id, this.nickname, this.avatar});
-
-  Sender.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    nickname = json['nickname'];
-    avatar = json['avatar'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['nickname'] = this.nickname;
-    data['avatar'] = this.avatar;
     return data;
   }
 }

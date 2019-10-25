@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/public.dart';
 
 class TopicCommentsModel {
   List<TopicCommentsModelData> data;
@@ -99,7 +100,7 @@ class Sender {
 
   Sender.fromJson(Map<String, dynamic> json) {
     nickname = json['nickname'];
-    avatar = ApiClient.host + json['avatar'];
+    avatar = Avatar.getImageUrl(json['avatar']);
     id = json['id'];
   }
 

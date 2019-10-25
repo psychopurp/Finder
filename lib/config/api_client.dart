@@ -322,7 +322,7 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_follow_users/', queryParameters: formData);
-      print(response.data);
+      // print(response.data);
       return response.data;
     } catch (e) {
       print('获取用户关注的用户列表错误==========>$e');
@@ -335,7 +335,7 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_fan_users/', queryParameters: formData);
-      print(response.data);
+      // print(response.data);
       return response.data;
     } catch (e) {
       print('获取关注该用户的用户列表错误==========>$e');
@@ -384,7 +384,7 @@ class ApiClient {
     type:int(活动、话题、话题评论、招募、分别是1，2，3，4)
 */
     var formData = {'query': query, 'page': page};
-    print(formData);
+    // print(formData);
     try {
       Response response =
           await dio.get('get_collections/', queryParameters: formData);
