@@ -18,6 +18,9 @@ class UserProvider with ChangeNotifier {
     "recruit": Set()
   };
 
+  ///点赞
+  Map<String, Set<int>> like = {"topicComment": Set()};
+
   //登陆
   Future<bool> login(
       {@required String phone, @required String password}) async {

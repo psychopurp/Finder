@@ -233,7 +233,7 @@ class ApiClient {
     try {
       Response response =
           await dio.post('add_topic_comment/', data: jsonEncode(formData));
-      print('发布话题评论成功==========>${response.data}');
+      // print('发布话题评论成功==========>${response.data}');
       return response.data;
     } catch (e) {
       print('发布话题评论错误==========>$e');

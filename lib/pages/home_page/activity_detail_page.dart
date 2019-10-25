@@ -17,25 +17,27 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   IconData collectIcon = Icons.favorite_border;
   List<IconData> collectIcons = [Icons.favorite_border, Icons.favorite];
   _ActivityDetailPageState(this.activity);
+  var collect;
 
   ///是否已收藏
   bool isContain;
+  @override
+  void initState() {
+    collect = {
+      true: Icons.favorite,
+      false: Icons.favorite_border,
+    };
+    super.initState();
+  }
 
   @override
   void dispose() {
-    if (collectIcon == collectIcons[1]) {
-      apiClient.addCollection(type: ApiClient.ACTIVITY, id: activity.id);
-    } else {}
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
-    if (user.collection['activity'].contains(activity.id)) {
-      collectIcon = collectIcons[1];
-    }
-    isContain = user.collection['activity'].contains(activity.id);
 
     var top = Align(
       child: Container(
@@ -194,104 +196,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
       ),
     );
 
-    var bottomBar = DefaultTextStyle(
-        style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: ScreenUtil().setSp(35)),
-        child: Container(
-          height: kToolbarHeight,
-          // color: Colors.white,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.black38,
-                  offset: Offset(5.0, 8.0),
-                  blurRadius: 10.0,
-                  spreadRadius: 1.0),
-            ],
-          ),
-          child: Row(
-            children: <Widget>[
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    if (collectIcon == collectIcons[0]) {
-                      this.collectIcon = this.collectIcons[1];
-                      user.collection['activity'].add(activity.id);
-                    } else {
-                      this.collectIcon = collectIcons[0];
-                      if (user.collection['activity'].contains(activity.id)) {
-                        user.collection['activity'].remove(activity.id);
-                      }
-                    }
-                  });
-                },
-                child: Container(
-                  width: ScreenUtil().setWidth(200),
-                  height: kToolbarHeight,
-                  // color: Colors.blue,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      AnimatedSwitcher(
-                          transitionBuilder: (child, anim) {
-                            return ScaleTransition(child: child, scale: anim);
-                          },
-                          duration: Duration(milliseconds: 300),
-                          child: Container(
-                            key: ValueKey(this.collectIcon),
-                            child: Icon(
-                              this.collectIcon,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          )),
-                      Text("收藏")
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  width: ScreenUtil().setWidth(200),
-                  height: kToolbarHeight,
-                  // color: Colors.blue,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Icon(
-                        Icons.phone,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      Text("联系")
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: ScreenUtil().setWidth(350),
-                height: kToolbarHeight,
-                // color: Colors.blue,
-                alignment: Alignment.center,
-                child: Container(
-                  alignment: Alignment.center,
-                  width: ScreenUtil().setWidth(300),
-                  height: ScreenUtil().setHeight(80),
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(20)),
-                  child: Text(
-                    "立即参加",
-                    style: TextStyle(
-                        color: Colors.white, fontSize: ScreenUtil().setSp(30)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ));
-
     return Scaffold(
       appBar: AppBar(),
       body: Stack(
@@ -319,7 +223,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: bottomBar,
+            child: bottomBar(user),
           )
         ],
       ),
@@ -327,4 +231,120 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   }
 
   // Future
+
+  Widget bottomBar(UserProvider user) {
+    return Builder(builder: (context) {
+      return DefaultTextStyle(
+          style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: ScreenUtil().setSp(35)),
+          child: Container(
+            height: kToolbarHeight,
+            // color: Colors.white,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black38,
+                    offset: Offset(5.0, 8.0),
+                    blurRadius: 10.0,
+                    spreadRadius: 1.0),
+              ],
+            ),
+            child: Row(
+              children: <Widget>[
+                InkWell(
+                  onTap: () async {
+                    if (user.isLogIn) {
+                      if (user.collection['activity'].contains(activity.id)) {
+                        // apiClient.deleteCollection()
+                        user.collection['activity'].remove(activity.id);
+                      } else {
+                        var data = await apiClient.addCollection(
+                            type: ApiClient.ACTIVITY, id: this.activity.id);
+                        user.collection['activity'].add(activity.id);
+                        Future.delayed(Duration(milliseconds: 500), () {
+                          Scaffold.of(context).showSnackBar(new SnackBar(
+                            duration: Duration(milliseconds: 200),
+                            content: new Text("${data}"),
+                            action: new SnackBarAction(
+                              label: "取消",
+                              onPressed: () {},
+                            ),
+                          ));
+                        });
+                      }
+                      setState(() {});
+                    } else {
+                      //TODO 添加未登录的状态
+                    }
+                  },
+                  child: Container(
+                    width: ScreenUtil().setWidth(200),
+                    height: kToolbarHeight,
+                    // color: Colors.blue,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        AnimatedSwitcher(
+                            transitionBuilder: (child, anim) {
+                              return ScaleTransition(child: child, scale: anim);
+                            },
+                            duration: Duration(milliseconds: 300),
+                            child: Container(
+                              key: ValueKey<bool>(user.collection['activity']
+                                  .contains(activity.id)),
+                              child: Icon(
+                                  collect[user.collection['activity']
+                                      .contains(activity.id)],
+                                  color: Theme.of(context).primaryColor),
+                            )),
+                        Text("收藏")
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Container(
+                    width: ScreenUtil().setWidth(200),
+                    height: kToolbarHeight,
+                    // color: Colors.blue,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Icon(
+                          Icons.phone,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        Text("联系")
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: ScreenUtil().setWidth(350),
+                  height: kToolbarHeight,
+                  // color: Colors.blue,
+                  alignment: Alignment.center,
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: ScreenUtil().setWidth(300),
+                    height: ScreenUtil().setHeight(80),
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Text(
+                      "立即参加",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil().setSp(30)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ));
+    });
+  }
 }

@@ -233,9 +233,13 @@ class _TopicCommentsState extends State<TopicComments> {
   FocusNode _commentFocusNode;
   FocusNode blackFocusNode;
   double commentHeight = 0;
+  //FormState为Form的State类，可以通过 Form.of() 或GlobalKey获得。我们可以通过它来对
+  //Form的子孙FormField进行统一操作。
+  GlobalKey _formKey = new GlobalKey<FormState>();
 
   @override
   void initState() {
+    getInitialData();
     _commentFocusNode = FocusNode();
     blackFocusNode = FocusNode();
     _commentController = TextEditingController();
@@ -271,7 +275,7 @@ class _TopicCommentsState extends State<TopicComments> {
       }
     };
     _refreshController = EasyRefreshController();
-    getInitialData();
+
     super.initState();
   }
 
@@ -288,9 +292,6 @@ class _TopicCommentsState extends State<TopicComments> {
     _commentController.dispose();
     _refreshController.dispose();
     super.dispose();
-    this.likeList.forEach((i) {
-      apiClient.likeTopicComment(topicCommentId: i);
-    });
   }
 
   @override
@@ -309,18 +310,15 @@ class _TopicCommentsState extends State<TopicComments> {
               success: true, noMore: (data.length == 0));
         },
         child: (this.topicComments != null)
-            ? Column(children: <Widget>[
-                Container(
-                  // color: Colors.yellow,
-                  // height: 700,
-                  child: Column(
-                    children: this.topicComments.data.map((item) {
-                      return _singleItem(item, user);
-                    }).toList(),
-                  ),
+            ? Container(
+                // color: Colors.yellow,
+                // height: 700,
+                child: Column(
+                  children: this.topicComments.data.map((item) {
+                    return _singleItem(item, user);
+                  }).toList(),
                 ),
-                // Container(height: 200, color: Colors.amber, child: TextField())
-              ])
+              )
             : Container(
                 alignment: Alignment.center,
                 height: 400,
@@ -328,34 +326,66 @@ class _TopicCommentsState extends State<TopicComments> {
               ));
   }
 
-  Widget collectHandle() {
-    return MaterialButton(
-      onPressed: () {},
-      shape: RoundedRectangleBorder(),
-      child: buttonItem['collect']['icon'],
-    );
+  commentHandle(UserProvider user, TopicCommentsModelData item) async {
+    String content = _commentController.text;
+    String msg = "";
+    if ((_formKey.currentState as FormState).validate()) {
+      var data = await user.addTopicComment(
+          topicId: widget.topicId, content: content, referComment: item.id);
+      Navigator.pop(context);
+      msg = (data['status']) ? "评论成功" : "评论失败";
+      Fluttertoast.showToast(
+          msg: msg,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM);
+    }
   }
 
-  likeHandle() {}
-
-  commentHandle(
-    UserProvider user,
-    TopicCommentsModelData item,
-  ) async {
+  likeHandle(UserProvider user, TopicCommentsModelData item) async {
     if (user.isLogIn) {
-      if (user.collection['comment'].contains(item.id)) {
-        user.collection['comment'].remove(item.id);
+      var data;
+      if (user.like['topicComment'].contains(item.id)) {
+        data = await apiClient.likeTopicComment(topicCommentId: item.id);
+        user.like['topicComment'].remove(item.id);
       } else {
-        var data =
-            await apiClient.addCollection(type: ApiClient.COMMENT, id: item.id);
+        data = await apiClient.likeTopicComment(topicCommentId: item.id);
+        user.like['topicComment'].add(item.id);
+      }
+      Future.delayed(Duration(milliseconds: 500), () {
         Scaffold.of(context).showSnackBar(new SnackBar(
+          duration: Duration(milliseconds: 200),
           content: new Text("${data}"),
           action: new SnackBarAction(
             label: "取消",
             onPressed: () {},
           ),
         ));
+      });
+
+      setState(() {});
+    } else {
+      //TODO 添加未登录的状态
+    }
+  }
+
+  collectHandle(UserProvider user, TopicCommentsModelData item) async {
+    if (user.isLogIn) {
+      if (user.collection['comment'].contains(item.id)) {
+        user.collection['comment'].remove(item.id);
+      } else {
+        var data =
+            await apiClient.addCollection(type: ApiClient.COMMENT, id: item.id);
         user.collection['comment'].add(item.id);
+        Future.delayed(Duration(milliseconds: 500), () {
+          Scaffold.of(context).showSnackBar(new SnackBar(
+            duration: Duration(milliseconds: 200),
+            content: new Text("${data}"),
+            action: new SnackBarAction(
+              label: "取消",
+              onPressed: () {},
+            ),
+          ));
+        });
       }
 
       setState(() {});
@@ -370,70 +400,67 @@ class _TopicCommentsState extends State<TopicComments> {
         backgroundColor: Colors.black38,
         context: context,
         builder: (context) {
-          return Column(
-            children: <Widget>[
-              Expanded(child: GestureDetector(
-                onTap: () {
-                  print('tapped');
-                  Navigator.pop(context);
-                },
-              )),
-              Container(
-                color: Theme.of(context).dividerColor,
-                padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      width: ScreenUtil().setWidth(580),
-                      padding: EdgeInsets.only(right: 10),
-                      child: TextField(
-                        style: TextStyle(fontFamily: 'normal', fontSize: 18),
-                        cursorColor: Theme.of(context).primaryColor,
-                        controller: _commentController,
-                        focusNode: _commentFocusNode,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          // labelText: '活动名称',
-                          filled: true,
-                          hintText: '@' + item.sender.nickname,
-                          fillColor: Colors.white,
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(12),
+          return Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                Expanded(child: GestureDetector(
+                  onTap: () {
+                    print('tapped');
+                    Navigator.pop(context);
+                  },
+                )),
+                Container(
+                  color: Theme.of(context).dividerColor,
+                  padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        width: ScreenUtil().setWidth(580),
+                        padding: EdgeInsets.only(right: 10),
+                        child: TextFormField(
+                          validator: (str) {
+                            return str.trim().length > 0 ? null : "内容不能为空";
+                          },
+                          style: TextStyle(fontFamily: 'normal', fontSize: 18),
+                          cursorColor: Theme.of(context).primaryColor,
+                          controller: _commentController,
+                          focusNode: _commentFocusNode,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            // labelText: '活动名称',
+                            filled: true,
+                            hintText: '@' + item.sender.nickname,
+                            fillColor: Colors.white,
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(12),
+                          ),
+                          // expands: true,
+                          minLines: 3,
+                          maxLines: 4,
+                          maxLengthEnforced: true,
+                          // maxLength: 1000,
                         ),
-                        // expands: true,
-                        minLines: 3,
-                        maxLines: 4,
-                        maxLengthEnforced: true,
-                        // maxLength: 1000,
                       ),
-                    ),
-                    MaterialButton(
-                      onPressed: () async {
-                        String content = _commentController.text;
-                        var data = await user.addTopicComment(
-                            topicId: widget.topicId,
-                            content: content,
-                            referComment: item.id);
-                        print(data);
-                        Navigator.pop(context);
-                        Fluttertoast.showToast(
-                            msg: '评论成功',
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM);
-                      },
-                      color: Theme.of(context).primaryColor,
-                      minWidth: ScreenUtil().setWidth(100),
-                      height: ScreenUtil().setHeight(70),
-                      shape: StadiumBorder(),
-                      child: Text(
-                        "发送",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
+                      MaterialButton(
+                        disabledColor: Colors.black,
+                        onPressed: () {
+                          buttonItem['comment']['handle'](user, item);
+                        },
+                        color: Theme.of(context).primaryColor,
+                        minWidth: ScreenUtil().setWidth(100),
+                        height: ScreenUtil().setHeight(70),
+                        shape: StadiumBorder(),
+                        child: Text(
+                          "发送",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           );
         });
   }
@@ -496,7 +523,7 @@ class _TopicCommentsState extends State<TopicComments> {
                 child: MaterialButton(
                   key: ValueKey<bool>(
                       user.collection['comment'].contains(item.id)),
-                  onPressed: () => buttonItem['comment']['handle'](user, item),
+                  onPressed: () => buttonItem['collect']['handle'](user, item),
                   shape: RoundedRectangleBorder(),
                   child: buttonItem['collect']
                       [user.collection['comment'].contains(item.id)],
@@ -527,10 +554,12 @@ class _TopicCommentsState extends State<TopicComments> {
                 },
                 duration: Duration(milliseconds: 500),
                 child: MaterialButton(
-                  key: ValueKey<bool>(this.likeList.contains(item.id)),
-                  onPressed: () {},
+                  key: ValueKey<bool>(
+                      user.like['topicComment'].contains(item.id)),
+                  onPressed: () => buttonItem['like']['handle'](user, item),
                   shape: RoundedRectangleBorder(),
-                  child: buttonItem['like'][this.likeList.contains(item.id)],
+                  child: buttonItem['like']
+                      [user.like['topicComment'].contains(item.id)],
                   minWidth: ScreenUtil().setWidth(226),
                   // color: Colors.amber,
                   splashColor: Colors.white,
@@ -623,52 +652,6 @@ class _TopicCommentsState extends State<TopicComments> {
             ),
           )
         ],
-      ),
-    );
-  }
-
-  _singleButtonItem(Icon icon, String count, item) {
-    // Color myColor = Colors.white;
-    // switch (item) {
-    //   case '收藏':
-    //     myColor = Colors.amber;
-    //     print('sho');
-    //     break;
-    //   case '评论':
-    //     myColor = Colors.cyan;
-    //     print('ping');
-    //     break;
-    //   case '点赞':
-    //     myColor = Colors.deepPurple;
-    //     break;
-    //   default:
-    //     myColor = Colors.blue;
-    // }
-
-    return Material(
-      color: Colors.white,
-      child: InkWell(
-        // hoverColor: Colors.black,
-        // focusColor: Colors.amber,
-        // highlightColor: Colors.blue,
-        // splashColor: Colors.amber,
-        onTap: () {
-          print('object');
-        },
-        child: Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(30)),
-          // color: myColor,
-          width: ScreenUtil().setWidth(226),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              icon,
-              Text(count),
-            ],
-          ),
-        ),
       ),
     );
   }
