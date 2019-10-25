@@ -4,6 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:provider/provider.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final int topicId;
@@ -100,6 +102,12 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         // automaticallyImplyLeading: false,
         elevation: 5,
         backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: Text(
           this.widget.topicTitle,
           style: TextStyle(
@@ -216,11 +224,52 @@ class TopicComments extends StatefulWidget {
 class _TopicCommentsState extends State<TopicComments> {
   EasyRefreshController _refreshController;
   TopicCommentsModel topicComments;
-  var followList = [];
+  // List collectList = [];
+  List likeList = [];
   int pageCount = 2;
+  var buttonItem;
+  bool ifComment = false;
+  TextEditingController _commentController;
+  FocusNode _commentFocusNode;
+  FocusNode blackFocusNode;
+  double commentHeight = 0;
 
   @override
   void initState() {
+    _commentFocusNode = FocusNode();
+    blackFocusNode = FocusNode();
+    _commentController = TextEditingController();
+    buttonItem = {
+      'collect': {
+        false: Icon(
+          IconData(0xe646, fontFamily: 'myIcon'),
+          color: Colors.black,
+        ),
+        true: Icon(
+          IconData(0xe780, fontFamily: 'myIcon'),
+          color: Colors.black,
+        ),
+        'handle': collectHandle
+      },
+      'comment': {
+        'icon': Icon(
+          IconData(0xe60d, fontFamily: 'myIcon'),
+          color: Colors.black,
+        ),
+        'handle': commentHandle
+      },
+      'like': {
+        true: Icon(
+          IconData(0xe686, fontFamily: 'myIcon'),
+          color: Colors.black,
+        ),
+        false: Icon(
+          IconData(0xe66f, fontFamily: 'myIcon'),
+          color: Colors.black,
+        ),
+        'handle': likeHandle
+      }
+    };
     _refreshController = EasyRefreshController();
     getInitialData();
     super.initState();
@@ -234,12 +283,19 @@ class _TopicCommentsState extends State<TopicComments> {
 
   @override
   void dispose() {
+    _commentFocusNode.dispose();
+    blackFocusNode.dispose();
+    _commentController.dispose();
     _refreshController.dispose();
     super.dispose();
+    this.likeList.forEach((i) {
+      apiClient.likeTopicComment(topicCommentId: i);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
     return EasyRefresh(
         enableControlFinishLoad: true,
         header: MaterialHeader(),
@@ -253,15 +309,18 @@ class _TopicCommentsState extends State<TopicComments> {
               success: true, noMore: (data.length == 0));
         },
         child: (this.topicComments != null)
-            ? Container(
-                // color: Colors.white,
-                padding: EdgeInsets.only(top: 10),
-                child: Column(
-                  children: this.topicComments.data.map((item) {
-                    return _singleItem(item);
-                  }).toList(),
+            ? Column(children: <Widget>[
+                Container(
+                  // color: Colors.yellow,
+                  // height: 700,
+                  child: Column(
+                    children: this.topicComments.data.map((item) {
+                      return _singleItem(item, user);
+                    }).toList(),
+                  ),
                 ),
-              )
+                // Container(height: 200, color: Colors.amber, child: TextField())
+              ])
             : Container(
                 alignment: Alignment.center,
                 height: 400,
@@ -269,7 +328,117 @@ class _TopicCommentsState extends State<TopicComments> {
               ));
   }
 
-  Widget _singleItem(TopicCommentsModelData item) {
+  Widget collectHandle() {
+    return MaterialButton(
+      onPressed: () {},
+      shape: RoundedRectangleBorder(),
+      child: buttonItem['collect']['icon'],
+    );
+  }
+
+  likeHandle() {}
+
+  commentHandle(
+    UserProvider user,
+    TopicCommentsModelData item,
+  ) async {
+    if (user.isLogIn) {
+      if (user.collection['comment'].contains(item.id)) {
+        user.collection['comment'].remove(item.id);
+      } else {
+        var data =
+            await apiClient.addCollection(type: ApiClient.COMMENT, id: item.id);
+        Scaffold.of(context).showSnackBar(new SnackBar(
+          content: new Text("${data}"),
+          action: new SnackBarAction(
+            label: "取消",
+            onPressed: () {},
+          ),
+        ));
+        user.collection['comment'].add(item.id);
+      }
+
+      setState(() {});
+    } else {
+      //TODO 添加未登录的状态
+    }
+  }
+
+  void onComment(TopicCommentsModelData item, UserProvider user) {
+    showBottomSheet(
+        // elevation: 10,
+        backgroundColor: Colors.black38,
+        context: context,
+        builder: (context) {
+          return Column(
+            children: <Widget>[
+              Expanded(child: GestureDetector(
+                onTap: () {
+                  print('tapped');
+                  Navigator.pop(context);
+                },
+              )),
+              Container(
+                color: Theme.of(context).dividerColor,
+                padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: ScreenUtil().setWidth(580),
+                      padding: EdgeInsets.only(right: 10),
+                      child: TextField(
+                        style: TextStyle(fontFamily: 'normal', fontSize: 18),
+                        cursorColor: Theme.of(context).primaryColor,
+                        controller: _commentController,
+                        focusNode: _commentFocusNode,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          // labelText: '活动名称',
+                          filled: true,
+                          hintText: '@' + item.sender.nickname,
+                          fillColor: Colors.white,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(12),
+                        ),
+                        // expands: true,
+                        minLines: 3,
+                        maxLines: 4,
+                        maxLengthEnforced: true,
+                        // maxLength: 1000,
+                      ),
+                    ),
+                    MaterialButton(
+                      onPressed: () async {
+                        String content = _commentController.text;
+                        var data = await user.addTopicComment(
+                            topicId: widget.topicId,
+                            content: content,
+                            referComment: item.id);
+                        print(data);
+                        Navigator.pop(context);
+                        Fluttertoast.showToast(
+                            msg: '评论成功',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM);
+                      },
+                      color: Theme.of(context).primaryColor,
+                      minWidth: ScreenUtil().setWidth(100),
+                      height: ScreenUtil().setHeight(70),
+                      shape: StadiumBorder(),
+                      child: Text(
+                        "发送",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          );
+        });
+  }
+
+  Widget _singleItem(TopicCommentsModelData item, UserProvider user) {
     return Container(
       padding: EdgeInsets.only(
           left: ScreenUtil().setWidth(35),
@@ -313,31 +482,61 @@ class _TopicCommentsState extends State<TopicComments> {
           Divider(
             color: Colors.black12,
             thickness: 0.4,
+            height: 0.1,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              _singleButtonItem(
-                  Icon(
-                    IconData(0xe646, fontFamily: 'myIcon'),
-                    color: Colors.black,
-                  ),
-                  '收藏数',
-                  '收藏'),
-              _singleButtonItem(
-                  Icon(
-                    IconData(0xe60d, fontFamily: 'myIcon'),
-                    color: Colors.black,
-                  ),
-                  '收藏数',
-                  '评论'),
-              _singleButtonItem(
-                  Icon(
-                    IconData(0xe6b4, fontFamily: 'myIcon'),
-                    color: Colors.black,
-                  ),
-                  '收藏数',
-                  '点赞'),
+              ///收藏
+              AnimatedSwitcher(
+                transitionBuilder: (child, anim) {
+                  return ScaleTransition(child: child, scale: anim);
+                },
+                duration: Duration(milliseconds: 500),
+                child: MaterialButton(
+                  key: ValueKey<bool>(
+                      user.collection['comment'].contains(item.id)),
+                  onPressed: () => buttonItem['comment']['handle'](user, item),
+                  shape: RoundedRectangleBorder(),
+                  child: buttonItem['collect']
+                      [user.collection['comment'].contains(item.id)],
+                  // color: Colors.amber,
+                  splashColor: Colors.white,
+                  minWidth: ScreenUtil().setWidth(226),
+                  height: 30,
+                ),
+              ),
+
+              ///评论
+              MaterialButton(
+                onPressed: () {
+                  onComment(item, user);
+                },
+                shape: RoundedRectangleBorder(),
+                child: buttonItem['comment']['icon'],
+                // color: Colors.amber,
+                splashColor: Colors.white,
+                minWidth: ScreenUtil().setWidth(226),
+                height: 30,
+              ),
+
+              ///点赞
+              AnimatedSwitcher(
+                transitionBuilder: (child, anim) {
+                  return ScaleTransition(child: child, scale: anim);
+                },
+                duration: Duration(milliseconds: 500),
+                child: MaterialButton(
+                  key: ValueKey<bool>(this.likeList.contains(item.id)),
+                  onPressed: () {},
+                  shape: RoundedRectangleBorder(),
+                  child: buttonItem['like'][this.likeList.contains(item.id)],
+                  minWidth: ScreenUtil().setWidth(226),
+                  // color: Colors.amber,
+                  splashColor: Colors.white,
+                  height: 30,
+                ),
+              )
             ],
           ),
         ],
@@ -460,7 +659,7 @@ class _TopicCommentsState extends State<TopicComments> {
           alignment: Alignment.center,
           padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(30)),
           // color: myColor,
-          width: ScreenUtil().setWidth(220),
+          width: ScreenUtil().setWidth(226),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -477,6 +676,7 @@ class _TopicCommentsState extends State<TopicComments> {
   Future getInitialData() async {
     var data =
         await apiClient.getTopicComments(topicId: widget.topicId, page: 1);
+    print(data);
     var topicComments = TopicCommentsModel.fromJson(data);
 
     if (!mounted) return;

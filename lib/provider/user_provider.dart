@@ -73,6 +73,12 @@ class UserProvider with ChangeNotifier {
     return data;
   }
 
+  ///点赞话题评论/取消点赞话题评论
+  Future likeTopicComment({int topicCommentId}) async {
+    var data = await apiClient.likeTopicComment(topicCommentId: topicCommentId);
+    return data;
+  }
+
   ///用户发布活动
   Future addActivity(
       {String sponsor,
