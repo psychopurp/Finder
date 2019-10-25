@@ -107,11 +107,12 @@ class DataObject implements Listenable {
 
   Future<void> getData() async {
     print("Try Get Messages.");
-    if (lastRequestTime == null) {
-      lastRequestTime = DateTime.now().add(Duration(days: -1));
-    }
     DateTime reqTime = DateTime.now();
-    await getMessages(lastRequestTime.millisecondsSinceEpoch ~/ 1000);
+    int time;
+    if(lastRequestTime != null){
+      time = lastRequestTime.millisecondsSinceEpoch ~/ 1000;
+    }
+    await getMessages(time);
     lastRequestTime = reqTime.subtract(Duration(seconds: 10));
   }
 
@@ -326,9 +327,10 @@ class DataObject implements Listenable {
       bool isNotReadOnly,
       bool isReceiveOnly,
       String sessionId}) async {
-    Map<String, dynamic> queryParameters = {
-      "start": start,
-    };
+    Map<String, dynamic> queryParameters = {};
+    if(start != null){
+      queryParameters["start"] = start;
+    }
     if (isNotReadOnly != null) {
       queryParameters["isNotReadOnly"] = isNotReadOnly ? 1 : 0;
     }

@@ -8,6 +8,7 @@ export 'package:cached_network_image/cached_network_image.dart';
 export 'package:image_picker/image_picker.dart';
 export 'package:fluttertoast/fluttertoast.dart';
 export 'package:finder/routers/routes.dart';
+export 'package:finder/plugin/avatar.dart';
 
 //日期转化成时间戳工具
 String getTime({int year, int month, int day}) {

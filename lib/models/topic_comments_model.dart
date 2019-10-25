@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/public.dart';
 
 class TopicCommentsModel {
   List<TopicCommentsModelData> data;
@@ -36,9 +37,10 @@ class TopicCommentsModelData {
   int id;
   Sender sender;
   String content;
-  String replyTo;
-  String rootComment;
-  String hasReply;
+  Null replyTo;
+  RootComment rootComment;
+  List<Sender> likes;
+  bool hasReply;
 
   TopicCommentsModelData(
       {this.id,
@@ -46,15 +48,27 @@ class TopicCommentsModelData {
       this.content,
       this.replyTo,
       this.rootComment,
+      this.likes,
       this.hasReply});
 
   TopicCommentsModelData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     sender =
         json['sender'] != null ? new Sender.fromJson(json['sender']) : null;
+
     content = json['content'];
     replyTo = json['reply_to'];
-    rootComment = json['root_comment'];
+
+    rootComment = json['root_comment'] != "None"
+        ? new RootComment.fromJson(json['root_comment'])
+        : null;
+    if (json['likes'] != null) {
+      likes = new List<Sender>();
+      json['likes'].forEach((v) {
+        likes.add(new Sender.fromJson(v));
+      });
+    }
+
     hasReply = json['has_reply'];
   }
 
@@ -66,7 +80,12 @@ class TopicCommentsModelData {
     }
     data['content'] = this.content;
     data['reply_to'] = this.replyTo;
-    data['root_comment'] = this.rootComment;
+    if (this.rootComment != null) {
+      data['root_comment'] = this.rootComment.toJson();
+    }
+    if (this.likes != null) {
+      data['likes'] = this.likes.map((v) => v.toJson()).toList();
+    }
     data['has_reply'] = this.hasReply;
     return data;
   }
@@ -81,7 +100,7 @@ class Sender {
 
   Sender.fromJson(Map<String, dynamic> json) {
     nickname = json['nickname'];
-    avatar = ApiClient.host + json['avatar'];
+    avatar = Avatar.getImageUrl(json['avatar']);
     id = json['id'];
   }
 
@@ -90,6 +109,47 @@ class Sender {
     data['nickname'] = this.nickname;
     data['avatar'] = this.avatar;
     data['id'] = this.id;
+    return data;
+  }
+}
+
+class RootComment {
+  int id;
+  int topicId;
+  int rootCommentId;
+  String replyToId;
+  String time;
+  int senderId;
+  String content;
+
+  RootComment(
+      {this.id,
+      this.topicId,
+      this.rootCommentId,
+      this.replyToId,
+      this.time,
+      this.senderId,
+      this.content});
+
+  RootComment.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    topicId = json['topic_id'];
+    rootCommentId = json['root_comment_id'];
+    replyToId = json['reply_to_id'];
+    time = json['time'];
+    senderId = json['sender_id'];
+    content = json['content'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['topic_id'] = this.topicId;
+    data['root_comment_id'] = this.rootCommentId;
+    data['reply_to_id'] = this.replyToId;
+    data['time'] = this.time;
+    data['sender_id'] = this.senderId;
+    data['content'] = this.content;
     return data;
   }
 }

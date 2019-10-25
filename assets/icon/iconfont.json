@@ -188,6 +188,20 @@
       "unicode_decimal": 59259
     },
     {
+      "icon_id": "1071052",
+      "name": "点赞1",
+      "font_class": "dianzan1",
+      "unicode": "e66f",
+      "unicode_decimal": 58991
+    },
+    {
+      "icon_id": "1071083",
+      "name": "点赞2",
+      "font_class": "dianzan21",
+      "unicode": "e686",
+      "unicode_decimal": 59014
+    },
+    {
       "icon_id": "1125611",
       "name": "图库2",
       "font_class": "tuku2",
@@ -375,6 +389,13 @@
       "font_class": "xiala1",
       "unicode": "e672",
       "unicode_decimal": 58994
+    },
+    {
+      "icon_id": "5330403",
+      "name": "书签",
+      "font_class": "shuqian1",
+      "unicode": "e780",
+      "unicode_decimal": 59264
     },
     {
       "icon_id": "5485623",

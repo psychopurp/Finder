@@ -163,6 +163,11 @@ class ApiClient {
     root_id(传了就是回复，不传是评论): int
        */
     var formData = {'topic_id': topicId, 'query': query, 'page': page};
+    if (rootId != null) {
+      formData.addAll({'root_id': rootId});
+    }
+    print(formData);
+
     try {
       Response response =
           await dio.get('get_topic_comments/', queryParameters: formData);
@@ -218,20 +223,33 @@ class ApiClient {
     评论不写refer_comment，回复要写
      topic: int
     content: str
-    refer_comment: int
+    refer_comment_id: int
      */
     var formData = {"topic_id": topicId, "content": content};
     if (referComment != null) {
-      formData.addAll({"refer_comment": referComment});
+      formData.addAll({"refer_comment_id": referComment});
     }
     print(jsonEncode(formData));
     try {
       Response response =
           await dio.post('add_topic_comment/', data: jsonEncode(formData));
-      print('发布话题评论成功==========>${response.data}');
+      // print('发布话题评论成功==========>${response.data}');
       return response.data;
     } catch (e) {
       print('发布话题评论错误==========>$e');
+    }
+  }
+
+  ///点赞话题评论/取消点赞话题评论
+  Future likeTopicComment({int topicCommentId}) async {
+    var formData = {'topic_comment_id': topicCommentId};
+    try {
+      Response response =
+          await dio.get('like_topic_comment/', queryParameters: formData);
+      // print('点赞话题评论成功....${response.data}');
+      return response.data;
+    } catch (e) {
+      print('点赞话题评论错误==========>$e');
     }
   }
 
@@ -304,7 +322,7 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_follow_users/', queryParameters: formData);
-      print(response.data);
+      // print(response.data);
       return response.data;
     } catch (e) {
       print('获取用户关注的用户列表错误==========>$e');
@@ -317,7 +335,7 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_fan_users/', queryParameters: formData);
-      print(response.data);
+      // print(response.data);
       return response.data;
     } catch (e) {
       print('获取关注该用户的用户列表错误==========>$e');
@@ -366,7 +384,7 @@ class ApiClient {
     type:int(活动、话题、话题评论、招募、分别是1，2，3，4)
 */
     var formData = {'query': query, 'page': page};
-    print(formData);
+    // print(formData);
     try {
       Response response =
           await dio.get('get_collections/', queryParameters: formData);
@@ -394,6 +412,20 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('用户收藏错误==========>$e');
+    }
+  }
+
+  ///删除收藏
+  Future deleteCollection({int collectionId}) async {
+    var formData = {'collection_id': collectionId};
+    // print(formData);
+    try {
+      Response response =
+          await dio.post('delete_collection/', data: jsonEncode(formData));
+      print('用户删除收藏成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('用户删除收藏错误==========>$e');
     }
   }
 

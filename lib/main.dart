@@ -1,5 +1,7 @@
+import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/config/global.dart';
@@ -12,7 +14,7 @@ import 'package:finder/provider/user_provider.dart';
 
 void main() {
   global.init().then((isLogin) => runApp(MyApp(
-        isLogin: true,
+        isLogin: isLogin,
       )));
 }
 
@@ -46,7 +48,7 @@ class MyApp extends StatelessWidget {
           theme: _buildAppTheme(),
           title: 'Finder',
           debugShowCheckedModeBanner: false,
-          home: LoginPage(),
+          home: isLogin ? IndexPage() : LoginPage(),
         ));
   }
 }
