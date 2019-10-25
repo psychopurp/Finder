@@ -7,13 +7,13 @@ import 'package:finder/models/activity_model.dart';
 
 class HomePageActivities extends StatelessWidget {
   final ActivityModel activities;
-  final double mainHeight = 520;
-  final double titleHeight = 100;
+  final double mainHeight = ScreenUtil().setHeight(500);
+  final double titleHeight = ScreenUtil().setHeight(80);
   HomePageActivities(this.activities);
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(mainHeight),
+      // height: mainHeight,
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 20),
       color: Colors.white,
@@ -25,14 +25,14 @@ class HomePageActivities extends StatelessWidget {
 
   Widget _title(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(titleHeight),
+      height: titleHeight,
       width: ScreenUtil().setWidth(750),
       // color: Colors.yellow,
       child: Row(
         children: <Widget>[
           Container(
             width: ScreenUtil().setWidth(500),
-            height: ScreenUtil().setHeight(80),
+            height: titleHeight,
             // color: Colors.yellow,
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.only(
@@ -43,7 +43,7 @@ class HomePageActivities extends StatelessWidget {
               children: <Widget>[
                 Container(
                   width: ScreenUtil().setWidth(150),
-                  height: ScreenUtil().setHeight(20),
+                  height: titleHeight / 4,
                   decoration: BoxDecoration(
                     // color: Colors.amber,
                     gradient: LinearGradient(colors: [
@@ -94,10 +94,10 @@ class HomePageActivities extends StatelessWidget {
 
   Widget _activityPart() {
     return Container(
-      height: ScreenUtil().setHeight(420),
+      height: mainHeight - titleHeight,
       width: ScreenUtil().setWidth(750),
       padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
-      // color: Colors.amber,
+      // color: Colors.green,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: this.activities.data.length,
@@ -127,7 +127,7 @@ class HomePageActivities extends StatelessWidget {
           child: Container(
             width: picWidth,
             height: picWidth * 1.8,
-            // color: Colors.blue,
+            // color: Colors.yellow,
             margin: EdgeInsets.only(
               right: ScreenUtil().setWidth(20),
             ),

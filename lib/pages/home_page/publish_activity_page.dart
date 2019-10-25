@@ -534,26 +534,30 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
     /**
      * 进行上传图片并显示操作
      */
+    double picWidth = ScreenUtil().setWidth(220);
+    double picHeight = picWidth * 1.4;
+
     Future getImage() async {
       var image = await ImagePicker.pickImage(source: ImageSource.gallery);
       var cropImage = await ImageCropper.cropImage(
+          aspectRatio: CropAspectRatio(ratioX: 3, ratioY: 4),
           sourcePath: image.path,
-          aspectRatioPresets: [
-            CropAspectRatioPreset.square,
-            CropAspectRatioPreset.ratio3x2,
-            CropAspectRatioPreset.original,
-            CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio16x9
-          ],
+          // aspectRatioPresets: [
+          // CropAspectRatioPreset.square,
+          // CropAspectRatioPreset.ratio3x2,
+          // CropAspectRatioPreset.original,
+          //   CropAspectRatioPreset.ratio4x3,
+          // CropAspectRatioPreset.ratio16x9
+          // ],
           androidUiSettings: AndroidUiSettings(
+              showCropGrid: false,
               toolbarTitle: '图片剪切',
               toolbarColor: Theme.of(context).primaryColor,
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
+              lockAspectRatio: true),
           iosUiSettings: IOSUiSettings(
-            minimumAspectRatio: 1.0,
-          ));
+              minimumAspectRatio: 1.0, aspectRatioLockEnabled: true));
       return cropImage;
     }
 
@@ -571,16 +575,17 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
           child: (this._imageFile != null)
               ? Container(
                   // margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
-                  height: ScreenUtil().setHeight(310),
-                  width: ScreenUtil().setWidth(220),
+                  height: picHeight,
+                  width: picWidth,
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
                     image: DecorationImage(
                         image: FileImage(this._imageFile), fit: BoxFit.fill),
                   ))
               : Container(
                   // margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
-                  height: ScreenUtil().setHeight(310),
-                  width: ScreenUtil().setWidth(220),
+                  height: picHeight,
+                  width: picWidth,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -600,6 +605,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                   ),
                   decoration: BoxDecoration(
                       // color: Colors.amber,
+                      borderRadius: BorderRadius.circular(3),
                       border: Border.all(color: Color(0xFFF0AA89), width: 1))),
         ),
       ),
