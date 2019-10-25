@@ -4,10 +4,9 @@ import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
 
 class HomePageTopics extends StatelessWidget {
-  final double mainHeight = 260;
-  final double titleHeight = 40;
   final TopicModel topics;
-
+  static double mainHeight = ScreenUtil().setHeight(500);
+  static double titleHeight = ScreenUtil().setHeight(100);
   HomePageTopics(this.topics);
 
   @override
@@ -15,15 +14,7 @@ class HomePageTopics extends StatelessWidget {
     return Container(
       height: mainHeight,
       // margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        // borderRadius: BorderRadius.only(
-        //     topLeft: Radius.circular(20),
-        //     topRight: Radius.circular(20),
-        //     bottomLeft: Radius.circular(10),
-        //     bottomRight: Radius.circular(10))
-      ),
-      // color: Colors.white,
+      color: Colors.white,
       child: Column(
         children: <Widget>[
           _title(context),
@@ -45,7 +36,7 @@ class HomePageTopics extends StatelessWidget {
         children: <Widget>[
           Container(
             width: ScreenUtil().setWidth(500),
-            height: ScreenUtil().setHeight(80),
+            height: titleHeight,
             // color: Colors.yellow,
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.only(
@@ -56,7 +47,7 @@ class HomePageTopics extends StatelessWidget {
               children: <Widget>[
                 Container(
                   width: ScreenUtil().setWidth(150),
-                  height: ScreenUtil().setHeight(20),
+                  height: titleHeight / 5,
                   decoration: BoxDecoration(
                     // color: Colors.amber,
                     gradient: LinearGradient(colors: [
@@ -109,6 +100,7 @@ class HomePageTopics extends StatelessWidget {
     List<TopicModelData> topics = [];
     if (isSchoolTopics) {
       for (var i = 0; i < this.topics.data.length; i++) {
+        // print(this.topics.data[i].school);
         if (this.topics.data[i].school != null) {
           topics.add(this.topics.data[i]);
         }
@@ -122,8 +114,10 @@ class HomePageTopics extends StatelessWidget {
 }
 
 class TopicList extends StatelessWidget {
-  final double topicHeight = 100;
-  final double topicWidth = 160;
+  final double topicListHeight =
+      (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2;
+  final double topicHeight =
+      (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2 - 5;
 
   final bool isSchoolTopics;
   final List<TopicModelData> topicsData;
@@ -131,9 +125,10 @@ class TopicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: isSchoolTopics ? 110 : 105,
+      height: topicListHeight,
       width: ScreenUtil().setWidth(750),
       // color: isSchoolTopics ? Colors.green : Colors.yellow,
+      padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: this.topicsData.length,
@@ -147,8 +142,8 @@ class TopicList extends StatelessWidget {
 
   _singleItem(
       BuildContext context, TopicModelData item, int index, bool inSchool) {
-    bool isLastItem = (index == this.topicsData.length - 1);
-
+    ///宽高比 1.6/1
+    double topicWidth = topicHeight * 1.6;
     return CachedNetworkImage(
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => InkWell(
@@ -161,12 +156,7 @@ class TopicList extends StatelessWidget {
           child: Container(
             height: topicHeight,
             width: topicWidth,
-            margin: isLastItem
-                ? EdgeInsets.only(
-                    left: ScreenUtil().setWidth(20),
-                    right: ScreenUtil().setWidth(20),
-                  )
-                : EdgeInsets.only(left: ScreenUtil().setWidth(20)),
+            margin: EdgeInsets.only(right: ScreenUtil().setWidth(20)),
             decoration: BoxDecoration(
               // color: Colors.green,
               borderRadius: BorderRadius.all(Radius.circular(3)),

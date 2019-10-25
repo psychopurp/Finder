@@ -59,7 +59,7 @@ class _PicSwiperState extends State<PicSwiper>
 
         /// if you use ExtendedImageSlidePage and slideType =SlideType.onlyImage,
         /// make sure your page is transparent background
-        color: Colors.transparent,
+        color: Colors.black,
         shadowColor: Colors.transparent,
         child: Stack(
           fit: StackFit.expand,
@@ -236,7 +236,7 @@ class MySwiperPlugin extends StatelessWidget {
           child: Container(
             height: 50.0,
             width: double.infinity,
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withOpacity(0.4),
             child: Row(
               children: <Widget>[
                 Container(

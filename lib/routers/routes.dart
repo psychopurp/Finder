@@ -30,6 +30,7 @@ class Routes {
   static String internshipCompany = "/serve/internship/company"; //服务页面 -- 实习 公司
   //用户页
   static String userProfile = "/userProfile"; //个人详情页
+  static String minePage = "/minePage"; //我的 页
 
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
@@ -85,7 +86,8 @@ class Routes {
     //我的页
     router.define(userProfile,
         handler: userProfileHandler, transitionType: TransitionType.fadeIn);
-
+    router.define(minePage,
+        handler: minePageHandler, transitionType: TransitionType.fadeIn);
     router.define(chat,
         handler: chatPageHandle, transitionType: TransitionType.cupertino);
     router.define(systemMessage,

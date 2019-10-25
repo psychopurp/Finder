@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:finder/models/activity_model.dart';
+import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/pages/message_page/chat_page.dart';
 import 'package:finder/pages/home_page/publish_topic_comment.dart';
 import 'package:finder/pages/message_page/say_to_he_chat_page.dart';
 import 'package:finder/pages/message_page/say_to_he_list_page.dart';
 import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
+import 'package:finder/pages/mine_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/pages/serve_page/internship_page/company_page.dart';
@@ -156,7 +158,17 @@ var internshipCompanyHandler = Handler(
 //用户详情页
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return UserProfilePage();
+  String senderData = params['senderData']?.first;
+  // print("activityData====>$activityData");
+  var sender = Sender.fromJson(jsonDecode(senderData));
+  return UserProfilePage(
+    sender: sender,
+  );
+});
+
+var minePageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return MinePage();
 });
 
 var chatPageHandle = Handler(

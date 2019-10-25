@@ -7,21 +7,22 @@ import 'package:flutter/cupertino.dart';
 class HomePageBanner extends StatelessWidget {
   final BannerModel banner;
   HomePageBanner(this.banner);
+  final double bannerHeight = 135;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 0),
-      padding: EdgeInsets.symmetric(vertical: 10.0),
-      height: ScreenUtil().setHeight(260),
+      // padding: EdgeInsets.symmetric(vertical: 10.0),
+      height: bannerHeight,
       width: ScreenUtil().setWidth(750),
-      color: Colors.white,
+      // color: Colors.amber,
       child: Swiper(
-        // layout: SwiperLayout.STACK,
+        // layout: SwiperLayout.CUSTOM,
         // autoplayDelay: 100,
         onTap: (index) {},
-        viewportFraction: 0.75,
-        scale: 0.7,
+        // viewportFraction: 0.75,
+        // scale: 0.7,
         pagination: SwiperPagination(
             margin: const EdgeInsets.only(
                 top: 10.0, left: 10.0, right: 10.0, bottom: 5.0),
@@ -48,7 +49,7 @@ class HomePageBanner extends StatelessWidget {
       imageBuilder: (context, imageProvider) => Container(
         decoration: BoxDecoration(
           // color: Colors.green,
-          borderRadius: BorderRadius.all(Radius.circular(3)),
+          // borderRadius: BorderRadius.all(Radius.circular(3)),
           // border: Border.all(color: Colors.black, width: 2),
           image: DecorationImage(
             image: imageProvider,

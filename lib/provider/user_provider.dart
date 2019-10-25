@@ -18,6 +18,9 @@ class UserProvider with ChangeNotifier {
     "recruit": Set()
   };
 
+  ///点赞
+  Map<String, Set<int>> like = {"topicComment": Set()};
+
   //登陆
   Future<bool> login(
       {@required String phone, @required String password}) async {
@@ -70,6 +73,12 @@ class UserProvider with ChangeNotifier {
       {int topicId, String content, int referComment}) async {
     var data = await apiClient.addTopicComment(
         topicId: topicId, content: content, referComment: referComment);
+    return data;
+  }
+
+  ///点赞话题评论/取消点赞话题评论
+  Future likeTopicComment({int topicCommentId}) async {
+    var data = await apiClient.likeTopicComment(topicCommentId: topicCommentId);
     return data;
   }
 

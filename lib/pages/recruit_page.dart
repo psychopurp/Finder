@@ -8,7 +8,6 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:finder/pages/recruit_page/recruit_search_page.dart';
-import 'package:image_cropper/image_cropper.dart';
 
 class RecruitPage extends StatefulWidget {
   @override

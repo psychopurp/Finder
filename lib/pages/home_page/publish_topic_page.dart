@@ -204,6 +204,9 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
 
   //处理图片部分
   Widget uploadImage() {
+    ///宽高比 1.6/1
+    double picHeight = ScreenUtil().setHeight(400);
+    double picWidth = picHeight * 1.6;
     /**
      * 进行上传图片并显示操作
      */
@@ -211,22 +214,23 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
       var image = await ImagePicker.pickImage(source: ImageSource.gallery);
       var cropImage = await ImageCropper.cropImage(
           sourcePath: image.path,
-          aspectRatioPresets: [
-            CropAspectRatioPreset.square,
-            CropAspectRatioPreset.ratio3x2,
-            CropAspectRatioPreset.original,
-            CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio16x9
-          ],
+          aspectRatio: CropAspectRatio(ratioX: 16, ratioY: 10),
+          // aspectRatioPresets: [
+          //   CropAspectRatioPreset.square,
+          //   CropAspectRatioPreset.ratio3x2,
+          //   CropAspectRatioPreset.original,
+          //   CropAspectRatioPreset.ratio4x3,
+          //   CropAspectRatioPreset.ratio16x9
+          // ],
           androidUiSettings: AndroidUiSettings(
+              showCropGrid: false,
               toolbarTitle: '图片剪切',
               toolbarColor: Theme.of(context).primaryColor,
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
+              lockAspectRatio: true),
           iosUiSettings: IOSUiSettings(
-            minimumAspectRatio: 1.0,
-          ));
+              minimumAspectRatio: 1.0, aspectRatioLockEnabled: true));
       return cropImage;
     }
 
@@ -241,16 +245,16 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
           child: (this._imageFile != null)
               ? Container(
                   margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
-                  height: ScreenUtil().setHeight(300),
-                  width: ScreenUtil().setWidth(710),
+                  height: picHeight,
+                  width: picWidth,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                         image: FileImage(this._imageFile), fit: BoxFit.fill),
                   ))
               : Container(
                   margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
-                  height: ScreenUtil().setHeight(300),
-                  width: ScreenUtil().setWidth(710),
+                  height: picHeight,
+                  width: picWidth,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
