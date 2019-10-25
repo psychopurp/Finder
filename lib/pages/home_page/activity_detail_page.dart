@@ -1,5 +1,6 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/activity_model.dart';
+import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
@@ -14,13 +15,10 @@ class ActivityDetailPage extends StatefulWidget {
 
 class _ActivityDetailPageState extends State<ActivityDetailPage> {
   ActivityModelData activity;
-  IconData collectIcon = Icons.favorite_border;
-  List<IconData> collectIcons = [Icons.favorite_border, Icons.favorite];
   _ActivityDetailPageState(this.activity);
+
   var collect;
 
-  ///是否已收藏
-  bool isContain;
   @override
   void initState() {
     collect = {
@@ -37,6 +35,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    double picWidth = ScreenUtil().setWidth(220);
+    double picHeight = picWidth * 1.4;
     final user = Provider.of<UserProvider>(context);
 
     var top = Align(
@@ -49,22 +49,34 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Container(
-              height: ScreenUtil().setHeight(310),
-              width: ScreenUtil().setWidth(220),
-              decoration: BoxDecoration(
-                  // color: Colors.yellow,
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black38,
-                        offset: Offset(-1.0, 2.0),
-                        blurRadius: 2.0,
-                        spreadRadius: 1.0),
-                  ],
-                  image: DecorationImage(
-                      image: CachedNetworkImageProvider(activity.poster),
-                      fit: BoxFit.cover)),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    fullscreenDialog: false,
+                    builder: (_) {
+                      return PicSwiper(
+                        index: 0,
+                        pics: [activity.poster],
+                      );
+                    }));
+              },
+              child: Container(
+                height: picHeight,
+                width: picWidth,
+                decoration: BoxDecoration(
+                    // color: Colors.yellow,
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black38,
+                          offset: Offset(-1.0, 2.0),
+                          blurRadius: 2.0,
+                          spreadRadius: 1.0),
+                    ],
+                    image: DecorationImage(
+                        image: CachedNetworkImageProvider(activity.poster),
+                        fit: BoxFit.fill)),
+              ),
             ),
             DefaultTextStyle(
               style: Theme.of(context).textTheme.body1,
@@ -72,6 +84,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  ///title
                   Container(
                     // color: Colors.cyan,
                     width: ScreenUtil().setWidth(480),
@@ -88,6 +101,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                               FontWeight.w400, FontWeight.w800, 0.8)),
                     ),
                   ),
+
+                  ///主办方
                   Container(
                     // color: Colors.yellow,
                     width: ScreenUtil().setWidth(480),
@@ -98,24 +113,29 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           Icons.people,
                           color: Theme.of(context).primaryColor,
                         ),
-                        Container(
-                          // color: Colors.blue,
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          width: ScreenUtil().setWidth(380),
-                          child: Text(
-                            activity.sponsor,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: ScreenUtil().setSp(30),
-                                fontWeight: FontWeight.w500),
+                        Tooltip(
+                          message: activity.sponsor,
+                          child: Container(
+                            // color: Colors.blue,
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            width: ScreenUtil().setWidth(380),
+                            child: Text(
+                              activity.sponsor,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: ScreenUtil().setSp(30),
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
+
+                  ///时间
                   Container(
                     // color: Colors.yellow,
                     width: ScreenUtil().setWidth(480),
@@ -150,6 +170,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       ],
                     ),
                   ),
+
+                  ///地点
                   Container(
                     // color: Colors.yellow,
                     width: ScreenUtil().setWidth(480),
@@ -161,18 +183,21 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           IconData(0xe608, fontFamily: "myIcon"),
                           color: Theme.of(context).primaryColor,
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          width: ScreenUtil().setWidth(380),
-                          child: Text(
-                            activity.place,
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: ScreenUtil().setSp(25),
-                                fontWeight: FontWeight.w500),
+                        Tooltip(
+                          message: activity.place,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            width: ScreenUtil().setWidth(380),
+                            child: Text(
+                              activity.place,
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: ScreenUtil().setSp(25),
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
                         ),
                       ],

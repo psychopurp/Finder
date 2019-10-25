@@ -14,16 +14,9 @@ class HomePageActivities extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: ScreenUtil().setHeight(mainHeight),
-      width: ScreenUtil().setWidth(710),
-      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        // borderRadius: BorderRadius.only(
-        //     topLeft: Radius.circular(20),
-        //     topRight: Radius.circular(20),
-        //     bottomLeft: Radius.circular(10),
-        //     bottomRight: Radius.circular(10))
-      ),
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 20),
+      color: Colors.white,
       child: Column(
         children: <Widget>[_title(context), _activityPart()],
       ),
@@ -34,7 +27,7 @@ class HomePageActivities extends StatelessWidget {
     return Container(
       height: ScreenUtil().setHeight(titleHeight),
       width: ScreenUtil().setWidth(750),
-      // color: Colors.amber,
+      // color: Colors.yellow,
       child: Row(
         children: <Widget>[
           Container(
@@ -103,7 +96,8 @@ class HomePageActivities extends StatelessWidget {
     return Container(
       height: ScreenUtil().setHeight(420),
       width: ScreenUtil().setWidth(750),
-      // color: Colors.yellow,
+      padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
+      // color: Colors.amber,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: this.activities.data.length,
@@ -115,41 +109,37 @@ class HomePageActivities extends StatelessWidget {
   }
 
   _singleItem(BuildContext context, ActivityModelData item, int index) {
-    bool isLastItem = (index == this.activities.data.length - 1);
+    // bool isLastItem = (index == this.activities.data.length - 1);
+    double picWidth = ScreenUtil().setWidth(220);
+
+    ///宽高比 1/1.4
+    double picHeight = picWidth * 1.4;
 
     return CachedNetworkImage(
       imageUrl: item.poster,
-      imageBuilder: (context, imageProvider) => InkWell(
+      imageBuilder: (context, imageProvider) => GestureDetector(
         onTap: () {
           var activityData = jsonEncode(item.toJson());
           Application.router.navigateTo(context,
               "/home/activityDetail?activityData=${Uri.encodeComponent(activityData)}");
         },
         child: Align(
-          alignment: Alignment.topCenter,
           child: Container(
-            height: ScreenUtil().setHeight(390),
-            width: ScreenUtil().setWidth(220),
+            width: picWidth,
+            height: picWidth * 1.8,
             // color: Colors.blue,
-            margin: isLastItem
-                ? EdgeInsets.only(
-                    left: ScreenUtil().setWidth(20),
-                    right: ScreenUtil().setWidth(20),
-                    top: ScreenUtil().setWidth(5),
-                  )
-                : EdgeInsets.only(
-                    left: ScreenUtil().setWidth(20),
-                    top: ScreenUtil().setWidth(5),
-                  ),
+            margin: EdgeInsets.only(
+              right: ScreenUtil().setWidth(20),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  height: ScreenUtil().setHeight(310),
-                  width: ScreenUtil().setWidth(220),
+                  height: picHeight,
+                  width: picWidth,
                   decoration: BoxDecoration(
                     // color: Colors.green,
-                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                    borderRadius: BorderRadius.circular(3),
                     // border: Border.all(color: Colors.black, width: 2),
                     image: DecorationImage(
                       image: imageProvider,
@@ -158,10 +148,9 @@ class HomePageActivities extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  height: ScreenUtil().setHeight(80),
-                  width: ScreenUtil().setWidth(220),
+                  width: picWidth,
                   padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
-                  // color: Colors.amber,
+                  // color: Colors.yellow,
                   child: Text(item.title,
                       maxLines: 2,
                       textAlign: TextAlign.start,
