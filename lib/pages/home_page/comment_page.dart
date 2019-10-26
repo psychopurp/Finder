@@ -1,12 +1,13 @@
-import 'dart:convert';
-
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -21,9 +22,13 @@ class CommentPage extends StatefulWidget {
 class _CommentPageState extends State<CommentPage> {
   TopicCommentsModel comment;
   TextEditingController _commentController;
+  EasyRefreshController _refreshController;
+  ScrollController _controller;
   FocusNode _commentFocusNode;
   int currentComment;
+  String defaultHint = '喜欢就评论告诉Ta';
   String hintText = '喜欢就评论告诉Ta';
+  int pageCount = 2;
 
   @override
   void initState() {
@@ -38,14 +43,22 @@ class _CommentPageState extends State<CommentPage> {
         if (!_commentFocusNode.hasFocus) {
           setState(() {
             currentComment = widget.topicCommentId;
+            hintText = defaultHint;
           });
         }
       });
+    _controller = ScrollController()
+      ..addListener(() {
+        _commentFocusNode.unfocus();
+      });
+    _refreshController = EasyRefreshController();
     super.initState();
   }
 
   @override
   void dispose() {
+    _controller.dispose();
+    _refreshController.dispose();
     _commentController.dispose();
     _commentFocusNode.dispose();
     super.dispose();
@@ -75,9 +88,29 @@ class _CommentPageState extends State<CommentPage> {
               _commentFocusNode.unfocus();
             },
             child: EasyRefresh(
-              onRefresh: () async {},
-              onLoad: () async {},
-              child: ListView(children: buildContent()),
+              enableControlFinishLoad: true,
+              header: MaterialHeader(),
+              footer: MaterialFooter(),
+              controller: _refreshController,
+              onRefresh: () async {
+                await getReplies();
+                _refreshController.resetLoadState();
+              },
+              onLoad: () async {
+                var data = await getMore(this.pageCount);
+                print("data===$data");
+                _refreshController.finishLoad(
+                    success: true, noMore: (data.length == 0));
+              },
+              child: (this.comment != null)
+                  ? ListView(
+                      controller: _controller,
+                      padding: EdgeInsets.only(bottom: 20),
+                      children: buildContent(user))
+                  : Container(
+                      height: 400,
+                      child: CupertinoActivityIndicator(),
+                    ),
             ),
           ),
           Positioned(
@@ -91,14 +124,13 @@ class _CommentPageState extends State<CommentPage> {
     );
   }
 
-  List<Widget> buildContent() {
+  List<Widget> buildContent(UserProvider user) {
     String getTimeString(DateTime time) {
       DateTime now = DateTime.now();
-      String timeString = "";
 
       if (now.month == now.month) {
         if (now.difference(time).inMinutes < 60) {
-          if (now.minute == time.minute) {
+          if (now.difference(time).inMinutes == 0) {
             return "刚刚";
           } else {
             return now.difference(time).inMinutes.toString() + '分钟前';
@@ -116,11 +148,13 @@ class _CommentPageState extends State<CommentPage> {
     List<Widget> content = [];
     this.comment.data.forEach((item) {
       Widget singleItem = InkWell(
+          onLongPress: () => handleDelete(user, item),
           onTap: () {
             setState(() {
               this.hintText = "@" + item.sender.nickname;
               this.currentComment = item.id;
             });
+            FocusScope.of(context).requestFocus(_commentFocusNode);
           },
           child: Container(
             padding: EdgeInsets.only(top: 10.0, left: 15.0, bottom: 20),
@@ -154,11 +188,23 @@ class _CommentPageState extends State<CommentPage> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 10.0, top: 5.0),
-                        child: Text(
-                          item.content,
-                          style: Theme.of(context).textTheme.body2,
-                        ),
-                      )
+                        child: (item.replyTo.id != widget.topicCommentId)
+                            ? Text.rich(TextSpan(children: [
+                                TextSpan(
+                                    text: " @" + item.replyTo.sender.nickname,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .body2
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .primaryColor)),
+                                TextSpan(text: " : " + item.content)
+                              ]))
+                            : Text(
+                                item.content,
+                                style: Theme.of(context).textTheme.body2,
+                              ),
+                      ),
                     ],
                   ),
                 ),
@@ -234,16 +280,44 @@ class _CommentPageState extends State<CommentPage> {
     );
   }
 
+  handleDelete(UserProvider user, TopicCommentsModelData item) async {
+    if (user.isLogIn) {
+      if (user.userInfo.id == item.sender.id) {
+        showDialog(
+            context: context,
+            builder: (_) {
+              return GestureDetector(
+                onTap: () async {
+                  FinderDialog.showLoading();
+                  var data =
+                      await apiClient.deleteTopicComment(commentId: item.id);
+                  Navigator.pop(context);
+                },
+                child: CupertinoAlertDialog(
+                  title: Text('删除话题评论',
+                      style: TextStyle(
+                          fontFamily: 'normal', fontWeight: FontWeight.w200)),
+                ),
+              );
+            });
+      }
+    }
+  }
+
   Future commentHandle(UserProvider user) async {
-    String msg = "asf";
+    String msg = "";
     if (user.isLogIn) {
       String content = _commentController.text;
+      _commentController.clear();
       var data = await apiClient.addTopicComment(
           topicId: widget.topicId,
           content: content,
-          referComment: widget.topicCommentId);
-      _commentController.clear();
+          referComment: currentComment);
+      hintText = defaultHint;
+      currentComment = widget.topicCommentId;
+      // _commentController.clear();
       _commentFocusNode.unfocus();
+
       msg = (data['status']) ? "评论成功" : "评论失败";
     } else {
       //TODO 未登录
@@ -257,14 +331,29 @@ class _CommentPageState extends State<CommentPage> {
     });
   }
 
-  Future getReplies({int pageCount}) async {
+  Future getReplies() async {
     var data = await apiClient.getTopicComments(
         topicId: widget.topicId, page: 1, rootId: widget.topicCommentId);
     TopicCommentsModel topicComment = TopicCommentsModel.fromJson(data);
-    // print("reply ==== $topicComment");
+    // print("reply ==== ${jsonEncode(data)}");
     if (!mounted) return;
     setState(() {
       this.comment = topicComment;
+      this.pageCount = 2;
     });
+  }
+
+  Future getMore(int pageCount) async {
+    var data = await apiClient.getTopicComments(
+        topicId: widget.topicId,
+        page: pageCount,
+        rootId: widget.topicCommentId);
+    TopicCommentsModel topicComment = TopicCommentsModel.fromJson(data);
+
+    setState(() {
+      this.comment.data.addAll(topicComment.data);
+      this.pageCount++;
+    });
+    return topicComment.data;
   }
 }

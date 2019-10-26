@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -20,6 +21,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
 
   ///标签
   List<String> tags = [];
+  List<Asset> images = [];
 
   bool onlyInSchool = false;
 
@@ -213,7 +215,35 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
      * 进行上传图片并显示操作
      */
     Future getImage() async {
-      var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      var image;
+      // var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      String error = 'No Error Dectected';
+      List<Asset> resultList = List<Asset>();
+      try {
+        resultList = await MultiImagePicker.pickImages(
+          maxImages: 1,
+          enableCamera: true,
+          selectedAssets: images,
+          cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+          materialOptions: MaterialOptions(
+            selectionLimitReachedText: '请选择一张图片',
+            textOnNothingSelected: '请至少选择一张图片',
+            actionBarColor: "#000000",
+            statusBarColor: '#999999',
+            actionBarTitle: "相册",
+            allViewTitle: "全部图片",
+            useDetailsView: true,
+            selectCircleStrokeColor: "#000000",
+          ),
+        );
+      } on Exception catch (e) {
+        error = e.toString();
+      }
+      if (resultList.length != 0) {
+        var t = await resultList[0].filePath;
+        image = File(t);
+      }
+
       var cropImage = await ImageCropper.cropImage(
           sourcePath: image.path,
           aspectRatio: CropAspectRatio(ratioX: 16, ratioY: 10),

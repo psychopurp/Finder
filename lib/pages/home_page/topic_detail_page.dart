@@ -30,19 +30,29 @@ class TopicDetailPage extends StatefulWidget {
 class _TopicDetailPageState extends State<TopicDetailPage> {
   ScrollController _controller;
   double titileOpacity = 0;
+  double bottomTitleOpacity = 0;
 
   @override
   void initState() {
     _controller = ScrollController()
       ..addListener(() {
-        // print(_controller.offset);
-        if (_controller.offset < 195 && _controller.offset > 108) {
+        print(_controller.offset);
+        if (_controller.offset < 160 && _controller.offset > 108) {
           setState(() {
             titileOpacity = (_controller.offset / 100) % 1;
+            bottomTitleOpacity = ((_controller.offset / 100) > 1)
+                ? 1
+                : (_controller.offset / 100);
+            // print(1 - titileOpacity);
+          });
+        } else if (_controller.offset > 160) {
+          setState(() {
+            titileOpacity = 1;
           });
         } else if (_controller.offset < 80) {
           setState(() {
             titileOpacity = 0;
+            bottomTitleOpacity = 0;
           });
         }
         // print(titileOpacity);
@@ -81,6 +91,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         children: <Widget>[
           NestedScrollView(
             controller: _controller,
+            physics: ScrollPhysics(),
             headerSliverBuilder: _sliverBuilder,
             body: TopicComments(
               topicId: widget.topicId,
@@ -129,7 +140,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             ),
             centerTitle: true,
             title: Container(
-              padding: EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 18),
+              padding: EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 50),
               // alignment: Alignment.center,
               // color: Colors.amber,
               child: Text(
@@ -137,7 +148,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                 softWrap: true,
                 maxLines: 2,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(1 - titileOpacity),
+                  color: Colors.white.withOpacity(1 - bottomTitleOpacity),
                   fontSize: ScreenUtil().setSp(22),
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -481,6 +492,31 @@ class _TopicCommentsState extends State<TopicComments> {
         });
   }
 
+  handleDelete(UserProvider user, TopicCommentsModelData item) async {
+    if (user.isLogIn) {
+      if (user.userInfo.id == item.sender.id) {
+        showDialog(
+            context: context,
+            builder: (_) {
+              return GestureDetector(
+                onTap: () async {
+                  FinderDialog.showLoading();
+                  var data =
+                      await apiClient.deleteTopicComment(commentId: item.id);
+                  getInitialData();
+                  Navigator.pop(context);
+                },
+                child: CupertinoAlertDialog(
+                  title: Text('删除话题评论',
+                      style: TextStyle(
+                          fontFamily: 'normal', fontWeight: FontWeight.w200)),
+                ),
+              );
+            });
+      }
+    }
+  }
+
   Widget _singleItem(TopicCommentsModelData item, UserProvider user) {
     String likeCount = item.likes.toString();
     String replyCount = item.replyCount.toString();
@@ -495,132 +531,138 @@ class _TopicCommentsState extends State<TopicComments> {
       replyCount = "999+";
     }
 
-    return Container(
-      padding: EdgeInsets.only(
-          left: ScreenUtil().setWidth(35),
-          right: ScreenUtil().setWidth(35),
-          top: ScreenUtil().setWidth(20)),
-      // color: Colors.amber,
-      margin: EdgeInsets.only(bottom: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ///头部
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  InkWell(
-                    onTap: () {
-                      Application.router.navigateTo(context,
-                          "${Routes.userProfile}?senderId=${item.sender.id}");
-                    },
-                    child: Avatar(
-                      url: item.sender.avatar,
-                      avatarHeight: ScreenUtil().setHeight(90),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
-                    child: Text(
-                      item.sender.nickname,
-                      style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w200,
-                          fontSize: ScreenUtil().setSp(35)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          contentPart(item.content),
-          Divider(
-            color: Colors.black12,
-            thickness: 0.4,
-            height: 0.1,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              ///收藏
-              AnimatedSwitcher(
-                transitionBuilder: (child, anim) {
-                  return ScaleTransition(child: child, scale: anim);
-                },
-                duration: Duration(milliseconds: 500),
-                child: MaterialButton(
-                  key: ValueKey<bool>(item.isCollected),
-                  onPressed: () => buttonItem['collect']['handle'](user, item),
-                  shape: RoundedRectangleBorder(),
-                  child: buttonItem['collect'][item.isCollected],
-                  // color: Colors.amber,
-                  splashColor: Colors.white,
-                  minWidth: ScreenUtil().setWidth(226),
-                  height: 30,
-                ),
-              ),
-
-              ///评论
-              MaterialButton(
-                onPressed: () {
-                  // onComment(item, user);
-                  String topicId = widget.topicId.toString();
-                  Application.router.navigateTo(context,
-                      "${Routes.commentPage}?topicCommentId=${item.id}&topicId=$topicId");
-                },
-                shape: RoundedRectangleBorder(),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+    return InkWell(
+      onLongPress: () {
+        handleDelete(user, item);
+      },
+      child: Container(
+        padding: EdgeInsets.only(
+            left: ScreenUtil().setWidth(35),
+            right: ScreenUtil().setWidth(35),
+            top: ScreenUtil().setWidth(20)),
+        // color: Colors.amber,
+        margin: EdgeInsets.only(bottom: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ///头部
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Row(
                   children: <Widget>[
-                    buttonItem['comment']['icon'],
+                    InkWell(
+                      onTap: () {
+                        Application.router.navigateTo(context,
+                            "${Routes.userProfile}?senderId=${item.sender.id}");
+                      },
+                      child: Avatar(
+                        url: item.sender.avatar,
+                        avatarHeight: ScreenUtil().setHeight(90),
+                      ),
+                    ),
                     Padding(
-                      padding: EdgeInsets.only(left: 5),
-                      child: Text(replyCount),
-                    )
+                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
+                      child: Text(
+                        item.sender.nickname,
+                        style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w200,
+                            fontSize: ScreenUtil().setSp(35)),
+                      ),
+                    ),
                   ],
                 ),
-                // color: Colors.amber,
-                splashColor: Colors.white,
-                minWidth: ScreenUtil().setWidth(226),
-                height: 30,
-              ),
+              ],
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            contentPart(item.content),
+            Divider(
+              color: Colors.black12,
+              thickness: 0.4,
+              height: 0.1,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                ///收藏
+                AnimatedSwitcher(
+                  transitionBuilder: (child, anim) {
+                    return ScaleTransition(child: child, scale: anim);
+                  },
+                  duration: Duration(milliseconds: 500),
+                  child: MaterialButton(
+                    key: ValueKey<bool>(item.isCollected),
+                    onPressed: () =>
+                        buttonItem['collect']['handle'](user, item),
+                    shape: RoundedRectangleBorder(),
+                    child: buttonItem['collect'][item.isCollected],
+                    // color: Colors.amber,
+                    splashColor: Colors.white,
+                    minWidth: ScreenUtil().setWidth(226),
+                    height: 30,
+                  ),
+                ),
 
-              ///点赞
-              AnimatedSwitcher(
-                transitionBuilder: (child, anim) {
-                  return ScaleTransition(child: child, scale: anim);
-                },
-                duration: Duration(milliseconds: 500),
-                child: MaterialButton(
-                  key: ValueKey<bool>(item.isLike),
-                  onPressed: () => buttonItem['like']['handle'](user, item),
+                ///评论
+                MaterialButton(
+                  onPressed: () {
+                    // onComment(item, user);
+                    String topicId = widget.topicId.toString();
+                    Application.router.navigateTo(context,
+                        "${Routes.commentPage}?topicCommentId=${item.id}&topicId=$topicId");
+                  },
                   shape: RoundedRectangleBorder(),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      buttonItem['like'][item.isLike],
+                      buttonItem['comment']['icon'],
                       Padding(
                         padding: EdgeInsets.only(left: 5),
-                        child: Text(likeCount),
+                        child: Text(replyCount),
                       )
                     ],
                   ),
-                  minWidth: ScreenUtil().setWidth(226),
                   // color: Colors.amber,
                   splashColor: Colors.white,
+                  minWidth: ScreenUtil().setWidth(226),
                   height: 30,
                 ),
-              )
-            ],
-          ),
-        ],
+
+                ///点赞
+                AnimatedSwitcher(
+                  transitionBuilder: (child, anim) {
+                    return ScaleTransition(child: child, scale: anim);
+                  },
+                  duration: Duration(milliseconds: 500),
+                  child: MaterialButton(
+                    key: ValueKey<bool>(item.isLike),
+                    onPressed: () => buttonItem['like']['handle'](user, item),
+                    shape: RoundedRectangleBorder(),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        buttonItem['like'][item.isLike],
+                        Padding(
+                          padding: EdgeInsets.only(left: 5),
+                          child: Text(likeCount),
+                        )
+                      ],
+                    ),
+                    minWidth: ScreenUtil().setWidth(226),
+                    // color: Colors.amber,
+                    splashColor: Colors.white,
+                    height: 30,
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

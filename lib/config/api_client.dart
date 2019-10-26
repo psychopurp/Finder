@@ -243,6 +243,27 @@ class ApiClient {
     }
   }
 
+  ///删除话题评论/回复
+  Future deleteTopicComment({int commentId}) async {
+    /**
+     * description: 
+    评论不写refer_comment，回复要写
+     topic: int
+    content: str
+    refer_comment_id: int
+     */
+    var formData = {"comment_id": commentId};
+
+    try {
+      Response response =
+          await dio.post('delete_topic_comment/', data: jsonEncode(formData));
+      // print('发布话题评论成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('删除题评论错误==========>$e');
+    }
+  }
+
   ///点赞话题评论/取消点赞话题评论
   Future likeTopicComment({int topicCommentId}) async {
     var formData = {'topic_comment_id': topicCommentId};

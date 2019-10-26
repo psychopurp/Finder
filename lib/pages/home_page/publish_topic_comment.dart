@@ -32,10 +32,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   @override
   void initState() {
     _contentFocusNode = FocusNode();
-    _contentController = TextEditingController()
-      ..addListener(() {
-        print(_contentController.text);
-      });
+    _contentController = TextEditingController();
     super.initState();
   }
 

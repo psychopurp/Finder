@@ -2,6 +2,7 @@ import 'package:finder/config/api_client.dart';
 import 'package:finder/public.dart';
 
 class UserModel {
+  int id;
   String nickname;
   String phone;
   String avatar;
@@ -12,6 +13,7 @@ class UserModel {
 
   UserModel(
       {this.avatar,
+      this.id,
       this.birthday,
       this.introduction,
       this.major,
@@ -19,6 +21,7 @@ class UserModel {
       this.phone,
       this.school});
   UserModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     nickname = json['nickname'];
     phone = json['phone'];
     avatar = Avatar.getImageUrl(json['avatar']);
@@ -37,6 +40,7 @@ class UserModel {
     json['introduction'] = this.introduction;
     json["birthday"] = this.birthday;
     json['major'] = this.major;
+    json['id'] = this.id;
     if (this.school != null) {
       json['school'] = this.school.toJson();
     }
