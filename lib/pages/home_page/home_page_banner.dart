@@ -13,7 +13,7 @@ class HomePageBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 0),
-      // padding: EdgeInsets.symmetric(vertical: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
       height: bannerHeight,
       width: ScreenUtil().setWidth(750),
       // color: Colors.amber,

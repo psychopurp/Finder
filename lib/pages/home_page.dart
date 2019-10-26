@@ -1,6 +1,7 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:finder/models/topic_model.dart';
 import 'package:finder/models/activity_model.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -22,32 +24,32 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     print('homepage setstate');
-    // _getHomePageData().then((val) {
-    //   setState(() {
-    //     this.formData = val;
-    //   });
-    // });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // final user = Provider.of<UserProvider>(context);
+    final user = Provider.of<UserProvider>(context);
     return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(IconData(0xe66d, fontFamily: 'myIcon')),
+          leading: MaterialButton(
+            padding: EdgeInsets.all(0),
+            // color: Colors.yellow,
+            shape: CircleBorder(),
+            child: Avatar(
+              url: user.userInfo.avatar,
+              avatarHeight: 40,
+            ),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
           title: Text(
             'Finders',
             style: TextStyle(
-                color: Colors.black.withOpacity(0.8),
+                color: Theme.of(context).primaryColor.withRed(200),
                 fontFamily: 'Yellowtail',
                 fontWeight: FontWeight.w400,
                 fontSize: ScreenUtil().setSp(70)),
           ),
-          elevation: 1,
           centerTitle: true,
         ),
 

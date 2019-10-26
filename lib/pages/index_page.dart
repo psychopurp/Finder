@@ -47,7 +47,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return Scaffold(
-      primary: false,
+      // primary: false,
       drawer: ProfileDrawer(),
 //      body: AnimatedSwitcher(
 //        duration: Duration(seconds: 1),

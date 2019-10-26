@@ -204,8 +204,8 @@ class _MinePageState extends State<MinePage> {
             tag: 'profile',
             child: Container(
               // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-              height: ScreenUtil().setHeight(200),
-              width: ScreenUtil().setWidth(200),
+              height: 100,
+              width: 100,
               decoration: BoxDecoration(
                   // shape: CircleBorder(),
                   border: Border.all(color: Colors.white, width: 3),

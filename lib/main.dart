@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/login_page.dart';
 import 'package:finder/public.dart';
@@ -14,9 +16,18 @@ import 'routers/routes.dart';
 import 'package:finder/provider/user_provider.dart';
 
 void main() {
-  global.init().then((isLogin) => runApp(MyApp(
-        isLogin: isLogin,
-      )));
+  global.init().then((isLogin) {
+    runApp(MyApp(
+      isLogin: isLogin,
+    ));
+    if (Platform.isAndroid) {
+      SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+      );
+      SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+      // print("systemUiOverlayStyle");
+    }
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -48,7 +59,7 @@ class MyApp extends StatelessWidget {
             ],
             navigatorObservers: [BotToastNavigatorObserver()],
             onGenerateRoute: Application.router.generator,
-            theme: _buildAppTheme(),
+            theme: _buildAppTheme(), //设置App主题
             title: 'Finder',
             debugShowCheckedModeBanner: false,
             home: isLogin ? IndexPage() : LoginPage(),
@@ -61,21 +72,6 @@ class MyApp extends StatelessWidget {
 final ThemeData appTheme = _buildAppTheme();
 
 ThemeData _buildAppTheme() {
-  const MaterialColor white = const MaterialColor(
-    0xFFFFFFFF,
-    const <int, Color>{
-      50: const Color(0xFFFFFFFF),
-      100: const Color(0xFFFFFFFF),
-      200: const Color(0xFFFFFFFF),
-      300: const Color(0xFFFFFFFF),
-      400: const Color(0xFFFFFFFF),
-      500: const Color(0xFFFFFFFF),
-      600: const Color(0xFFFFFFFF),
-      700: const Color(0xFFFFFFFF),
-      800: const Color(0xFFFFFFFF),
-      900: const Color(0xFFFFFFFF),
-    },
-  );
   ThemeData base = ThemeData(
     //指定平台，应用特定平台控件风格
     // platform: TargetPlatform.android,
@@ -91,7 +87,10 @@ ThemeData _buildAppTheme() {
       // scaffoldBackgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
       accentIconTheme: base.accentIconTheme.copyWith(color: Colors.white),
       dividerColor: Color.fromARGB(255, 245, 241, 241),
-      // appBarTheme: base.appBarTheme.copyWith(color: Colors.white),
+      appBarTheme: base.appBarTheme.copyWith(
+          color: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          elevation: 1),
 
       // Icon的默认样式
       iconTheme:

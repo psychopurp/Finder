@@ -43,7 +43,6 @@ class _RecruitPageState extends State<RecruitPage> {
             '招募 · 寻你',
             style: TextStyle(color: Colors.black),
           ),
-          elevation: 0,
           centerTitle: true,
           actions: <Widget>[
             Padding(
