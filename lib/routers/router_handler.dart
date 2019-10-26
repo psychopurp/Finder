@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
+import 'package:finder/pages/home_page/comment_page.dart';
 import 'package:finder/pages/message_page/chat_page.dart';
 import 'package:finder/pages/home_page/publish_topic_comment.dart';
 import 'package:finder/pages/message_page/say_to_he_chat_page.dart';
@@ -9,6 +10,7 @@ import 'package:finder/pages/message_page/say_to_he_list_page.dart';
 import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/mine_page.dart';
+import 'package:finder/pages/mine_page/collection_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/pages/serve_page/internship_page/company_page.dart';
@@ -95,6 +97,17 @@ var publishTopicCommentHandler = Handler(
   );
 });
 
+var commentPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  String topicCommentId = params['topicCommentId']?.first;
+  String topicId = params['topicId']?.first;
+
+  return CommentPage(
+    topicCommentId: int.parse(topicCommentId),
+    topicId: int.parse(topicId),
+  );
+});
+
 //首页 -- 发布活动
 var publishActivityHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -158,11 +171,9 @@ var internshipCompanyHandler = Handler(
 //用户详情页
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  String senderData = params['senderData']?.first;
-  // print("activityData====>$activityData");
-  var sender = Sender.fromJson(jsonDecode(senderData));
+  String senderId = params['senderId']?.first;
   return UserProfilePage(
-    sender: sender,
+    senderId: int.parse(senderId),
   );
 });
 
@@ -190,4 +201,9 @@ var sayToHeHandle = Handler(
 var sayToHeChatHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return SayToHeChatRoute();
+});
+
+var collectionPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return CollectionPage();
 });

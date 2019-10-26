@@ -56,12 +56,6 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  //上传图片 --返回图片地址
-  Future uploadImage(File image) async {
-    String imagePath = await apiClient.uploadImage(image);
-    return imagePath;
-  }
-
   //用户发布话题
   Future addTopic(String title, List<String> tags, String image,
       {int schoolId}) async {
@@ -74,12 +68,6 @@ class UserProvider with ChangeNotifier {
       {int topicId, String content, int referComment}) async {
     var data = await apiClient.addTopicComment(
         topicId: topicId, content: content, referComment: referComment);
-    return data;
-  }
-
-  ///点赞话题评论/取消点赞话题评论
-  Future likeTopicComment({int topicCommentId}) async {
-    var data = await apiClient.likeTopicComment(topicCommentId: topicCommentId);
     return data;
   }
 

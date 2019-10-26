@@ -22,8 +22,8 @@ void main() {
     ));
     if (Platform.isAndroid) {
       SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
-      );
+          // statusBarColor: Colors.white,
+          );
       SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
       // print("systemUiOverlayStyle");
     }
@@ -101,16 +101,20 @@ ThemeData _buildAppTheme() {
       textTheme: _buildTextTheme(base.textTheme),
       primaryTextTheme: _buildTextTheme(base.primaryTextTheme),
       accentTextTheme: _buildTextTheme(base.accentTextTheme),
-      inputDecorationTheme: base.inputDecorationTheme);
+      inputDecorationTheme: InputDecorationTheme(
+          hintStyle: TextStyle(
+              color: Colors.black12, fontSize: 15, fontFamily: 'Poppins')));
 }
 
 //全局字体主题  --apply 应用在copywith里面的属性
 TextTheme _buildTextTheme(TextTheme base) {
   return base
       .copyWith(
-        title: base.title.copyWith(fontSize: 20),
-        body1: base.body1.copyWith(fontSize: 13),
-      )
+          title: base.title.copyWith(fontSize: 20),
+          body1: base.body1.copyWith(fontSize: 14),
+
+          ///回复页内容
+          body2: base.body2.copyWith(fontSize: 12))
       .apply(
         fontFamily: "Poppins",
       );

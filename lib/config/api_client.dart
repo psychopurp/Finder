@@ -155,7 +155,7 @@ class ApiClient {
 
   //获取话题评论
   Future getTopicComments(
-      {int topicId, String query = '', int page = 0, int rootId}) async {
+      {int topicId, String query = '', int page = 1, int rootId}) async {
     /**
     topic_id: int
     query: str
@@ -179,13 +179,16 @@ class ApiClient {
   }
 
   //获取活动
-  Future getActivities({String query = "", int page = 1}) async {
+  Future getActivities(
+      {String query = "", int page = 1, int activityId}) async {
     var formData = {'query': query, 'page': page};
+    if (activityId != null) formData = {'activity_id': activityId};
     try {
       Response response = await dio.get(
         'get_activities/',
         queryParameters: formData,
       );
+      // print(dio.options.headers['token']);
       print('获得活动成功....');
       return response.data;
     } catch (e) {
@@ -250,6 +253,19 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('点赞话题评论错误==========>$e');
+    }
+  }
+
+  ///获取他人个人页信息
+  Future getOtherProfile({int userId}) async {
+    var formData = {'user_id': userId};
+    try {
+      Response response =
+          await dio.get('get_other_profile/', queryParameters: formData);
+      // print('点赞话题评论成功....${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取他人个人页信息错误==========>$e');
     }
   }
 
@@ -388,7 +404,7 @@ class ApiClient {
     try {
       Response response =
           await dio.get('get_collections/', queryParameters: formData);
-      print('用户收藏列表==========>${response.data}');
+      // print('用户收藏列表==========>${response.data}');
       return response.data;
     } catch (e) {
       print('获取用户收藏列表错误==========>$e');

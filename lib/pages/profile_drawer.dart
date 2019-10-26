@@ -8,6 +8,21 @@ import 'package:provider/provider.dart';
 import 'package:extended_image/extended_image.dart';
 
 class ProfileDrawer extends StatelessWidget {
+  final listOption = {
+    'settings': {
+      'icon': Icon(
+        Icons.settings,
+        color: Colors.black54,
+      ),
+    },
+    'collection': {
+      'icon': Icon(
+        IconData(0xe6e0, fontFamily: 'myIcon'),
+        color: Colors.black54,
+      ),
+    },
+  };
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -17,9 +32,19 @@ class ProfileDrawer extends StatelessWidget {
         children: <Widget>[
           topAvatar(user.userInfo, context),
           ListTile(
-            leading: Icon(Icons.settings),
+            leading: listOption['collection']['icon'],
+            title: Text('收藏'),
+            onTap: () {
+              Application.router.navigateTo(context, Routes.collectionPage);
+            },
+          ),
+          ListTile(
+            leading: listOption['settings']['icon'],
             title: Text('设置'),
-          )
+            onTap: () {
+              Application.router.navigateTo(context, Routes.settings);
+            },
+          ),
         ],
       );
     }));

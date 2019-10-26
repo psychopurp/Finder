@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,11 @@ class PublishTopicCommentPage extends StatefulWidget {
 class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   TextEditingController _contentController;
   FocusNode _contentFocusNode;
+
   List<Widget> wrapList = [];
   List<Asset> images = [];
   List<File> imageFiles = [];
+  int currentIndex;
   String error = "";
   static const double imageWidth = 220;
 
@@ -46,7 +49,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
-    print('painte');
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -141,46 +144,68 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
                     child: Wrap(
                         spacing: 10,
                         runSpacing: 5,
-                        children: this.imageFiles.map((image) {
+                        children: this.imageFiles.asMap().keys.map((index) {
                           return Container(
                             child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    fullscreenDialog: false,
-                                    builder: (_) {
-                                      return Container(
-                                        constraints: BoxConstraints.expand(
-                                          height: MediaQuery.of(context)
-                                              .size
-                                              .height,
-                                        ),
-                                        child: PhotoView(
-                                          imageProvider: FileImage(image),
-                                          minScale: 0.2,
-                                          maxScale: 0.5,
-                                          heroAttributes:
-                                              const PhotoViewHeroAttributes(
-                                                  tag: "someTag"),
+                                onTap: () {
+                                  Future<void> loadAssets() async {
+                                    String error = 'No Error Dectected';
+                                    List<Asset> resultList;
+                                    try {
+                                      resultList =
+                                          await MultiImagePicker.pickImages(
+                                        maxImages: 9,
+                                        enableCamera: false,
+                                        selectedAssets: images,
+                                        cupertinoOptions: CupertinoOptions(
+                                            takePhotoIcon: "chat"),
+                                        materialOptions: MaterialOptions(
+                                          selectionLimitReachedText: '请选择一张图片',
+                                          textOnNothingSelected: '请至少选择一张图片',
+                                          actionBarColor: "#000000",
+                                          statusBarColor: '#999999',
+                                          actionBarTitle: "相册",
+                                          allViewTitle: "全部图片",
+                                          useDetailsView: true,
+                                          startInAllView: true,
+                                          lightStatusBar: true,
+                                          selectCircleStrokeColor: "#000000",
                                         ),
                                       );
-                                    }));
-                              },
-                              child: Container(
-                                width: ScreenUtil().setWidth(imageWidth),
-                                height: ScreenUtil().setHeight(imageWidth),
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: FileImage(image),
-                                        fit: BoxFit.cover)),
-                                // AssetThumb(
-                                //   quality: 100,
-                                //   asset: image,
-                                //   width: ScreenUtil().setWidth(imageWidth).toInt(),
-                                //   height:
-                                //       ScreenUtil().setHeight(imageWidth).toInt(),
-                                // ),
-                              ),
-                            ),
+                                    } on Exception catch (e) {
+                                      error = e.toString();
+                                    }
+                                    if (!mounted) return;
+                                    // if (images.length != resultList.length)
+                                    //   return;
+
+                                    print(images);
+                                    print(resultList);
+                                    List<File> files = [];
+
+                                    for (var r in resultList) {
+                                      var t = await r.filePath;
+                                      files.add(File(t));
+                                    }
+
+                                    setState(() {
+                                      this.imageFiles = files;
+                                      images = resultList;
+                                      error = error;
+                                    });
+                                  }
+
+                                  loadAssets();
+                                },
+                                child: Container(
+                                  height: ScreenUtil().setWidth(imageWidth),
+                                  width: ScreenUtil().setWidth(imageWidth),
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          image:
+                                              FileImage(this.imageFiles[index]),
+                                          fit: BoxFit.cover)),
+                                )),
                           );
                         }).toList()
                           ..add(addImage()))),
@@ -188,12 +213,12 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
             ),
 
             ///菜单栏
-            Container(
-              height: ScreenUtil().setHeight(100),
-              width: ScreenUtil().setWidth(750),
-              color: Colors.amber,
-              child: Text('toolbar'),
-            )
+            //   Container(
+            //     height: ScreenUtil().setHeight(100),
+            //     width: ScreenUtil().setWidth(750),
+            //     color: Colors.amber,
+            //     child: Text('toolbar'),
+            //   )
           ],
         ),
       ),
@@ -203,11 +228,11 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   Widget addImage() {
     ///从相册选择图片
     Future<void> loadAssets() async {
-      List<Asset> resultList = List<Asset>();
       String error = 'No Error Dectected';
+      List<Asset> resultList = List<Asset>();
       try {
         resultList = await MultiImagePicker.pickImages(
-          maxImages: 30,
+          maxImages: 9,
           enableCamera: true,
           selectedAssets: images,
           cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
@@ -226,8 +251,8 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
         error = e.toString();
       }
       if (!mounted) return;
-
-      List<File> files = this.imageFiles;
+      print(images);
+      List<File> files = [];
       for (var r in resultList) {
         var t = await r.filePath;
         files.add(File(t));
@@ -246,7 +271,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
           loadAssets();
         },
         minWidth: ScreenUtil().setWidth(imageWidth),
-        height: ScreenUtil().setHeight(imageWidth),
+        height: ScreenUtil().setWidth(imageWidth),
         shape: RoundedRectangleBorder(side: BorderSide(color: Colors.white)),
         elevation: 0,
         highlightElevation: 0,
@@ -270,7 +295,8 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
     List<String> imageString = [];
     for (var image in this.images) {
       String path = await image.filePath;
-      String imagePath = ApiClient.host + await user.uploadImage(File(path));
+      String imagePath =
+          Avatar.getImageUrl(await apiClient.uploadImage(File(path)));
       imageString.add(imagePath);
     }
 

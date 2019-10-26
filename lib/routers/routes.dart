@@ -1,3 +1,4 @@
+import 'package:finder/pages/settings_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'router_handler.dart';
@@ -6,10 +7,12 @@ class Routes {
   static String root = "/"; //首页
   static String serve = "/serve";
   static String login = '/login';
+  static String settings = '/settings'; //设置
 
   //首页
   static String publishTopic = '/publishTopic'; //首页-- 发布话题
   static String publishTopicComment = '/publishTopicComment'; //首页-- 发布话题
+  static String commentPage = '/commentPage'; //首页-- 话题评论回复
   static String publishActivity = '/publishActivity'; //首页 -- 发布活动
   static String moreTopics = '/home/moreTopics'; //首页 -- 更多话题
   static String moreActivities = '/home/moreActivities'; //首页 -- 更多活动
@@ -31,6 +34,7 @@ class Routes {
   //用户页
   static String userProfile = "/userProfile"; //个人详情页
   static String minePage = "/minePage"; //我的 页
+  static String collectionPage = "/collectionPage"; //用户收藏页
 
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
@@ -47,6 +51,9 @@ class Routes {
       );
     });
     router.define(root, handler: rootHandler);
+    router.define(settings, handler: Handler(handlerFunc: (_, __) {
+      return SettingsPage();
+    }));
 
     //首页
     router.define(publishTopic,
@@ -66,6 +73,8 @@ class Routes {
         handler: topicDetailsHandler, transitionType: TransitionType.fadeIn);
     router.define(activityDetail,
         handler: acitvityDetailsHandler, transitionType: TransitionType.fadeIn);
+    router.define(commentPage,
+        handler: commentPageHandler, transitionType: TransitionType.cupertino);
 
     //服务页 --导航
     router.define(lostFound,
@@ -98,5 +107,8 @@ class Routes {
         handler: sayToHeHandle, transitionType: TransitionType.cupertino);
     router.define(sayToHeChat,
         handler: sayToHeChatHandle, transitionType: TransitionType.cupertino);
+    router.define(collectionPage,
+        handler: collectionPageHandler,
+        transitionType: TransitionType.cupertino);
   }
 }

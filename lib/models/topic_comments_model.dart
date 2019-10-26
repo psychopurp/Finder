@@ -37,11 +37,13 @@ class TopicCommentsModelData {
   int id;
   Sender sender;
   String content;
-  Null replyTo;
+  ReplyTo replyTo;
   RootComment rootComment;
   int likes;
+  int replyCount;
+  DateTime time;
   bool isLike;
-  bool isCollect;
+  bool isCollected;
   bool hasReply;
 
   TopicCommentsModelData(
@@ -52,23 +54,28 @@ class TopicCommentsModelData {
       this.rootComment,
       this.likes,
       this.isLike,
-      this.isCollect,
+      this.time,
+      this.replyCount,
+      this.isCollected,
       this.hasReply});
 
   TopicCommentsModelData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     sender =
         json['sender'] != null ? new Sender.fromJson(json['sender']) : null;
-
     content = json['content'];
-    replyTo = json['reply_to'];
+    replyTo = json['reply_to'] != null
+        ? new ReplyTo.fromJson(json['reply_to'])
+        : null;
+    time = DateTime.fromMillisecondsSinceEpoch((json['time'] * 1000).toInt());
 
     // rootComment = json['root_comment'] != "None"
     //     ? new RootComment.fromJson(json['root_comment'])
     //     : null;
+    replyCount = json['reply_count'];
     likes = json['likes'];
     isLike = json['is_like'];
-    isCollect = json['is_collect'];
+    isCollected = json['is_collected'];
 
     hasReply = json['has_reply'];
   }
@@ -80,13 +87,15 @@ class TopicCommentsModelData {
       data['sender'] = this.sender.toJson();
     }
     data['content'] = this.content;
-    data['reply_to'] = this.replyTo;
+    if (this.replyTo != null) {
+      data['reply_to'] = this.replyTo.toJson();
+    }
     if (this.rootComment != null) {
       data['root_comment'] = this.rootComment.toJson();
     }
     data['likes'] = this.likes;
     data['is_like'] = this.isLike;
-    data['is_collect'] = this.isCollect;
+    data['is_collected'] = this.isCollected;
     data['has_reply'] = this.hasReply;
     return data;
   }
@@ -133,7 +142,6 @@ class RootComment {
       this.content});
 
   RootComment.fromJson(Map<String, dynamic> json) {
-    print(json);
     id = json['id'];
     topicId = json['topic_id'];
     rootCommentId = json['root_comment_id'];
@@ -152,6 +160,28 @@ class RootComment {
     data['time'] = this.time;
     data['sender_id'] = this.senderId;
     data['content'] = this.content;
+    return data;
+  }
+}
+
+class ReplyTo {
+  int id;
+  Sender sender;
+
+  ReplyTo({this.id, this.sender});
+
+  ReplyTo.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    sender =
+        json['sender'] != null ? new Sender.fromJson(json['sender']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    if (this.sender != null) {
+      data['sender'] = this.sender.toJson();
+    }
     return data;
   }
 }

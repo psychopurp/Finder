@@ -273,7 +273,7 @@ class _TopicsState extends State<Topics>
                   ),
                 ),
                 Positioned(
-                    bottom: ScreenUtil().setHeight(35),
+                    bottom: topicHeight / 4.5,
                     child: Container(
                       padding: EdgeInsets.all(4),
                       decoration: BoxDecoration(

@@ -10,84 +10,91 @@ import 'package:finder/plugin/my_appbar.dart';
 
 ///用户信息详情页
 class UserProfilePage extends StatefulWidget {
-  final Sender sender;
-  UserProfilePage({this.sender});
+  final int senderId;
+  UserProfilePage({this.senderId});
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
+  UserModel user;
+
+  @override
+  void initState() {
+    getProfile();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // apiClient.getFollowUsers();
-    // apiClient.getCollections(page: 1);
-    // apiClient.getFanUsers();
-    print(widget.sender.avatar);
+    getProfile();
     return Scaffold(
-        body: SafeArea(
-            top: false,
-            child: Container(
-              color: Colors.amber,
-              child: MyAppBar(
-                appbar: AppBar(
-                  title: Text(widget.sender.nickname),
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                ),
-                child: ListView(
-                  padding: EdgeInsets.all(0),
-                  children: <Widget>[
-                    // buildUserBackground(this.widget.sender, context),
-                    Align(
-                      child: Container(
-                        child: Avatar(
-                          url: widget.sender.avatar,
-                          avatarHeight: 200,
+        body: (this.user != null)
+            ? SafeArea(
+                top: false,
+                child: Container(
+                  color: Colors.amber,
+                  child: MyAppBar(
+                    appbar: AppBar(
+                      // title: Text(widget.sender.nickname),
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                    child: ListView(
+                      padding: EdgeInsets.all(0),
+                      children: <Widget>[
+                        // buildUserBackground(this.widget.sender, context),
+                        Align(
+                          child: Container(
+                            child: Avatar(
+                              url: user.avatar,
+                              avatarHeight: 200,
+                            ),
+                          ),
                         ),
-                      ),
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              _singleButtonItem(
+                                  Icon(
+                                    IconData(0xe6e0, fontFamily: 'myIcon'),
+                                    color: Colors.black,
+                                  ),
+                                  '收藏',
+                                  '收藏'),
+                              // VerticalDivider(),
+                              _singleButtonItem(
+                                  Icon(
+                                    IconData(0xe879, fontFamily: 'myIcon'),
+                                    color: Colors.black,
+                                  ),
+                                  '小F',
+                                  '收藏'),
+                              _singleButtonItem(
+                                  Icon(
+                                    IconData(0xe654, fontFamily: 'myIcon'),
+                                    color: Colors.black,
+                                  ),
+                                  '设置',
+                                  '评论'),
+                              _singleButtonItem(
+                                  Icon(
+                                    IconData(0xe879, fontFamily: 'myIcon'),
+                                    color: Colors.black,
+                                  ),
+                                  '消息',
+                                  '点赞'),
+                            ],
+                          ),
+                        ),
+                        // buildUserBackground(user.userInfo, context),
+                        // buildUserBackground(user.userInfo, context),
+                      ],
                     ),
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          _singleButtonItem(
-                              Icon(
-                                IconData(0xe6e0, fontFamily: 'myIcon'),
-                                color: Colors.black,
-                              ),
-                              '收藏',
-                              '收藏'),
-                          // VerticalDivider(),
-                          _singleButtonItem(
-                              Icon(
-                                IconData(0xe879, fontFamily: 'myIcon'),
-                                color: Colors.black,
-                              ),
-                              '小F',
-                              '收藏'),
-                          _singleButtonItem(
-                              Icon(
-                                IconData(0xe654, fontFamily: 'myIcon'),
-                                color: Colors.black,
-                              ),
-                              '设置',
-                              '评论'),
-                          _singleButtonItem(
-                              Icon(
-                                IconData(0xe879, fontFamily: 'myIcon'),
-                                color: Colors.black,
-                              ),
-                              '消息',
-                              '点赞'),
-                        ],
-                      ),
-                    ),
-                    // buildUserBackground(user.userInfo, context),
-                    // buildUserBackground(user.userInfo, context),
-                  ],
-                ),
-              ),
-            )));
+                  ),
+                ))
+            : FinderDialog.showLoading());
   }
 
   _singleButtonItem(Icon icon, String count, item) {
@@ -214,20 +221,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
-}
 
-class BackGroundClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    print(size);
-    var path = Path();
-    path.lineTo(0.0, size.height);
-    path.lineTo(size.width, 3 * size.height / 4);
-    path.lineTo(size.width, 0.0);
-    path.close();
-    return path;
+  Future getProfile() async {
+    var data = await apiClient.getOtherProfile(userId: widget.senderId);
+    UserModel user = UserModel.fromJson(data['data']);
+
+    if (!mounted) return;
+    setState(() {
+      this.user = user;
+    });
   }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

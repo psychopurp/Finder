@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/pages/home_page/comment_page.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
@@ -344,23 +345,25 @@ class _TopicCommentsState extends State<TopicComments> {
   likeHandle(UserProvider user, TopicCommentsModelData item) async {
     if (user.isLogIn) {
       var data;
-      if (user.like['topicComment'].contains(item.id)) {
+      if (item.isLike == true) {
         data = await apiClient.likeTopicComment(topicCommentId: item.id);
-        user.like['topicComment'].remove(item.id);
+        item.isLike = false;
+        item.likes--;
       } else {
         data = await apiClient.likeTopicComment(topicCommentId: item.id);
-        user.like['topicComment'].add(item.id);
+        item.likes++;
+        item.isLike = true;
       }
-      Future.delayed(Duration(milliseconds: 500), () {
-        Scaffold.of(context).showSnackBar(new SnackBar(
-          duration: Duration(milliseconds: 200),
-          content: new Text("${data}"),
-          action: new SnackBarAction(
-            label: "取消",
-            onPressed: () {},
-          ),
-        ));
-      });
+      // Future.delayed(Duration(milliseconds: 500), () {
+      //   Scaffold.of(context).showSnackBar(new SnackBar(
+      //     duration: Duration(milliseconds: 200),
+      //     content: new Text("${data}"),
+      //     action: new SnackBarAction(
+      //       label: "取消",
+      //       onPressed: () {},
+      //     ),
+      //   ));
+      // });
 
       setState(() {});
     } else {
@@ -371,12 +374,12 @@ class _TopicCommentsState extends State<TopicComments> {
   collectHandle(UserProvider user, TopicCommentsModelData item) async {
     String showText = "";
     if (user.isLogIn) {
-      if (user.collection['comment'].contains(item.id)) {
+      if (item.isCollected == true) {
         var data = await apiClient.deleteCollection(
             modelId: item.id, type: ApiClient.COMMENT);
         if (data['status'] == true) {
           showText = '取消收藏成功';
-          user.collection['comment'].remove(item.id);
+          item.isCollected = false;
         } else {
           showText = '取消收藏失败';
         }
@@ -385,7 +388,7 @@ class _TopicCommentsState extends State<TopicComments> {
             await apiClient.addCollection(type: ApiClient.COMMENT, id: item.id);
         if (data['status'] == true) {
           showText = '收藏成功';
-          user.collection['comment'].add(item.id);
+          item.isCollected = true;
         } else {
           showText = '收藏失败';
         }
@@ -479,6 +482,19 @@ class _TopicCommentsState extends State<TopicComments> {
   }
 
   Widget _singleItem(TopicCommentsModelData item, UserProvider user) {
+    String likeCount = item.likes.toString();
+    String replyCount = item.replyCount.toString();
+    if (item.likes == 0) {
+      likeCount = "";
+    } else if (item.likes > 999) {
+      likeCount = "999+";
+    }
+    if (item.replyCount == 0) {
+      replyCount = "";
+    } else if (item.replyCount > 999) {
+      replyCount = "999+";
+    }
+
     return Container(
       padding: EdgeInsets.only(
           left: ScreenUtil().setWidth(35),
@@ -499,10 +515,8 @@ class _TopicCommentsState extends State<TopicComments> {
                 children: <Widget>[
                   InkWell(
                     onTap: () {
-                      var senderData = jsonEncode(item.sender.toJson());
-
                       Application.router.navigateTo(context,
-                          "${Routes.userProfile}?senderData=${Uri.encodeComponent(senderData)}");
+                          "${Routes.userProfile}?senderId=${item.sender.id}");
                     },
                     child: Avatar(
                       url: item.sender.avatar,
@@ -542,12 +556,10 @@ class _TopicCommentsState extends State<TopicComments> {
                 },
                 duration: Duration(milliseconds: 500),
                 child: MaterialButton(
-                  key: ValueKey<bool>(
-                      user.collection['comment'].contains(item.id)),
+                  key: ValueKey<bool>(item.isCollected),
                   onPressed: () => buttonItem['collect']['handle'](user, item),
                   shape: RoundedRectangleBorder(),
-                  child: buttonItem['collect']
-                      [user.collection['comment'].contains(item.id)],
+                  child: buttonItem['collect'][item.isCollected],
                   // color: Colors.amber,
                   splashColor: Colors.white,
                   minWidth: ScreenUtil().setWidth(226),
@@ -558,10 +570,22 @@ class _TopicCommentsState extends State<TopicComments> {
               ///评论
               MaterialButton(
                 onPressed: () {
-                  onComment(item, user);
+                  // onComment(item, user);
+                  String topicId = widget.topicId.toString();
+                  Application.router.navigateTo(context,
+                      "${Routes.commentPage}?topicCommentId=${item.id}&topicId=$topicId");
                 },
                 shape: RoundedRectangleBorder(),
-                child: buttonItem['comment']['icon'],
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    buttonItem['comment']['icon'],
+                    Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Text(replyCount),
+                    )
+                  ],
+                ),
                 // color: Colors.amber,
                 splashColor: Colors.white,
                 minWidth: ScreenUtil().setWidth(226),
@@ -575,12 +599,19 @@ class _TopicCommentsState extends State<TopicComments> {
                 },
                 duration: Duration(milliseconds: 500),
                 child: MaterialButton(
-                  key: ValueKey<bool>(
-                      user.like['topicComment'].contains(item.id)),
+                  key: ValueKey<bool>(item.isLike),
                   onPressed: () => buttonItem['like']['handle'](user, item),
                   shape: RoundedRectangleBorder(),
-                  child: buttonItem['like']
-                      [user.like['topicComment'].contains(item.id)],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      buttonItem['like'][item.isLike],
+                      Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(likeCount),
+                      )
+                    ],
+                  ),
                   minWidth: ScreenUtil().setWidth(226),
                   // color: Colors.amber,
                   splashColor: Colors.white,
@@ -680,7 +711,7 @@ class _TopicCommentsState extends State<TopicComments> {
   Future getInitialData() async {
     var data =
         await apiClient.getTopicComments(topicId: widget.topicId, page: 1);
-    print(data);
+    // print(data);
     var topicComments = TopicCommentsModel.fromJson(data);
 
     if (!mounted) return;
