@@ -18,8 +18,6 @@ import 'package:flutter_easyrefresh/material_footer.dart';
 
 /// Topics
 
-/// GlobalTopics
-
 class MoreTopics extends StatefulWidget {
   @override
   _MoreTopicsState createState() => _MoreTopicsState();
@@ -124,18 +122,20 @@ class Topics extends StatefulWidget {
 class _TopicsState extends State<Topics>
     with AutomaticKeepAliveClientMixin<Topics> {
   final bool isSchoolTopics;
+  final double topicHeight = ScreenUtil().setHeight(430);
 
   _TopicsState({this.isSchoolTopics});
   TopicModel topics;
   int pageCount = 2;
   int itemCount = 0;
-  EasyRefreshController _refreshController = EasyRefreshController();
+  EasyRefreshController _refreshController;
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     print('topics正在initstate');
+    _refreshController = EasyRefreshController();
     _getInitialTopicsData(2);
     super.initState();
   }
@@ -217,6 +217,8 @@ class _TopicsState extends State<Topics>
   }
 
   _singleItem(BuildContext context, TopicModelData item, int index) {
+    ///宽高比 1.6/1
+    double topicWidth = topicHeight * 1.6;
     return CachedNetworkImage(
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => InkWell(
@@ -227,12 +229,9 @@ class _TopicsState extends State<Topics>
         child: Align(
           alignment: Alignment.topCenter,
           child: Container(
-            margin: EdgeInsets.only(
-                left: ScreenUtil().setWidth(20),
-                right: ScreenUtil().setWidth(20),
-                top: ScreenUtil().setWidth(20)),
-            height: ScreenUtil().setHeight(300),
-            width: ScreenUtil().setWidth(750),
+            margin: EdgeInsets.only(top: ScreenUtil().setWidth(20)),
+            height: topicHeight,
+            width: topicWidth,
             decoration: BoxDecoration(
               // color: Colors.green,
               borderRadius: BorderRadius.all(Radius.circular(3)),

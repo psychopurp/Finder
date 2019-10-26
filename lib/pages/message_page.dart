@@ -35,7 +35,6 @@ class _MessagePageState extends State<MessagePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("消息"),
-        elevation: 0,
         centerTitle: true,
         actions: <Widget>[
           MaterialButton(

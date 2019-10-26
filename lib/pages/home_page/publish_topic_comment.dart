@@ -3,10 +3,6 @@ import 'dart:io';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as prefix0;
-import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:finder/public.dart';
 import 'package:provider/provider.dart';
@@ -57,45 +53,48 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
         title: Text(widget.topicTitle),
         elevation: 0,
         actions: <Widget>[
-          FlatButton(
-            // color: Colors.yellow,
-            highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
-            onPressed: () async {
-              showDialog(
-                context: context,
-                barrierDismissible: false, //点击遮罩不关闭对话框
-                builder: (context) {
-                  return AlertDialog(
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        CircularProgressIndicator(),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 26.0),
-                          child: Text("正在发布，请稍后..."),
-                        )
-                      ],
-                    ),
-                  );
-                },
-              );
-              bool status = await publishTopicComment(user);
-              // print(status);
-              Navigator.pop(context);
-              if (!status) {
-                // handleError();
-              } else {
-                handleSuccess();
-              }
-            },
-            child: Text(
-              '发布',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: "normal",
-                  fontSize: ScreenUtil().setSp(30)),
-            ),
-          )
+          Builder(builder: (context) {
+            return FlatButton(
+              // color: Colors.yellow,
+              highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, //点击遮罩不关闭对话框
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          CircularProgressIndicator(),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 26.0),
+                            child: Text("正在发布，请稍后..."),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                );
+                bool status = await publishTopicComment(user);
+                // await Future.delayed(Duration(seconds: 3), () {});
+                // print(status);
+                Navigator.pop(context);
+                if (!status) {
+                  // handleError();
+                } else {
+                  handleSuccess();
+                }
+              },
+              child: Text(
+                '发布',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "normal",
+                    fontSize: ScreenUtil().setSp(30)),
+              ),
+            );
+          })
         ],
       ),
       body: Container(
@@ -258,15 +257,13 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
   }
 
   void handleSuccess() {
-    Fluttertoast.showToast(
-        msg: "参与话题成功",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: Theme.of(context).dividerColor.withOpacity(0.5),
-        textColor: Colors.black,
-        fontSize: 14.0);
     Navigator.pop(context);
+    BotToast.showText(
+        text: '参与话题成功',
+        duration: Duration(milliseconds: 2000),
+        align: Alignment(0, 0.3),
+        textStyle:
+            TextStyle(fontFamily: 'normal', color: Colors.white, fontSize: 17));
   }
 
   Future<bool> publishTopicComment(UserProvider user) async {

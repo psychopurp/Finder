@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -112,5 +113,19 @@ class UserProvider with ChangeNotifier {
   Future getFollowUsers({String query = "", int page = 1}) async {
     var data = await apiClient.getFollowUsers(query: query, page: page);
     return data;
+  }
+
+  ///保存数据
+  Future save() async {
+    await Global.save("collection", jsonEncode(collection));
+    print(jsonEncode(collection));
+    await Global.save("like", jsonEncode(like));
+  }
+
+  @override
+  void dispose() {
+    // save();
+    print("dispose provider....");
+    super.dispose();
   }
 }

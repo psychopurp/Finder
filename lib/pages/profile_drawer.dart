@@ -39,10 +39,13 @@ class ProfileDrawer extends StatelessWidget {
               Navigator.pop(context);
               Application.router.navigateTo(context, Routes.minePage);
             },
-            child: Container(
-              child: Avatar(
-                url: user.avatar,
-                avatarHeight: 100,
+            child: Hero(
+              tag: 'profile',
+              child: Container(
+                child: Avatar(
+                  url: user.avatar,
+                  avatarHeight: 100,
+                ),
               ),
             ),
           ),

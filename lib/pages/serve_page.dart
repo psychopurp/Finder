@@ -66,7 +66,6 @@ class _ServePageState extends State<ServePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('服务'),
-        elevation: 0,
         centerTitle: true,
       ),
       // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
@@ -89,7 +88,8 @@ class _ServePageState extends State<ServePage> {
         height: ScreenUtil().setHeight(110),
         child: ListTile(
           onTap: () {
-            Application.router.navigateTo(context, serviceItemList[index]['url']);
+            Application.router
+                .navigateTo(context, serviceItemList[index]['url']);
           },
           title: Text(serviceItemList[index]['name']),
           leading: Icon(

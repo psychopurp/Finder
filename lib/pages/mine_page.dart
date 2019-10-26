@@ -2,6 +2,7 @@ import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/my_appbar.dart';
 import 'package:finder/public.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:finder/provider/user_provider.dart';
@@ -194,18 +195,24 @@ class _MinePageState extends State<MinePage> {
   Widget _userAvatar(UserModel user) {
     return Align(
         alignment: Alignment.topCenter,
-        child: Hero(
-          tag: 'profile',
-          child: Container(
-            // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-            height: ScreenUtil().setHeight(200),
-            width: ScreenUtil().setWidth(200),
-            decoration: BoxDecoration(
-                // shape: CircleBorder(),
-                border: Border.all(color: Colors.white, width: 3),
-                borderRadius: BorderRadius.all(Radius.circular(50)),
-                image: DecorationImage(
-                    image: CachedNetworkImageProvider(user.avatar))),
+        child: InkWell(
+          onTap: () {
+            BotToast.showText(
+                text: 'elyar', duration: Duration(milliseconds: 500));
+          },
+          child: Hero(
+            tag: 'profile',
+            child: Container(
+              // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+              height: 100,
+              width: 100,
+              decoration: BoxDecoration(
+                  // shape: CircleBorder(),
+                  border: Border.all(color: Colors.white, width: 3),
+                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                  image: DecorationImage(
+                      image: CachedNetworkImageProvider(user.avatar))),
+            ),
           ),
         ));
   }
