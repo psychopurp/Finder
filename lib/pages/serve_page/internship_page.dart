@@ -7,6 +7,9 @@ import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 const Color ActionColorActive = Color(0xFFEC7C6D);
@@ -21,12 +24,21 @@ class InternshipPage extends StatefulWidget {
 class _InternshipPageState extends State<InternshipPage> {
   List<InternshipItem> _bannerData = [];
   List<InternshipItem> _data = [];
-  static List<InternshipBigType> _bigTypes = [];
-  static Map<InternshipBigType, List<InternshipSmallType>> _smallTypes = {};
-  static InternshipBigType _nowBigType;
-  static InternshipSmallType _nowSmallType;
+  static InternshipBigType allBig = InternshipBigType(id: 0, name: "全部");
+  static InternshipSmallType allSmall = InternshipSmallType(id: 0, name: "全部");
+  static List<InternshipBigType> _bigTypes = [allBig];
+  static Map<InternshipBigType, List<InternshipSmallType>> _smallTypes = {
+    allBig: [allSmall]
+  };
+  static InternshipBigType _nowBigType = allBig;
+  static InternshipSmallType _nowSmallType = allSmall;
+  EasyRefreshController _loadController;
   int _nowPage = 1;
   bool isShow = true;
+  bool loading = true;
+  bool moreThanMoment = false;
+  bool hasMore = true;
+  String query = "";
 
   @override
   void initState() {
@@ -34,18 +46,25 @@ class _InternshipPageState extends State<InternshipPage> {
     getRecommend();
     getBigTypes();
     getInternships();
+    _loadController = EasyRefreshController();
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        moreThanMoment = true;
+      });
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    _nowBigType = null;
-    _nowSmallType = null;
+    _nowBigType = allBig;
+    _nowSmallType = allSmall;
+    _loadController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if(isShow){
+    if (isShow) {
       Future<void>.delayed(Duration(milliseconds: 200), () {
         SystemChrome.setSystemUIOverlayStyle(
             SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark));
@@ -74,7 +93,26 @@ class _InternshipPageState extends State<InternshipPage> {
   Widget get body {
     Widget child;
     List<Widget> preItems = [];
-    if (_bannerData.length == 0 && _data.length == 0) {
+    if (loading || !moreThanMoment) {
+      child = Center(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            Container(
+              height: 50,
+              width: 50,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+            ),
+            Text("加载中...")
+          ],
+        ),
+      );
+    } else if (_bannerData.length == 0 && _data.length == 0) {
       child = Center(
         child: Text("暂时没有数据"),
       );
@@ -83,15 +121,57 @@ class _InternshipPageState extends State<InternshipPage> {
         preItems.add(banner);
       }
       preItems.add(Filter(onChange: changeType));
+      if (_data.length == 0) {
+        preItems.add(Center(
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            color: Colors.white,
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: Text(
+              "暂时没有这个类别的实习哟~\n换一个类型看看吧！",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ));
+      }
       child = Padding(
         padding: EdgeInsets.only(top: 5),
-        child: listBuilder(preItems, getItem, _data.length),
+        child: EasyRefresh(
+          header: MaterialHeader(),
+          footer: MaterialFooter(),
+          controller: _loadController,
+          enableControlFinishLoad: true,
+          headerIndex: 0,
+          key: ValueKey(child),
+          child: listBuilder(preItems, getItem, _data.length),
+          onRefresh: () async {
+            _nowPage = 1;
+            _bannerData = [];
+            await getRecommend();
+            _data = [];
+            await getInternships();
+          },
+          onLoad: () async {
+            await getInternships();
+            _loadController.finishLoad(success: true, noMore: !hasMore);
+          },
+        ),
       );
     }
-    return RefreshIndicator(
-      child: child,
-      onRefresh: () async {},
-    );
+
+    return AnimatedSwitcher(
+        duration: Duration(milliseconds: 1000),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+              child: child,
+              opacity:
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+        },
+        child: child);
   }
 
   Widget get banner {
@@ -104,7 +184,7 @@ class _InternshipPageState extends State<InternshipPage> {
         itemCount: _bannerData.length,
         autoplay: _bannerData.length > 1,
         onTap: (index) {
-          Navigator.pushNamed(context, Routes.heSaysDetail,
+          Navigator.pushNamed(context, Routes.internshipCompany,
               arguments: _bannerData[index]);
         },
         pagination: SwiperPagination(
@@ -166,7 +246,7 @@ class _InternshipPageState extends State<InternshipPage> {
                 onPressed: () async {
                   isShow = false;
                   await Navigator.of(context)
-                      .pushNamed(Routes.internshipCompany, arguments: company);
+                      .pushNamed(Routes.internshipCompany, arguments: item);
                   isShow = true;
                 },
                 padding: EdgeInsets.all(0),
@@ -175,41 +255,46 @@ class _InternshipPageState extends State<InternshipPage> {
                     Container(
                       width: 50,
                       height: 50,
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) {
-                          return Container(
-                            padding: EdgeInsets.all(10),
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        imageUrl: company.image,
-                        errorWidget: (context, url, err) {
-                          return Container(
-                            child: Icon(
-                              Icons.cancel,
-                              size: 50,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
-                        imageBuilder: (context, imageProvider) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(25)),
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
+                      child: Hero(
+                        tag: "${company.name}-${item.id}",
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) {
+                            return Container(
+                              padding: EdgeInsets.all(10),
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          imageUrl: company.image,
+                          errorWidget: (context, url, err) {
+                            return Container(
+                              child: Icon(
+                                Icons.cancel,
+                                size: 50,
+                                color: Colors.grey,
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                          imageBuilder: (context, imageProvider) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(25)),
+                                image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 20),
                       child: Text(
                         company.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 17,
                           color: ActionColor,
@@ -266,7 +351,7 @@ class _InternshipPageState extends State<InternshipPage> {
             child: Wrap(
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
-                  (index) => getTag(item.tags[index]?.name ?? "Default")),
+                      (index) => getTag(item.tags[index]?.name ?? "Default")),
             ),
           ),
           Padding(
@@ -333,8 +418,9 @@ class _InternshipPageState extends State<InternshipPage> {
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
-          _bigTypes = List<InternshipBigType>.generate(result["data"].length,
-              (index) => InternshipBigType.fromJson(result["data"][index]));
+          _bigTypes = [allBig]..addAll(List<InternshipBigType>.generate(
+              result["data"].length,
+              (index) => InternshipBigType.fromJson(result["data"][index])));
         });
       }
     } on DioError catch (e) {
@@ -377,47 +463,39 @@ class _InternshipPageState extends State<InternshipPage> {
     String url = 'get_internships/';
     try {
       Dio dio = ApiClient.dio;
-      Map<String, dynamic> query = {'page': _nowPage};
-      if (_nowSmallType != null) {
-        query['small_type_ids'] = [_nowSmallType.id];
+      Map<String, dynamic> query = {'page': _nowPage, 'query': this.query};
+      if (_nowSmallType.id != 0) {
+        query['small_type_ids'] = _nowSmallType.id;
       }
       Response response = await dio.get(url, queryParameters: query);
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
-          _data = List<InternshipItem>.generate(result["data"].length,
+          var newData = List<InternshipItem>.generate(result["data"].length,
               (index) => InternshipItem.fromJson(result["data"][index]));
+          if (_data == null)
+            _data = newData;
+          else
+            _data.addAll(newData);
         });
+        _nowPage += 1;
+        hasMore = result['has_more'];
       }
     } on DioError catch (e) {
       print(e);
       print(url);
     }
+    loading = false;
   }
 
   Future<void> onSearch(String queryStr) async {
     queryStr = queryStr.trim();
-    if (queryStr == '') return;
     _nowPage = 1;
     _data = [];
-    _nowSmallType = null;
-    _nowBigType = null;
-    String url = 'get_internships/';
-    try {
-      Dio dio = ApiClient.dio;
-      Map<String, dynamic> query = {'page': _nowPage, "query": queryStr};
-      Response response = await dio.get(url, queryParameters: query);
-      Map<String, dynamic> result = response.data;
-      if (result["status"]) {
-        setState(() {
-          _data = List<InternshipItem>.generate(result["data"].length,
-              (index) => InternshipItem.fromJson(result["data"][index]));
-        });
-      }
-    } on DioError catch (e) {
-      print(e);
-      print(url);
-    }
+    _nowSmallType = allSmall;
+    _nowBigType = allBig;
+    query = queryStr;
+    getInternships();
   }
 }
 
@@ -787,10 +865,10 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
 
   Future<void> changeHeight() async {
     int length = _tempBigType != null
-        ? _smallTypes[_tempBigType].length > _bigTypes.length
-            ? _smallTypes[_tempBigType].length
-            : _bigTypes.length
-        : _bigTypes.length;
+        ? (_smallTypes[_tempBigType]?.length ?? 0) > (_bigTypes?.length ?? 0)
+            ? _smallTypes[_tempBigType]?.length ?? 0
+            : _bigTypes?.length ?? 0
+        : _bigTypes?.length ?? 0; // 获取较大的列表长度
     double height = length * 55.0 + 31;
     await changeHeightTo(height);
   }
@@ -813,12 +891,8 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
         children: <Widget>[
           Row(
             children: <Widget>[
-              _nowBigType == null
-                  ? getTag("全部", select: false)
-                  : getTag(_nowBigType.name),
-              _nowBigType == null
-                  ? getTag("全部", select: false)
-                  : getTag(_nowSmallType.name),
+              getTag(_nowBigType.name),
+              getTag(_nowSmallType.name),
               Expanded(
                 flex: 1,
                 child: Container(),
@@ -912,8 +986,8 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                         })),
                         decoration: BoxDecoration(
                             border: _tempBigType == null ||
-                                    _bigTypes.length >
-                                        _smallTypes[_tempBigType].length
+                                    (_bigTypes?.length ?? 0) >
+                                        (_smallTypes[_tempBigType]?.length ?? 0)
                                 ? Border(
                                     right: BorderSide(
                                         color: Color(0xffeeeeee), width: 1),
@@ -927,48 +1001,61 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.max,
-                                  children: List<Widget>.generate(
-                                    _smallTypes[_tempBigType].length,
-                                    (index) {
-                                      InternshipSmallType item =
-                                          _smallTypes[_tempBigType][index];
-                                      return Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 0, horizontal: 10),
-                                        width: double.infinity,
-                                        child: MaterialButton(
-                                          splashColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          elevation: 0,
-                                          onPressed: () async {
-                                            setState(() {
-                                              _tempSmallType = item;
-                                            });
+                                  children: _smallTypes
+                                          .containsKey(_tempBigType)
+                                      ? List<Widget>.generate(
+                                          _smallTypes[_tempBigType].length,
+                                          (index) {
+                                            InternshipSmallType item =
+                                                _smallTypes[_tempBigType]
+                                                    [index];
+                                            return Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 0, horizontal: 10),
+                                              width: double.infinity,
+                                              child: MaterialButton(
+                                                splashColor: Colors.transparent,
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                elevation: 0,
+                                                onPressed: () async {
+                                                  setState(() {
+                                                    _tempSmallType = item;
+                                                  });
+                                                },
+                                                child: Text(
+                                                  item.name,
+                                                  style: TextStyle(
+                                                    color:
+                                                        _tempSmallType == item
+                                                            ? Theme.of(context)
+                                                                .primaryColor
+                                                            : Color(0xff555555),
+                                                  ),
+                                                ),
+                                              ),
+                                              margin: EdgeInsets.only(left: 15),
+                                              decoration: BoxDecoration(
+                                                  border: index !=
+                                                          _smallTypes[_tempBigType]
+                                                                  .length -
+                                                              1
+                                                      ? Border(
+                                                          bottom: BorderSide(
+                                                              color: Color(
+                                                                  0xffeeeeee)))
+                                                      : null),
+                                            );
                                           },
-                                          child: Text(
-                                            item.name,
-                                            style: TextStyle(
-                                              color: _tempSmallType == item
-                                                  ? Theme.of(context)
-                                                      .primaryColor
-                                                  : Color(0xff555555),
-                                            ),
+                                        )
+                                      : <Widget>[
+                                          Container(
+                                            child: CircularProgressIndicator(),
                                           ),
-                                        ),
-                                        margin: EdgeInsets.only(left: 15),
-                                        decoration: BoxDecoration(
-                                            border: index !=
-                                                    _smallTypes[_tempBigType]
-                                                            .length -
-                                                        1
-                                                ? Border(
-                                                    bottom: BorderSide(
-                                                        color:
-                                                            Color(0xffeeeeee)))
-                                                : null),
-                                      );
-                                    },
-                                  ),
+                                          Container(
+                                            child: Text("加载中"),
+                                          ),
+                                        ],
                                 ),
                                 decoration: BoxDecoration(
                                   border: _tempBigType != null &&

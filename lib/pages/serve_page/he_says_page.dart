@@ -70,7 +70,6 @@ class _HeSaysPageState extends State<HeSaysPage> {
         if (result["status"]) {
           data.addAll(List.generate(result["data"].length, (index) {
             var item = HeSheSayItem.fromJson(result["data"][index]);
-            item.authorAvatar = ApiClient.host + item.authorAvatar;
             return item;
           }));
           requestStatus = true;

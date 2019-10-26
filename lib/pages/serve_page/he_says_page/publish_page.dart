@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -450,16 +451,37 @@ class _PublishPageState extends State<PublishPage>
       );
   }
 
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var cropImage = await ImageCropper.cropImage(
+        sourcePath: image.path,
+        aspectRatio: CropAspectRatio(ratioX: 16, ratioY: 10),
+        // aspectRatioPresets: [
+        //   CropAspectRatioPreset.square,
+        //   CropAspectRatioPreset.ratio3x2,
+        //   CropAspectRatioPreset.original,
+        //   CropAspectRatioPreset.ratio4x3,
+        //   CropAspectRatioPreset.ratio16x9
+        // ],
+        androidUiSettings: AndroidUiSettings(
+            showCropGrid: false,
+            toolbarTitle: '图片剪切',
+            toolbarColor: Theme.of(context).primaryColor,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: true),
+        iosUiSettings: IOSUiSettings(
+            minimumAspectRatio: 1.0, aspectRatioLockEnabled: true));
+    return cropImage;
+  }
+
   Widget leadSay() {
     return ListView(
       children: <Widget>[
         InkWell(
           child: selectImageWidget(),
           onTap: () async {
-            var image =
-                await ImagePicker.pickImage(source: ImageSource.gallery);
-            // var photo = await ImagePicker.pickImage(source: ImageSource.camera);
-            // ImagePicker.pickVideo(source: ImageSource.camera);
+            var image = await getImage();
             setState(() {
               _image = image;
             });
