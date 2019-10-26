@@ -21,10 +21,10 @@ void main() {
       isLogin: isLogin,
     ));
     if (Platform.isAndroid) {
-      SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
-      );
-      SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+//      SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
+//        statusBarColor: Colors.red,
+//      );
+//      SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
       // print("systemUiOverlayStyle");
     }
   });

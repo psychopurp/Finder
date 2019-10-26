@@ -38,6 +38,7 @@ class _InternshipPageState extends State<InternshipPage> {
   bool loading = true;
   bool moreThanMoment = false;
   bool hasMore = true;
+  String query = "";
 
   @override
   void initState() {
@@ -183,7 +184,7 @@ class _InternshipPageState extends State<InternshipPage> {
         itemCount: _bannerData.length,
         autoplay: _bannerData.length > 1,
         onTap: (index) {
-          Navigator.pushNamed(context, Routes.heSaysDetail,
+          Navigator.pushNamed(context, Routes.internshipCompany,
               arguments: _bannerData[index]);
         },
         pagination: SwiperPagination(
@@ -277,7 +278,7 @@ class _InternshipPageState extends State<InternshipPage> {
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(25)),
+                                BorderRadius.all(Radius.circular(25)),
                                 image: DecorationImage(
                                   image: imageProvider,
                                   fit: BoxFit.cover,
@@ -292,6 +293,8 @@ class _InternshipPageState extends State<InternshipPage> {
                       padding: EdgeInsets.only(left: 20),
                       child: Text(
                         company.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 17,
                           color: ActionColor,
@@ -348,7 +351,7 @@ class _InternshipPageState extends State<InternshipPage> {
             child: Wrap(
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
-                  (index) => getTag(item.tags[index]?.name ?? "Default")),
+                      (index) => getTag(item.tags[index]?.name ?? "Default")),
             ),
           ),
           Padding(
@@ -415,7 +418,7 @@ class _InternshipPageState extends State<InternshipPage> {
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
-          _bigTypes.addAll(List<InternshipBigType>.generate(
+          _bigTypes = [allBig]..addAll(List<InternshipBigType>.generate(
               result["data"].length,
               (index) => InternshipBigType.fromJson(result["data"][index])));
         });
@@ -460,7 +463,7 @@ class _InternshipPageState extends State<InternshipPage> {
     String url = 'get_internships/';
     try {
       Dio dio = ApiClient.dio;
-      Map<String, dynamic> query = {'page': _nowPage};
+      Map<String, dynamic> query = {'page': _nowPage, 'query': this.query};
       if (_nowSmallType.id != 0) {
         query['small_type_ids'] = _nowSmallType.id;
       }
@@ -489,24 +492,10 @@ class _InternshipPageState extends State<InternshipPage> {
     queryStr = queryStr.trim();
     _nowPage = 1;
     _data = [];
-    _nowSmallType = null;
-    _nowBigType = null;
-    String url = 'get_internships/';
-    try {
-      Dio dio = ApiClient.dio;
-      Map<String, dynamic> query = {'page': _nowPage, "query": queryStr};
-      Response response = await dio.get(url, queryParameters: query);
-      Map<String, dynamic> result = response.data;
-      if (result["status"]) {
-        setState(() {
-          _data = List<InternshipItem>.generate(result["data"].length,
-              (index) => InternshipItem.fromJson(result["data"][index]));
-        });
-      }
-    } on DioError catch (e) {
-      print(e);
-      print(url);
-    }
+    _nowSmallType = allSmall;
+    _nowBigType = allBig;
+    query = queryStr;
+    getInternships();
   }
 }
 
@@ -1012,48 +1001,61 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.max,
-                                  children: List<Widget>.generate(
-                                    _smallTypes[_tempBigType].length,
-                                    (index) {
-                                      InternshipSmallType item =
-                                          _smallTypes[_tempBigType][index];
-                                      return Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 0, horizontal: 10),
-                                        width: double.infinity,
-                                        child: MaterialButton(
-                                          splashColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          elevation: 0,
-                                          onPressed: () async {
-                                            setState(() {
-                                              _tempSmallType = item;
-                                            });
+                                  children: _smallTypes
+                                          .containsKey(_tempBigType)
+                                      ? List<Widget>.generate(
+                                          _smallTypes[_tempBigType].length,
+                                          (index) {
+                                            InternshipSmallType item =
+                                                _smallTypes[_tempBigType]
+                                                    [index];
+                                            return Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 0, horizontal: 10),
+                                              width: double.infinity,
+                                              child: MaterialButton(
+                                                splashColor: Colors.transparent,
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                elevation: 0,
+                                                onPressed: () async {
+                                                  setState(() {
+                                                    _tempSmallType = item;
+                                                  });
+                                                },
+                                                child: Text(
+                                                  item.name,
+                                                  style: TextStyle(
+                                                    color:
+                                                        _tempSmallType == item
+                                                            ? Theme.of(context)
+                                                                .primaryColor
+                                                            : Color(0xff555555),
+                                                  ),
+                                                ),
+                                              ),
+                                              margin: EdgeInsets.only(left: 15),
+                                              decoration: BoxDecoration(
+                                                  border: index !=
+                                                          _smallTypes[_tempBigType]
+                                                                  .length -
+                                                              1
+                                                      ? Border(
+                                                          bottom: BorderSide(
+                                                              color: Color(
+                                                                  0xffeeeeee)))
+                                                      : null),
+                                            );
                                           },
-                                          child: Text(
-                                            item.name,
-                                            style: TextStyle(
-                                              color: _tempSmallType == item
-                                                  ? Theme.of(context)
-                                                      .primaryColor
-                                                  : Color(0xff555555),
-                                            ),
+                                        )
+                                      : <Widget>[
+                                          Container(
+                                            child: CircularProgressIndicator(),
                                           ),
-                                        ),
-                                        margin: EdgeInsets.only(left: 15),
-                                        decoration: BoxDecoration(
-                                            border: index !=
-                                                    _smallTypes[_tempBigType]
-                                                            .length -
-                                                        1
-                                                ? Border(
-                                                    bottom: BorderSide(
-                                                        color:
-                                                            Color(0xffeeeeee)))
-                                                : null),
-                                      );
-                                    },
-                                  ),
+                                          Container(
+                                            child: Text("加载中"),
+                                          ),
+                                        ],
                                 ),
                                 decoration: BoxDecoration(
                                   border: _tempBigType != null &&
