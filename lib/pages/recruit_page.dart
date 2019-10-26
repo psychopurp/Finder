@@ -41,7 +41,6 @@ class _RecruitPageState extends State<RecruitPage> {
         appBar: AppBar(
           title: Text(
             '招募 · 寻你',
-            style: TextStyle(color: Colors.black),
           ),
           centerTitle: true,
           actions: <Widget>[

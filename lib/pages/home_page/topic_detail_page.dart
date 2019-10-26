@@ -369,24 +369,37 @@ class _TopicCommentsState extends State<TopicComments> {
   }
 
   collectHandle(UserProvider user, TopicCommentsModelData item) async {
+    String showText = "";
     if (user.isLogIn) {
       if (user.collection['comment'].contains(item.id)) {
-        user.collection['comment'].remove(item.id);
+        var data = await apiClient.deleteCollection(
+            modelId: item.id, type: ApiClient.COMMENT);
+        if (data['status'] == true) {
+          showText = '取消收藏成功';
+          user.collection['comment'].remove(item.id);
+        } else {
+          showText = '取消收藏失败';
+        }
       } else {
         var data =
             await apiClient.addCollection(type: ApiClient.COMMENT, id: item.id);
-        user.collection['comment'].add(item.id);
-        Future.delayed(Duration(milliseconds: 500), () {
-          Scaffold.of(context).showSnackBar(new SnackBar(
-            duration: Duration(milliseconds: 200),
-            content: new Text("${data}"),
-            action: new SnackBarAction(
-              label: "取消",
-              onPressed: () {},
-            ),
-          ));
-        });
+        if (data['status'] == true) {
+          showText = '收藏成功';
+          user.collection['comment'].add(item.id);
+        } else {
+          showText = '收藏失败';
+        }
       }
+      Future.delayed(Duration(milliseconds: 500), () {
+        Scaffold.of(context).showSnackBar(new SnackBar(
+          duration: Duration(milliseconds: 200),
+          content: new Text("$showText"),
+          action: new SnackBarAction(
+            label: "取消",
+            onPressed: () {},
+          ),
+        ));
+      });
 
       setState(() {});
     } else {
