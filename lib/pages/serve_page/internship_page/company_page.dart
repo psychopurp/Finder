@@ -197,12 +197,13 @@ class _CompanyPageState extends State<CompanyPage>
     _internshipScrollController = ScrollController();
     _detailScrollController.addListener(() {
       setState(() {
-        offset = _detailScrollController.offset;
+        if (selected == 0) offset = _detailScrollController.offset;
         syncScrollController(0);
       });
     });
     _internshipScrollController.addListener(() {
       setState(() {
+        if (selected == 1) offset = _internshipScrollController.offset;
         syncScrollController(1);
       });
     });
@@ -379,6 +380,37 @@ class _CompanyPageState extends State<CompanyPage>
               }
             },
           ),
+          loading
+              ? Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Listener(
+                    behavior: HitTestBehavior.opaque,
+                    child: UnconstrainedBox(
+                      child: Container(
+                        width: 110,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                            Padding(
+                              padding: EdgeInsets.all(10),
+                            ),
+                            Text("加载中..."),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
@@ -532,7 +564,11 @@ class CompanyPageHeader extends StatelessWidget {
         MediaQuery.of(context).padding.top;
     double avatarOpacity = (maxTabsBottom - 2 * tabsBottom) / maxTabsBottom;
     avatarOpacity = avatarOpacity < 0 ? 0 : avatarOpacity;
-    double bottomLeft = ScreenUtil.screenWidthDp  / 2 - 30 - ((leftOffset + ScreenUtil.screenWidthDp) / ScreenUtil.screenWidthDp - 0.5) * 132;
+    double bottomLeft = ScreenUtil.screenWidthDp / 2 -
+        30 -
+        ((leftOffset + ScreenUtil.screenWidthDp) / ScreenUtil.screenWidthDp -
+                0.5) *
+            132;
     TextStyle unSelectedStyle = TextStyle(
       fontSize: 15,
       color: Color(0xff555555),
@@ -695,10 +731,11 @@ class CompanyPageHeader extends StatelessWidget {
                           bottom: 10,
                           left: bottomLeft,
                           child: Container(
-                            width: 60,
-                            height: 4,
-                            color: Theme.of(context).primaryColor.withOpacity(0.5)
-                          ),
+                              width: 60,
+                              height: 4,
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.5)),
                         ),
                         Positioned(
                           bottom: 0,
