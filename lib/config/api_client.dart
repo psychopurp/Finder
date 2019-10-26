@@ -416,9 +416,13 @@ class ApiClient {
   }
 
   ///删除收藏
-  Future deleteCollection({int collectionId}) async {
-    var formData = {'collection_id': collectionId};
-    // print(formData);
+  Future deleteCollection({int collectionId, int type, int modelId}) async {
+    var formData;
+    if (collectionId != null) {
+      formData = {'collection_id': collectionId};
+    } else if (type != null && modelId != null) {
+      formData = {'type': type, 'model_id': modelId};
+    }
     try {
       Response response =
           await dio.post('delete_collection/', data: jsonEncode(formData));

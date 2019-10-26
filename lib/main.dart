@@ -88,9 +88,11 @@ ThemeData _buildAppTheme() {
       accentIconTheme: base.accentIconTheme.copyWith(color: Colors.white),
       dividerColor: Color.fromARGB(255, 245, 241, 241),
       appBarTheme: base.appBarTheme.copyWith(
-          color: Colors.white,
-          iconTheme: IconThemeData(color: Colors.black),
-          elevation: 1),
+          // color: Colors.white,
+          textTheme:
+              TextTheme(title: TextStyle(color: Colors.white, fontSize: 20)),
+          iconTheme: IconThemeData(color: Colors.white),
+          elevation: 0),
 
       // Icon的默认样式
       iconTheme:

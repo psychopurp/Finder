@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
           title: Text(
             'Finders',
             style: TextStyle(
-                color: Theme.of(context).primaryColor.withRed(200),
+                // color: Theme.of(context).primaryColor.withRed(200),
                 fontFamily: 'Yellowtail',
                 fontWeight: FontWeight.w400,
                 fontSize: ScreenUtil().setSp(70)),

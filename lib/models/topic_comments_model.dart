@@ -39,7 +39,9 @@ class TopicCommentsModelData {
   String content;
   Null replyTo;
   RootComment rootComment;
-  List<Sender> likes;
+  int likes;
+  bool isLike;
+  bool isCollect;
   bool hasReply;
 
   TopicCommentsModelData(
@@ -49,6 +51,8 @@ class TopicCommentsModelData {
       this.replyTo,
       this.rootComment,
       this.likes,
+      this.isLike,
+      this.isCollect,
       this.hasReply});
 
   TopicCommentsModelData.fromJson(Map<String, dynamic> json) {
@@ -59,15 +63,12 @@ class TopicCommentsModelData {
     content = json['content'];
     replyTo = json['reply_to'];
 
-    rootComment = json['root_comment'] != "None"
-        ? new RootComment.fromJson(json['root_comment'])
-        : null;
-    if (json['likes'] != null) {
-      likes = new List<Sender>();
-      json['likes'].forEach((v) {
-        likes.add(new Sender.fromJson(v));
-      });
-    }
+    // rootComment = json['root_comment'] != "None"
+    //     ? new RootComment.fromJson(json['root_comment'])
+    //     : null;
+    likes = json['likes'];
+    isLike = json['is_like'];
+    isCollect = json['is_collect'];
 
     hasReply = json['has_reply'];
   }
@@ -83,9 +84,9 @@ class TopicCommentsModelData {
     if (this.rootComment != null) {
       data['root_comment'] = this.rootComment.toJson();
     }
-    if (this.likes != null) {
-      data['likes'] = this.likes.map((v) => v.toJson()).toList();
-    }
+    data['likes'] = this.likes;
+    data['is_like'] = this.isLike;
+    data['is_collect'] = this.isCollect;
     data['has_reply'] = this.hasReply;
     return data;
   }
@@ -132,6 +133,7 @@ class RootComment {
       this.content});
 
   RootComment.fromJson(Map<String, dynamic> json) {
+    print(json);
     id = json['id'];
     topicId = json['topic_id'];
     rootCommentId = json['root_comment_id'];
