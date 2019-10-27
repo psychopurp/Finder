@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/api_client.dart';
-import 'package:finder/pages/home_page/comment_page.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
@@ -13,8 +11,6 @@ import 'package:finder/models/topic_comments_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
-import 'package:flutter_easyrefresh/material_header.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 
 class TopicDetailPage extends StatefulWidget {
@@ -95,6 +91,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             headerSliverBuilder: _sliverBuilder,
             body: TopicComments(
               topicId: widget.topicId,
+              controller: _controller,
             ),
           ),
           Positioned(
@@ -227,8 +224,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 }
 
 class TopicComments extends StatefulWidget {
+  final ScrollController controller;
   final int topicId;
-  TopicComments({this.topicId});
+  TopicComments({this.topicId, this.controller});
   @override
   _TopicCommentsState createState() => _TopicCommentsState();
 }
@@ -309,9 +307,10 @@ class _TopicCommentsState extends State<TopicComments> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
+
     return EasyRefresh(
         enableControlFinishLoad: true,
-        header: MaterialHeader(),
+        // header: MaterialHeader(),
         footer: MaterialFooter(),
         topBouncing: false,
         bottomBouncing: false,
@@ -500,10 +499,21 @@ class _TopicCommentsState extends State<TopicComments> {
             builder: (_) {
               return GestureDetector(
                 onTap: () async {
-                  FinderDialog.showLoading();
+                  Navigator.pop(context);
+                  showDialog(
+                      context: context,
+                      builder: (_) {
+                        return FinderDialog.showLoading();
+                      });
+
                   var data =
                       await apiClient.deleteTopicComment(commentId: item.id);
-                  getInitialData();
+                  await getInitialData();
+
+                  widget.controller.animateTo(0,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.bounceIn);
+
                   Navigator.pop(context);
                 },
                 child: CupertinoAlertDialog(

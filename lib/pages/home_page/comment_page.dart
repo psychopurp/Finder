@@ -292,6 +292,7 @@ class _CommentPageState extends State<CommentPage> {
                   var data =
                       await apiClient.deleteTopicComment(commentId: item.id);
                   Navigator.pop(context);
+                  _refreshController.callRefresh();
                 },
                 child: CupertinoAlertDialog(
                   title: Text('删除话题评论',
@@ -317,6 +318,7 @@ class _CommentPageState extends State<CommentPage> {
       currentComment = widget.topicCommentId;
       // _commentController.clear();
       _commentFocusNode.unfocus();
+      _refreshController.callRefresh();
 
       msg = (data['status']) ? "评论成功" : "评论失败";
     } else {
