@@ -405,6 +405,11 @@ class _RecruitPageState extends State<RecruitPage> {
     }
     setState(() {
       loading = false;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 4efb1436fc97d056d54046499f8de558df5cbf6c
     });
   }
 
@@ -645,6 +650,10 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
     _rotateController = AnimationController(vsync: this, duration: duration);
     _animationController.addListener(() {
       setState(() {});
+<<<<<<< HEAD
+=======
+>>>>>>> 366f0fa01e4fe5cda5b726847e86350fc5c8c6b9
+>>>>>>> 4efb1436fc97d056d54046499f8de558df5cbf6c
     });
     _curve =
         CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
