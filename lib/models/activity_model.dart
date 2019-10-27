@@ -45,6 +45,7 @@ class ActivityModelData {
   String poster;
   String description;
   String signUpLocation;
+  bool isCollected;
 
   String position;
   List<ActivityTypesModelData> types;
@@ -52,6 +53,7 @@ class ActivityModelData {
 
   ActivityModelData(
       {this.id,
+      this.isCollected,
       this.title,
       this.senderId,
       this.sponsor,
@@ -66,6 +68,7 @@ class ActivityModelData {
       this.types});
 
   ActivityModelData.fromJson(Map<String, dynamic> json) {
+    isCollected = json['is_collected'];
     id = json['id'];
     title = json['title'];
     senderId = json['sender_id'];

@@ -2,6 +2,10 @@ library public;
 
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:palette_generator/palette_generator.dart';
+
 //util
 export 'package:flutter_screenutil/flutter_screenutil.dart';
 export 'package:cached_network_image/cached_network_image.dart';
@@ -32,4 +36,18 @@ String timestampToDateTime(num time) {
 String contentToJson({List<String> images, String text}) {
   var formData = {'images': images, 'text': text};
   return jsonEncode(formData);
+}
+
+Future<Color> getColor(String imageUrl) async {
+  PaletteGenerator paletteGenerator = await PaletteGenerator.fromImageProvider(
+    CachedNetworkImageProvider(imageUrl),
+  );
+  // print(paletteGenerator);
+  Color pageColor;
+  if (paletteGenerator.darkVibrantColor != null) {
+    pageColor = paletteGenerator.darkVibrantColor.color;
+  } else {
+    pageColor = paletteGenerator.mutedColor.color;
+  }
+  return pageColor;
 }

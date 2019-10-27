@@ -97,12 +97,6 @@ class UserProvider with ChangeNotifier {
     return data;
   }
 
-  ///获取用户关注的用户列表
-  Future getFollowUsers({String query = "", int page = 1}) async {
-    var data = await apiClient.getFollowUsers(query: query, page: page);
-    return data;
-  }
-
   ///保存数据
   Future save() async {
     await Global.save("collection", jsonEncode(collection));

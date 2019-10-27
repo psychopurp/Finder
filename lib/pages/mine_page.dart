@@ -1,11 +1,14 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/my_appbar.dart';
 import 'package:finder/public.dart';
+import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:finder/provider/user_provider.dart';
+import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/pages/mine_page/mine_page_top.dart';
 import 'package:finder/pages/mine_page/mine_page_bottom.dart';
@@ -16,13 +19,45 @@ class MinePage extends StatefulWidget {
 }
 
 class _MinePageState extends State<MinePage> {
+  Color backGroundColor = Colors.grey;
+  double topPartHeight = 150;
+  var cards;
+
+  @override
+  void initState() {
+    cards = {
+      'topic': {'name': '话题'},
+      'activity': {'name': '活动'},
+      'toHeSay': {'name': '表白Ta'},
+      'message': {'name': '私信Ta'}
+    };
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    apiClient.getFollowUsers();
-    apiClient.getCollections(page: 1);
-    apiClient.getFanUsers();
     return Scaffold(
       body: Consumer<UserProvider>(builder: (context, user, child) {
+        var avatar = GestureDetector(
+          onTap: () {
+            BotToast.showText(
+                text: 'elyar', duration: Duration(milliseconds: 500));
+          },
+          child: Hero(
+            tag: 'profile',
+            child: Container(
+              // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+              height: 90,
+              width: 90,
+              decoration: BoxDecoration(
+                  // shape: CircleBorder(),
+                  border: Border.all(color: Colors.white, width: 3),
+                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                  image: DecorationImage(
+                      image: CachedNetworkImageProvider(user.userInfo.avatar))),
+            ),
+          ),
+        );
         print(user.collection);
         return SafeArea(
           top: false,
@@ -32,48 +67,24 @@ class _MinePageState extends State<MinePage> {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
               ),
-              child: ListView(
-                padding: EdgeInsets.all(0),
+              child: Stack(
+                alignment: Alignment.topCenter,
+                fit: StackFit.expand,
                 children: <Widget>[
-                  buildUserBackground(user.userInfo, context),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe6e0, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '收藏',
-                            '收藏'),
-                        // VerticalDivider(),
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe879, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '小F',
-                            '收藏'),
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe654, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '设置',
-                            '评论'),
-                        _singleButtonItem(
-                            Icon(
-                              IconData(0xe879, fontFamily: 'myIcon'),
-                              color: Colors.black,
-                            ),
-                            '消息',
-                            '点赞'),
-                      ],
-                    ),
-                  ),
-                  // buildUserBackground(user.userInfo, context),
-                  // buildUserBackground(user.userInfo, context),
+                  ListView(
+                      padding: EdgeInsets.all(0),
+                      children: buildBackground(user.userInfo)),
+                  Positioned(
+                      left: 0,
+                      right: 0,
+                      top: topPartHeight * 0.5,
+                      child: userCard(user.userInfo)),
+                  Positioned(
+                    // left: ScreenUtil().setWidth(0),
+                    // right: 0,
+                    top: topPartHeight * 0.5 - 40,
+                    child: avatar,
+                  )
                 ],
               ),
             ),
@@ -83,56 +94,51 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  _singleButtonItem(Icon icon, String count, item) {
-    // Color myColor = Colors.white;
-    // switch (item) {
-    //   case '收藏':
-    //     myColor = Colors.amber;
-    //     print('sho');
-    //     break;
-    //   case '评论':
-    //     myColor = Colors.cyan;
-    //     print('ping');
-    //     break;
-    //   case '点赞':
-    //     myColor = Colors.deepPurple;
-    //     break;
-    //   default:
-    //     myColor = Colors.blue;
-    // }
+  buildBackground(UserModel user) {
+    double cardWidth = 130;
 
-    return Material(
-      color: Colors.white,
-      child: InkWell(
-        // hoverColor: Colors.black,
-        // focusColor: Colors.amber,
-        // highlightColor: Colors.blue,
-        // splashColor: Colors.amber,
-        onTap: () {
-          print('object');
-        },
-        child: Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(30)),
-          // color: myColor,
-          width: ScreenUtil().setWidth(187.5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              icon,
-              Text(count),
-            ],
+    Widget getCard(item) => Card(
+          color: Colors.white,
+          elevation: 5,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Container(
+            alignment: Alignment.center,
+            height: cardWidth,
+            width: cardWidth * 2,
+            child: Text(item['name']),
           ),
-        ),
-      ),
+        );
+
+    List<Widget> content = [];
+
+    Widget topPart = Container(
+      height: topPartHeight,
+      decoration: BoxDecoration(color: Theme.of(context).primaryColor),
     );
+
+    content.add(topPart);
+    content.add(Container(
+      alignment: Alignment.center,
+      padding: EdgeInsets.only(top: cardWidth + 10),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 14,
+        children: <Widget>[
+          getCard(cards['topic']),
+          getCard(cards['activity']),
+          // getCard(cards['toHeSay']),
+          // getCard(cards['message'])
+        ],
+      ),
+    ));
+
+    return content;
   }
 
   Widget buildUserBackground(UserModel user, BuildContext context) {
     return Container(
       height: ScreenUtil().setHeight(650),
-      width: ScreenUtil().setWidth(750),
       decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.only(
@@ -144,7 +150,7 @@ class _MinePageState extends State<MinePage> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(top: kToolbarHeight),
-              child: _userAvatar(user),
+              child: userCard(user),
             ),
             Padding(
               padding: EdgeInsets.only(left: 20),
@@ -191,27 +197,66 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  Widget _userAvatar(UserModel user) {
-    return Align(
-        alignment: Alignment.topCenter,
-        child: InkWell(
-          onTap: () {
-            BotToast.showText(
-                text: 'elyar', duration: Duration(milliseconds: 500));
-          },
-          child: Hero(
-            tag: 'profile',
-            child: Container(
-              // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-              height: 100,
-              width: 100,
-              decoration: BoxDecoration(
-                  // shape: CircleBorder(),
-                  border: Border.all(color: Colors.white, width: 3),
-                  borderRadius: BorderRadius.all(Radius.circular(50)),
-                  image: DecorationImage(
-                      image: CachedNetworkImageProvider(user.avatar))),
-            ),
+  Widget userCard(UserModel user) {
+    return Card(
+        margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(100)),
+        color: Colors.white,
+        elevation: 10,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Container(
+          padding: EdgeInsets.only(bottom: 50, top: 50),
+          width: ScreenUtil().setWidth(750),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              ///昵称
+              Text(
+                user.nickname,
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+
+              ///学校专业
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(user.school.name),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    height: 14,
+                    width: 1,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  Text((user.major != null) ? user.major : "")
+                ],
+              ),
+
+              ///关注
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  MaterialButton(
+                    onPressed: () {
+                      Application.router.navigateTo(context,
+                          "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=true");
+                    },
+                    shape: RoundedRectangleBorder(),
+                    child: Column(
+                      children: <Widget>[Text('关注')],
+                    ),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      Application.router.navigateTo(context,
+                          "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=false");
+                    },
+                    shape: RoundedRectangleBorder(),
+                    child: Column(
+                      children: <Widget>[Text('粉丝')],
+                    ),
+                  )
+                ],
+              )
+            ],
           ),
         ));
   }

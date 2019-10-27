@@ -35,6 +35,7 @@ class Routes {
   static String userProfile = "/userProfile"; //个人详情页
   static String minePage = "/minePage"; //我的 页
   static String collectionPage = "/collectionPage"; //用户收藏页
+  static String fansFollowPage = "/fansFollowPage"; //关注和粉丝页
 
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
@@ -90,13 +91,15 @@ class Routes {
     router.define(psychoTest, handler: psychoTestHandler);
     router.define(treeHole, handler: treeHoleHandler);
     router.define(internship, handler: internshipHandler);
-    router.define(internshipCompany, handler: internshipCompanyHandler, transitionType: TransitionType.cupertino);
+    router.define(internshipCompany,
+        handler: internshipCompanyHandler,
+        transitionType: TransitionType.cupertino);
 
     //我的页
     router.define(userProfile,
         handler: userProfileHandler, transitionType: TransitionType.fadeIn);
     router.define(minePage,
-        handler: minePageHandler, transitionType: TransitionType.fadeIn);
+        handler: minePageHandler, transitionType: TransitionType.cupertino);
     router.define(chat,
         handler: chatPageHandle, transitionType: TransitionType.cupertino);
     router.define(systemMessage,
@@ -109,6 +112,9 @@ class Routes {
         handler: sayToHeChatHandle, transitionType: TransitionType.cupertino);
     router.define(collectionPage,
         handler: collectionPageHandler,
+        transitionType: TransitionType.cupertino);
+    router.define(fansFollowPage,
+        handler: fansFollowPageHandle,
         transitionType: TransitionType.cupertino);
   }
 }

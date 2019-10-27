@@ -52,13 +52,10 @@ class ProfileDrawer extends StatelessWidget {
 
   topAvatar(UserModel user, context) {
     return Container(
-      height: 200,
+      padding: EdgeInsets.only(bottom: 50, top: kToolbarHeight / 2),
       color: Theme.of(context).primaryColor,
       child: Column(
         children: <Widget>[
-          SizedBox(
-            height: 30,
-          ),
           InkWell(
             onTap: () {
               Navigator.pop(context);
@@ -67,6 +64,7 @@ class ProfileDrawer extends StatelessWidget {
             child: Hero(
               tag: 'profile',
               child: Container(
+                // color: Colors.yellow,
                 child: Avatar(
                   url: user.avatar,
                   avatarHeight: 100,
