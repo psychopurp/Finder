@@ -395,6 +395,7 @@ class _RecruitPageState extends State<RecruitPage> {
     }
     data = await apiClient.getRecruits(query);
     RecruitModel recruits = RecruitModel.fromJson(data);
+    if (!mounted) return;
     if (recruits.status) {
       _nowPage += 1;
       hasMore = recruits.hasMore;

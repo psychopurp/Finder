@@ -308,33 +308,49 @@ class _TopicCommentsState extends State<TopicComments> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
 
-    return EasyRefresh(
+    return body(user);
+  }
+
+  Widget body(UserProvider user) {
+    Widget child;
+    if (this.topicComments == null) {
+      child = Container(
+          alignment: Alignment.center,
+          height: double.infinity,
+          child: CupertinoActivityIndicator());
+    } else {
+      List<Widget> widgets =
+          List.generate(this.topicComments.data.length, (index) {
+        return _singleItem(this.topicComments.data[index], user);
+      });
+
+      child = EasyRefresh(
         enableControlFinishLoad: true,
         // header: MaterialHeader(),
         footer: MaterialFooter(),
         topBouncing: false,
         bottomBouncing: false,
         controller: _refreshController,
+        child: ListView(
+          children: widgets,
+        ),
         onLoad: () async {
           var data = await getMore(this.pageCount);
           _refreshController.finishLoad(
               success: true, noMore: (data.length == 0));
         },
-        child: (this.topicComments != null)
-            ? Container(
-                // color: Colors.yellow,
-                // height: 700,
-                child: Column(
-                  children: this.topicComments.data.map((item) {
-                    return _singleItem(item, user);
-                  }).toList(),
-                ),
-              )
-            : Container(
-                alignment: Alignment.center,
-                height: 400,
-                child: CupertinoActivityIndicator(),
-              ));
+      );
+    }
+
+    return AnimatedSwitcher(
+        duration: Duration(milliseconds: 1000),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+              child: child,
+              opacity:
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+        },
+        child: child);
   }
 
   commentHandle(UserProvider user, TopicCommentsModelData item) async {
