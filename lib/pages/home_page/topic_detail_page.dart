@@ -297,11 +297,11 @@ class _TopicCommentsState extends State<TopicComments> {
 
   @override
   void dispose() {
+    super.dispose();
     _commentFocusNode.dispose();
     blackFocusNode.dispose();
     _commentController.dispose();
     _refreshController.dispose();
-    super.dispose();
   }
 
   @override

@@ -109,39 +109,55 @@ class _TabBodyState extends State<TabBody> {
 
   @override
   void dispose() {
+    super.dispose();
     _controller.dispose();
     _refreshController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
-    return EasyRefresh(
-      enableControlFinishLoad: true,
-      header: MaterialHeader(),
-      footer: MaterialFooter(),
-      controller: _refreshController,
-      onRefresh: () async {
-        await getInitialData();
-        _refreshController.resetLoadState();
-      },
-      onLoad: () async {
-        var data = await getMore(pageCount: this.pageCount);
-        print("data===$data");
-        _refreshController.finishLoad(
-            success: true, noMore: (data.length == 0));
-      },
-      child: (this.follower != null)
-          ? ListView(
-              controller: _controller,
-              padding: EdgeInsets.only(bottom: 50),
-              children: buildUserList())
-          : Container(
-              height: 400,
-              child: CupertinoActivityIndicator(),
-            ),
-    );
+    return body;
+  }
+
+  Widget get body {
+    Widget child;
+    if (this.follower == null) {
+      child = Container(
+          alignment: Alignment.center,
+          height: double.infinity,
+          child: CupertinoActivityIndicator());
+    } else {
+      child = EasyRefresh.custom(
+        enableControlFinishLoad: true,
+        header: MaterialHeader(),
+        footer: MaterialFooter(),
+        controller: _refreshController,
+        slivers: <Widget>[
+          SliverList(delegate: SliverChildListDelegate(buildUserList())),
+        ],
+        onRefresh: () async {
+          await getInitialData();
+          _refreshController.resetLoadState();
+        },
+        onLoad: () async {
+          var data = await getMore(pageCount: this.pageCount);
+          print("data===$data");
+          _refreshController.finishLoad(
+              success: true, noMore: (data.length == 0));
+        },
+      );
+    }
+
+    return AnimatedSwitcher(
+        duration: Duration(milliseconds: 1000),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+              child: child,
+              opacity:
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+        },
+        child: child);
   }
 
   buildUserList() {

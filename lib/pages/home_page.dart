@@ -21,9 +21,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var formData;
+
   @override
   void initState() {
     print('homepage setstate');
+    _getHomePageData();
     super.initState();
   }
 
@@ -54,33 +57,41 @@ class _HomePageState extends State<HomePage> {
         ),
 
         // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-        body: FutureBuilder(
-          future: _getHomePageData(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Container(
-                color: Colors.white.withOpacity(0.1),
-                child: EasyRefresh(
-                  header: MaterialHeader(),
-                  onRefresh: () async {
-                    await Future.delayed(Duration(seconds: 1), () {
-                      setState(() {});
-                    });
-                  },
-                  child: ListView(
-                    children: <Widget>[
-                      HomePageBanner(snapshot.data['banner']),
-                      HomePageTopics(snapshot.data['topics']),
-                      HomePageActivities(snapshot.data['activities']),
-                    ],
-                  ),
-                ),
-              );
-            } else {
-              return FinderDialog.showLoading();
-            }
-          },
-        ));
+        body: body);
+  }
+
+  Widget get body {
+    Widget child;
+    if (this.formData == null) {
+      child = Container(
+          alignment: Alignment.center,
+          height: double.infinity,
+          child: CupertinoActivityIndicator());
+    } else {
+      child = EasyRefresh(
+        header: MaterialHeader(),
+        child: ListView(
+          children: <Widget>[
+            HomePageBanner(this.formData['banner']),
+            HomePageTopics(this.formData['topics']),
+            HomePageActivities(this.formData['activities']),
+          ],
+        ),
+        onRefresh: () async {
+          await _getHomePageData();
+        },
+      );
+    }
+
+    return AnimatedSwitcher(
+        duration: Duration(milliseconds: 1000),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+              child: child,
+              opacity:
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+        },
+        child: child);
   }
 
   Future _getBannerData() async {
@@ -116,7 +127,10 @@ class _HomePageState extends State<HomePage> {
       'topics': await _getTopicsData(3),
       'activities': await _getAcitivitiesData()
     };
+    if (!mounted) return;
     // print(formData);
-    return formData;
+    setState(() {
+      this.formData = formData;
+    });
   }
 }
