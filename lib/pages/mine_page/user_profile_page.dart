@@ -185,8 +185,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
             ),
             Text(
-              user.school.name,
-              style: TextStyle(fontSize: ScreenUtil().setSp(35)),
+              user?.school?.name ?? "家里蹲大学",
+              style: TextStyle(fontSize: 16),
             ),
             Padding(
               padding: EdgeInsets.only(top: 8.0),

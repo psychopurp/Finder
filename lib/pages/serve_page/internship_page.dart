@@ -1004,7 +1004,7 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                                   children: _smallTypes
                                           .containsKey(_tempBigType)
                                       ? List<Widget>.generate(
-                                          _smallTypes[_tempBigType].length,
+                                          _smallTypes[_tempBigType]?.length ?? 0,
                                           (index) {
                                             InternshipSmallType item =
                                                 _smallTypes[_tempBigType]
