@@ -14,8 +14,8 @@ class MessageType {
   static const int Tips = 4;
 }
 
-class DataObject implements Listenable {
-  static DataObject instance;
+class MessageModel implements Listenable {
+  static MessageModel instance;
   DateTime lastRequestTime;
   List<SystemMessageItem> systems = [];
   List<TipItem> tips = [];
@@ -38,9 +38,9 @@ class DataObject implements Listenable {
   Timer _timer;
   static int failCount = -1;
 
-  factory DataObject({VoidCallback onChange}) {
+  factory MessageModel({VoidCallback onChange}) {
     if (instance == null) {
-      instance = DataObject._init();
+      instance = MessageModel._init();
     }
     return instance;
   }
@@ -59,7 +59,7 @@ class DataObject implements Listenable {
     _timer = null;
   }
 
-  DataObject._init() {
+  MessageModel._init() {
     changeEvents = [save];
     SharedPreferences.getInstance().then((value) {
       prefs = value;
@@ -672,7 +672,7 @@ class UserMessageItem extends Item implements ToJson {
         sender: UserProfile.fromJson(map['sender']),
         receiver: receiver,
         content: map["content"],
-        isRead: !(!map["isRead"] && receiver == DataObject().self),
+        isRead: !(!map["isRead"] && receiver == MessageModel().self),
         sessionId: map["sessionId"],
         id: map["id"]);
   }

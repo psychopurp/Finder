@@ -12,7 +12,7 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> {
-  DataObject data = DataObject();
+  MessageModel data = MessageModel();
 
   void update() {
     setState(() {});

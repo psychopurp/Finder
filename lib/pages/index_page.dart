@@ -34,13 +34,13 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    DataObject().addListener(update);
+    MessageModel().addListener(update);
   }
 
   @override
   void dispose() {
     super.dispose();
-    DataObject().removeListener(update);
+    MessageModel().removeListener(update);
   }
 
   @override
@@ -164,7 +164,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                 ),
               ),
               _singleButton(IconData(0xe879, fontFamily: 'myIcon'), '消息', 3,
-                  withTips: true, count: DataObject().allUnReadCount),
+                  withTips: true, count: MessageModel().allUnReadCount),
               _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), '服务', 4),
 //              _singleButton(
 //                  IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),

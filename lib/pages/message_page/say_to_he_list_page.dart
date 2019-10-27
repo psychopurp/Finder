@@ -13,7 +13,7 @@ class SayToHePage extends StatefulWidget {
 }
 
 class _SayToHePageState extends State<SayToHePage> {
-  DataObject data = DataObject();
+  MessageModel data = MessageModel();
 
   void update() {
     setState(() {});

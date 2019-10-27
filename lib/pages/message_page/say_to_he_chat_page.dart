@@ -19,7 +19,7 @@ class SayToHeChatRoute extends StatelessWidget {
     Map<String, dynamic> args = ModalRoute.of(context).settings.arguments;
     UserProfile other = args["other"];
     String sessionId = args["sessionId"];
-    DataObject data = DataObject();
+    MessageModel data = MessageModel();
     int id1;
     int id2;
     if (other.id < data.self.id) {
@@ -50,7 +50,7 @@ class SayToHeChatPage extends StatefulWidget {
 }
 
 class _SayToHeChatPageState extends State<SayToHeChatPage> {
-  DataObject data;
+  MessageModel data;
   List<SayToHeItem> messages;
   TextEditingController _textController;
   ScrollController _scrollController;
@@ -75,7 +75,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
   @override
   void initState() {
     super.initState();
-    data = DataObject();
+    data = MessageModel();
     data.addListener(update);
     data.getDataInterval(duration: Duration(seconds: 10));
     messages = data.says[widget.sessionId];
@@ -147,7 +147,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
         setState(() {
           item.sending = false;
           item.fail = true;
-          item.id = DataObject.failCount--;
+          item.id = MessageModel.failCount--;
         });
         return false;
       }
@@ -156,7 +156,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
       setState(() {
         item.sending = false;
         item.fail = true;
-        item.id = DataObject.failCount--;
+        item.id = MessageModel.failCount--;
       });
       return false;
     }
@@ -187,7 +187,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
         setState(() {
           item.sending = false;
           item.fail = true;
-          item.id = DataObject.failCount--;
+          item.id = MessageModel.failCount--;
         });
         return false;
       }
@@ -196,7 +196,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
       setState(() {
         item.sending = false;
         item.fail = true;
-        item.id = DataObject.failCount--;
+        item.id = MessageModel.failCount--;
       });
       return false;
     }

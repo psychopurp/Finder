@@ -10,7 +10,7 @@ class TipsPage extends StatefulWidget {
 }
 
 class _TipsPageState extends State<TipsPage> {
-  DataObject data = DataObject();
+  MessageModel data = MessageModel();
 
   void update() {
     setState(() {});
