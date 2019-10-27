@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/follower_model.dart';
+import 'package:finder/models/user_model.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -88,26 +89,27 @@ class TabBody extends StatefulWidget {
 }
 
 class _TabBodyState extends State<TabBody> {
-  EasyRefreshController _refreshController;
   FollowerModel follower;
+  EasyRefreshController _refreshController;
+  ScrollController _controller;
 
   static const int FOLLOW = 0;
   static const int BOTHFOLLOW = 1;
   static const int FOLLOWED = 2;
 
-  var followButton;
+  int pageCount = 2;
 
   @override
   void initState() {
-    followButton = {};
-
-    getInitialData();
+    _controller = ScrollController();
     _refreshController = EasyRefreshController();
+    getInitialData();
     super.initState();
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _refreshController.dispose();
     super.dispose();
   }
@@ -124,17 +126,17 @@ class _TabBodyState extends State<TabBody> {
         await getInitialData();
         _refreshController.resetLoadState();
       },
-      // onLoad: () async {
-      //   var data = await getMore(this.pageCount);
-      //   print("data===$data");
-      //   _refreshController.finishLoad(
-      //       success: true, noMore: (data.length == 0));
-      // },
+      onLoad: () async {
+        var data = await getMore(pageCount: this.pageCount);
+        print("data===$data");
+        _refreshController.finishLoad(
+            success: true, noMore: (data.length == 0));
+      },
       child: (this.follower != null)
           ? ListView(
-              // controller: _controller,
-              padding: EdgeInsets.only(bottom: 20),
-              children: buildUserList(user))
+              controller: _controller,
+              padding: EdgeInsets.only(bottom: 50),
+              children: buildUserList())
           : Container(
               height: 400,
               child: CupertinoActivityIndicator(),
@@ -142,21 +144,7 @@ class _TabBodyState extends State<TabBody> {
     );
   }
 
-  handleFollow(UserProvider user, FollowerModelData userInfo) async {
-    if (user.isLogIn) {
-      /// 关注页
-      if (widget.isFollow) {
-        // if(userInfo.isBothFollowed)
-
-      }
-      var data = await apiClient.addFollowUser(userId: userInfo.id);
-      print(data);
-    } else {
-      //TODO 处理未登录
-    }
-  }
-
-  buildUserList(UserProvider user) {
+  buildUserList() {
     List<Widget> content = [];
     this.follower.data.forEach((item) {
       Widget userRow = Container(
@@ -167,11 +155,16 @@ class _TabBodyState extends State<TabBody> {
             GestureDetector(
               onTap: () {
                 Application.router.navigateTo(context,
-                    "${Routes.userProfile}?senderId=${item.id.toString()}");
+                    "${Routes.userProfile}?senderId=${item.id.toString()}&heroTag=${item.id.toString() + widget.isFollow.toString() + 'follower'}");
               },
-              child: Avatar(
-                url: item.avatar,
-                avatarHeight: 40,
+              child: Hero(
+                tag: item.id.toString() +
+                    widget.isFollow.toString() +
+                    'follower',
+                child: Avatar(
+                  url: item.avatar,
+                  avatarHeight: 40,
+                ),
               ),
             ),
             Expanded(
@@ -204,7 +197,7 @@ class _TabBodyState extends State<TabBody> {
                 // color: Colors.amber,
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(right: 10),
-                child: getButton(item.status, user, item))
+                child: getButton(item.status, item))
           ],
         ),
       );
@@ -215,7 +208,7 @@ class _TabBodyState extends State<TabBody> {
     return content;
   }
 
-  getButton(int typeId, UserProvider user, FollowerModelData userInfo) {
+  getButton(int typeId, FollowerModelData userInfo) {
     String buttonText = "";
     if (typeId == FOLLOW) {
       buttonText = "关注";
@@ -288,14 +281,26 @@ class _TabBodyState extends State<TabBody> {
   Future getInitialData() async {
     var data = await apiClient.getFollowers(
         userId: widget.userId, isFan: !widget.isFollow);
-    print(data);
-    print(!widget.isFollow);
-    print(widget.userId);
+
     FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFollow);
 
     if (!mounted) return;
     setState(() {
       this.follower = followerModel;
+      this.pageCount = 2;
     });
+  }
+
+  Future getMore({int pageCount}) async {
+    var data = await apiClient.getFollowers(
+        page: pageCount, userId: widget.userId, isFan: !widget.isFollow);
+
+    FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFollow);
+
+    setState(() {
+      this.follower.data.addAll(followerModel.data);
+      this.pageCount++;
+    });
+    return followerModel.data;
   }
 }

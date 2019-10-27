@@ -1,5 +1,6 @@
+import 'dart:io';
+
 import 'package:finder/config/api_client.dart';
-import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/my_appbar.dart';
 import 'package:finder/public.dart';
@@ -8,10 +9,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:finder/provider/user_provider.dart';
-import 'package:palette_generator/palette_generator.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:finder/pages/mine_page/mine_page_top.dart';
-import 'package:finder/pages/mine_page/mine_page_bottom.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -21,13 +21,14 @@ class MinePage extends StatefulWidget {
 class _MinePageState extends State<MinePage> {
   Color backGroundColor = Colors.grey;
   double topPartHeight = 150;
+  List<Asset> images = [];
   var cards;
 
   @override
   void initState() {
     cards = {
-      'topic': {'name': '话题'},
-      'activity': {'name': '活动'},
+      'topic': {'name': '话题 (待完善)'},
+      'activity': {'name': '活动(待完善)'},
       'toHeSay': {'name': '表白Ta'},
       'message': {'name': '私信Ta'}
     };
@@ -40,8 +41,103 @@ class _MinePageState extends State<MinePage> {
       body: Consumer<UserProvider>(builder: (context, user, child) {
         var avatar = GestureDetector(
           onTap: () {
-            BotToast.showText(
-                text: 'elyar', duration: Duration(milliseconds: 500));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (_) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          constraints: BoxConstraints.expand(height: 500),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CachedNetworkImage(
+                                  imageUrl: user.userInfo.avatar),
+                              Padding(
+                                padding: EdgeInsets.only(top: 18.0),
+                                child: MaterialButton(
+                                  onPressed: () async {
+                                    Future getImage() async {
+                                      var image;
+                                      // var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+                                      String error = 'No Error Dectected';
+                                      List<Asset> resultList = List<Asset>();
+                                      try {
+                                        resultList =
+                                            await MultiImagePicker.pickImages(
+                                          maxImages: 1,
+                                          enableCamera: true,
+                                          selectedAssets: images,
+                                          cupertinoOptions: CupertinoOptions(
+                                              takePhotoIcon: "chat"),
+                                          materialOptions: MaterialOptions(
+                                            selectionLimitReachedText:
+                                                '请选择一张图片',
+                                            textOnNothingSelected: '请至少选择一张图片',
+                                            actionBarColor: "#000000",
+                                            statusBarColor: '#999999',
+                                            actionBarTitle: "相册",
+                                            allViewTitle: "全部图片",
+                                            useDetailsView: true,
+                                            selectCircleStrokeColor: "#000000",
+                                          ),
+                                        );
+                                      } on Exception catch (e) {
+                                        error = e.toString();
+                                      }
+                                      if (resultList.length != 0) {
+                                        var t = await resultList[0].filePath;
+                                        image = File(t);
+                                      }
+
+                                      var cropImage =
+                                          await ImageCropper.cropImage(
+                                              sourcePath: image.path,
+                                              aspectRatio: CropAspectRatio(
+                                                  ratioX: 16, ratioY: 16),
+                                              androidUiSettings:
+                                                  AndroidUiSettings(
+                                                      showCropGrid: false,
+                                                      toolbarTitle: '图片剪切',
+                                                      toolbarColor:
+                                                          Theme.of(context)
+                                                              .primaryColor,
+                                                      toolbarWidgetColor: Colors
+                                                          .white,
+                                                      initAspectRatio:
+                                                          CropAspectRatioPreset
+                                                              .original,
+                                                      lockAspectRatio: true),
+                                              iosUiSettings: IOSUiSettings(
+                                                  minimumAspectRatio: 1.0,
+                                                  aspectRatioLockEnabled:
+                                                      true));
+                                      return cropImage;
+                                    }
+
+                                    File image = await getImage();
+                                    var data =
+                                        await imageUpdate(image, user.userInfo);
+                                    Navigator.pop(context);
+                                    BotToast.showText(text: data.toString());
+                                  },
+                                  shape: StadiumBorder(
+                                      side: BorderSide(color: Colors.white)),
+                                  child: Text(
+                                    "修改图片",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    }));
           },
           child: Hero(
             tag: 'profile',
@@ -136,6 +232,14 @@ class _MinePageState extends State<MinePage> {
     return content;
   }
 
+  imageUpdate(File image, UserModel user) async {
+    var imageStr = await apiClient.uploadImage(image);
+    imageStr = Avatar.getImageUrl(imageStr);
+    user.avatar = imageStr;
+    var data = await apiClient.upLoadUserProfile(user);
+    return data;
+  }
+
   Widget buildUserBackground(UserModel user, BuildContext context) {
     return Container(
       height: ScreenUtil().setHeight(650),
@@ -204,7 +308,7 @@ class _MinePageState extends State<MinePage> {
         elevation: 10,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Container(
-          padding: EdgeInsets.only(bottom: 50, top: 50),
+          padding: EdgeInsets.only(bottom: 15, top: 50),
           width: ScreenUtil().setWidth(750),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -226,35 +330,45 @@ class _MinePageState extends State<MinePage> {
                     width: 1,
                     color: Theme.of(context).primaryColor,
                   ),
-                  Text((user.major != null) ? user.major : "")
+                  Text((user.major != null) ? user.major : ""),
                 ],
               ),
 
               ///关注
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  MaterialButton(
-                    onPressed: () {
-                      Application.router.navigateTo(context,
-                          "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=true");
-                    },
-                    shape: RoundedRectangleBorder(),
-                    child: Column(
-                      children: <Widget>[Text('关注')],
+              Container(
+                // color: Colors.amber,
+                padding: EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    MaterialButton(
+                      onPressed: () {
+                        Application.router.navigateTo(context,
+                            "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=true");
+                      },
+                      shape: RoundedRectangleBorder(),
+                      child: Column(
+                        children: <Widget>[
+                          Text(user.followCount.toString()),
+                          Text('关注')
+                        ],
+                      ),
                     ),
-                  ),
-                  MaterialButton(
-                    onPressed: () {
-                      Application.router.navigateTo(context,
-                          "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=false");
-                    },
-                    shape: RoundedRectangleBorder(),
-                    child: Column(
-                      children: <Widget>[Text('粉丝')],
-                    ),
-                  )
-                ],
+                    MaterialButton(
+                      onPressed: () {
+                        Application.router.navigateTo(context,
+                            "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=false");
+                      },
+                      shape: RoundedRectangleBorder(),
+                      child: Column(
+                        children: <Widget>[
+                          Text(user.fanCount.toString()),
+                          Text('粉丝')
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               )
             ],
           ),

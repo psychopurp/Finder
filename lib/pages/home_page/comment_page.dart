@@ -164,11 +164,16 @@ class _CommentPageState extends State<CommentPage> {
                 InkWell(
                   onTap: () {
                     Application.router.navigateTo(context,
-                        "${Routes.userProfile}?senderId=${item.sender.id.toString()}");
+                        "${Routes.userProfile}?senderId=${item.sender.id.toString()}&heroTag=${item.id.toString() + item.sender.id.toString() + 'comment'}");
                   },
-                  child: Avatar(
-                    url: item.sender.avatar,
-                    avatarHeight: 40,
+                  child: Hero(
+                    tag: item.id.toString() +
+                        item.sender.id.toString() +
+                        'comment',
+                    child: Avatar(
+                      url: item.sender.avatar,
+                      avatarHeight: 40,
+                    ),
                   ),
                 ),
                 Expanded(

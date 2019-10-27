@@ -566,11 +566,16 @@ class _TopicCommentsState extends State<TopicComments> {
                     InkWell(
                       onTap: () {
                         Application.router.navigateTo(context,
-                            "${Routes.userProfile}?senderId=${item.sender.id}");
+                            "${Routes.userProfile}?senderId=${item.sender.id}&heroTag=${item.id.toString() + item.sender.id.toString() + 'topic'}");
                       },
-                      child: Avatar(
-                        url: item.sender.avatar,
-                        avatarHeight: ScreenUtil().setHeight(90),
+                      child: Hero(
+                        tag: item.id.toString() +
+                            item.sender.id.toString() +
+                            'topic',
+                        child: Avatar(
+                          url: item.sender.avatar,
+                          avatarHeight: ScreenUtil().setHeight(90),
+                        ),
                       ),
                     ),
                     Padding(

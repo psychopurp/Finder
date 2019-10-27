@@ -10,6 +10,8 @@ class UserModel {
   String birthday;
   String major;
   School school;
+  int fanCount;
+  int followCount;
 
   UserModel(
       {this.avatar,
@@ -19,7 +21,9 @@ class UserModel {
       this.major,
       this.nickname,
       this.phone,
-      this.school});
+      this.school,
+      this.fanCount,
+      this.followCount});
   UserModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     nickname = json['nickname'];
@@ -28,6 +32,8 @@ class UserModel {
     introduction = json['introduction'];
     birthday = json["birthday"];
     major = json['major'];
+    fanCount = json['fan_count'];
+    followCount = json['follow_count'];
     school =
         json['school'] != null ? new School.fromJson(json['school']) : null;
   }
@@ -41,6 +47,8 @@ class UserModel {
     json["birthday"] = this.birthday;
     json['major'] = this.major;
     json['id'] = this.id;
+    json['follow_count'] = this.followCount;
+    json['fan_count'] = this.fanCount;
     if (this.school != null) {
       json['school'] = this.school.toJson();
     }

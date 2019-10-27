@@ -172,8 +172,12 @@ var internshipCompanyHandler = Handler(
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   String senderId = params['senderId']?.first;
+  String heroTag = params['heroTag']?.first;
+  print("heroTag===>$heroTag");
+  // print(senderId);
   return UserProfilePage(
     senderId: int.parse(senderId),
+    heroTag: heroTag,
   );
 });
 

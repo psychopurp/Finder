@@ -354,8 +354,8 @@ class ApiClient {
   }
 
   //获取用户关注/粉丝的用户列表
-  Future getFollowers({int userId, bool isFan}) async {
-    var formData = {'user_id': userId, 'is_fan': isFan ? 1 : 0};
+  Future getFollowers({int userId, bool isFan, int page}) async {
+    var formData = {'user_id': userId, 'is_fan': isFan ? 1 : 0, 'page': page};
     try {
       Response response =
           await dio.get('get_followers/', queryParameters: formData);

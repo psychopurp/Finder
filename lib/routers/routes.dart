@@ -97,7 +97,7 @@ class Routes {
 
     //我的页
     router.define(userProfile,
-        handler: userProfileHandler, transitionType: TransitionType.fadeIn);
+        handler: userProfileHandler, transitionType: TransitionType.cupertino);
     router.define(minePage,
         handler: minePageHandler, transitionType: TransitionType.cupertino);
     router.define(chat,
