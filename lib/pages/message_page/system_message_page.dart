@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
-import 'package:finder/pages/message_page/data_object.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';

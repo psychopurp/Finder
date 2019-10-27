@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/models/internship_item.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';

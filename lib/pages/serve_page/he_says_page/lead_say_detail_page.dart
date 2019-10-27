@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
-import 'package:finder/pages/serve_page/he_says_page.dart';
+import 'package:finder/models/he_says_item.dart';
 import 'package:flutter/material.dart';
 
 const Color ActionColor = Color(0xFFDB6B5C);

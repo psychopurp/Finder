@@ -2,7 +2,7 @@ import 'package:finder/plugin/avatar.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 
-import 'data_object.dart';
+import '../../models/message_model.dart';
 
 const double MessageHeight = 70;
 const double AvatarHeight = 54;
