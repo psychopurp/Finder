@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'data_object.dart';
+import '../../models/message_model.dart';
 
 const double MessageHeight = 70;
 const double AvatarHeight = 54;
@@ -10,7 +10,7 @@ class TipsPage extends StatefulWidget {
 }
 
 class _TipsPageState extends State<TipsPage> {
-  DataObject data = DataObject();
+  MessageModel data = MessageModel();
 
   void update() {
     setState(() {});

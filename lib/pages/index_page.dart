@@ -1,4 +1,4 @@
-import 'package:finder/pages/message_page/data_object.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/pages/profile_drawer.dart';
 import 'package:finder/routers/application.dart';
 import 'package:fluro/fluro.dart';
@@ -34,13 +34,13 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    DataObject().addListener(update);
+    MessageModel().addListener(update);
   }
 
   @override
   void dispose() {
     super.dispose();
-    DataObject().removeListener(update);
+    MessageModel().removeListener(update);
   }
 
   @override
@@ -165,8 +165,8 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                 ),
               ),
               _singleButton(IconData(0xe879, fontFamily: 'myIcon'), '消息', 3,
-                  withTips: true, count: DataObject().allUnReadCount),
-              _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), '广场', 4),
+                  withTips: true, count: MessageModel().allUnReadCount),
+              _singleButton(IconData(0xe6b8, fontFamily: 'myIcon'), '服务', 4),
 //              _singleButton(
 //                  IconData(0xe66d, fontFamily: 'myIcon'), 'Profile', 4),
             ],

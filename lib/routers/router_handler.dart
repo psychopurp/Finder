@@ -12,9 +12,13 @@ import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/mine_page.dart';
 import 'package:finder/pages/mine_page/collection_page.dart';
+import 'package:finder/pages/recruit_page/recommend_recruit_detail_page.dart';
+import 'package:finder/pages/recruit_page/recruit_detail_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/pages/serve_page/internship_page/company_page.dart';
+import 'package:finder/pages/serve_page/internship_page/internship_detail_page.dart';
+import 'package:finder/pages/serve_page/internship_page/recommend_internship_detail_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/serve_page/lost_found_page.dart';
@@ -114,6 +118,17 @@ var publishActivityHandler = Handler(
   return PublishActivityPage();
 });
 
+//招募页
+var recruitDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return RecruitDetailPage();
+    });
+var recommendRecruitDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return RecommendRecruitDetailPage();
+    });
+
+
 //服务页面 -- 失物招领
 var lostFoundHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -167,7 +182,14 @@ var internshipCompanyHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CompanyRoute();
 });
-
+var internshipDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return InternshipDetailPage();
+});
+var recommendInternshipDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return RecommendInternshipDetailPage();
+    });
 //用户详情页
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {

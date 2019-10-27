@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
-import 'package:finder/plugin/avatar.dart';
+import 'package:finder/models/internship_item.dart';
 import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +184,7 @@ class _InternshipPageState extends State<InternshipPage> {
         itemCount: _bannerData.length,
         autoplay: _bannerData.length > 1,
         onTap: (index) {
-          Navigator.pushNamed(context, Routes.internshipCompany,
+          Navigator.pushNamed(context, Routes.recommendInternshipDetail,
               arguments: _bannerData[index]);
         },
         pagination: SwiperPagination(
@@ -214,7 +214,9 @@ class _InternshipPageState extends State<InternshipPage> {
           );
           return Padding(
             padding: EdgeInsets.only(bottom: 25, left: 10, right: 10),
-            child: image,
+            child: _bannerData.length > 1
+                ? Hero(tag: item.image, child: image)
+                : image,
           );
         },
       ),
@@ -278,7 +280,7 @@ class _InternshipPageState extends State<InternshipPage> {
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(25)),
+                                    BorderRadius.all(Radius.circular(25)),
                                 image: DecorationImage(
                                   image: imageProvider,
                                   fit: BoxFit.cover,
@@ -326,24 +328,37 @@ class _InternshipPageState extends State<InternshipPage> {
             color: Color(0xcceeeeee),
             height: 1,
           ),
-          Container(
-            padding: EdgeInsets.only(left: 13, bottom: 8),
-            child: Text(
-              item.title,
-              style: TextStyle(
-                  color: Color(0xff555555),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.only(left: 13),
-            child: Text(
-              item.salaryRange,
-              style: TextStyle(
-                color: Color(0xff777777),
-                fontSize: 14,
-              ),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context)
+                  .pushNamed(Routes.internshipDetail, arguments: item);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(left: 13, bottom: 8),
+                  width: ScreenUtil.screenWidthDp,
+                  child: Text(
+                    item.title,
+                    style: TextStyle(
+                        color: Color(0xff555555),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 13),
+                  width: ScreenUtil.screenWidthDp,
+                  child: Text(
+                    item.salaryRange,
+                    style: TextStyle(
+                      color: Color(0xff777777),
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Container(
@@ -351,7 +366,7 @@ class _InternshipPageState extends State<InternshipPage> {
             child: Wrap(
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
-                      (index) => getTag(item.tags[index]?.name ?? "Default")),
+                  (index) => getTag(item.tags[index]?.name ?? "Default")),
             ),
           ),
           Padding(
@@ -648,129 +663,6 @@ class _InternshipPageHeaderState extends State<InternshipPageHeader>
   }
 }
 
-class InternshipItem {
-  InternshipItem(
-      {this.id,
-      this.image,
-      this.company,
-      this.types,
-      this.salaryRange,
-      this.tags,
-      this.title,
-      this.time});
-
-  factory InternshipItem.fromJson(Map<String, dynamic> map) {
-    return InternshipItem(
-      id: map['id'],
-      company: CompanyItem.fromJson(map['company']),
-      types: List<InternshipSmallType>.generate((map['types'] ?? []).length,
-          (index) => InternshipSmallType.fromJson(map['types'][index])),
-      tags: List<InternshipTag>.generate((map['tags'] ?? []).length,
-          (index) => InternshipTag.fromJson(map['tags'][index])),
-      salaryRange: map['salary_range'],
-      title: map['title'],
-      time: DateTime.fromMillisecondsSinceEpoch((map['time'] * 1000).toInt()),
-    );
-  }
-
-  factory InternshipItem.recommend(Map<String, dynamic> json) {
-    Map<String, dynamic> map = json["internship"];
-    return InternshipItem(
-      id: map['id'],
-      image: Avatar.getImageUrl(json['image']),
-      company: CompanyItem.fromJson(map['company']),
-      types: List<InternshipSmallType>.generate((map['types'] ?? []).length,
-          (index) => InternshipSmallType.fromJson(map['types'][index])),
-      tags: List<InternshipTag>.generate((map['tags'] ?? []).length,
-          (index) => InternshipTag.fromJson(map['tags'][index])),
-      salaryRange: map['salary_range'],
-      title: map['title'],
-      time: DateTime.fromMillisecondsSinceEpoch((map['time'] * 1000).toInt()),
-    );
-  }
-
-  final int id;
-  final String title;
-  final String image;
-  final CompanyItem company;
-  final List<InternshipSmallType> types;
-  final List<InternshipTag> tags;
-  final String salaryRange;
-  final DateTime time;
-}
-
-class CompanyItem {
-  CompanyItem({this.id, this.name, this.image});
-
-  factory CompanyItem.fromJson(Map<String, dynamic> map) {
-    if (map == null) return null;
-    return CompanyItem(
-        id: map["id"],
-        name: map["name"],
-        image: Avatar.getImageUrl(map["image"]));
-  }
-
-  final int id;
-  final String name;
-  final String image;
-}
-
-class InternshipType {
-  InternshipType({this.id, this.name});
-
-  final int id;
-  final String name;
-
-  @override
-  int get hashCode {
-    if (runtimeType == InternshipSmallType) {
-      return 1000000000 + id;
-    } else {
-      return 2000000000 + id;
-    }
-  }
-
-  @override
-  bool operator ==(other) {
-    return other.runtimeType == runtimeType && other.id == this.id;
-  }
-}
-
-class InternshipSmallType extends InternshipType {
-  InternshipSmallType({int id, String name}) : super(id: id, name: name);
-
-  factory InternshipSmallType.fromJson(Map<String, dynamic> map) {
-    return InternshipSmallType(
-      id: map["id"],
-      name: map["name"],
-    );
-  }
-}
-
-class InternshipBigType extends InternshipType {
-  InternshipBigType({int id, String name}) : super(id: id, name: name);
-
-  factory InternshipBigType.fromJson(Map<String, dynamic> map) {
-    return InternshipBigType(
-      id: map["id"],
-      name: map["name"],
-    );
-  }
-}
-
-class InternshipTag {
-  InternshipTag({this.id, this.name});
-
-  factory InternshipTag.fromJson(Map<String, dynamic> map) {
-    return InternshipTag(
-      id: map["id"],
-      name: map["name"],
-    );
-  }
-
-  final int id;
-  final String name;
-}
 
 String getTimeString(DateTime time) {
   Map<int, String> weekdayMap = {
@@ -1004,7 +896,8 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                                   children: _smallTypes
                                           .containsKey(_tempBigType)
                                       ? List<Widget>.generate(
-                                          _smallTypes[_tempBigType]?.length ?? 0,
+                                          _smallTypes[_tempBigType]?.length ??
+                                              0,
                                           (index) {
                                             InternshipSmallType item =
                                                 _smallTypes[_tempBigType]

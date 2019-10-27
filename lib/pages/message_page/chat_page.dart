@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
-import 'package:finder/pages/message_page/data_object.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -17,7 +17,7 @@ class ChatRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     UserProfile other = ModalRoute.of(context).settings.arguments;
-    DataObject data = DataObject();
+    MessageModel data = MessageModel();
     int id1;
     int id2;
     if (other.id < data.self.id) {
@@ -49,7 +49,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  DataObject data;
+  MessageModel data;
   List<UserMessageItem> messages;
   bool needSync = false;
   TextEditingController _textController;
@@ -75,7 +75,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    data = DataObject();
+    data = MessageModel();
     data.addListener(update);
     data.getDataInterval(duration: Duration(seconds: 10));
     if (!data.users.containsKey(widget.sessionId)) {
@@ -156,7 +156,7 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {
           item.sending = false;
           item.fail = true;
-          item.id = DataObject.failCount--;
+          item.id = MessageModel.failCount--;
         });
         return false;
       }
@@ -165,7 +165,7 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         item.sending = false;
         item.fail = true;
-        item.id = DataObject.failCount--;
+        item.id = MessageModel.failCount--;
       });
       return false;
     }
@@ -196,7 +196,7 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {
           item.sending = false;
           item.fail = true;
-          item.id = DataObject.failCount--;
+          item.id = MessageModel.failCount--;
         });
         return false;
       }
@@ -205,7 +205,7 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         item.sending = false;
         item.fail = true;
-        item.id = DataObject.failCount--;
+        item.id = MessageModel.failCount--;
       });
       return false;
     }
