@@ -109,7 +109,7 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
         child: Text("参与"),
         elevation: 1,
         onPressed: () {
-
+            Navigator.of(context).pushNamed(Routes.engageRecruit, arguments: item.id);
         },
         backgroundColor: Theme.of(context).primaryColor,
       ),

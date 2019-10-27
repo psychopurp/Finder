@@ -118,7 +118,7 @@ class _RecruitPageState extends State<RecruitPage> {
             width: double.infinity,
             alignment: Alignment.center,
             child: Text(
-              "暂时没有这个类别的实习哟~\n换一个类型看看吧！",
+              "暂时没有这个类别的招募哟~\n换一个类型看看吧！",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -138,11 +138,13 @@ class _RecruitPageState extends State<RecruitPage> {
           key: ValueKey(child),
           child: listBuilder(preItems, getItem, _data.length),
           onRefresh: () async {
+            loading = true;
             _nowPage = 1;
             _bannerData = [];
             await getRecommend();
             _data = [];
             await getRecruitsData();
+            loading = false;
           },
           onLoad: () async {
             await getRecruitsData();

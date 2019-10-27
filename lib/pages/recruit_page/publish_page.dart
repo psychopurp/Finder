@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
 import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:finder/models/recruit_model.dart';
 
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 const Color ActionColor = Color(0xFFDB6B5C);
@@ -19,59 +19,41 @@ class RecruitPublishPage extends StatefulWidget {
 
 class _RecruitPublishPageState extends State<RecruitPublishPage>
     with SingleTickerProviderStateMixin {
-  TabController _tabController;
-  File _image;
-  bool nameLess = false;
   TextEditingController inputController;
   TextEditingController titleInputController;
-  TextEditingController schoolInputController;
-  TextEditingController idInputController;
-  List<Map<String, dynamic>> tabBarItem;
+  TextEditingController _tagController;
+  static List<RecruitTypesModelData> _types = [];
+  static List<RecruitTypesModelData> _nowTypes = [];
+  FocusNode _tagFocus;
+  List<String> tags = [];
   String errorHint = "";
   Dio dio;
 
   @override
   void dispose() {
-    _tabController.dispose();
     inputController.dispose();
     titleInputController.dispose();
-    schoolInputController.dispose();
-    idInputController.dispose();
+    _tagController.dispose();
+    _types = [];
+    _tagFocus.dispose();
+    _nowTypes = [];
     super.dispose();
   }
 
   void initState() {
     super.initState();
-    _tabController = new TabController(vsync: this, length: 3, initialIndex: 1);
     inputController = TextEditingController();
     titleInputController = TextEditingController();
-    schoolInputController = TextEditingController();
-    idInputController = TextEditingController();
+    _tagController = TextEditingController();
+    _tagFocus = FocusNode();
     dio = ApiClient.dio;
-    tabBarItem = [
-      {
-        "name": '头号说',
-        "page": leadSay,
-        "post": leadSayPost,
-      },
-      {
-        "name": "心动说",
-        "page": normalSay,
-        "post": normalSayPost,
-      },
-      {
-        "name": "对Ta说",
-        "page": sayToHe,
-        "post": sayToHePost,
-      }
-    ];
+    RecruitTypesModel recruitTypes = global.recruitTypes;
+    if (recruitTypes.status) {
+      _types = recruitTypes.data;
+    }
   }
 
-  Future<bool> leadSayPost() async {
-    if (_image == null) {
-      errorHint = "请上传图片";
-      return false;
-    }
+  Future<bool> postData() async {
     String title = titleInputController.text;
     if (title == "" || title == null) {
       errorHint = "请输入标题";
@@ -82,81 +64,17 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
       errorHint = "请输入内容";
       return false;
     }
-    String image = await apiClient.uploadImage(_image);
-    if (image == null) {
-      errorHint = "图片上传失败, 请重试";
+    if(_types.length == 0){
+      errorHint = "请至少选择一个类型";
       return false;
     }
     try {
-      var response = await dio.post("add_lead_he_she_say/",
+      var response = await dio.post("add_recruit/",
           data: json.encode({
             "title": title,
-            "content": content,
-            "is_show_name": !nameLess,
-            "image": image,
-          }));
-      var data = response.data;
-      if (!data["status"]) {
-        errorHint = data["error"];
-        return false;
-      } else {
-        return true;
-      }
-    } on DioError catch (e) {
-      print(e);
-      errorHint = "网络连接失败, 请稍后再试";
-      return false;
-    }
-  }
-
-  Future<bool> normalSayPost() async {
-    String content = inputController.text;
-    if (content == null || content == "") {
-      errorHint = "请输入内容";
-      return false;
-    }
-    try {
-      var response = await dio.post("add_he_she_say/",
-          data: json.encode({
-            "content": content,
-            "is_show_name": !nameLess,
-          }));
-      var data = response.data;
-      if (!data["status"]) {
-        errorHint = data["error"];
-        return false;
-      } else {
-        return true;
-      }
-    } on DioError catch (e) {
-      print(e);
-      errorHint = "网络连接失败, 请稍后再试";
-      return false;
-    }
-  }
-
-  Future<bool> sayToHePost() async {
-    String id = idInputController.text;
-    if (id == "" || id == null) {
-      errorHint = "请输入学号";
-      return false;
-    }
-    int numId = int.tryParse(id);
-    if (numId == null) {
-      errorHint = "学号非法";
-      return false;
-    }
-    String content = inputController.text;
-    if (content == null || content == "") {
-      errorHint = "请输入内容";
-      return false;
-    }
-    try {
-      var response = await dio.post("send_say_to_he/",
-          data: json.encode({
-            "content": content,
-            "is_show_name": !nameLess,
-            "student_id": id,
+            "introduction": content,
+            "types": _types.map((e)=>e.id).toList(),
+            "tags": tags
           }));
       var data = response.data;
       if (!data["status"]) {
@@ -248,250 +166,115 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
     var appBarColor = Color.fromARGB(255, 95, 95, 95);
     var appBarIconColor = Color.fromARGB(255, 155, 155, 155);
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 7),
-            child: MaterialButton(
-              minWidth: 30,
-              padding: EdgeInsets.symmetric(horizontal: 18),
-              color: ActionColor,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              onPressed: () async {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false, //点击遮罩不关闭对话框
-                  builder: (context) {
-                    return AlertDialog(
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          CircularProgressIndicator(),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 26.0),
-                            child: Text("正在发布，请稍后..."),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                );
-                bool status = await tabBarItem[_tabController.index]["post"]();
-                Navigator.pop(context);
-                if (!status) {
-                  handleError();
-                } else {
-                  handleSuccess();
-                }
-              },
-              child: Text(
-                '发布',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+        appBar: AppBar(
+          actions: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 7),
+              child: MaterialButton(
+                minWidth: 30,
+                padding: EdgeInsets.symmetric(horizontal: 18),
+                color: ActionColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false, //点击遮罩不关闭对话框
+                    builder: (context) {
+                      return AlertDialog(
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 26.0),
+                              child: Text("正在发布，请稍后..."),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                  bool status = await postData();
+                  Navigator.pop(context);
+                  if (!status) {
+                    handleError();
+                  } else {
+                    handleSuccess();
+                  }
+                },
+                child: Text(
+                  '发布',
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
               ),
+            )
+          ],
+          backgroundColor: Colors.white,
+          leading: MaterialButton(
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: appBarIconColor,
             ),
-          )
-        ],
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          // title: Text('Finders'),
+          brightness: Brightness.light,
+          elevation: 0,
+          title: Text(
+            "招募",
+            style: TextStyle(
+              color: appBarColor,
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true, // centerTitle: true,
+        ),
         backgroundColor: Colors.white,
-        leading: MaterialButton(
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: appBarIconColor,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        // title: Text('Finders'),
-        brightness: Brightness.light,
-        elevation: 0,
-        title: Text(
-          "他 · 她说",
-          style: TextStyle(
-            color: appBarColor,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        // centerTitle: true,
-        bottom: TabBarWithBorder(
-          child: TabBar(
-            isScrollable: true,
-            labelColor: ActionColor,
-            indicatorColor: ActionColorActive,
-            indicatorWeight: 3,
-            indicatorSize: TabBarIndicatorSize.label,
-            labelPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
-            unselectedLabelColor: Color(0xff333333),
-            tabs: List<Widget>.generate(tabBarItem.length, (index) {
-              return Tab(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(tabBarItem[index]["name"]),
-                ),
-              );
-            }),
-            controller: _tabController,
-          ),
-        ),
-      ),
-      backgroundColor: Colors.white,
-      body: new TabBarView(
-        controller: _tabController,
-        children: List<Widget>.generate(
-            tabBarItem.length, (index) => tabBarItem[index]["page"]()),
-      ),
-    );
+        body: body);
   }
 
-  Widget getTextField(int key) => Padding(
-        padding: EdgeInsets.symmetric(vertical: 23, horizontal: 15),
-        child: TextField(
-          key: ValueKey(key),
-          decoration: InputDecoration(
-            // border: UnderlineInputBorder(),
-            fillColor: Colors.white,
-            filled: true,
-            hintText: '写下想说的...',
-            border: InputBorder.none,
-          ),
-          expands: true,
-          maxLines: null,
-          maxLengthEnforced: true,
-          maxLength: 1000,
-          autofocus: false,
-          cursorColor: ActionColor,
-          controller: inputController,
-        ),
-      );
-
-  Widget getShowNameSwitch() => Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        child: Container(
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(color: Colors.black12),
-              )),
-          child: ListTile(
-            leading: Text('启用匿名'),
-            trailing: Switch(
-              value: nameLess,
-              onChanged: (val) {
-                setState(() {
-                  nameLess = val;
-                });
-              },
-              activeColor: Colors.white,
-              activeTrackColor: ActionColor,
-              inactiveThumbColor: Colors.white,
-              inactiveTrackColor: ActionColor,
-              key: ValueKey(1),
-            ),
-          ),
-        ),
-      );
-
-  Widget normalSay() {
-    return Column(
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child: getTextField(1),
-        ),
-        getShowNameSwitch()
-      ],
-    );
-  }
-
-  Widget selectImageWidget() {
-    var uploadColor = Color.fromARGB(255, 235, 173, 146);
-    double height = 250;
-    if (_image == null)
-      return Padding(
-        padding: EdgeInsets.only(top: 20, left: 15, right: 15),
-        child: Container(
-          height: height,
-          decoration: BoxDecoration(
-              border: Border.all(style: BorderStyle.solid, color: uploadColor)),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Icon(
-                  Icons.add,
-                  color: uploadColor,
-                  size: 50,
-                ),
-                Text(
-                  "上传封面图",
-                  style: TextStyle(
-                    color: uploadColor,
-                    fontSize: 16,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      );
-    else
-      return Padding(
-        padding: EdgeInsets.only(top: 20, left: 15, right: 15),
-        child: Container(
-          height: height,
-          width: double.infinity,
-          child: Image.file(
-            _image,
-            fit: BoxFit.cover,
-          ),
-        ),
-      );
-  }
-
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    var cropImage = await ImageCropper.cropImage(
-        sourcePath: image.path,
-        aspectRatio: CropAspectRatio(ratioX: 16, ratioY: 10),
-        // aspectRatioPresets: [
-        //   CropAspectRatioPreset.square,
-        //   CropAspectRatioPreset.ratio3x2,
-        //   CropAspectRatioPreset.original,
-        //   CropAspectRatioPreset.ratio4x3,
-        //   CropAspectRatioPreset.ratio16x9
-        // ],
-        androidUiSettings: AndroidUiSettings(
-            showCropGrid: false,
-            toolbarTitle: '图片剪切',
-            toolbarColor: Theme.of(context).primaryColor,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: true),
-        iosUiSettings: IOSUiSettings(
-            minimumAspectRatio: 1.0, aspectRatioLockEnabled: true));
-    return cropImage;
-  }
-
-  Widget leadSay() {
-    return ListView(
-      children: <Widget>[
-        InkWell(
-          child: selectImageWidget(),
-          onTap: () async {
-            var image = await getImage();
+  Widget getTag(String tag, {bool select = true}) {
+    return Builder(
+      builder: (context) {
+        return GestureDetector(
+          onTap: (){
             setState(() {
-              _image = image;
+              tags.remove(tag);
             });
           },
-        ),
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: BoxDecoration(
+                color: !select
+                    ? Color.fromARGB(255, 204, 204, 204)
+                    : Theme.of(context).accentColor,
+                borderRadius: BorderRadius.circular(15)),
+            child: Text(
+              tag,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget get body {
+    return ListView(
+      children: <Widget>[
         Padding(
           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
           child: TextField(
             maxLines: 1,
-            maxLength: 20,
+            maxLength: 30,
             minLines: 1,
             cursorColor: ActionColor,
             controller: titleInputController,
@@ -520,74 +303,255 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
             ),
             maxLines: 14,
             maxLengthEnforced: true,
-            maxLength: 1000,
+            maxLength: 3000,
             autofocus: false,
             controller: inputController,
             cursorColor: ActionColor,
           ),
         ),
-        getShowNameSwitch(),
-      ],
-    );
-  }
-
-  Widget sayToHe() {
-    return Column(
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child: getTextField(3),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-          child: TextField(
-            maxLines: 1,
-            maxLength: 10,
-            minLines: 1,
-            cursorColor: ActionColor,
-            controller: idInputController,
-            decoration: InputDecoration(
-              labelText: '学号',
-              filled: true,
-              hintText: '请输入Ta的学号',
-              fillColor: Color.fromARGB(255, 245, 241, 241),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none,
+        Row(children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              maxLines: 1,
+              cursorColor: ActionColor,
+              controller: _tagController,
+              focusNode: _tagFocus,
+              decoration: InputDecoration(
+                labelText: '标签',
+                filled: true,
+                hintText: '请输入标签',
+                fillColor: Color.fromARGB(255, 245, 241, 241),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ),
+          MaterialButton(
+            onPressed: () {
+              String value = _tagController.value.text.trim();
+              if(value == "") return;
+              _tagController.clear();
+              tags.add(value);
+              _tagFocus.unfocus();
+            },
+            child: Icon(Icons.add),
+          )
+        ]),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Wrap(
+            children: tags.map((e)=>getTag(e)).toList(),
+          ),
         ),
-        getShowNameSwitch()
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: TypeSelector(
+            onChange: () {
+              setState(() {});
+            },
+          ),
+        )
       ],
     );
   }
 }
 
-class TabBarWithBorder extends StatelessWidget implements PreferredSizeWidget {
-  TabBarWithBorder({this.child, Key key}) : super(key: key);
-  final PreferredSizeWidget child;
+class TypeSelector extends StatefulWidget {
+  TypeSelector({this.onChange});
+
+  final VoidCallback onChange;
 
   @override
-  Widget build(BuildContext context) {
-    var divisorColor = Color(0xeeeeeeee);
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(10),
-          color: divisorColor,
-          height: 1,
-        ),
-        child,
-        Container(
-          padding: EdgeInsets.all(10),
-          color: divisorColor,
-          height: 1,
-        ),
-      ],
-    );
+  _TypeSelectorState createState() => _TypeSelectorState();
+}
+
+class _TypeSelectorState extends State<TypeSelector>
+    with TickerProviderStateMixin {
+  bool isOpen = false;
+
+  List<RecruitTypesModelData> get _types => _RecruitPublishPageState._types;
+
+  List<RecruitTypesModelData> get _nowTypes =>
+      _RecruitPublishPageState._nowTypes;
+
+  AnimationController _animationController;
+  AnimationController _rotateController;
+  Animation _rotateAnimation;
+  Animation _animation;
+  Animation _curve;
+
+  double _oldHeight = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    const Duration duration = Duration(milliseconds: 300);
+    _animationController = AnimationController(vsync: this, duration: duration);
+    _rotateController = AnimationController(vsync: this, duration: duration);
+    _animationController.addListener(() {
+      setState(() {});
+    });
+    _curve =
+        CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
+    _animation = Tween<double>(begin: 0, end: 1).animate(_curve);
+    _rotateAnimation = Tween<double>(begin: 0, end: pi / 2).animate(
+        CurvedAnimation(curve: Curves.easeInOut, parent: _rotateController));
+  }
+
+  Future<void> changeHeightTo(height) async {
+    double oldHeight = _oldHeight;
+    _animationController.reset();
+    _animation = Tween<double>(begin: oldHeight, end: height).animate(_curve);
+    await _animationController.forward();
+    _oldHeight = height;
+  }
+
+  Future<void> changeHeight() async {
+    int length = _types.length; // 获取较大的列表长度
+    double height = (length / 5).ceil() * 65.0 + 31;
+    await changeHeightTo(height);
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(child.preferredSize.height + 2);
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
+    _rotateController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget child;
+    child = Container(
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      margin: EdgeInsets.symmetric(vertical: 5),
+      child: Column(
+        children: <Widget>[
+          Row(children: <Widget>[
+            _nowTypes.length == 0
+                ? Text("请选择招募类型")
+                : _nowTypes.length <= 2
+                    ? Row(
+                        children: _nowTypes.map((e) => getTag(e.name)).toList(),
+                      )
+                    : Row(
+                        children: List<Widget>.generate(
+                            2, (index) => getTag(_nowTypes[index].name))
+                          ..add(getTag("等")),
+                      ),
+            Expanded(
+              flex: 1,
+              child: Container(),
+            ),
+            MaterialButton(
+              onPressed: () {
+                if (!isOpen) {
+                  open();
+                } else {
+                  close();
+                }
+              },
+              minWidth: 10,
+              padding: EdgeInsets.symmetric(horizontal: 13),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Text(
+                    "修改分类",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xff444444),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(3),
+                  ),
+                  Transform.rotate(
+                    angle: _rotateAnimation.value,
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 11,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ]),
+          Container(
+            height: _animation.value,
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                children: <Widget>[
+                  Wrap(
+                    children: List<Widget>.generate(
+                        _types.length,
+                        (index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (!_nowTypes.contains(_types[index])) {
+                                    _nowTypes.add(_types[index]);
+                                  } else
+                                    _nowTypes.remove(_types[index]);
+                                });
+                              },
+                              child: getTag(_types[index].name,
+                                  select: _nowTypes.contains(_types[index])),
+                            )),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return child;
+  }
+
+  Future<void> close() async {
+    _rotateController.reverse();
+    await changeHeightTo(0.0);
+    isOpen = false;
+    setState(() {});
+  }
+
+  Future<void> open() async {
+    _rotateController.forward();
+    await changeHeight();
+    isOpen = true;
+  }
+
+  Widget getTag(String tag, {bool select = true}) {
+    return Builder(
+      builder: (context) {
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          decoration: BoxDecoration(
+              color: !select
+                  ? Color.fromARGB(255, 204, 204, 204)
+                  : Theme.of(context).accentColor,
+              borderRadius: BorderRadius.circular(15)),
+          child: Text(
+            tag,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

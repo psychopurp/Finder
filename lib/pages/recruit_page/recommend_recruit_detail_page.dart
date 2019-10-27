@@ -46,6 +46,14 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
     );
     RecruitModelData item = ModalRoute.of(context).settings.arguments;
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Text("参与"),
+        elevation: 1,
+        onPressed: () {
+          Navigator.of(context).pushNamed(Routes.engageRecruit, arguments: item.id);
+        },
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
       appBar: AppBar(
         leading: MaterialButton(
           child: Icon(
