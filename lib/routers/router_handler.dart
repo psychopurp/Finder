@@ -162,7 +162,7 @@ var heSaysPublishHandler = Handler(
 });
 var sayToHePublishHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return SayToHeRoute();
+  return SayToHePublishRoute();
 });
 
 var heSaysDetailHandler = Handler(
@@ -241,7 +241,7 @@ var tipsHandle = Handler(
 });
 var sayToHeHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return SayToHeRoute();
+  return SayToHePage();
 });
 var sayToHeChatHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {

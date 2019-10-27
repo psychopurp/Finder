@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/routers/application.dart';
@@ -11,7 +12,9 @@ import 'package:finder/plugin/my_appbar.dart';
 class UserProfilePage extends StatefulWidget {
   final int senderId;
   final String heroTag;
+
   UserProfilePage({this.senderId, this.heroTag});
+
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -29,17 +32,33 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.heroTag);
+//    print(widget.heroTag);
     return Scaffold(
-        body: SafeArea(
-            top: false,
-            child: Container(
-                child: MyAppBar(
-                    appbar: AppBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: body))));
+      floatingActionButton: FloatingActionButton(
+        child: Text("私信"),
+        elevation: 1,
+        onPressed: () {
+          Navigator.of(context).pushNamed(Routes.chat,
+              arguments: UserProfile.fromJson(user.toJson()));
+        },
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
+      body: SafeArea(
+        top: false,
+        child: Container(
+          child: MyAppBar(
+            appbar: AppBar(
+              backgroundColor: Theme.of(context).primaryColor,
+              elevation: 0,
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(top: 80),
+              child: body,
+            )
+          ),
+        ),
+      ),
+    );
   }
 
   Widget get body {
@@ -62,7 +81,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: userCard(user)),
           Positioned(
             // left: ScreenUtil().setWidth(0),
-            right: 0,
+            right: ScreenUtil.screenWidthDp / 2 - 45,
             top: topPartHeight * 0.5 - 40,
             child: avatar(),
           )

@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/models/recruit_model.dart';
+import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -109,7 +111,8 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
         child: Text("参与"),
         elevation: 1,
         onPressed: () {
-            Navigator.of(context).pushNamed(Routes.engageRecruit, arguments: item.id);
+          Navigator.of(context)
+              .pushNamed(Routes.engageRecruit, arguments: item.id);
         },
         backgroundColor: Theme.of(context).primaryColor,
       ),
@@ -117,12 +120,6 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.all(10),
-          ),
-          MaterialButton(
-            onPressed: (){
-              Navigator.of(context).pushNamed(Routes.candidates, arguments: item.id);
-            },
-            child: Text("应聘者"),
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -169,8 +166,8 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(Routes.internshipCompany, arguments: item);
+                Application.router.navigateTo(context,
+                    "${Routes.userProfile}?senderId=${item.sender.id}&heroTag=user:${item.sender.id}-${item.id}");
               },
               padding: EdgeInsets.all(0),
               child: Row(
@@ -255,6 +252,19 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
                   (index) => getTag(item.tags[index]?.name ?? "Default")),
+            ),
+          ),
+          split,
+          Padding(padding: EdgeInsets.all(20),),
+          MaterialButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamed(Routes.candidates, arguments: item);
+            },
+            child: Text(
+              MessageModel().self.id == item.sender.id ? "管理应聘者" : "查看应聘者",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+              textAlign: TextAlign.left,
             ),
           ),
         ],

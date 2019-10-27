@@ -8,6 +8,7 @@ import 'package:finder/pages/serve_page/he_says_page.dart';
 import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/models/recruit_model.dart';
 import 'package:finder/public.dart';
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
@@ -237,8 +238,8 @@ class _RecruitPageState extends State<RecruitPage> {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onPressed: () async {
-                  await Navigator.of(context)
-                      .pushNamed(Routes.internshipCompany, arguments: item);
+                  Application.router.navigateTo(context,
+                      "${Routes.userProfile}?senderId=${item.sender.id}&heroTag=user:${item.sender.id}-${item.id}");
                 },
                 padding: EdgeInsets.all(0),
                 child: Row(

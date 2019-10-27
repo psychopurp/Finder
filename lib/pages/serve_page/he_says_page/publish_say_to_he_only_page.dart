@@ -8,23 +8,23 @@ const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
 const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
 
-class SayToHeRoute extends StatelessWidget {
+class SayToHePublishRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     int id = ModalRoute.of(context).settings.arguments;
-    return SayToHePage(id);
+    return SayToHePublishPage(id);
   }
 }
 
-class SayToHePage extends StatefulWidget {
-  SayToHePage(this.id);
+class SayToHePublishPage extends StatefulWidget {
+  SayToHePublishPage(this.id);
   final int id;
   @override
-  _SayToHePageState createState() => _SayToHePageState();
+  _SayToHePublishPageState createState() => _SayToHePublishPageState();
 }
 
-class _SayToHePageState extends State<SayToHePage>
+class _SayToHePublishPageState extends State<SayToHePublishPage>
     with SingleTickerProviderStateMixin {
   bool nameLess = false;
   TextEditingController inputController;

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/models/recruit_model.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
@@ -268,6 +269,18 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
                       (index) => getTag(item.tags[index]?.name ?? "Default")),
+            ),
+          ),         split,
+          Padding(padding: EdgeInsets.all(20),),
+          MaterialButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamed(Routes.candidates, arguments: item);
+            },
+            child: Text(
+              MessageModel().self.id == item.sender.id ? "管理应聘者" : "查看应聘者",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+              textAlign: TextAlign.left,
             ),
           ),
         ],

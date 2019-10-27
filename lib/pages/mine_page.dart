@@ -323,7 +323,7 @@ class _MinePageState extends State<MinePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(user.school.name),
+                  Text( user?.school?.name ?? "家里蹲大学"),
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 5),
                     height: 14,

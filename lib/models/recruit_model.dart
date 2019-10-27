@@ -166,6 +166,9 @@ class RecruitTypesModelData {
 
 class CandidateItem {
   CandidateItem({this.id, this.status, this.time, this.information, this.user});
+  static final int reject = 0;
+  static final int waiting = 1;
+  static final int accept = 2;
 
   factory CandidateItem.fromJson(Map<String, dynamic> map) {
     return CandidateItem(
@@ -180,6 +183,6 @@ class CandidateItem {
   final UserProfile user;
   final DateTime time;
   final String information;
-  bool status;
+  int status;
   final int id;
 }
