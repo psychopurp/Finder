@@ -29,7 +29,6 @@ class _MinePageState extends State<MinePage> {
           child: Container(
             child: MyAppBar(
               appbar: AppBar(
-                title: Text('mine page'),
                 backgroundColor: Colors.transparent,
                 elevation: 0,
               ),
@@ -165,15 +164,15 @@ class _MinePageState extends State<MinePage> {
                     icon: Icon(
                       IconData(0xe845, fontFamily: 'myIcon'),
                       size: ScreenUtil().setSp(50),
-                      color: Colors.black38,
+                      color: Color(0xffDDDDDD),
                     ),
                   ),
                 ],
               ),
             ),
             Text(
-              user.school.name,
-              style: TextStyle(fontSize: ScreenUtil().setSp(35)),
+              user?.school?.name ?? "家里蹲大学",
+              style: TextStyle(fontSize: 16),
             ),
             Padding(
               padding: EdgeInsets.only(top: 8.0),
