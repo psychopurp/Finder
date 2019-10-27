@@ -302,6 +302,11 @@ class _CompanyPageState extends State<CompanyPage>
           ),
           Padding(
             padding: EdgeInsets.all(15),
+          ),
+          Container(
+            width: double.infinity,
+            color: Color(0xffeeeeee),
+            height: 1,
           )
         ],
       ),

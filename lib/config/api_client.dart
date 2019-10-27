@@ -380,13 +380,7 @@ class ApiClient {
   }
 
   //获取招募列表
-  Future getRecruits({int page = 1, int typeId}) async {
-    var formData = (typeId != null)
-        ? {'page': page, 'type_id': typeId}
-        : {
-            'page': page,
-          };
-    // print(formData);
+  Future getRecruits(Map<String, dynamic> formData) async {
     try {
       Response response = await dio.get(
         'get_recruits/',

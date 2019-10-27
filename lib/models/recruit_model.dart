@@ -1,5 +1,6 @@
 import 'package:finder/models/tag_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
+import 'package:finder/plugin/avatar.dart';
 
 class RecruitModel {
   List<RecruitModelData> data;
@@ -35,12 +36,13 @@ class RecruitModel {
 
 class RecruitModelData {
   Sender sender;
-  num time;
+  DateTime time;
   String title;
   String introduction;
   int id;
   List<RecruitTypesModelData> types;
   List<TagModel> tags;
+  String image;
 
   RecruitModelData(
       {this.sender,
@@ -49,12 +51,36 @@ class RecruitModelData {
       this.introduction,
       this.id,
       this.tags,
-      this.types});
+      this.types,
+      this.image});
 
   RecruitModelData.fromJson(Map<String, dynamic> json) {
     sender =
         json['sender'] != null ? new Sender.fromJson(json['sender']) : null;
-    time = json['time'];
+    time = DateTime.fromMillisecondsSinceEpoch((json['time'] * 1000).toInt());
+    title = json['title'];
+    introduction = json['introduction'];
+    id = json['id'];
+    if (json['types'] != null) {
+      types = new List<RecruitTypesModelData>();
+      json['types'].forEach((v) {
+        types.add(new RecruitTypesModelData.fromJson(v));
+      });
+    }
+    if (json['tags'] != null) {
+      tags = new List<TagModel>();
+      json['tags'].forEach((v) {
+        tags.add(new TagModel.fromJson(v));
+      });
+    }
+  }
+
+  RecruitModelData.fromRecommend(Map<String, dynamic> map) {
+    image = Avatar.getImageUrl( map['image']);
+    var json = map['recruit'];
+    sender =
+    json['sender'] != null ? new Sender.fromJson(json['sender']) : null;
+    time = DateTime.fromMillisecondsSinceEpoch((json['time'] * 1000).toInt());
     title = json['title'];
     introduction = json['introduction'];
     id = json['id'];
