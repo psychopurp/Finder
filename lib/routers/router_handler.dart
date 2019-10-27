@@ -14,6 +14,8 @@ import 'package:finder/pages/mine_page/collection_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/pages/serve_page/internship_page/company_page.dart';
+import 'package:finder/pages/serve_page/internship_page/internship_detail_page.dart';
+import 'package:finder/pages/serve_page/internship_page/recommend_internship_detail_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/serve_page/lost_found_page.dart';
@@ -167,7 +169,14 @@ var internshipCompanyHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CompanyRoute();
 });
-
+var internshipDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return InternshipDetailPage();
+});
+var recommendInternshipDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return RecommendInternshipDetailPage();
+    });
 //用户详情页
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {

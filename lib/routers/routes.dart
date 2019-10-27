@@ -31,6 +31,8 @@ class Routes {
   static String treeHole = "/serve/treeHole"; //服务页面 -- 我·树洞
   static String internship = "/serve/internship"; //服务页面 -- 实习
   static String internshipCompany = "/serve/internship/company"; //服务页面 -- 实习 公司
+  static String internshipDetail = "/serve/internship/detail"; //服务页面 -- 实习 公司
+  static String recommendInternshipDetail = "/serve/internship/recommend"; //服务页面 -- 实习 公司
   //用户页
   static String userProfile = "/userProfile"; //个人详情页
   static String minePage = "/minePage"; //我的 页
@@ -89,8 +91,10 @@ class Routes {
     router.define(selectCourse, handler: selectCourseHandler);
     router.define(psychoTest, handler: psychoTestHandler);
     router.define(treeHole, handler: treeHoleHandler);
-    router.define(internship, handler: internshipHandler);
+    router.define(internship, handler: internshipHandler, transitionType: TransitionType.cupertino);
     router.define(internshipCompany, handler: internshipCompanyHandler, transitionType: TransitionType.cupertino);
+    router.define(internshipDetail, handler: internshipDetailHandler, transitionType: TransitionType.cupertino);
+    router.define(recommendInternshipDetail, handler: recommendInternshipDetailHandler, transitionType: TransitionType.cupertino);
 
     //我的页
     router.define(userProfile,

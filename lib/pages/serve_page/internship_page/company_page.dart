@@ -237,46 +237,58 @@ class _CompanyPageState extends State<CompanyPage>
           Padding(
             padding: EdgeInsets.all(10),
           ),
-          Row(
-            children: <Widget>[
-              Container(
-                width: ScreenUtil.screenWidthDp - 140,
-                padding: EdgeInsets.only(left: 13, bottom: 8),
-                child: Text(
-                  item.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: Color(0xff555555),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context)
+                  .pushNamed(Routes.internshipDetail, arguments: item);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: ScreenUtil.screenWidthDp - 140,
+                      padding: EdgeInsets.only(left: 13, bottom: 8),
+                      child: Text(
+                        item.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Color(0xff555555),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: Text(
+                        getTimeString(item.time),
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ActionColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Container(),
-              ),
-              Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: Text(
-                  getTimeString(item.time),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: ActionColor,
+                Container(
+                  padding: EdgeInsets.only(left: 13),
+                  width: ScreenUtil.screenWidthDp,
+                  child: Text(
+                    item.salaryRange,
+                    style: TextStyle(
+                      color: Color(0xff777777),
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.only(left: 13),
-            child: Text(
-              item.salaryRange,
-              style: TextStyle(
-                color: Color(0xff777777),
-                fontSize: 14,
-              ),
+              ],
             ),
           ),
           Container(
