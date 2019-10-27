@@ -1,3 +1,10 @@
+import 'package:dio/dio.dart';
+import 'package:finder/config/api_client.dart';
+import 'package:finder/models/he_says_item.dart';
+import 'package:finder/models/recruit_model.dart';
+import 'package:finder/models/topic_model.dart';
+import 'package:finder/routers/application.dart';
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import '../../models/message_model.dart';
 
@@ -83,7 +90,7 @@ class _TipsPageState extends State<TipsPage> {
       children: <Widget>[
         Container(width: double.infinity, height: MessageHeight, child: child),
         Padding(
-          padding: EdgeInsets.only(right: 10, left: 70),
+          padding: EdgeInsets.only(right: 10, left: 10),
           child: Container(
             color: Color(0xEEEEEEEE),
             height: 1,
@@ -99,19 +106,6 @@ class _TipsPageState extends State<TipsPage> {
     Widget child = _withBottomBorder(
       Row(
         children: <Widget>[
-          Container(
-            width: AvatarHeight,
-            height: AvatarHeight,
-            decoration: BoxDecoration(
-              color: Color(0xFFFF9933),
-              borderRadius: BorderRadius.circular(AvatarHeight / 2),
-            ),
-            child: Icon(
-              Icons.error,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
           Padding(
             padding: EdgeInsets.all(10),
           ),
@@ -137,17 +131,13 @@ class _TipsPageState extends State<TipsPage> {
             ),
           ),
           Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
                 getTimeString(item.time),
               ),
               Padding(
-                padding: EdgeInsets.only(right: 10, top: 13, bottom: 5),
-                child: Text(
-                  getTimeString(item.time),
-                  style: TextStyle(fontSize: 12),
-                ),
+                padding: EdgeInsets.all(8),
               ),
               item.isRead ? Container() : pop
             ],
@@ -160,7 +150,7 @@ class _TipsPageState extends State<TipsPage> {
         behavior: HitTestBehavior.opaque,
         onTap: () {
           data.readOne(item);
-          Navigator.pushNamed(context, jump);
+          jumpHandler(jump);
         },
         child: Dismissible(
           key: ValueKey(item.id),
@@ -202,6 +192,80 @@ class _TipsPageState extends State<TipsPage> {
       return "前天";
     }
     return weekdayMap[time.weekday];
+  }
+
+  Future<void> jumpHandler(String jump) async {
+    List<String> jumpPara = jump.split(":");
+    String page = jumpPara[0];
+    int id = int.parse(jumpPara[1]);
+    switch (page) {
+      case "recruit":
+        var data = await getRecruitData(id);
+        if (data != null) {
+          Navigator.of(context)
+              .pushNamed(Routes.recruitDetail, arguments: data);
+        }
+        break;
+      case "topic":
+        var item = await getTopic(id);
+        if (item != null) {
+          Application.router.navigateTo(context,
+              '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
+        }
+        break;
+      case "topic_comment":
+        Application.router.navigateTo(context,
+            "${Routes.commentPage}?topicCommentId=$id&topicId=${jumpPara[2]}");
+        break;
+      case "lead_say":
+        var data = await getLeadHeSheSays(id);
+        if (data != null) {
+          Navigator.of(context).pushNamed(Routes.heSaysDetail, arguments: data);
+        }
+        break;
+      case "he_she_say":
+        Navigator.of(context).pushNamed(Routes.heSays);
+    }
+  }
+
+  Future<RecruitModelData> getRecruitData(int id) async {
+    var data;
+    Map<String, dynamic> query = {'recruit_id': id};
+    data = await apiClient.getRecruits(query);
+    RecruitModel recruits = RecruitModel.fromJson(data);
+    if (recruits.status) {
+      return recruits.data[0];
+    }
+    return null;
+  }
+
+  Future<HeSheSayItem> getLeadHeSheSays(int id) async {
+    try {
+      Dio dio = ApiClient.dio;
+      Response response =
+          await dio.get('get_lead_he_she_say/', queryParameters: {"id": id});
+      Map<String, dynamic> result = response.data;
+      if (result["status"]) {
+        return HeSheSayItem.fromJson(result["data"][0]);
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+    return null;
+  }
+  Future<TopicModelData> getTopic(int id) async {
+    try {
+      Dio dio = ApiClient.dio;
+      Response response =
+          await dio.get('get_topics/', queryParameters: {"topic_id": id});
+      Map<String, dynamic> result = response.data;
+      if (result["status"]) {
+        return TopicModelData.fromJson(result["data"][0]);
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   String _addZero(int value) => value < 10 ? "0$value" : "$value";

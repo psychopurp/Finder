@@ -132,7 +132,6 @@ class MessageModel implements Listenable {
         item.isRead = true;
       });
       updateSaysCount();
-      print(saysCount);
       onChange();
     }
   }
@@ -147,7 +146,6 @@ class MessageModel implements Listenable {
     Response response = await dio.post('read_message_by_session/', data: {
       "sessionId": sessionId,
     });
-    print(response.data);
     if (response.data["status"]) {
       users[sessionId].forEach((item) {
         item.isRead = true;
@@ -326,16 +324,16 @@ class MessageModel implements Listenable {
     Response response =
         await dio.get("get_messages/", queryParameters: queryParameters);
     Map<String, dynamic> data = response.data;
-//    print(data);
     if (!data["status"]) {
       throw DioError(
           request: response.request,
           response: response,
           message: data["error"],
           type: DioErrorType.RESPONSE);
-    } else
+    } else{
       addAll(List<Map<String, dynamic>>.generate(
           data["data"].length, (index) => data["data"][index]));
+    }
   }
 
   int get allUnReadCount {
@@ -359,7 +357,7 @@ class MessageModel implements Listenable {
   void updateSaysCount() {
     List<int> count = [];
     says.forEach((key, value) => count.add(unReadCount(value)));
-    usersCount = _sum(count);
+    saysCount = _sum(count);
   }
 
   int _sum(List<int> list) {
@@ -372,13 +370,24 @@ class MessageModel implements Listenable {
 
   void read<T extends Item>(List<T> list) {
     for (Item i in list) {
-      readOne(i);
+      readOne(i, updateNow: false);
     }
   }
 
-  void readOne(Item item) {
-    //TODO Implement read request
-    item.isRead = true;
+  Future<void> readOne(Item item, {bool updateNow = true})async {
+    Response response = await dio.post('read_message/', data: {
+      "id": item.id,
+    });
+    if (response.data["status"]) {
+      item.isRead = true;
+      if(updateNow){
+        updateTipsCount();
+        updateSystemsCount();
+        updateSaysCount();
+        updateUsersCount();
+      }
+      onChange();
+    }
   }
 
   int unReadCount<T extends Item>(List<T> list) {
@@ -737,7 +746,7 @@ class SayToHeItem extends Item implements ToJson {
       : super(id, isRead: isRead);
 
   factory SayToHeItem.fromJson(Map<String, dynamic> map) {
-    print(map);
+//    print(map);
     return SayToHeItem(
       time:
           DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),

@@ -32,7 +32,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   void initState() {
     _controller = ScrollController()
       ..addListener(() {
-        print(_controller.offset);
+//        print(_controller.offset);
         if (_controller.offset < 160 && _controller.offset > 108) {
           setState(() {
             titileOpacity = (_controller.offset / 100) % 1;

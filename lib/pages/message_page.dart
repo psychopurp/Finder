@@ -52,8 +52,7 @@ class _MessagePageState extends State<MessagePage> {
         padding: EdgeInsets.only(left: 13, right: 13, top: 10),
         child: RefreshIndicator(
           onRefresh: () async {
-            data.lastRequestTime = null;
-            data.reset();
+//            data.reset();
             data.getData();
           },
           child: body,
