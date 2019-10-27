@@ -138,9 +138,8 @@ class _ChildActivitiesState extends State<ChildActivities>
       footer: MaterialFooter(),
       controller: _refreshController,
       onRefresh: () async {
-        await Future.delayed(Duration(microseconds: 500), () {
-          _getInitialActivitiesData(2);
-        });
+        await _getInitialActivitiesData(2);
+
         _refreshController.resetLoadState();
       },
       onLoad: () async {
@@ -222,9 +221,8 @@ class _ChildActivitiesState extends State<ChildActivities>
       imageUrl: item.poster,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          var activityData = jsonEncode(item.toJson());
-          Application.router.navigateTo(context,
-              "/home/activityDetail?activityData=${Uri.encodeComponent(activityData)}");
+          Application.router.navigateTo(
+              context, "${Routes.activityDetail}?activityId=${item.id}");
         },
         child: Align(
           alignment: Alignment.topCenter,

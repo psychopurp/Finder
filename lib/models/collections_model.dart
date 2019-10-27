@@ -1,4 +1,3 @@
-import 'package:finder/models/recruit_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/public.dart';
 

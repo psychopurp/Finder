@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
+import 'package:finder/pages/fans_follow_page.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
 import 'package:finder/pages/message_page/chat_page.dart';
 import 'package:finder/pages/home_page/publish_topic_comment.dart';
@@ -70,11 +71,10 @@ var topicDetailsHandler = Handler(
 //活动详情页
 var acitvityDetailsHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  String activityData = params['activityData']?.first;
-  // print("activityData====>$activityData");
-  var activity = ActivityModelData.fromJson(jsonDecode(activityData));
+  String activityId = params['activityId']?.first;
+
   return ActivityDetailPage(
-    activity: activity,
+    activityId: int.parse(activityId),
   );
 });
 
@@ -194,8 +194,12 @@ var recommendInternshipDetailHandler = Handler(
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   String senderId = params['senderId']?.first;
+  String heroTag = params['heroTag']?.first;
+  print("heroTag===>$heroTag");
+  // print(senderId);
   return UserProfilePage(
     senderId: int.parse(senderId),
+    heroTag: heroTag,
   );
 });
 
@@ -228,4 +232,15 @@ var sayToHeChatHandle = Handler(
 var collectionPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CollectionPage();
+});
+
+var fansFollowPageHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  String userId = params['userId']?.first;
+  String isFollow = params['isFollow']?.first;
+
+  return FansFollowPage(
+    userId: int.parse(userId),
+    isFollow: (isFollow == 'true') ? true : false,
+  );
 });

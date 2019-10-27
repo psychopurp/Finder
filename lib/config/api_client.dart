@@ -269,7 +269,7 @@ class ApiClient {
     var formData = {'topic_comment_id': topicCommentId};
     try {
       Response response =
-          await dio.get('like_topic_comment/', queryParameters: formData);
+          await dio.post('like_topic_comment/', data: jsonEncode(formData));
       // print('点赞话题评论成功....${response.data}');
       return response.data;
     } catch (e) {
@@ -353,29 +353,29 @@ class ApiClient {
     }
   }
 
-  //获取用户关注的用户列表
-  Future getFollowUsers({String query = "", int page = 1}) async {
-    var formData = {'query': query, 'page': page};
+  //获取用户关注/粉丝的用户列表
+  Future getFollowers({int userId, bool isFan, int page}) async {
+    var formData = {'user_id': userId, 'is_fan': isFan ? 1 : 0, 'page': page};
     try {
       Response response =
-          await dio.get('get_follow_users/', queryParameters: formData);
+          await dio.get('get_followers/', queryParameters: formData);
       // print(response.data);
       return response.data;
     } catch (e) {
-      print('获取用户关注的用户列表错误==========>$e');
+      print('获取用户关注/粉丝的用户列表错误==========>$e');
     }
   }
 
-  //获取关注该用户的用户列表
-  Future getFanUsers({String query = "", int page = 1}) async {
-    var formData = {'query': query, 'page': page};
+  ///关注一个用户
+  Future addFollowUser({int userId}) async {
+    var formData = {'user_id': userId};
     try {
       Response response =
-          await dio.get('get_fan_users/', queryParameters: formData);
+          await dio.post('add_follow_user/', data: jsonEncode(formData));
       // print(response.data);
       return response.data;
     } catch (e) {
-      print('获取关注该用户的用户列表错误==========>$e');
+      print('关注用户错误==========>$e');
     }
   }
 

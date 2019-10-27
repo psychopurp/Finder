@@ -58,6 +58,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
 //        child: pages[_selectIndex],
 //      ), // 切换动画
       body: pages[_selectIndex],
+
       bottomNavigationBar: SafeArea(
         child: BottomAppBar(
           color: Colors.white,
