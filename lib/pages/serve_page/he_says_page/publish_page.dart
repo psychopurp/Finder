@@ -386,7 +386,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
               activeColor: Colors.white,
               activeTrackColor: ActionColor,
               inactiveThumbColor: Colors.white,
-              inactiveTrackColor: ActionColor,
+              inactiveTrackColor: Colors.grey,
               key: ValueKey(1),
             ),
           ),

@@ -12,12 +12,12 @@ const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
 const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
 
-class PublishPage extends StatefulWidget {
+class EngageRecruitPage extends StatefulWidget {
   @override
-  _PublishPageState createState() => _PublishPageState();
+  _EngageRecruitPageState createState() => _EngageRecruitPageState();
 }
 
-class _PublishPageState extends State<PublishPage>
+class _EngageRecruitPageState extends State<EngageRecruitPage>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
   File _image;

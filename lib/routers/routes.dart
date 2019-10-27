@@ -22,6 +22,8 @@ class Routes {
   static String recruitDetail = '/home/recruitDetail'; //首页 -- 活动详情
   static String recommendRecruitDetail =
       '/home/recommendRecruitDetail'; //首页 -- 活动详情
+  static String publishRecruit = '/home/publishRecruit'; //首页 -- 活动详情
+  static String engageRecruit = '/home/engageRecruit'; //首页 -- 活动详情
 
   //服务页
   static String lostFound = "/serve/lostFound"; //服务页面 -- 失物招领
@@ -30,6 +32,8 @@ class Routes {
       "/serve/heSays/heSaysPublish"; //服务页面 -- 他·她·说 --发布页
   static String heSaysDetail =
       "/serve/heSays/heSaysDetail"; //服务页面 -- 他·她·说 --发布页
+  static String sayToHePublish =
+      "/serve/heSays/sayToHePublish"; //服务页面 -- 他·她·说 --发布页
   static String study = "/serve/study"; //服务页面 -- 一起学习
   static String selectCourse = "/serve/selectCourse"; //服务页面 -- 选课指南
   static String psychoTest = "/serve/psychoTest"; //服务页面 -- 心理测试
@@ -92,6 +96,12 @@ class Routes {
     router.define(recommendRecruitDetail,
         handler: recommendRecruitDetailHandler,
         transitionType: TransitionType.cupertino);
+    router.define(publishRecruit,
+        handler: publishRecruitHandler,
+        transitionType: TransitionType.cupertino);
+    router.define(engageRecruit,
+        handler: engageRecruitHandler,
+        transitionType: TransitionType.cupertino);
 
     //服务页 --导航
     router.define(lostFound,
@@ -102,6 +112,8 @@ class Routes {
         handler: heSaysPublishHandler, transitionType: TransitionType.fadeIn);
     router.define(heSaysDetail,
         handler: heSaysDetailHandler, transitionType: TransitionType.fadeIn);
+    router.define(sayToHePublish,
+        handler: sayToHePublishHandler, transitionType: TransitionType.fadeIn);
     router.define(study, handler: studyHandler);
     router.define(selectCourse, handler: selectCourseHandler);
     router.define(psychoTest, handler: psychoTestHandler);
