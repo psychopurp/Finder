@@ -238,7 +238,7 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             width: ScreenUtil.screenWidthDp,
             child: Text(
-              "职位介绍",
+              "招募详情",
               textAlign: TextAlign.left,
               style: TextStyle(
                   color: Theme.of(context).primaryColor,

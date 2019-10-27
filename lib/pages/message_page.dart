@@ -78,6 +78,7 @@ class _MessagePageState extends State<MessagePage> {
               url: Routes.tips);
         } else if (index == 2) {
           return _generateOtherMessagePage("对Ta说", Icons.person, data.saysCount,
+              data: data.says.length == 0 ? "" :  data.says[data.saysIndex.last].last.content,
               background: Color(0xFFFF6666), url: Routes.sayToHe);
         }
         return _generateUserMessage(index - 3);

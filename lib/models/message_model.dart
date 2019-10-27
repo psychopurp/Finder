@@ -85,6 +85,7 @@ class MessageModel implements Listenable {
     prefs.remove("messages");
     lastRequestTime = null;
     loadUser = self;
+    noMoreHistoryMessage = false;
   }
 
   Future<bool> getSelf() async {
@@ -116,6 +117,26 @@ class MessageModel implements Listenable {
     lastRequestTime = reqTime.subtract(Duration(seconds: 10));
   }
 
+  Future<void> readSaysMessagesBySessionId(String sessionId) async {
+    if (!says.containsKey(sessionId)) return;
+    bool value = true;
+    says[sessionId].forEach((item) {
+      value = value && item.isRead;
+    });
+    if (value) return;
+    Response response = await dio.post('read_message_by_session/', data: {
+      "sessionId": sessionId,
+    });
+    if (response.data["status"]) {
+      says[sessionId].forEach((item) {
+        item.isRead = true;
+      });
+      updateSaysCount();
+      print(saysCount);
+      onChange();
+    }
+  }
+
   Future<void> readUserMessagesBySessionId(String sessionId) async {
     if (!users.containsKey(sessionId)) return;
     bool value = true;
@@ -136,25 +157,6 @@ class MessageModel implements Listenable {
     }
   }
 
-  Future<void> readSaysBySessionId(String sessionId) async {
-    if (!users.containsKey(sessionId)) return;
-    bool value = true;
-    says[sessionId].forEach((item) {
-      value = value && item.isRead;
-    });
-    if (value) return;
-    Response response = await dio.post('read_message_by_session/', data: {
-      "sessionId": sessionId,
-    });
-    if (response.data["status"]) {
-      says[sessionId].forEach((item) {
-        item.isRead = true;
-      });
-      updateSaysCount();
-      onChange();
-    }
-  }
-
   Future<void> readSystemMessages() async {
     bool value = true;
     systems.forEach((item) {
@@ -168,25 +170,6 @@ class MessageModel implements Listenable {
         item.isRead = true;
       });
       updateSystemsCount();
-      onChange();
-    }
-  }
-
-  Future<void> readSayToHeMessagesBySessionId(String sessionId) async {
-    if (!users.containsKey(sessionId)) return;
-    bool value = true;
-    says[sessionId].forEach((item) {
-      value = value && item.isRead;
-    });
-    if (value) return;
-    Response response = await dio.post('read_message_by_session/', data: {
-      "sessionId": sessionId,
-    });
-    if (response.data["status"]) {
-      says[sessionId].forEach((item) {
-        item.isRead = true;
-      });
-      updateSaysCount();
       onChange();
     }
   }
@@ -754,6 +737,7 @@ class SayToHeItem extends Item implements ToJson {
       : super(id, isRead: isRead);
 
   factory SayToHeItem.fromJson(Map<String, dynamic> map) {
+    print(map);
     return SayToHeItem(
       time:
           DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),

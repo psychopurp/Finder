@@ -156,7 +156,7 @@ class _PublishPageState extends State<PublishPage>
           data: json.encode({
             "content": content,
             "is_show_name": !nameLess,
-            "id": id,
+            "student_id": id,
           }));
       var data = response.data;
       if (!data["status"]) {

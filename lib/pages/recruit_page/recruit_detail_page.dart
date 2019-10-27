@@ -4,7 +4,6 @@ import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
 const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
 const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
@@ -105,6 +104,14 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
             ),
           )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Text("举手"),
+        elevation: 1,
+        onPressed: () {
+
+        },
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: ListView(
         children: <Widget>[
@@ -220,7 +227,7 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             width: ScreenUtil.screenWidthDp,
             child: Text(
-              "职位介绍",
+              "招募详情",
               textAlign: TextAlign.left,
               style: TextStyle(
                   color: Theme.of(context).primaryColor,
