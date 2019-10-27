@@ -12,12 +12,12 @@ const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
 const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
 
-class HeSaysPublishPage extends StatefulWidget {
+class PublishPage extends StatefulWidget {
   @override
-  _HeSaysPublishPageState createState() => _HeSaysPublishPageState();
+  _PublishPageState createState() => _PublishPageState();
 }
 
-class _HeSaysPublishPageState extends State<HeSaysPublishPage>
+class _PublishPageState extends State<PublishPage>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
   File _image;

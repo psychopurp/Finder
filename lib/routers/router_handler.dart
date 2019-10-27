@@ -143,7 +143,7 @@ var heSaysHandler = Handler(
 //服务页面 -- 他·她·说 -- 发布页
 var heSaysPublishHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return PublishPage();
+  return HeSaysPublishPage();
 });
 
 var heSaysDetailHandler = Handler(

@@ -106,7 +106,7 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: Text("举手"),
+        child: Text("参与"),
         elevation: 1,
         onPressed: () {
 
