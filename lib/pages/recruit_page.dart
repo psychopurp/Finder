@@ -118,7 +118,7 @@ class _RecruitPageState extends State<RecruitPage> {
             width: double.infinity,
             alignment: Alignment.center,
             child: Text(
-              "暂时没有这个类别的招募哟~\n换一个类型看看吧！",
+              "暂时没有找到相关的招募哟~\n重新找找看吧！",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,

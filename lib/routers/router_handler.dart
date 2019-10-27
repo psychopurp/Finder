@@ -10,6 +10,7 @@ import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/mine_page.dart';
 import 'package:finder/pages/mine_page/collection_page.dart';
+import 'package:finder/pages/recruit_page/candidates_page.dart';
 import 'package:finder/pages/recruit_page/engage_page.dart';
 import 'package:finder/pages/recruit_page/publish_page.dart';
 import 'package:finder/pages/recruit_page/recommend_recruit_detail_page.dart';
@@ -135,6 +136,11 @@ var publishRecruitHandler = Handler(
 var engageRecruitHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       return EngageRecruitRoute();
+    });
+
+var candidatesHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return CandidatesRoute();
     });
 
 

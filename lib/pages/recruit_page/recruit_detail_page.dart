@@ -118,6 +118,12 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
           Padding(
             padding: EdgeInsets.all(10),
           ),
+          MaterialButton(
+            onPressed: (){
+              Navigator.of(context).pushNamed(Routes.candidates, arguments: item.id);
+            },
+            child: Text("应聘者"),
+          ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             width: double.infinity,

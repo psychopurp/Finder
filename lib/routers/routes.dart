@@ -24,6 +24,7 @@ class Routes {
       '/home/recommendRecruitDetail'; //首页 -- 活动详情
   static String publishRecruit = '/home/publishRecruit'; //首页 -- 活动详情
   static String engageRecruit = '/home/engageRecruit'; //首页 -- 活动详情
+  static String candidates = '/home/candidates'; //首页 -- 活动详情
 
   //服务页
   static String lostFound = "/serve/lostFound"; //服务页面 -- 失物招领
@@ -101,6 +102,9 @@ class Routes {
         transitionType: TransitionType.cupertino);
     router.define(engageRecruit,
         handler: engageRecruitHandler,
+        transitionType: TransitionType.cupertino);
+    router.define(candidates,
+        handler: candidatesHandler,
         transitionType: TransitionType.cupertino);
 
     //服务页 --导航
