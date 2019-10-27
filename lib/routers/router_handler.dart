@@ -11,6 +11,8 @@ import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/mine_page.dart';
 import 'package:finder/pages/mine_page/collection_page.dart';
+import 'package:finder/pages/recruit_page/recommend_recruit_detail_page.dart';
+import 'package:finder/pages/recruit_page/recruit_detail_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/pages/serve_page/internship_page/company_page.dart';
@@ -115,6 +117,17 @@ var publishActivityHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return PublishActivityPage();
 });
+
+//招募页
+var recruitDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return RecruitDetailPage();
+    });
+var recommendRecruitDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return RecommendRecruitDetailPage();
+    });
+
 
 //服务页面 -- 失物招领
 var lostFoundHandler = Handler(

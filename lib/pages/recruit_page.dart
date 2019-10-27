@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/topic_comments_model.dart';
-import 'package:finder/pages/recruit_page/recruit_search_page.dart';
 import 'package:finder/pages/serve_page/he_says_page.dart';
 import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/models/recruit_model.dart';
@@ -44,7 +43,7 @@ class _RecruitPageState extends State<RecruitPage> {
     getTypes();
     getRecruitsData();
     _loadController = EasyRefreshController();
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(Duration(milliseconds: 200), () {
       setState(() {
         moreThanMoment = true;
       });
@@ -174,7 +173,7 @@ class _RecruitPageState extends State<RecruitPage> {
         itemCount: _bannerData.length,
         autoplay: _bannerData.length > 1,
         onTap: (index) {
-          Navigator.pushNamed(context, Routes.recommendInternshipDetail,
+          Navigator.pushNamed(context, Routes.recommendRecruitDetail,
               arguments: _bannerData[index]);
         },
         pagination: SwiperPagination(
@@ -246,7 +245,7 @@ class _RecruitPageState extends State<RecruitPage> {
                       width: 50,
                       height: 50,
                       child: Hero(
-                        tag: "${sender.avatar}",
+                        tag: "user:${item.sender.id}-${item.id}",
                         child: CachedNetworkImage(
                           placeholder: (context, url) {
                             return Container(
@@ -319,7 +318,7 @@ class _RecruitPageState extends State<RecruitPage> {
           GestureDetector(
             onTap: () {
               Navigator.of(context)
-                  .pushNamed(Routes.internshipDetail, arguments: item);
+                  .pushNamed(Routes.recruitDetail, arguments: item);
             },
             behavior: HitTestBehavior.opaque,
             child: Column(
