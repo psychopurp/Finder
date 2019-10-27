@@ -30,7 +30,7 @@ class UserModel {
     phone = json['phone'];
     avatar = Avatar.getImageUrl(json['avatar']);
     introduction = json['introduction'];
-    birthday = json["birthday"];
+    // birthday = json["birthday"];
     major = json['major'];
     fanCount = json['fan_count'];
     followCount = json['follow_count'];

@@ -149,33 +149,55 @@ class _TopicsState extends State<Topics>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return EasyRefresh.custom(
-      enableControlFinishLoad: true,
-      header: MaterialHeader(),
-      footer: MaterialFooter(),
-      controller: _refreshController,
-      onRefresh: () async {
-        await Future.delayed(Duration(microseconds: 500), () {
-          _getInitialTopicsData(2);
-        });
-        _refreshController.resetLoadState();
-      },
-      onLoad: () async {
-        var data = await _getMore(this.pageCount);
-        _refreshController.finishLoad(
-            success: true, noMore: (data.length == 0));
-      },
-      slivers: <Widget>[
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return _singleItem(context, this.topics.data[index], index);
-            },
-            childCount: this.itemCount,
+    return body;
+  }
+
+  Widget get body {
+    Widget child;
+    if (this.topics == null) {
+      child = Container(
+          alignment: Alignment.center,
+          height: double.infinity,
+          child: CupertinoActivityIndicator());
+    } else {
+      child = EasyRefresh.custom(
+        enableControlFinishLoad: true,
+        header: MaterialHeader(),
+        footer: MaterialFooter(),
+        controller: _refreshController,
+        onRefresh: () async {
+          await Future.delayed(Duration(microseconds: 500), () {
+            _getInitialTopicsData(2);
+          });
+          _refreshController.resetLoadState();
+        },
+        onLoad: () async {
+          var data = await _getMore(this.pageCount);
+          _refreshController.finishLoad(
+              success: true, noMore: (data.length == 0));
+        },
+        slivers: <Widget>[
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return _singleItem(context, this.topics.data[index], index);
+              },
+              childCount: this.itemCount,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    }
+
+    return AnimatedSwitcher(
+        duration: Duration(milliseconds: 1000),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+              child: child,
+              opacity:
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+        },
+        child: child);
   }
 
   ///初始话数据

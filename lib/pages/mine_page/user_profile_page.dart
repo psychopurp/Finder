@@ -34,38 +34,51 @@ class _UserProfilePageState extends State<UserProfilePage> {
         body: SafeArea(
             top: false,
             child: Container(
-              child: MyAppBar(
-                  appbar: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                  ),
-                  child: (this.user != null)
-                      ? Stack(
-                          alignment: Alignment.topCenter,
-                          fit: StackFit.expand,
-                          children: <Widget>[
-                            ListView(
-                                padding: EdgeInsets.all(0),
-                                children: buildBackground(user)),
-                            Positioned(
-                                left: 0,
-                                right: 0,
-                                top: topPartHeight * 0.5,
-                                child: userCard(user)),
-                            Positioned(
-                              // left: ScreenUtil().setWidth(0),
-                              right: 0,
-                              top: topPartHeight * 0.5 - 40,
-                              child: avatar(),
-                            )
-                          ],
-                        )
-                      : Container(
-                          height: double.infinity,
-                          alignment: Alignment.center,
-                          child: FinderDialog.showLoading(),
-                        )),
-            )));
+                child: MyAppBar(
+                    appbar: AppBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                    child: body))));
+  }
+
+  Widget get body {
+    Widget child;
+    if (this.user == null) {
+      child = Container(
+          alignment: Alignment.center,
+          height: double.infinity,
+          child: CupertinoActivityIndicator());
+    } else {
+      child = Stack(
+        alignment: Alignment.topCenter,
+        fit: StackFit.expand,
+        children: <Widget>[
+          ListView(padding: EdgeInsets.all(0), children: buildBackground(user)),
+          Positioned(
+              left: 0,
+              right: 0,
+              top: topPartHeight * 0.5,
+              child: userCard(user)),
+          Positioned(
+            // left: ScreenUtil().setWidth(0),
+            right: 0,
+            top: topPartHeight * 0.5 - 40,
+            child: avatar(),
+          )
+        ],
+      );
+    }
+
+    return AnimatedSwitcher(
+        duration: Duration(milliseconds: 600),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+              child: child,
+              opacity:
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+        },
+        child: child);
   }
 
   avatar() => Hero(
