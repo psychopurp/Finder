@@ -1,21 +1,20 @@
-import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
-import 'package:finder/config/api_client.dart';
-import 'package:finder/models/he_says_item.dart';
+import 'package:finder/models/recruit_model.dart';
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 
 const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
 const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
 
-class HeSaysDetail extends StatefulWidget {
+class RecruitDetailPage extends StatefulWidget {
   @override
-  _HeSaysDetailState createState() => _HeSaysDetailState();
+  _RecruitDetailPageState createState() => _RecruitDetailPageState();
 }
 
-class _HeSaysDetailState extends State<HeSaysDetail> {
+class _RecruitDetailPageState extends State<RecruitDetailPage> {
   Map<String, Map<String, dynamic>> menuItem;
 
   void _handleShare() {
@@ -33,54 +32,6 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
     };
   }
 
-  handleLike(HeSheSayItem item, bool status) async {
-    Dio dio = ApiClient.dio;
-    var data = {"like": status, "id": item.id};
-    var jsonData = json.encode(data);
-    var response = await dio.post("like_he_she_say/", data: jsonData);
-    var responseData = response.data;
-    if (responseData["status"]) {
-      setState(() {
-        item.isLike = status;
-        if (status) {
-          item.likeCount += 1;
-        } else {
-          item.likeCount -= 1;
-        }
-      });
-    } else {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("提示"),
-              content: Text("请先登录再点赞!"),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text("取消"),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                FlatButton(
-                  child: Text("确认"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/login');
-                  },
-                ),
-              ],
-            );
-          });
-    }
-//    setState(() {
-//      item.isLike = status;
-//      if (status) {
-//        item.likeCount += 1;
-//      } else {
-//        item.likeCount -= 1;
-//      }
-//    });
-  }
-
   @override
   Widget build(BuildContext context) {
     var appBarColor = Color.fromARGB(255, 95, 95, 95);
@@ -90,10 +41,10 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
       padding: EdgeInsets.symmetric(horizontal: 30),
       child: Container(
         height: 1,
-        color: Color(0xdddddddd),
+        color: Color(0xFFeeeeee),
       ),
     );
-    HeSheSayItem item = ModalRoute.of(context).settings.arguments;
+    RecruitModelData item = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
         leading: MaterialButton(
@@ -157,25 +108,8 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
       ),
       body: ListView(
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
-            width: double.infinity,
-            height: 250,
-            child: Hero(
-              tag: item.id,
-              child: CachedNetworkImage(
-                imageUrl: item.image,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            )
+          Padding(
+            padding: EdgeInsets.all(10),
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -189,7 +123,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                     children: <Widget>[
                       Text(
                         item.title,
-                        maxLines: 1,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 24,
@@ -212,44 +146,6 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                     ],
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    handleLike(item, !item.isLike);
-                  },
-                  child: Column(
-                    children: <Widget>[
-                      AnimatedSwitcher(
-                        duration: Duration(milliseconds: 200),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return ScaleTransition(
-                            child: child,
-                            scale: animation,
-                          );
-                        },
-                        child: Icon(
-                          item.isLike ? Icons.favorite : Icons.favorite_border,
-                          color: ActionColor,
-                          size: 35,
-                          key: ValueKey(item.likeCount),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3),
-                      ),
-                      Text(
-                        item.likeCount < 999 ? "${item.likeCount}" : "999+",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: numColor,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
           ),
@@ -259,47 +155,54 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
             child: MaterialButton(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamed(Routes.internshipCompany, arguments: item);
+              },
               padding: EdgeInsets.all(0),
               child: Row(
                 children: <Widget>[
                   Container(
                     width: 50,
                     height: 50,
-                    child: CachedNetworkImage(
-                      placeholder: (context, url) {
-                        return Container(
-                          padding: EdgeInsets.all(10),
-                          child: CircularProgressIndicator(),
-                        );
-                      },
-                      imageUrl: item.authorAvatar,
-                      errorWidget: (context, url, err) {
-                        return Container(
-                          child: Icon(
-                            Icons.cancel,
-                            size: 50,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                      imageBuilder: (context, imageProvider) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(25)),
-                            image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
+                    child: Hero(
+                      tag: "user:${item.sender.id}-${item.id}",
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) {
+                          return Container(
+                            padding: EdgeInsets.all(10),
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                        imageUrl: item.sender.avatar,
+                        errorWidget: (context, url, err) {
+                          return Container(
+                            child: Icon(
+                              Icons.cancel,
+                              size: 50,
+                              color: Colors.grey,
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                        imageBuilder: (context, imageProvider) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(25)),
+                              image: DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 15),
                     child: Text(
-                      item.authorName,
+                      item.sender.nickname,
                       style: TextStyle(
                         fontSize: 17,
                         color: ActionColor,
@@ -310,16 +213,57 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
               ),
             ),
           ),
-          split,
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+            width: ScreenUtil.screenWidthDp,
+            child: Text(
+              "职位介绍",
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15),
+            ),
+          ),
           Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: Text(
-              item.content,
+              item.introduction,
               style: TextStyle(fontSize: 16),
             ),
-          )
+          ),
+          split,
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+            child: Wrap(
+              direction: Axis.horizontal,
+              children: List<Widget>.generate(item.tags.length,
+                  (index) => getTag(item.tags[index]?.name ?? "Default")),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget getTag(String tag) {
+    return Builder(
+      builder: (context) {
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: 7, vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+          decoration: BoxDecoration(
+              color: Color.fromARGB(255, 244, 167, 131),
+              borderRadius: BorderRadius.circular(15)),
+          child: Text(
+            tag,
+            style: TextStyle(color: Colors.white),
+          ),
+        );
+      },
     );
   }
 

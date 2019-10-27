@@ -18,6 +18,11 @@ class Routes {
   static String moreActivities = '/home/moreActivities'; //首页 -- 更多活动
   static String topicDetail = '/home/topicDetail'; //首页 -- 话题详情
   static String activityDetail = '/home/activityDetail'; //首页 -- 活动详情
+  //招募页
+  static String recruitDetail = '/home/recruitDetail'; //首页 -- 活动详情
+  static String recommendRecruitDetail =
+      '/home/recommendRecruitDetail'; //首页 -- 活动详情
+
   //服务页
   static String lostFound = "/serve/lostFound"; //服务页面 -- 失物招领
   static String heSays = "/serve/heSays"; //服务页面 -- 他·她·说
@@ -31,6 +36,9 @@ class Routes {
   static String treeHole = "/serve/treeHole"; //服务页面 -- 我·树洞
   static String internship = "/serve/internship"; //服务页面 -- 实习
   static String internshipCompany = "/serve/internship/company"; //服务页面 -- 实习 公司
+  static String internshipDetail = "/serve/internship/detail"; //服务页面 -- 实习 公司
+  static String recommendInternshipDetail =
+      "/serve/internship/recommend"; //服务页面 -- 实习 公司
   //用户页
   static String userProfile = "/userProfile"; //个人详情页
   static String minePage = "/minePage"; //我的 页
@@ -77,6 +85,14 @@ class Routes {
     router.define(commentPage,
         handler: commentPageHandler, transitionType: TransitionType.cupertino);
 
+    //招募页 --导航
+    router.define(recruitDetail,
+        handler: recruitDetailHandler,
+        transitionType: TransitionType.cupertino);
+    router.define(recommendRecruitDetail,
+        handler: recommendRecruitDetailHandler,
+        transitionType: TransitionType.cupertino);
+
     //服务页 --导航
     router.define(lostFound,
         handler: lostFoundHandler, transitionType: TransitionType.material);
@@ -90,9 +106,16 @@ class Routes {
     router.define(selectCourse, handler: selectCourseHandler);
     router.define(psychoTest, handler: psychoTestHandler);
     router.define(treeHole, handler: treeHoleHandler);
-    router.define(internship, handler: internshipHandler);
+    router.define(internship,
+        handler: internshipHandler, transitionType: TransitionType.cupertino);
     router.define(internshipCompany,
         handler: internshipCompanyHandler,
+        transitionType: TransitionType.cupertino);
+    router.define(internshipDetail,
+        handler: internshipDetailHandler,
+        transitionType: TransitionType.cupertino);
+    router.define(recommendInternshipDetail,
+        handler: recommendInternshipDetailHandler,
         transitionType: TransitionType.cupertino);
 
     //我的页
