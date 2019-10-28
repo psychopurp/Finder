@@ -30,7 +30,7 @@ class Global {
   //返回 isLogin
   Future init() async {
     print('...正在进行Global初始化...');
-    try{
+    try {
       _prefs = await SharedPreferences.getInstance();
       if (_prefs.getString('userToken') != null) {
         Global.token = _prefs.getString("userToken");
@@ -50,7 +50,7 @@ class Global {
         Global.isLogin = true;
       }
       return data['status'];
-    }on DioError catch(e){
+    } on DioError catch (e) {
       print(e);
     }
     return false;

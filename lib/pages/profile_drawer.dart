@@ -2,7 +2,6 @@ import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
-import 'package:finder/plugin/avatar.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -39,7 +38,6 @@ class ProfileDrawer extends StatelessWidget {
       ),
     },
   };
-
   Widget generateListTile(List list, int index) {
     return ListTile(
       title: Text(
@@ -48,12 +46,10 @@ class ProfileDrawer extends StatelessWidget {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Consumer<UserProvider>(
-        builder: (context, user, child) {
+        child: Consumer<UserProvider>(builder: (context, user, child) {
           List list = [
             ["昵称", user.userInfo.nickname ?? "无名氏"],
             ["姓名", user.userInfo.realName ?? "无名氏"],
@@ -62,15 +58,17 @@ class ProfileDrawer extends StatelessWidget {
             ["专业", user.userInfo.major ?? "专业"],
           ];
           List<Widget> children = <Widget>[
-            topAvatar(user.userInfo, context),
+            topUserInfo(user.userInfo, context),
+            ListTile()
           ];
           children.addAll(List<Widget>.generate(
               list.length, (index) => generateListTile(list, index)));
+          children.add(ListTile());
           children.add(ListTile(
             leading: listOption['modify']['icon'],
             title: Text('编辑信息'),
             onTap: () async {
-                Navigator.of(context).pushNamed(Routes.modifyInfoPage);
+              Navigator.of(context).pushNamed(Routes.modifyInfoPage);
             },
           ),);
           children.add(
@@ -88,43 +86,66 @@ class ProfileDrawer extends StatelessWidget {
                 Provider.of<UserProvider>(context).userInfo = null;
                 Navigator.of(context).pushAndRemoveUntil(
                     new MaterialPageRoute(builder: (context) => LoginPage()),
-                    (route) => route == null);
+                        (route) => route == null);
               },
             ),
           );
-
           return ListView(
             padding: EdgeInsets.all(0),
             children: children,
           );
-        },
-      ),
-    );
+        }));
   }
 
-  topAvatar(UserModel user, context) {
-    return Container(
-      padding: EdgeInsets.only(bottom: 50, top: kToolbarHeight / 2),
-      color: Theme.of(context).primaryColor,
-      child: Column(
-        children: <Widget>[
-          InkWell(
-            onTap: () {
-              Navigator.pop(context);
-              Application.router.navigateTo(context, Routes.minePage);
-            },
-            child: Hero(
-              tag: 'profile',
-              child: Container(
-                // color: Colors.yellow,
-                child: Avatar(
-                  url: user.avatar,
-                  avatarHeight: 100,
-                ),
+  topUserInfo(UserModel user, context) {
+    double borderRadius = 10;
+
+    Widget avatar = Container(
+        height: 100,
+        width: 100,
+        child: Avatar(
+          url: user.avatar,
+          avatarHeight: 100,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 3),
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+        ));
+
+    return Card(
+      margin: EdgeInsets.all(0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(borderRadius),
+              bottomLeft: Radius.circular(borderRadius))),
+      child: Container(
+        padding: EdgeInsets.only(bottom: 50, top: kToolbarHeight / 2),
+        // color: Theme.of(context).primaryColor,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(borderRadius),
+                bottomLeft: Radius.circular(borderRadius)),
+            gradient: LinearGradient(colors: [
+              Theme.of(context).primaryColor.withOpacity(0.6),
+              Theme.of(context).primaryColor.withOpacity(0.7),
+              Theme.of(context).primaryColor.withOpacity(0.8),
+              Theme.of(context).primaryColor.withOpacity(0.9)
+            ], begin: Alignment.topLeft, end: Alignment.bottomRight)),
+        child: Column(
+          children: <Widget>[
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                Application.router.navigateTo(context, Routes.minePage);
+              },
+              child: Hero(
+                tag: 'profile',
+                child: avatar,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

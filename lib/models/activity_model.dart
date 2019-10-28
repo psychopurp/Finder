@@ -78,9 +78,9 @@ class ActivityModelData {
       endTime = json['end_time'];
     } else {
       num time = json['start_time'];
-      startTime = timestampToDateTime(time);
+      startTime = timestampToDateTime(time).toString();
       time = json['end_time'];
-      endTime = timestampToDateTime(time);
+      endTime = timestampToDateTime(time).toString();
     }
 
     place = json['place'];

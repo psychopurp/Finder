@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
+import 'package:finder/plugin/gradient_generator.dart';
 import 'package:finder/plugin/my_appbar.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -39,121 +40,13 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<UserProvider>(builder: (context, user, child) {
-        var avatar = GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    fullscreenDialog: true,
-                    builder: (_) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          constraints: BoxConstraints.expand(height: 500),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              CachedNetworkImage(
-                                  imageUrl: user.userInfo.avatar),
-                              Padding(
-                                padding: EdgeInsets.only(top: 18.0),
-                                child: MaterialButton(
-                                  onPressed: () async {
-                                    Future getImage() async {
-                                      var image;
-                                      // var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-                                      String error = 'No Error Dectected';
-                                      List<Asset> resultList = List<Asset>();
-                                      try {
-                                        resultList =
-                                            await MultiImagePicker.pickImages(
-                                          maxImages: 1,
-                                          enableCamera: true,
-                                          selectedAssets: images,
-                                          cupertinoOptions: CupertinoOptions(
-                                              takePhotoIcon: "chat"),
-                                          materialOptions: MaterialOptions(
-                                            selectionLimitReachedText:
-                                                '请选择一张图片',
-                                            textOnNothingSelected: '请至少选择一张图片',
-                                            actionBarColor: "#000000",
-                                            statusBarColor: '#999999',
-                                            actionBarTitle: "相册",
-                                            allViewTitle: "全部图片",
-                                            useDetailsView: true,
-                                            selectCircleStrokeColor: "#000000",
-                                          ),
-                                        );
-                                      } on Exception catch (e) {
-                                        error = e.toString();
-                                      }
-                                      if (resultList.length != 0) {
-                                        var t = await resultList[0].filePath;
-                                        image = File(t);
-                                      }
+        if (user.userInfo.backGround == null) {
+          imageToColors(user.userInfo.avatar).then((val) {
+            user.userInfo.backGround = val;
+            setState(() {});
+          });
+        }
 
-                                      var cropImage =
-                                          await ImageCropper.cropImage(
-                                              sourcePath: image.path,
-                                              aspectRatio: CropAspectRatio(
-                                                  ratioX: 16, ratioY: 16),
-                                              androidUiSettings:
-                                                  AndroidUiSettings(
-                                                      showCropGrid: false,
-                                                      toolbarTitle: '图片剪切',
-                                                      toolbarColor:
-                                                          Theme.of(context)
-                                                              .primaryColor,
-                                                      toolbarWidgetColor: Colors
-                                                          .white,
-                                                      initAspectRatio:
-                                                          CropAspectRatioPreset
-                                                              .original,
-                                                      lockAspectRatio: true),
-                                              iosUiSettings: IOSUiSettings(
-                                                  minimumAspectRatio: 1.0,
-                                                  aspectRatioLockEnabled:
-                                                      true));
-                                      return cropImage;
-                                    }
-
-                                    File image = await getImage();
-                                    var data =
-                                        await imageUpdate(image, user.userInfo);
-                                    Navigator.pop(context);
-                                    BotToast.showText(text: data.toString());
-                                  },
-                                  shape: StadiumBorder(
-                                      side: BorderSide(color: Colors.white)),
-                                  child: Text(
-                                    "修改图片",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    }));
-          },
-          child: Hero(
-            tag: 'profile',
-            child: Container(
-              // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-              height: 90,
-              width: 90,
-              decoration: BoxDecoration(
-                  // shape: CircleBorder(),
-                  border: Border.all(color: Colors.white, width: 3),
-                  borderRadius: BorderRadius.all(Radius.circular(50)),
-                  image: DecorationImage(
-                      image: CachedNetworkImageProvider(user.userInfo.avatar))),
-            ),
-          ),
-        );
         print(user.collection);
         return SafeArea(
           top: false,
@@ -167,9 +60,7 @@ class _MinePageState extends State<MinePage> {
                 alignment: Alignment.topCenter,
                 fit: StackFit.expand,
                 children: <Widget>[
-                  ListView(
-                      padding: EdgeInsets.all(0),
-                      children: buildBackground(user.userInfo)),
+                  buildBackground(user.userInfo),
                   Positioned(
                       left: 0,
                       right: 0,
@@ -179,7 +70,7 @@ class _MinePageState extends State<MinePage> {
                     // left: ScreenUtil().setWidth(0),
                     // right: 0,
                     top: topPartHeight * 0.5 - 40,
-                    child: avatar,
+                    child: avatar(user.userInfo),
                   )
                 ],
               ),
@@ -190,8 +81,125 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
+  avatar(UserModel userInfo) => GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (_) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        constraints: BoxConstraints.expand(height: 500),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            CachedNetworkImage(imageUrl: userInfo.avatar),
+                            Padding(
+                              padding: EdgeInsets.only(top: 18.0),
+                              child: MaterialButton(
+                                onPressed: () async {
+                                  Future getImage() async {
+                                    var image;
+                                    // var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+                                    String error = 'No Error Dectected';
+                                    List<Asset> resultList = List<Asset>();
+                                    try {
+                                      resultList =
+                                          await MultiImagePicker.pickImages(
+                                        maxImages: 1,
+                                        enableCamera: true,
+                                        selectedAssets: images,
+                                        cupertinoOptions: CupertinoOptions(
+                                            takePhotoIcon: "chat"),
+                                        materialOptions: MaterialOptions(
+                                          selectionLimitReachedText: '请选择一张图片',
+                                          textOnNothingSelected: '请至少选择一张图片',
+                                          actionBarColor: "#000000",
+                                          statusBarColor: '#999999',
+                                          actionBarTitle: "相册",
+                                          allViewTitle: "全部图片",
+                                          useDetailsView: true,
+                                          selectCircleStrokeColor: "#000000",
+                                        ),
+                                      );
+                                    } on Exception catch (e) {
+                                      error = e.toString();
+                                    }
+                                    if (resultList.length != 0) {
+                                      var t = await resultList[0].filePath;
+                                      image = File(t);
+                                    }
+
+                                    var cropImage =
+                                        await ImageCropper.cropImage(
+                                            sourcePath: image.path,
+                                            aspectRatio: CropAspectRatio(
+                                                ratioX: 16, ratioY: 16),
+                                            androidUiSettings:
+                                                AndroidUiSettings(
+                                                    showCropGrid: false,
+                                                    toolbarTitle: '图片剪切',
+                                                    toolbarColor:
+                                                        Theme.of(context)
+                                                            .primaryColor,
+                                                    toolbarWidgetColor:
+                                                        Colors.white,
+                                                    initAspectRatio:
+                                                        CropAspectRatioPreset
+                                                            .original,
+                                                    lockAspectRatio: true),
+                                            iosUiSettings: IOSUiSettings(
+                                                minimumAspectRatio: 1.0,
+                                                aspectRatioLockEnabled: true));
+                                    return cropImage;
+                                  }
+
+                                  File image = await getImage();
+                                  var data = await imageUpdate(image, userInfo);
+                                  Navigator.pop(context);
+                                },
+                                shape: StadiumBorder(
+                                    side: BorderSide(color: Colors.white)),
+                                child: Text(
+                                  "修改图片",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  }));
+        },
+        child: Hero(
+          tag: 'profile',
+          child: Container(
+            // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+            height: 90,
+            width: 90,
+            child: Avatar(
+              url: userInfo.avatar,
+              avatarHeight: 90,
+            ),
+            decoration: BoxDecoration(
+              // shape: CircleBorder(),
+              border: Border.all(color: Colors.white, width: 3),
+              borderRadius: BorderRadius.all(Radius.circular(50)),
+            ),
+          ),
+        ),
+      );
+
   buildBackground(UserModel user) {
     double cardWidth = 130;
+    List<Color> backGroundColor = user.backGround != null
+        ? user.backGround
+        : [Theme.of(context).primaryColor];
 
     Widget getCard(item) => Card(
           color: Colors.white,
@@ -208,15 +216,27 @@ class _MinePageState extends State<MinePage> {
 
     List<Widget> content = [];
 
-    Widget topPart = Container(
-      height: topPartHeight,
-      decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+    Widget backGround = Container(
+      key: ValueKey(user.backGround),
+      height: ScreenUtil.screenHeightDp,
+      decoration: BoxDecoration(
+          gradient: GradientGenerator.linear(
+              backGroundColor[backGroundColor.length ~/ 2],
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight)),
     );
 
-    content.add(topPart);
+    backGround = AnimatedSwitcher(
+      switchInCurve: Curves.easeIn,
+      switchOutCurve: Curves.easeOut,
+      duration: Duration(milliseconds: 5000),
+      child: backGround,
+    );
+
+    // content.add(backGround);
     content.add(Container(
       alignment: Alignment.center,
-      padding: EdgeInsets.only(top: cardWidth + 10),
+      padding: EdgeInsets.only(top: cardWidth * 2),
       child: Wrap(
         spacing: 12,
         runSpacing: 14,
@@ -229,76 +249,32 @@ class _MinePageState extends State<MinePage> {
       ),
     ));
 
-    return content;
+    return Stack(
+      children: <Widget>[
+        backGround,
+        ListView(
+          children: content,
+        )
+      ],
+    );
   }
 
   imageUpdate(File image, UserModel user) async {
+    String preAvatar = user.avatar;
     var imageStr = await apiClient.uploadImage(image);
     imageStr = Avatar.getImageUrl(imageStr);
     user.avatar = imageStr;
     var data = await apiClient.upLoadUserProfile(user);
-    return data;
-  }
+    String text = "";
+    if (data['status'] == true) {
+      text = '修改成功';
+    } else {
+      text = '修改失败';
+      user.avatar = preAvatar;
+    }
+    BotToast.showText(text: text);
 
-  Widget buildUserBackground(UserModel user, BuildContext context) {
-    return Container(
-      height: ScreenUtil().setHeight(650),
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30))),
-      child: DefaultTextStyle(
-        style: TextStyle(fontSize: ScreenUtil().setSp(40)),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: kToolbarHeight),
-              child: userCard(user),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 6.0),
-                    child: Text(user.nickname),
-                  ),
-                  IconButton(
-                    splashColor: Colors.white,
-                    onPressed: () {
-                      print("asfasf");
-                    },
-                    icon: Icon(
-                      IconData(0xe845, fontFamily: 'myIcon'),
-                      size: ScreenUtil().setSp(50),
-                      color: Color(0xffDDDDDD),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              user?.school?.name ?? "家里蹲大学",
-              style: TextStyle(fontSize: 16),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 8.0),
-              child: Text(
-                user.introduction,
-                style: TextStyle(color: Colors.black38),
-              ),
-            ),
-            Row(
-                // children: <Widget>[Text(user)],
-                )
-            // Text(user.)
-          ],
-        ),
-      ),
-    );
+    return data;
   }
 
   Widget userCard(UserModel user) {
@@ -306,10 +282,14 @@ class _MinePageState extends State<MinePage> {
         margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(100)),
         color: Colors.white,
         elevation: 10,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: EdgeInsets.only(bottom: 15, top: 50),
           width: ScreenUtil().setWidth(750),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: GradientGenerator.linear(Theme.of(context).primaryColor,
+                  gradient: 2)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -323,7 +303,7 @@ class _MinePageState extends State<MinePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text( user?.school?.name ?? "家里蹲大学"),
+                  Text(user?.school?.name ?? "家里蹲大学"),
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 5),
                     height: 14,

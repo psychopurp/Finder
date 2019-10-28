@@ -29,9 +29,16 @@ class _FansFollowPageState extends State<FansFollowPage>
 
   @override
   void initState() {
+    super.initState();
+
     _tabController = TabController(
         vsync: this, initialIndex: widget.isFollow ? 0 : 1, length: 2);
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,6 +56,7 @@ class _FansFollowPageState extends State<FansFollowPage>
         backgroundColor: Colors.white,
         centerTitle: true,
         bottom: TabBar(
+          isScrollable: true,
           labelColor: Colors.black,
           indicatorWeight: 1,
           indicatorColor: Theme.of(context).primaryColor,
@@ -64,6 +72,7 @@ class _FansFollowPageState extends State<FansFollowPage>
         ),
       ),
       body: TabBarView(
+        physics: PageScrollPhysics(),
         controller: _tabController,
         children: <Widget>[
           TabBody(
@@ -98,6 +107,7 @@ class _TabBodyState extends State<TabBody> {
   static const int FOLLOWED = 2;
 
   int pageCount = 2;
+  int userItSelfId;
 
   @override
   void initState() {
@@ -117,6 +127,9 @@ class _TabBodyState extends State<TabBody> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
+    setState(() {
+      userItSelfId = user.userInfo.id;
+    });
     return body;
   }
 
@@ -128,20 +141,20 @@ class _TabBodyState extends State<TabBody> {
           height: double.infinity,
           child: CupertinoActivityIndicator());
     } else {
-      child = EasyRefresh.custom(
+      child = EasyRefresh(
         enableControlFinishLoad: true,
         header: MaterialHeader(),
         footer: MaterialFooter(),
+        key: ValueKey(child),
         controller: _refreshController,
-        slivers: <Widget>[
-          SliverList(delegate: SliverChildListDelegate(buildUserList())),
-        ],
+        child: ListView(children: buildUserList()),
         onRefresh: () async {
           await getInitialData();
           _refreshController.resetLoadState();
         },
         onLoad: () async {
           var data = await getMore(pageCount: this.pageCount);
+          await Future.delayed(Duration(seconds: 2), () {});
           print("data===$data");
           _refreshController.finishLoad(
               success: true, noMore: (data.length == 0));
@@ -168,6 +181,7 @@ class _TabBodyState extends State<TabBody> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            ///头像
             GestureDetector(
               onTap: () {
                 Application.router.navigateTo(context,
@@ -183,6 +197,8 @@ class _TabBodyState extends State<TabBody> {
                 ),
               ),
             ),
+
+            ///名字/简介
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -208,12 +224,16 @@ class _TabBodyState extends State<TabBody> {
                 ],
               ),
             ),
+
+            ///关注按钮
             Container(
                 height: 40,
                 // color: Colors.amber,
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(right: 10),
-                child: getButton(item.status, item))
+                child: (item.id == userItSelfId)
+                    ? Container()
+                    : getButton(item.status, item))
           ],
         ),
       );

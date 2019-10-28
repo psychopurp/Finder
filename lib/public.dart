@@ -17,7 +17,12 @@ export 'package:bot_toast/bot_toast.dart';
 export 'package:finder/plugin/dialog.dart';
 
 //日期转化成时间戳工具
-String getTime({int year, int month, int day}) {
+String getTime({int year, int month, int day, DateTime dateTime}) {
+  if (dateTime != null) {
+    return (dateTime.millisecondsSinceEpoch.toDouble() ~/ 1000)
+        .toInt()
+        .toString();
+  }
   double time = DateTime(year, month, day).millisecondsSinceEpoch.toDouble();
   time = time.toDouble() / 1000;
   var date = time.toInt().toString();
@@ -25,11 +30,11 @@ String getTime({int year, int month, int day}) {
 }
 
 ///时间戳转换成日期
-String timestampToDateTime(num time) {
+DateTime timestampToDateTime(num time) {
   num temp = time * 1000;
   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(temp.toInt());
   // print(dateTime);
-  return dateTime.toString();
+  return dateTime;
 }
 
 ///content转换成html
@@ -38,16 +43,9 @@ String contentToJson({List<String> images, String text}) {
   return jsonEncode(formData);
 }
 
-Future<Color> getColor(String imageUrl) async {
+Future<List<Color>> imageToColors(String imageUrl) async {
   PaletteGenerator paletteGenerator = await PaletteGenerator.fromImageProvider(
     CachedNetworkImageProvider(imageUrl),
   );
-  // print(paletteGenerator);
-  Color pageColor;
-  if (paletteGenerator.darkVibrantColor != null) {
-    pageColor = paletteGenerator.darkVibrantColor.color;
-  } else {
-    pageColor = paletteGenerator.mutedColor.color;
-  }
-  return pageColor;
+  return paletteGenerator.colors.toList();
 }

@@ -139,7 +139,7 @@ class _CommentPageState extends State<CommentPage> {
         if ((now.difference(time).inHours) < 24) {
           return (now.difference(time).inHours).toString() + '小时前';
         } else {
-          return (time.day - now.day).toString() + '天前';
+          return (now.difference(time).inDays).toString() + '天前';
         }
       }
       return time.month.toString() + '月' + time.day.toString() + '日';

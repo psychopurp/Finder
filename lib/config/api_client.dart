@@ -61,6 +61,7 @@ class ApiClient {
   //修改个人信息
   Future upLoadUserProfile(UserModel userINfo) async {
     var data = jsonEncode(userINfo.toJson());
+    print(data);
     try {
       Response response = await dio.post('modify_profile/', data: data);
       print('修改个人信息成功=====${response.data}');
