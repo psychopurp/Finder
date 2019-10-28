@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/login_page.dart';
-import 'package:finder/pages/register_page.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,9 +16,14 @@ import 'routers/routes.dart';
 import 'package:finder/provider/user_provider.dart';
 
 void main() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
+
   global.init().then((isLogin) {
     runApp(MyApp(
-      isLogin: false,
+      isLogin: isLogin,
     ));
     if (Platform.isAndroid) {
       SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
