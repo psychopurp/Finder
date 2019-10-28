@@ -35,6 +35,7 @@ class Global {
       if (_prefs.getString('userToken') != null) {
         Global.token = _prefs.getString("userToken");
       }
+      print("GET TOKEN =======>:   $token");
 
       //初始化网络请求相关配置
       //给请求头加上token
@@ -45,7 +46,8 @@ class Global {
 
       //能获得用户信息说明token有效
       var data = await apiClient.getUserProfile();
-      if (data['status'] == true) {
+      print(data);
+      if (data['status']) {
         Global.userInfo = UserModel.fromJson(data['data']);
         Global.isLogin = true;
       }
@@ -78,6 +80,7 @@ class Global {
     if (newToken != null) {
       Global.token = newToken;
     }
+    print("sava TOKEN =======>:   $newToken");
     _prefs.setString('userToken', token);
   }
 

@@ -16,6 +16,11 @@ import 'routers/routes.dart';
 import 'package:finder/provider/user_provider.dart';
 
 void main() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
+
   global.init().then((isLogin) {
     runApp(MyApp(
       isLogin: isLogin,
@@ -62,7 +67,8 @@ class MyApp extends StatelessWidget {
             theme: _buildAppTheme(), //设置App主题
             title: 'Finder',
             debugShowCheckedModeBanner: false,
-            home: isLogin ? IndexPage() : LoginPage(),
+            home: isLogin  ? IndexPage() : LoginPage(),
+//            home: isLogin && false ? IndexPage() : RegisterPage(),
           ),
         ));
   }

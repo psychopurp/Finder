@@ -10,55 +10,55 @@ class ServePage extends StatefulWidget {
 
 class _ServePageState extends State<ServePage> {
   List serviceItemList = [
+//    {
+//      'name': '失物招领',
+//      'preIcon': IconData(0xe62e, fontFamily: 'myIcon'),
+//      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
+//      'color': Colors.yellow,
+//      'url': Routes.lostFound
+//    },
     {
-      'name': '失物招领',
-      'preIcon': IconData(0xe62e, fontFamily: 'myIcon'),
-      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
-      'color': Colors.yellow,
-      'url': Routes.lostFound
-    },
-    {
-      'name': '他·她·说',
+      'name': '他 · 她说',
       'preIcon': IconData(0xe627, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.pink[200],
       'url': Routes.heSays
     },
+//    {
+//      'name': '一起学习',
+//      'preIcon': IconData(0xe668, fontFamily: 'myIcon'),
+//      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
+//      'color': Colors.orange,
+//      'url': Routes.study
+//    },
+//    {
+//      'name': '选课指南',
+//      'preIcon': IconData(0xe635, fontFamily: 'myIcon'),
+//      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
+//      'color': Colors.cyan,
+//      'url': Routes.selectCourse
+//    },
+//    {
+//      'name': '心理测试',
+//      'preIcon': IconData(0xe6bd, fontFamily: 'myIcon'),
+//      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
+//      'color': Colors.blue,
+//      'url': Routes.psychoTest
+//    },
+//    {
+//      'name': '我·树洞',
+//      'preIcon': IconData(0xe60b, fontFamily: 'myIcon'),
+//      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
+//      'color': Colors.green,
+//      'url': Routes.treeHole
+//    },
     {
-      'name': '一起学习',
-      'preIcon': IconData(0xe668, fontFamily: 'myIcon'),
-      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
-      'color': Colors.orange,
-      'url': Routes.study
-    },
-    {
-      'name': '选课指南',
-      'preIcon': IconData(0xe635, fontFamily: 'myIcon'),
-      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
-      'color': Colors.cyan,
-      'url': Routes.selectCourse
-    },
-    {
-      'name': '心理测试',
+      'name': '实习 · 工作',
       'preIcon': IconData(0xe6bd, fontFamily: 'myIcon'),
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
       'color': Colors.blue,
-      'url': Routes.psychoTest
-    },
-    {
-      'name': '我·树洞',
-      'preIcon': IconData(0xe60b, fontFamily: 'myIcon'),
-      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
-      'color': Colors.green,
-      'url': Routes.treeHole
-    },
-    {
-      'name': '实习',
-      'preIcon': IconData(0xe60b, fontFamily: 'myIcon'),
-      'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
-      'color': Colors.red,
       'url': Routes.internship
-    },
+    }
   ];
 
   @override

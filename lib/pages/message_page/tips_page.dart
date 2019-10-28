@@ -79,7 +79,7 @@ class _TipsPageState extends State<TipsPage> {
   Widget get body {
     return ListView.builder(
       itemBuilder: (context, index) {
-        return _generateTip(index);
+        return _generateTip(data.tips.length - index - 1);
       },
       itemCount: data.tips.length,
     );

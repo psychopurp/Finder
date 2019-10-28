@@ -19,3 +19,20 @@ class FinderDialog {
         ),
       );
 }
+
+void showErrorHint(BuildContext context, String text) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("提示"),
+          content: Text(text),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("确认"),
+              onPressed: () => Navigator.of(context).pop(), //关闭对话框
+            ),
+          ],
+        );
+      });
+}

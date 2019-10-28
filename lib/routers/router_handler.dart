@@ -13,6 +13,7 @@ import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/mine_page.dart';
 import 'package:finder/pages/mine_page/change_profile_page.dart';
 import 'package:finder/pages/mine_page/collection_page.dart';
+import 'package:finder/pages/mine_page/modify_info_page.dart';
 import 'package:finder/pages/recruit_page/candidates_page.dart';
 import 'package:finder/pages/recruit_page/engage_page.dart';
 import 'package:finder/pages/recruit_page/publish_page.dart';
@@ -42,6 +43,8 @@ import 'package:finder/pages/login_page.dart';
 import 'package:finder/pages/home_page/topic_detail_page.dart';
 import 'package:finder/pages/mine_page/user_profile_page.dart';
 import 'package:finder/pages/home_page/activity_detail_page.dart';
+import 'package:finder/pages/login_page/privacy.dart';
+import 'package:finder/pages/login_page/serve_protocol.dart';
 
 //返回首页
 var rootHandler = Handler(
@@ -253,6 +256,10 @@ var sayToHeChatHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return SayToHeChatRoute();
 });
+var modifyInfoPageHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return ModifyInfoPage();
+});
 
 var collectionPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -273,4 +280,13 @@ var fansFollowPageHandle = Handler(
 var changeUserProfilePageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ChangeProfilePage();
+});
+//条款
+var privacyHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return PrivacyRoute();
+});
+var serveProtocolHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return ServeProtocolRoute();
 });

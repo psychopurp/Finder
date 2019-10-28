@@ -53,12 +53,19 @@ class Avatar extends StatelessWidget {
 
   static String getImageUrl(String url) {
     String baseUrl = ApiClient.host;
-    if (url == null) {
-      return "/static/default.jpg";
+    if(url == null){
+      return "/static/default.png";
     }
     if (url.startsWith("http")) {
       return url;
     } else
       return baseUrl + url;
+//    String baseUrl = "https://image.finder-nk.com";    if(url == null){
+//      return "/static/default.jpg";
+//    }
+//    if (url.startsWith("http")) {
+//      return url;
+//    } else
+//      return baseUrl + url;
   }
 }

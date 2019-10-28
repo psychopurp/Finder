@@ -12,12 +12,13 @@ class UserModel {
   String major;
   School school;
   int fanCount;
+  String realName;
+  String studentId;
   int followCount;
 
   /// 用户自己特有属性
   DateTime birthday;
   String phone;
-  String realName;
 
   ///用于其他用户页信息
   bool isFollowed;
@@ -35,12 +36,11 @@ class UserModel {
       this.major,
       this.nickname,
       this.phone,
+      this.studentId,
       this.school,
       this.fanCount,
-      this.followCount,
-      this.isBothFollowed,
-      this.isFollowed,
-      this.backGround});
+      this.followCount});
+
   UserModel.fromJson(Map<String, dynamic> json) {
     // print(json['real_name'].runtimeType);
     id = json['id'];
@@ -52,6 +52,7 @@ class UserModel {
     followCount = json['follow_count'];
 
     realName = json['real_name'] != null ? json['real_name'] : null;
+    studentId = json["student_id"];
     isFollowed = json['is_followed'] != null ? json['is_followed'] : null;
     isBothFollowed =
         json['is_both_followed'] != null ? json['is_both_followed'] : null;
@@ -69,13 +70,13 @@ class UserModel {
     json['phone'] = this.phone;
     json['avatar'] = this.avatar.substring(this.avatar.indexOf('/m'));
     json['introduction'] = this.introduction;
+    json['real_name'] = realName;
+    json["student_id"] = studentId;
     json["birthday"] = getTime(dateTime: this.birthday);
-    // print(json['birthday']);
     json['major'] = this.major;
     json['id'] = this.id;
     json['follow_count'] = this.followCount;
     json['fan_count'] = this.fanCount;
-    json['real_name'] = this.realName;
     if (this.school != null) {
       json['school'] = this.school.toJson();
     }

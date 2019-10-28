@@ -1,9 +1,12 @@
 import 'package:finder/models/message_model.dart';
 import 'package:finder/pages/profile_drawer.dart';
+import 'package:finder/pages/register_page.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/routers/application.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'home_page.dart';
 import 'message_page.dart';
 import 'serve_page.dart';
@@ -35,6 +38,15 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     MessageModel().addListener(update);
+    Future.delayed(Duration(milliseconds: 300), () {
+      String nickName = Provider.of<UserProvider>(context).userInfo.nickname;
+      bool notRegister = nickName == "" || nickName == null;
+      if (notRegister) {
+        Navigator.of(context).pushAndRemoveUntil(
+            new MaterialPageRoute(builder: (context) => new RegisterPage()),
+            (route) => route == null);
+      }
+    });
   }
 
   @override

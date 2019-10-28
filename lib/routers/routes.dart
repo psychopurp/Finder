@@ -52,12 +52,16 @@ class Routes {
   static String collectionPage = "/collectionPage"; //用户收藏页
   static String fansFollowPage = "/fansFollowPage"; //关注和粉丝页
   static String changeProfilePage = "/changeProfilePage"; //关注和粉丝页
+  static String modifyInfoPage = "/modifyInfoPage"; //关注和粉丝页
 
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
   static String tips = "/message/tips";
   static String sayToHe = "/message/say_to_he";
   static String sayToHeChat = "/message/say_to_he_chat";
+  //条款
+  static String privacy = "/login_page/privacy";
+  static String serveProtocol = "/login_page/serve_protocol";
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = Handler(
@@ -160,8 +164,19 @@ class Routes {
     router.define(fansFollowPage,
         handler: fansFollowPageHandle,
         transitionType: TransitionType.cupertino);
+<<<<<<< HEAD
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);
+=======
+    router.define(modifyInfoPage,
+        handler: modifyInfoPageHandle,
+        transitionType: TransitionType.cupertino);
+    //条款
+    router.define(privacy,
+        handler: privacyHandle, transitionType: TransitionType.cupertino);
+    router.define(serveProtocol,
+        handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
+>>>>>>> 4bac0ec3348b31f71a46272909527ac8797c9f72
   }
 }

@@ -8,24 +8,19 @@ import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/dialog.dart';
 import 'package:finder/provider/user_provider.dart';
-import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
 
-import 'index_page.dart';
-
-class RegisterPage extends StatefulWidget {
+class ModifyInfoPage extends StatefulWidget {
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _ModifyInfoPageState createState() => _ModifyInfoPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _ModifyInfoPageState extends State<ModifyInfoPage> {
   TextEditingController _nicknameController;
   TextEditingController _realNameController;
-  TextEditingController _passwordController;
-  TextEditingController _passwordAgainController;
   TextEditingController _studentIdController;
   TextEditingController _introductionController;
   List<School> schools = [];
@@ -91,16 +86,6 @@ class _RegisterPageState extends State<RegisterPage> {
       showErrorHint(context, "请输入用户名");
       return;
     }
-    String password = _passwordController.value.text;
-    if (password.length < 6) {
-      showErrorHint(context, "密码太短");
-      return;
-    }
-    String passwordAgain = _passwordAgainController.value.text;
-    if (password != passwordAgain) {
-      showErrorHint(context, "两次密码不相同");
-      return;
-    }
     String realName = _realNameController.value.text.trim();
     if (realName == "") {
       showErrorHint(context, "请输入真实姓名");
@@ -120,10 +105,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     String introduction = _introductionController.value.text.trim();
-    if ((avatarUrl ?? "") == "") {
-      showErrorHint(context, "请上传头像");
-      return;
-    }
     String url = 'register_profile/';
     try {
       Dio dio = ApiClient.dio;
@@ -133,7 +114,6 @@ class _RegisterPageState extends State<RegisterPage> {
         "introduction": introduction,
         "major": selectedMajor.name,
         "school": selectedSchool.id,
-        "password": password,
         "student_id": studentId,
         "real_name": realName
       };
@@ -141,11 +121,9 @@ class _RegisterPageState extends State<RegisterPage> {
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         Provider.of<UserProvider>(context).getData();
-        Navigator.of(context).pushAndRemoveUntil(
-            new MaterialPageRoute(builder: (context) => IndexPage()),
-            (route) => route == null);
+        Navigator.of(context).pop();
       } else {
-        showErrorHint(context, result["error"]);
+        showErrorHint(context, "网络连接失败, 请稍后再试");
       }
     } on DioError catch (e) {
       print(e);
@@ -158,12 +136,30 @@ class _RegisterPageState extends State<RegisterPage> {
     super.initState();
     _nicknameController = TextEditingController();
     _realNameController = TextEditingController();
-    _passwordController = TextEditingController();
-    _passwordAgainController = TextEditingController();
     _studentIdController = TextEditingController();
     _introductionController = TextEditingController();
-    getSchools();
-    getMajors();
+    Future.delayed(Duration(milliseconds: 400), (){
+      UserModel user = Provider.of<UserProvider>(context).userInfo;
+      _nicknameController.text = user.nickname;
+      _realNameController.text = user.realName;
+      _studentIdController.text = user.studentId;
+      _introductionController.text = user.introduction;
+      avatarRealUrl = user.avatar;
+      getSchools().then((x) {
+        getMajors().then((x) {
+          schools.forEach((e) {
+            if (e.id == user.school.id) {
+              selectedSchool = e;
+            }
+          });
+          majors.forEach((e) {
+            if (e.name == user.major) {
+              selectedMajor = e;
+            }
+          });
+        });
+      });
+    });
 //    showErrorHint(context, "由于本软件属于校园社交软件, 需要实名认证信息, 请务必保证信息的准确性.");
   }
 
@@ -267,8 +263,6 @@ class _RegisterPageState extends State<RegisterPage> {
     _introductionController.dispose();
     _studentIdController.dispose();
     _realNameController.dispose();
-    _passwordController.dispose();
-    _passwordAgainController.dispose();
     super.dispose();
   }
 
@@ -276,72 +270,13 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("完善个人信息"),
+        title: Text("修改个人信息"),
         centerTitle: true,
         leading: Container(),
         actions: <Widget>[
           MaterialButton(
             onPressed: () {
-              showDialog<bool>(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text("提示"),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "请详细阅读《意旸Finders智慧校园软件许可及服务协议》与《隐私政策》。",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                        ),
-                        MaterialButton(
-                          child: Text(
-                            "《意旸Finders智慧校园软件许可及服务协议》",
-                            style: TextStyle(
-                              color: Colors.indigo,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pushNamed(Routes.serveProtocol);
-                          },
-                        ),
-                        MaterialButton(
-                          child: Text(
-                            "《隐私政策》",
-                            style: TextStyle(
-                              color: Colors.indigo,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushNamed(Routes.privacy);
-                          },
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                        ),
-                        Text("点击确认既代表您同意本条款。"),
-                      ],
-                    ),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: Text("取消"),
-                        onPressed: () => Navigator.of(context).pop(), // 关闭对话框
-                      ),
-                      FlatButton(
-                        child: Text("确认"),
-                        onPressed: () {
-                          postData();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
+              postData();
             },
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
@@ -353,72 +288,57 @@ class _RegisterPageState extends State<RegisterPage> {
           )
         ],
       ),
-      body: WillPopScope(
-        onWillPop: () async {
-          return false;
-        },
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  child: avatar,
-                ),
-                Padding(
-                  padding: EdgeInsets.all(20),
-                ),
-                singleLineTestField(
-                    controller: _nicknameController,
-                    hint: "请输入昵称",
-                    label: "* 昵称"),
-                singleLineTestField(
-                    controller: _passwordController,
-                    hint: "请输入登录密码",
-                    label: "* 密码",
-                    obscureText: true),
-                singleLineTestField(
-                    controller: _passwordAgainController,
-                    hint: "请确认您的密码",
-                    label: "* 确认密码",
-                    obscureText: true),
-                singleLineTestField(
-                    controller: _realNameController,
-                    hint: "请输入您的真实姓名",
-                    label: "* 姓名"),
-                singleLineTestField(
-                    controller: _studentIdController,
-                    hint: "请输入您的学号",
-                    label: "* 学号",
-                    inputType: TextInputType.numberWithOptions(
-                        signed: false, decimal: false)),
-                singleLineTestField(
-                    controller: _introductionController,
-                    hint: "请简单的介绍一下自己吧!(非必填)",
-                    label: "简介",
-                    maxLine: null,
-                    minLine: null,
-                    expand: true),
-                Selector(
-                    onChange: (school) {
-                      setState(() {
-                        selectedSchool = school;
-                      });
-                    },
-                    schools: schools,
-                    selected: selectedSchool,
-                    verbose: "选择学校"),
-                Selector(
-                    onChange: (major) {
-                      setState(() {
-                        selectedMajor = major;
-                      });
-                    },
-                    schools: majors,
-                    selected: selectedMajor,
-                    verbose: "选择专业"),
-              ],
-            ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: Column(
+            children: <Widget>[
+              Container(
+                child: avatar,
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+              ),
+              singleLineTestField(
+                  controller: _nicknameController,
+                  hint: "请输入昵称",
+                  label: "* 昵称"),
+              singleLineTestField(
+                  controller: _realNameController,
+                  hint: "请输入您的真实姓名",
+                  label: "* 姓名"),
+              singleLineTestField(
+                  controller: _studentIdController,
+                  hint: "请输入您的学号",
+                  label: "* 学号",
+                  inputType: TextInputType.numberWithOptions(
+                      signed: false, decimal: false)),
+              singleLineTestField(
+                  controller: _introductionController,
+                  hint: "请简单的介绍一下自己吧!(非必填)",
+                  label: "简介",
+                  maxLine: null,
+                  minLine: null,
+                  expand: true),
+              Selector(
+                  onChange: (school) {
+                    setState(() {
+                      selectedSchool = school;
+                    });
+                  },
+                  schools: schools,
+                  selected: selectedSchool,
+                  verbose: "选择学校"),
+              Selector(
+                  onChange: (major) {
+                    setState(() {
+                      selectedMajor = major;
+                    });
+                  },
+                  schools: majors,
+                  selected: selectedMajor,
+                  verbose: "选择专业"),
+            ],
           ),
         ),
       ),
