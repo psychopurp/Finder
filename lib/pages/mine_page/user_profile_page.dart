@@ -1,17 +1,23 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/plugin/my_appbar.dart';
+import 'package:provider/provider.dart';
 
 ///用户信息详情页
 class UserProfilePage extends StatefulWidget {
   final int senderId;
   final String heroTag;
+
   UserProfilePage({this.senderId, this.heroTag});
+
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -20,26 +26,54 @@ class _UserProfilePageState extends State<UserProfilePage> {
   UserModel user;
   double topPartHeight = 150;
   var cards;
+  ScrollController _scrollController;
+  int userItSelfId;
 
   @override
   void initState() {
     getUserProfile();
+    _scrollController = ScrollController();
     super.initState();
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print(widget.heroTag);
+    final userProvider = Provider.of<UserProvider>(context);
+    setState(() {
+      userItSelfId = userProvider.userInfo.id;
+    });
+//    print(widget.heroTag);
     return Scaffold(
-        body: SafeArea(
-            top: false,
-            child: Container(
-                child: MyAppBar(
-                    appbar: AppBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: body))));
+      floatingActionButton: FloatingActionButton(
+        child: Text("私信"),
+        elevation: 1,
+        onPressed: () {
+          Navigator.of(context).pushNamed(Routes.chat,
+              arguments: UserProfile.fromJson(user.toJson()));
+        },
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
+      body: SafeArea(
+        top: false,
+        child: Container(
+          child: MyAppBar(
+              appbar: AppBar(
+                backgroundColor: Theme.of(context).primaryColor,
+                elevation: 0,
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(top: 80),
+                child: body,
+              )),
+        ),
+      ),
+    );
   }
 
   Widget get body {
@@ -62,10 +96,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: userCard(user)),
           Positioned(
             // left: ScreenUtil().setWidth(0),
-            right: 0,
+            right: ScreenUtil.screenWidthDp / 2 - 45,
             top: topPartHeight * 0.5 - 40,
             child: avatar(),
-          )
+          ),
+          // Positioned(
+          //   left: ScreenUtil.screenWidthDp / 2 + 50,
+          //   top: topPartHeight * 0.5,
+          //   child: followButton(),
+          // )
         ],
       );
     }
@@ -90,11 +129,42 @@ class _UserProfilePageState extends State<UserProfilePage> {
           decoration: BoxDecoration(
               // shape: CircleBorder(),
               border: Border.all(color: Colors.white, width: 3),
-              borderRadius: BorderRadius.all(Radius.circular(50)),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
               image: DecorationImage(
                   image: CachedNetworkImageProvider(user.avatar))),
         ),
       );
+
+  followButton() {
+    Widget child = Text(user.isFollowed ? '已关注' : '关注',
+        style:
+            TextStyle(color: user.isFollowed ? Colors.black38 : Colors.white));
+
+    child = MaterialButton(
+      key: ValueKey(user.isFollowed),
+      onPressed: () async {
+        user.isFollowed = !user.isFollowed;
+        user.fanCount = user.isFollowed ? user.fanCount + 1 : user.fanCount - 1;
+        var data = await apiClient.addFollowUser(userId: user.id);
+        // print(data);
+        setState(() {});
+      },
+      elevation: user.isFollowed ? 0 : 2,
+      shape: user.isFollowed
+          ? StadiumBorder(side: BorderSide(color: Colors.white10))
+          : StadiumBorder(),
+      color: user.isFollowed ? Colors.white24 : Theme.of(context).primaryColor,
+      child: child,
+    );
+    child = AnimatedSwitcher(
+      switchInCurve: Curves.easeIn,
+      switchOutCurve: Curves.easeOut,
+      duration: Duration(milliseconds: 200),
+      child: child,
+    );
+
+    return child;
+  }
 
   buildBackground(UserModel user) {
     double cardWidth = 130;
@@ -116,7 +186,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     Widget topPart = Container(
       height: topPartHeight,
-      decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+      ),
     );
 
     content.add(topPart);
@@ -143,10 +215,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
         margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(100)),
         color: Colors.white,
         elevation: 10,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: EdgeInsets.only(bottom: 15, top: 50),
           width: ScreenUtil().setWidth(750),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(colors: [
+                Theme.of(context).primaryColor.withOpacity(0.1),
+                Theme.of(context).primaryColor.withOpacity(0.4),
+                Theme.of(context).primaryColor.withOpacity(0.6),
+                Theme.of(context).primaryColor.withOpacity(0.9),
+              ])),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -206,7 +286,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     )
                   ],
                 ),
-              )
+              ),
+              (user.id == userItSelfId) ? Container() : followButton(),
             ],
           ),
         ));
@@ -214,8 +295,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   getUserProfile() async {
     var data = await apiClient.getOtherProfile(userId: widget.senderId);
+    // print(data);
+
     UserModel userModel = UserModel.fromJson(data['data']);
-    print(data);
 
     if (!mounted) return;
     setState(() {

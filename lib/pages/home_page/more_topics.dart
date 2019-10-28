@@ -43,27 +43,28 @@ class _MoreTopicsState extends State<MoreTopics>
     return Scaffold(
         appBar: AppBar(
           title: Text('话题'),
-          elevation: 0,
           centerTitle: true,
           bottom: new TabBar(
+            labelStyle: TextStyle(fontSize: 15),
             isScrollable: true,
-            labelColor: Colors.black,
+            labelColor: Colors.white,
             indicatorColor: Colors.white,
+            indicatorWeight: 1,
             tabs: <Widget>[
               new Tab(
                 child: Text(
-                  '   校内    ',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
+                  '校内',
+                  // style: TextStyle(
+                  //     fontSize: ScreenUtil().setSp(30),
+                  //     fontWeight: FontWeight.w500),
                 ),
               ),
               new Tab(
                 child: Text(
-                  '   校际    ',
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
+                  '校际',
+                  // style: TextStyle(
+                  //     fontSize: ScreenUtil().setSp(30),
+                  //     fontWeight: FontWeight.w500),
                 ),
               ),
             ],

@@ -19,16 +19,6 @@ class SayToHeChatRoute extends StatelessWidget {
     Map<String, dynamic> args = ModalRoute.of(context).settings.arguments;
     UserProfile other = args["other"];
     String sessionId = args["sessionId"];
-    MessageModel data = MessageModel();
-    int id1;
-    int id2;
-    if (other.id < data.self.id) {
-      id1 = other.id;
-      id2 = data.self.id;
-    } else {
-      id1 = data.self.id;
-      id2 = other.id;
-    }
     return Scaffold(
       appBar: AppBar(
         title: Text(other.nickname),
@@ -62,7 +52,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
   bool focus = false;
 
   void update() {
-    data.readSaysBySessionId(widget.sessionId);
+    data.readSaysMessagesBySessionId(widget.sessionId);
     setState(() {});
   }
 
@@ -79,7 +69,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
     data.addListener(update);
     data.getDataInterval(duration: Duration(seconds: 10));
     messages = data.says[widget.sessionId];
-    data.readUserMessagesBySessionId(widget.sessionId);
+    data.readSaysMessagesBySessionId(widget.sessionId);
     _textController = TextEditingController();
     _focusNode = FocusNode();
     sendKey = DateTime.now().millisecondsSinceEpoch;

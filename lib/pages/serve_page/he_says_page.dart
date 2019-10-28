@@ -343,42 +343,49 @@ class _HeSaysPageState extends State<HeSaysPage> {
                     MaterialButton(
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
-                      onPressed: () {},
+                      onPressed: () {
+                        if (item.authorId != 0)
+                          Application.router.navigateTo(context,
+                              "${Routes.userProfile}?senderId=${item.authorId}&heroTag=${item.authorId}-${item.id}");
+                      },
                       padding: EdgeInsets.all(0),
                       child: Row(
                         children: <Widget>[
                           Container(
                             width: 50,
                             height: 50,
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) {
-                                return Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: CircularProgressIndicator(),
-                                );
-                              },
-                              imageUrl: item.authorAvatar,
-                              errorWidget: (context, url, err) {
-                                return Container(
-                                  child: Icon(
-                                    Icons.cancel,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                              },
-                              imageBuilder: (context, imageProvider) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(25)),
-                                    image: DecorationImage(
-                                      image: imageProvider,
-                                      fit: BoxFit.cover,
+                            child: Hero(
+                              tag: "${item.authorId}-${item.id}",
+                              child: CachedNetworkImage(
+                                placeholder: (context, url) {
+                                  return Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: CircularProgressIndicator(),
+                                  );
+                                },
+                                imageUrl: item.authorAvatar,
+                                errorWidget: (context, url, err) {
+                                  return Container(
+                                    child: Icon(
+                                      Icons.cancel,
+                                      size: 50,
+                                      color: Colors.grey,
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                                imageBuilder: (context, imageProvider) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(25)),
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                           Padding(

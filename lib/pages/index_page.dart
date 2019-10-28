@@ -137,7 +137,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                                       Navigator.pop(context);
                                       Application.router.navigateTo(
                                         context,
-                                        "/publishTopicComment",
+                                        Routes.publishRecruit,
                                       );
                                     },
                                     shape: CircleBorder(),

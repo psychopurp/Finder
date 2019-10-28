@@ -58,7 +58,7 @@ class CollectionsModelData {
       time = json['time'];
     } else {
       num timeStamp = json['time'];
-      time = timestampToDateTime(timeStamp);
+      time = timestampToDateTime(timeStamp).toString();
     }
     type = json['type'];
     activity = json['activity'] != null

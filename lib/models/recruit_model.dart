@@ -1,3 +1,4 @@
+import 'package:finder/models/message_model.dart';
 import 'package:finder/models/tag_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/plugin/avatar.dart';
@@ -76,10 +77,10 @@ class RecruitModelData {
   }
 
   RecruitModelData.fromRecommend(Map<String, dynamic> map) {
-    image = Avatar.getImageUrl( map['image']);
+    image = Avatar.getImageUrl(map['image']);
     var json = map['recruit'];
     sender =
-    json['sender'] != null ? new Sender.fromJson(json['sender']) : null;
+        json['sender'] != null ? new Sender.fromJson(json['sender']) : null;
     time = DateTime.fromMillisecondsSinceEpoch((json['time'] * 1000).toInt());
     title = json['title'];
     introduction = json['introduction'];
@@ -161,4 +162,27 @@ class RecruitTypesModelData {
     data['name'] = this.name;
     return data;
   }
+}
+
+class CandidateItem {
+  CandidateItem({this.id, this.status, this.time, this.information, this.user});
+  static final int reject = 0;
+  static final int waiting = 1;
+  static final int accept = 2;
+
+  factory CandidateItem.fromJson(Map<String, dynamic> map) {
+    return CandidateItem(
+        user: UserProfile.fromJson(map["user"]),
+        time: DateTime.fromMicrosecondsSinceEpoch(
+            (map['time'] * 1000000).toInt()),
+        information: map["information"],
+        status: map["status"],
+        id: map["id"]);
+  }
+
+  final UserProfile user;
+  final DateTime time;
+  final String information;
+  int status;
+  final int id;
 }

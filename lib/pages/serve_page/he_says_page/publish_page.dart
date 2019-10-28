@@ -12,12 +12,12 @@ const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
 const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
 
-class PublishPage extends StatefulWidget {
+class HeSaysPublishPage extends StatefulWidget {
   @override
-  _PublishPageState createState() => _PublishPageState();
+  _HeSaysPublishPageState createState() => _HeSaysPublishPageState();
 }
 
-class _PublishPageState extends State<PublishPage>
+class _HeSaysPublishPageState extends State<HeSaysPublishPage>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
   File _image;
@@ -156,7 +156,7 @@ class _PublishPageState extends State<PublishPage>
           data: json.encode({
             "content": content,
             "is_show_name": !nameLess,
-            "id": id,
+            "student_id": id,
           }));
       var data = response.data;
       if (!data["status"]) {
@@ -386,7 +386,7 @@ class _PublishPageState extends State<PublishPage>
               activeColor: Colors.white,
               activeTrackColor: ActionColor,
               inactiveThumbColor: Colors.white,
-              inactiveTrackColor: ActionColor,
+              inactiveTrackColor: Colors.grey,
               key: ValueKey(1),
             ),
           ),

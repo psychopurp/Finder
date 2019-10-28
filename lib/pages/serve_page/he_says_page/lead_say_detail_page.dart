@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/he_says_item.dart';
+import 'package:finder/routers/application.dart';
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 
 const Color ActionColor = Color(0xFFDB6B5C);
@@ -158,25 +160,24 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
       body: ListView(
         children: <Widget>[
           Container(
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
-            width: double.infinity,
-            height: 250,
-            child: Hero(
-              tag: item.id,
-              child: CachedNetworkImage(
-                imageUrl: item.image,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
+              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
+              width: double.infinity,
+              height: 250,
+              child: Hero(
+                tag: item.id,
+                child: CachedNetworkImage(
+                  imageUrl: item.image,
+                  imageBuilder: (context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ),
+              )),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             width: double.infinity,
@@ -259,41 +260,48 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
             child: MaterialButton(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              onPressed: () {},
+              onPressed: () {
+                Application.router.navigateTo(context,
+                    "${Routes.userProfile}?senderId=${item.authorId}&heroTag=${item.authorId}");
+              },
               padding: EdgeInsets.all(0),
               child: Row(
                 children: <Widget>[
                   Container(
                     width: 50,
                     height: 50,
-                    child: CachedNetworkImage(
-                      placeholder: (context, url) {
-                        return Container(
-                          padding: EdgeInsets.all(10),
-                          child: CircularProgressIndicator(),
-                        );
-                      },
-                      imageUrl: item.authorAvatar,
-                      errorWidget: (context, url, err) {
-                        return Container(
-                          child: Icon(
-                            Icons.cancel,
-                            size: 50,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                      imageBuilder: (context, imageProvider) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(25)),
-                            image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
+                    child: Hero(
+                      tag: "${item.authorId}",
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) {
+                          return Container(
+                            padding: EdgeInsets.all(10),
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                        imageUrl: item.authorAvatar,
+                        errorWidget: (context, url, err) {
+                          return Container(
+                            child: Icon(
+                              Icons.cancel,
+                              size: 50,
+                              color: Colors.grey,
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                        imageBuilder: (context, imageProvider) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(25)),
+                              image: DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   Padding(

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/models/recruit_model.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,14 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
     );
     RecruitModelData item = ModalRoute.of(context).settings.arguments;
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Text("参与"),
+        elevation: 1,
+        onPressed: () {
+          Navigator.of(context).pushNamed(Routes.engageRecruit, arguments: item.id);
+        },
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
       appBar: AppBar(
         leading: MaterialButton(
           child: Icon(
@@ -238,7 +247,7 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             width: ScreenUtil.screenWidthDp,
             child: Text(
-              "职位介绍",
+              "招募详情",
               textAlign: TextAlign.left,
               style: TextStyle(
                   color: Theme.of(context).primaryColor,
@@ -260,6 +269,18 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
                       (index) => getTag(item.tags[index]?.name ?? "Default")),
+            ),
+          ),         split,
+          Padding(padding: EdgeInsets.all(20),),
+          MaterialButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamed(Routes.candidates, arguments: item);
+            },
+            child: Text(
+              MessageModel().self.id == item.sender.id ? "管理应聘者" : "查看应聘者",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+              textAlign: TextAlign.left,
             ),
           ),
         ],
