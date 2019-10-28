@@ -47,6 +47,12 @@ class UserProvider with ChangeNotifier {
       notifyListeners();
   }
 
+  Future<void> getData() async {
+    var userData = await apiClient.getUserProfile();
+    this.userInfo = UserModel.fromJson(userData['data']);
+    notifyListeners();
+  }
+
   //修改用户信息
   Future upLoadUserProfile(UserModel userINfo) async {
     await apiClient.upLoadUserProfile(userINfo);

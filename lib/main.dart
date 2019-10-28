@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/login_page.dart';
+import 'package:finder/pages/register_page.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -62,7 +63,8 @@ class MyApp extends StatelessWidget {
             theme: _buildAppTheme(), //设置App主题
             title: 'Finder',
             debugShowCheckedModeBanner: false,
-            home: isLogin ? IndexPage() : LoginPage(),
+            home: isLogin  ? IndexPage() : LoginPage(),
+//            home: isLogin && false ? IndexPage() : RegisterPage(),
           ),
         ));
   }

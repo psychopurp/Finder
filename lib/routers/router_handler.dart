@@ -11,6 +11,7 @@ import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/mine_page.dart';
 import 'package:finder/pages/mine_page/collection_page.dart';
+import 'package:finder/pages/mine_page/modify_info_page.dart';
 import 'package:finder/pages/recruit_page/candidates_page.dart';
 import 'package:finder/pages/recruit_page/engage_page.dart';
 import 'package:finder/pages/recruit_page/publish_page.dart';
@@ -251,6 +252,10 @@ var sayToHeHandle = Handler(
 var sayToHeChatHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return SayToHeChatRoute();
+});
+var modifyInfoPageHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return ModifyInfoPage();
 });
 
 var collectionPageHandler = Handler(

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/pages/register_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -65,28 +66,11 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
         duration: Duration(seconds: 5));
   }
 
-  void showErrorHint(String text) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("提示"),
-            content: Text(text),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("确认"),
-                onPressed: () => Navigator.of(context).pop(), //关闭对话框
-              ),
-            ],
-          );
-        });
-  }
-
   Future<bool> getCheckCode() async {
     RegExp phoneReg = RegExp(r"1[35789]\d{9}");
     bool right = phoneReg.hasMatch(_phone) && _phone.length == 11;
     if (!right) {
-      showErrorHint("手机号格式错误");
+      showErrorHint(context, "手机号格式错误");
       return false;
     }
     try {
@@ -95,7 +79,7 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
           data: json.encode({"phone": _phone}));
       Map<String, dynamic> result = response.data;
       if (!result["status"]) {
-        showErrorHint("网络连接失败, 请稍后再试");
+        showErrorHint(context, "网络连接失败, 请稍后再试");
       } else {
         showToast("验证码发送成功, 五分钟有效");
         setState(() {
@@ -114,15 +98,15 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
   }
 
   Future<bool> checkCheckCode() async {
-    if(!isGet){
-      showErrorHint("请先获取验证码");
+    if (!isGet) {
+      showErrorHint(context, "请先获取验证码");
       return false;
     }
     String _checkCode = _checkCodeController.value.text;
     RegExp checkReg = RegExp(r"\d{6}");
     bool right = checkReg.hasMatch(_checkCode) && _checkCode.length == 6;
     if (!right) {
-      showErrorHint("验证码格式错误");
+      showErrorHint(context, "验证码格式错误");
       _checkCodeController.clear();
       return false;
     }
@@ -132,12 +116,26 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
           data: json.encode({"phone": _sendPhone, "code": _checkCode}));
       Map<String, dynamic> result = response.data;
       if (!result["status"]) {
-        showErrorHint(result["error"]);
+        showErrorHint(context, result["error"]);
       } else {
         if (!isRegister) {
-          Provider.of<UserProvider>(context).loginWithToken(result["token"]);
+          await Provider.of<UserProvider>(context)
+              .loginWithToken(result["token"]);
+          String nickName =
+              Provider.of<UserProvider>(context).userInfo.nickname;
+          bool notRegister = nickName == "" || nickName == null;
+          if (!notRegister) {
+            Navigator.of(context).pushAndRemoveUntil(
+                new MaterialPageRoute(builder: (context) => new IndexPage()),
+                (route) => route == null);
+          } else {
+            Navigator.of(context).pushAndRemoveUntil(
+                new MaterialPageRoute(builder: (context) => new RegisterPage()),
+                (route) => route == null);
+          }
+        } else {
           Navigator.of(context).pushAndRemoveUntil(
-              new MaterialPageRoute(builder: (context) => new IndexPage()),
+              new MaterialPageRoute(builder: (context) => new RegisterPage()),
               (route) => route == null);
         }
       }
@@ -149,7 +147,6 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         body: Form(
             key: _formKey,
@@ -161,9 +158,13 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
                     EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(30)),
                 children: <Widget>[
                   // title(),
-                  Padding(padding: EdgeInsets.all(10),),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
                   topTitle(context),
-                  Padding(padding: EdgeInsets.all(10),),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
                   phoneTextField(context),
                   Container(height: ScreenUtil().setHeight(60)),
                   checkCodeTextField(context),
@@ -191,7 +192,6 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
 
   //顶部标题
   topTitle(context) => Container(
-        // color: Colors.amber,
         padding: EdgeInsets.only(
             left: ScreenUtil().setHeight(100),
             top: kToolbarHeight,
@@ -267,7 +267,8 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
         child: TextFormField(
           focusNode: checkCodeNode,
           controller: _checkCodeController,
-          keyboardType: TextInputType.numberWithOptions(decimal: false, signed: false),
+          keyboardType:
+              TextInputType.numberWithOptions(decimal: false, signed: false),
           decoration: InputDecoration(
             labelText: '验证码',
             contentPadding: EdgeInsets.only(bottom: 10),

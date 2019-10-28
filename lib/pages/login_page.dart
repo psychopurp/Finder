@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:finder/pages/register_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -43,22 +46,6 @@ class _LoginPageState extends State<LoginPage>
     super.dispose();
   }
 
-  void showErrorHint(String text) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("提示"),
-            content: Text(text),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("确认"),
-                onPressed: () => Navigator.of(context).pop(), //关闭对话框
-              ),
-            ],
-          );
-        });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,12 +95,21 @@ class _LoginPageState extends State<LoginPage>
                     onPress: () async {
                       Map result = await login(user);
                       if (result["status"]) {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            new MaterialPageRoute(
-                                builder: (context) => new IndexPage()),
-                            (route) => route == null);
+                        String nickName = Provider.of<UserProvider>(context).userInfo.nickname;
+                        bool notRegister = nickName == "" || nickName == null;
+                        if(!notRegister){
+                          Navigator.of(context).pushAndRemoveUntil(
+                              new MaterialPageRoute(
+                                  builder: (context) => new IndexPage()),
+                                  (route) => route == null);
+                        }else{
+                          Navigator.of(context).pushAndRemoveUntil(
+                              new MaterialPageRoute(
+                                  builder: (context) => new RegisterPage()),
+                                  (route) => route == null);
+                        }
                       } else {
-                        showErrorHint(result["error"]);
+                        showErrorHint(context, result["error"]);
                       }
                     },
                     child: Text(
@@ -242,7 +238,7 @@ class _LoginPageState extends State<LoginPage>
                 Text("试试  "),
                 InkWell(
                   child: Text(
-                    '验证码登录',
+                    '验证码登录 | 注册',
                     style: TextStyle(color: Theme.of(context).primaryColor),
                   ),
                   onTap: () {

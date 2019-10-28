@@ -50,6 +50,7 @@ class Routes {
   static String minePage = "/minePage"; //我的 页
   static String collectionPage = "/collectionPage"; //用户收藏页
   static String fansFollowPage = "/fansFollowPage"; //关注和粉丝页
+  static String modifyInfoPage = "/modifyInfoPage"; //关注和粉丝页
 
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
@@ -157,6 +158,9 @@ class Routes {
         transitionType: TransitionType.cupertino);
     router.define(fansFollowPage,
         handler: fansFollowPageHandle,
+        transitionType: TransitionType.cupertino);
+    router.define(modifyInfoPage,
+        handler: modifyInfoPageHandle,
         transitionType: TransitionType.cupertino);
   }
 }
