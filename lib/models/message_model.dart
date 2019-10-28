@@ -168,7 +168,6 @@ class MessageModel implements Listenable {
     });
     if (value) return;
     Response response = await dio.post('read_system_messages/');
-    print(response.data);
     if (response.data["status"]) {
       systems.forEach((item) {
         item.isRead = true;
@@ -274,7 +273,6 @@ class MessageModel implements Listenable {
   }
 
   Future<void> getHistoryUserMessages(String sessionId) async {
-    print(noMoreHistory);
     if (noMoreHistory.contains(sessionId)) return;
     List<UserMessageItem> messages = users[sessionId];
     DateTime endTime;
@@ -308,6 +306,42 @@ class MessageModel implements Listenable {
             addFirst: true);
     }
   }
+
+  Future<void> getHistorySays(String sessionId) async {
+    if (noMoreHistory.contains(sessionId)) return;
+    List<SayToHeItem> messages = says[sessionId];
+    DateTime endTime;
+    if (messages.length == 0)
+      endTime = DateTime.now();
+    else {
+      SayToHeItem first = messages[0];
+      endTime = first.time;
+    }
+    int end = endTime.millisecondsSinceEpoch ~/ 1000;
+    Map<String, dynamic> queryParameters = {
+      "end": end,
+      "sessionId": sessionId,
+    };
+    Response response =
+    await dio.get("get_history_message/", queryParameters: queryParameters);
+    Map<String, dynamic> data = response.data;
+    if (!data["status"]) {
+      throw DioError(
+          request: response.request,
+          response: response,
+          message: data["error"],
+          type: DioErrorType.RESPONSE);
+    } else {
+      if (data['data'].length == 0) {
+        noMoreHistory.add(sessionId);
+      } else
+        addAll(
+            List<Map<String, dynamic>>.generate(data["data"].length,
+                    (index) => data["data"][data["data"].length - index - 1]),
+            addFirst: true);
+    }
+  }
+
 
   Future<void> getMessages(int start,
       {int end,
