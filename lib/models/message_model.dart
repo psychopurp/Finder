@@ -656,7 +656,7 @@ class UserProfile extends Item implements ToJson {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'nickname': nickname, 'id': id, avatar: avatar};
+    return {'nickname': nickname, 'id': id, "avatar": avatar};
   }
 }
 
