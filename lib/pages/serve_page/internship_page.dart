@@ -292,20 +292,19 @@ class _InternshipPageState extends State<InternshipPage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Container(
-                        width: ScreenUtil.screenWidthDp - 180,
-                        child: Text(
-                          company.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 17,
-                            color: ActionColor,
+                        padding: EdgeInsets.only(left: 20),
+                        child: Container(
+                          width: ScreenUtil.screenWidthDp - 180,
+                          child: Text(
+                            company.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: ActionColor,
+                            ),
                           ),
-                        ),
-                      )
-                    ),
+                        )),
                   ],
                 ),
               ),
@@ -666,7 +665,6 @@ class _InternshipPageHeaderState extends State<InternshipPageHeader>
   }
 }
 
-
 String getTimeString(DateTime time) {
   Map<int, String> weekdayMap = {
     1: "星期一",
@@ -933,8 +931,9 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                                               margin: EdgeInsets.only(left: 15),
                                               decoration: BoxDecoration(
                                                   border: index !=
-                                                          _smallTypes[_tempBigType]
-                                                                  .length -
+                                                          (_smallTypes[_tempBigType]
+                                                                      ?.length ??
+                                                                  0) -
                                                               1
                                                       ? Border(
                                                           bottom: BorderSide(
@@ -955,8 +954,10 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                                 ),
                                 decoration: BoxDecoration(
                                   border: _tempBigType != null &&
-                                          _bigTypes.length <
-                                              _smallTypes[_tempBigType].length
+                                              _bigTypes.length <
+                                                  _smallTypes[_tempBigType]
+                                                      ?.length ??
+                                          0
                                       ? Border(
                                           left: BorderSide(
                                               color: Color(0xffeeeeee),
