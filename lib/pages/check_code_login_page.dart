@@ -118,9 +118,9 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
       if (!result["status"]) {
         showErrorHint(context, result["error"]);
       } else {
+        await Provider.of<UserProvider>(context)
+            .loginWithToken(result["token"]);
         if (!isRegister) {
-          await Provider.of<UserProvider>(context)
-              .loginWithToken(result["token"]);
           String nickName =
               Provider.of<UserProvider>(context).userInfo.nickname;
           bool notRegister = nickName == "" || nickName == null;

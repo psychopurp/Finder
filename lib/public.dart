@@ -23,6 +23,8 @@ String getTime({int year, int month, int day, DateTime dateTime}) {
         .toInt()
         .toString();
   }
+  if(year == null)
+    return null;
   double time = DateTime(year, month, day).millisecondsSinceEpoch.toDouble();
   time = time.toDouble() / 1000;
   var date = time.toInt().toString();

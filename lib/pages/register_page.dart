@@ -8,6 +8,7 @@ import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/dialog.dart';
 import 'package:finder/provider/user_provider.dart';
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
@@ -119,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     String introduction = _introductionController.value.text.trim();
-    if((avatarUrl ?? "") == ""){
+    if ((avatarUrl ?? "") == "") {
       showErrorHint(context, "请上传头像");
       return;
     }
@@ -144,7 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
             new MaterialPageRoute(builder: (context) => IndexPage()),
             (route) => route == null);
       } else {
-        showErrorHint(context, "网络连接失败, 请稍后再试");
+        showErrorHint(context, result["error"]);
       }
     } on DioError catch (e) {
       print(e);
@@ -235,9 +236,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 height: 118,
                 child: avatarRealUrl != ""
                     ? ClipRRect(
-                  borderRadius: BorderRadius.circular(59),
-                  child: Image.network(avatarRealUrl)
-                )
+                        borderRadius: BorderRadius.circular(59),
+                        child: Image.network(avatarRealUrl))
                     : Icon(
                         Icons.add,
                         size: 40,
@@ -279,14 +279,79 @@ class _RegisterPageState extends State<RegisterPage> {
         title: Text("完善个人信息"),
         centerTitle: true,
         leading: Container(),
-        actions: <Widget>[MaterialButton(
-          onPressed: (){
-            postData();
-          },
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          child: Icon(Icons.check, color: Colors.white, size: 30,),
-        )],
+        actions: <Widget>[
+          MaterialButton(
+            onPressed: () {
+              showDialog<bool>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("提示"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "请详细阅读《意旸Finders智慧校园软件许可及服务协议》与《隐私政策》。",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                        ),
+                        MaterialButton(
+                          child: Text(
+                            "《意旸Finders智慧校园软件许可及服务协议》",
+                            style: TextStyle(
+                              color: Colors.indigo,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pushNamed(Routes.serveProtocol);
+                          },
+                        ),
+                        MaterialButton(
+                          child: Text(
+                            "《隐私政策》",
+                            style: TextStyle(
+                              color: Colors.indigo,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(Routes.privacy);
+                          },
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                        ),
+                        Text("点击确认既代表您同意本条款。"),
+                      ],
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("取消"),
+                        onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+                      ),
+                      FlatButton(
+                        child: Text("确认"),
+                        onPressed: () {
+                          postData();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            child: Icon(
+              Icons.check,
+              color: Colors.white,
+              size: 30,
+            ),
+          )
+        ],
       ),
       body: WillPopScope(
         onWillPop: () async {
@@ -300,7 +365,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 Container(
                   child: avatar,
                 ),
-                Padding(padding: EdgeInsets.all(20),),
+                Padding(
+                  padding: EdgeInsets.all(20),
+                ),
                 singleLineTestField(
                     controller: _nicknameController,
                     hint: "请输入昵称",
@@ -309,7 +376,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     controller: _passwordController,
                     hint: "请输入登录密码",
                     label: "* 密码",
-                obscureText: true),
+                    obscureText: true),
                 singleLineTestField(
                     controller: _passwordAgainController,
                     hint: "请确认您的密码",
@@ -318,8 +385,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 singleLineTestField(
                     controller: _realNameController,
                     hint: "请输入您的真实姓名",
-                    label: "* 姓名"
-                ),
+                    label: "* 姓名"),
                 singleLineTestField(
                     controller: _studentIdController,
                     hint: "请输入您的学号",
