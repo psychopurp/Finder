@@ -83,7 +83,7 @@ class _SystemMessagePageState extends State<SystemMessagePage> {
   Future<bool> sendMessage() async {
     String text = _textController.value.text;
     if (text == null || text == "") return false;
-    await data.getData();
+    data.getData();
     SystemMessageItem item = SystemMessageItem(
         content: text,
         time: DateTime.now(),

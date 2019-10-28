@@ -104,7 +104,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
   Future<bool> sendMessage() async {
     String text = _textController.value.text;
     if (text == null || text == "") return false;
-    await data.getData();
+    data.getData();
     SayToHeItem item = SayToHeItem(
         sessionId: widget.sessionId,
         content: text,

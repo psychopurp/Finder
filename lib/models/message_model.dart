@@ -108,13 +108,19 @@ class MessageModel implements Listenable {
 
   Future<void> getData() async {
     print("Try Get Messages.");
-    DateTime reqTime = DateTime.now();
-    int time;
-    if (lastRequestTime != null) {
-      time = lastRequestTime.millisecondsSinceEpoch ~/ 1000;
+    DateTime old = lastRequestTime;
+    try{
+      DateTime reqTime = DateTime.now();
+      int time;
+      if (lastRequestTime != null) {
+        time = lastRequestTime.millisecondsSinceEpoch ~/ 1000;
+      }
+      await getMessages(time);
+      lastRequestTime = reqTime.subtract(Duration(seconds: 10));
+    }on DioError catch(e){
+      print(e);
+      lastRequestTime = old;
     }
-    await getMessages(time);
-    lastRequestTime = reqTime.subtract(Duration(seconds: 10));
   }
 
   Future<void> readSaysMessagesBySessionId(String sessionId) async {

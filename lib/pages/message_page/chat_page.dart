@@ -119,7 +119,7 @@ class _ChatPageState extends State<ChatPage> {
   Future<bool> sendMessage() async {
     String text = _textController.value.text;
     if (text == null || text == "") return false;
-    await data.getData();
+    data.getData();
     UserMessageItem item = UserMessageItem(
         sessionId: widget.sessionId,
         content: text,
