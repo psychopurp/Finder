@@ -44,7 +44,8 @@ class UserModel {
     isFollowed = json['is_followed'] != null ? json['is_followed'] : null;
     isBothFollowed =
         json['is_both_followed'] != null ? json['is_both_followed'] : null;
-    birthday = timestampToDateTime(json["birthday"]);
+    birthday =
+        json['birthday'] != null ? timestampToDateTime(json["birthday"]) : null;
     // print(birthday);
     school =
         json['school'] != null ? new School.fromJson(json['school']) : null;
