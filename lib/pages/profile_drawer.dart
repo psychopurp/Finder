@@ -51,54 +51,67 @@ class ProfileDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-        child: Consumer<UserProvider>(builder: (context, user, child) {
-      List list = [
-        ["昵称",user.userInfo.nickname == null || user.userInfo.nickname == "" ? "无名氏" : user.userInfo.nickname],
-        ["姓名", user.userInfo.realName == null || user.userInfo.realName == "" ? "无名氏" : user.userInfo.realName],
-        ["学号", user.userInfo.studentId ?? "没有学号的人"],
-        ["学校", user.userInfo.school?.name ?? "家里蹲大学"],
-        ["专业", user.userInfo.major ?? "专业"],
-      ];
-      List<Widget> children = <Widget>[
-        topUserInfo(user.userInfo, context),
-        ListTile()
-      ];
-      children.addAll(List<Widget>.generate(
-          list.length, (index) => generateListTile(list, index)));
-      children.add(ListTile());
-      children.add(
-        ListTile(
-          leading: listOption['modify']['icon'],
-          title: Text('编辑信息'),
-          onTap: () async {
-            Navigator.of(context).pushNamed(Routes.modifyInfoPage);
-          },
-        ),
-      );
-      children.add(
-        ListTile(
-          leading: listOption['exit']['icon'],
-          title: Text('退出登录'),
-          onTap: () async {
-            Global.isLogin = false;
-            Global.token = "";
-            MessageModel().reset();
-            MessageModel().getDataInterval(duration: Duration(minutes: 10));
-            ApiClient.dio.options.headers['token'] = "";
-            var prefs = await SharedPreferences.getInstance();
-            prefs.clear();
-            Provider.of<UserProvider>(context).userInfo = null;
-            Navigator.of(context).pushAndRemoveUntil(
-                new MaterialPageRoute(builder: (context) => LoginPage()),
-                (route) => route == null);
-          },
-        ),
-      );
-      return ListView(
-        padding: EdgeInsets.all(0),
-        children: children,
-      );
-    }));
+      child: Consumer<UserProvider>(
+        builder: (context, user, child) {
+          List list = [
+            [
+              "昵称",
+              user.userInfo.nickname == null || user.userInfo.nickname == ""
+                  ? "无名氏"
+                  : user.userInfo.nickname
+            ],
+            [
+              "姓名",
+              user.userInfo.realName == null || user.userInfo.realName == ""
+                  ? "无名氏"
+                  : user.userInfo.realName
+            ],
+            ["学号", user.userInfo.studentId ?? "没有学号的人"],
+            ["学校", user.userInfo.school?.name ?? "家里蹲大学"],
+            ["专业", user.userInfo.major ?? "专业"],
+          ];
+          List<Widget> children = <Widget>[
+            topUserInfo(user.userInfo, context),
+            ListTile()
+          ];
+          children.addAll(List<Widget>.generate(
+              list.length, (index) => generateListTile(list, index)));
+          children.add(ListTile());
+          children.add(
+            ListTile(
+              leading: listOption['modify']['icon'],
+              title: Text('编辑信息'),
+              onTap: () async {
+                Navigator.of(context).pushNamed(Routes.modifyInfoPage);
+              },
+            ),
+          );
+          children.add(
+            ListTile(
+              leading: listOption['exit']['icon'],
+              title: Text('退出登录'),
+              onTap: () async {
+                Global.isLogin = false;
+                Global.token = "";
+                MessageModel().reset();
+                MessageModel().getDataInterval(duration: Duration(minutes: 10));
+                ApiClient.dio.options.headers['token'] = "";
+                var prefs = await SharedPreferences.getInstance();
+                prefs.clear();
+                Provider.of<UserProvider>(context).userInfo = null;
+                Navigator.of(context).pushAndRemoveUntil(
+                    new MaterialPageRoute(builder: (context) => LoginPage()),
+                    (route) => route == null);
+              },
+            ),
+          );
+          return ListView(
+            padding: EdgeInsets.all(0),
+            children: children,
+          );
+        },
+      ),
+    );
   }
 
   topUserInfo(UserModel user, context) {
