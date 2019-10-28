@@ -161,7 +161,6 @@ class _MinePageState extends State<MinePage> {
                                   File image = await getImage();
                                   var data = await imageUpdate(image, userInfo);
                                   Navigator.pop(context);
-                                  BotToast.showText(text: data.toString());
                                 },
                                 shape: StadiumBorder(
                                     side: BorderSide(color: Colors.white)),
@@ -183,12 +182,15 @@ class _MinePageState extends State<MinePage> {
             // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
             height: 90,
             width: 90,
+            child: Avatar(
+              url: userInfo.avatar,
+              avatarHeight: 90,
+            ),
             decoration: BoxDecoration(
-                // shape: CircleBorder(),
-                border: Border.all(color: Colors.white, width: 3),
-                borderRadius: BorderRadius.all(Radius.circular(50)),
-                image: DecorationImage(
-                    image: CachedNetworkImageProvider(userInfo.avatar))),
+              // shape: CircleBorder(),
+              border: Border.all(color: Colors.white, width: 3),
+              borderRadius: BorderRadius.all(Radius.circular(50)),
+            ),
           ),
         ),
       );
@@ -258,72 +260,21 @@ class _MinePageState extends State<MinePage> {
   }
 
   imageUpdate(File image, UserModel user) async {
+    String preAvatar = user.avatar;
     var imageStr = await apiClient.uploadImage(image);
     imageStr = Avatar.getImageUrl(imageStr);
     user.avatar = imageStr;
     var data = await apiClient.upLoadUserProfile(user);
-    return data;
-  }
+    String text = "";
+    if (data['status'] == true) {
+      text = '修改成功';
+    } else {
+      text = '修改失败';
+      user.avatar = preAvatar;
+    }
+    BotToast.showText(text: text);
 
-  Widget buildUserBackground(UserModel user, BuildContext context) {
-    return Container(
-      height: ScreenUtil().setHeight(650),
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30))),
-      child: DefaultTextStyle(
-        style: TextStyle(fontSize: ScreenUtil().setSp(40)),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: kToolbarHeight),
-              child: userCard(user),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 6.0),
-                    child: Text(user.nickname),
-                  ),
-                  IconButton(
-                    splashColor: Colors.white,
-                    onPressed: () {
-                      print("asfasf");
-                    },
-                    icon: Icon(
-                      IconData(0xe845, fontFamily: 'myIcon'),
-                      size: ScreenUtil().setSp(50),
-                      color: Color(0xffDDDDDD),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              user?.school?.name ?? "家里蹲大学",
-              style: TextStyle(fontSize: 16),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 8.0),
-              child: Text(
-                user.introduction,
-                style: TextStyle(color: Colors.black38),
-              ),
-            ),
-            Row(
-                // children: <Widget>[Text(user)],
-                )
-            // Text(user.)
-          ],
-        ),
-      ),
-    );
+    return data;
   }
 
   Widget userCard(UserModel user) {
