@@ -4,18 +4,18 @@ import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../internship_page.dart';
-
 const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
 const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
 
 class RecommendInternshipDetailPage extends StatefulWidget {
   @override
-  _RecommendInternshipDetailPageState createState() => _RecommendInternshipDetailPageState();
+  _RecommendInternshipDetailPageState createState() =>
+      _RecommendInternshipDetailPageState();
 }
 
-class _RecommendInternshipDetailPageState extends State<RecommendInternshipDetailPage> {
+class _RecommendInternshipDetailPageState
+    extends State<RecommendInternshipDetailPage> {
   Map<String, Map<String, dynamic>> menuItem;
 
   void _handleShare() {
@@ -110,25 +110,24 @@ class _RecommendInternshipDetailPageState extends State<RecommendInternshipDetai
       body: ListView(
         children: <Widget>[
           Container(
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
-            width: double.infinity,
-            height: 250,
-            child: Hero(
-              tag: item.image,
-              child: CachedNetworkImage(
-                imageUrl: item.image,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
+              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
+              width: double.infinity,
+              height: 250,
+              child: Hero(
+                tag: item.image,
+                child: CachedNetworkImage(
+                  imageUrl: item.image,
+                  imageBuilder: (context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ),
+              )),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             width: double.infinity,
@@ -206,7 +205,7 @@ class _RecommendInternshipDetailPageState extends State<RecommendInternshipDetai
                           return Container(
                             decoration: BoxDecoration(
                               borderRadius:
-                              BorderRadius.all(Radius.circular(25)),
+                                  BorderRadius.all(Radius.circular(25)),
                               image: DecorationImage(
                                 image: imageProvider,
                                 fit: BoxFit.cover,
@@ -287,13 +286,14 @@ class _RecommendInternshipDetailPageState extends State<RecommendInternshipDetai
             child: Wrap(
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
-                      (index) => getTag(item.tags[index]?.name ?? "Default")),
+                  (index) => getTag(item.tags[index]?.name ?? "Default")),
             ),
           ),
         ],
       ),
     );
   }
+
   Widget getTag(String tag) {
     return Builder(
       builder: (context) {

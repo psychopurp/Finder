@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:finder/models/user_model.dart';
@@ -23,8 +22,7 @@ class UserProvider with ChangeNotifier {
   Map<String, Set<int>> like = {"topicComment": Set()};
 
   //登陆
-  Future<Map> login(
-      {@required String phone, @required String password}) async {
+  Future<Map> login({@required String phone, @required String password}) async {
     var data = await apiClient.login(phone, password);
     if (data['status'] == true) {
       this.isLogIn = true;
