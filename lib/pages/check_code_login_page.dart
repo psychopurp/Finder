@@ -9,12 +9,12 @@ import 'package:flutter/cupertino.dart';
 
 typedef MyCallBackFuture = Future Function();
 
-class LoginPage extends StatefulWidget {
+class CheckCodeLoginPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _CheckCodeLoginPageState createState() => _CheckCodeLoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
+class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String _phone, _password;
@@ -23,11 +23,6 @@ class _LoginPageState extends State<LoginPage>
 
   bool _isObscure = true;
   Color _eyeColor;
-  List _loginMethod = [
-    {"title": "微信", "icon": IconData(0xe628, fontFamily: 'myIcon')},
-    {"title": "QQ", "icon": IconData(0xe67f, fontFamily: 'myIcon')},
-    {"title": "微博", "icon": IconData(0xe644, fontFamily: 'myIcon')},
-  ];
 
   @override
   void initState() {
@@ -58,7 +53,7 @@ class _LoginPageState extends State<LoginPage>
             child: Container(
               // color: Colors.amber,
               child: ListView(
-                physics: NeverScrollableScrollPhysics(),
+              physics: NeverScrollableScrollPhysics(),
                 padding:
                     EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(30)),
                 children: <Widget>[
@@ -68,67 +63,48 @@ class _LoginPageState extends State<LoginPage>
                   Container(height: ScreenUtil().setHeight(60)),
                   passwordTextField(context),
                   //忘记密码
-                  Container(
-                    // color: Colors.yellow,
-                    alignment: Alignment.centerRight,
-                    padding: EdgeInsets.only(top: ScreenUtil().setHeight(8)),
-                    child: FlatButton(
-                      child: Text(
-                        '忘记密码？',
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                      ),
-                      onPressed: () {},
-                    ),
-                  ),
                   Padding(
                     padding: EdgeInsets.all(30),
                   ),
                   LoginButton(
-                    height: 100,
-                    beginWidth: 600,
-                    endWidth: 150,
-                    onPress: () async {
-                      Map result = await login(user);
-                      if (result["status"]) {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            new MaterialPageRoute(
-                                builder: (context) => new IndexPage()),
-                            (route) => route == null);
-                      } else {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: Text(result["error"]),
-                                title: Center(
-                                    child: Text(
-                                  '错误',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold),
-                                )),
-                              );
-                            });
-                      }
-                    },
-                    child: Text(
-                      '登录',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      height: 100,
+                      beginWidth: 600,
+                      endWidth: 150,
+                      onPress: () async {
+                        Map result = await login(user);
+                        if (result["status"]) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                              new MaterialPageRoute(
+                                  builder: (context) => new IndexPage()),
+                              (route) => route == null);
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  content: Text(result["error"]),
+                                  title: Center(
+                                      child: Text(
+                                    '错误',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                                );
+                              });
+                        }
+                      },
+                      child: Text(
+                        '登录',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
                     ),
-                  ),
                   SizedBox(
                     height: ScreenUtil().setHeight(50),
                   ),
                   buildOtherLoginText(),
                   otherMethod(context),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                  ),
-                  buildCheckCode(context),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                  ),
                   buildRegisterText(context),
 
                   // AnimatedButton(),
@@ -156,7 +132,7 @@ class _LoginPageState extends State<LoginPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Finders · 登录',
+                'Finders · 验证码登录',
               ),
               Container(
                 margin: EdgeInsets.only(top: ScreenUtil().setHeight(15)),
@@ -206,7 +182,6 @@ class _LoginPageState extends State<LoginPage>
             if (value.isEmpty) {
               return '请输入密码';
             }
-            return null;
           },
           decoration: InputDecoration(
               labelText: '密码',
@@ -243,7 +218,9 @@ class _LoginPageState extends State<LoginPage>
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
               onTap: () {
-                Navigator.of(context).pushNamed(Routes.checkCodeLogin);
+                //TODO 跳转到注册页面
+                print('去注册');
+                Navigator.pop(context);
               },
             ),
           ],
@@ -301,7 +278,7 @@ class _LoginPageState extends State<LoginPage>
 //              ))
 //          .toList(),
 //    );
-    return Container();
+  return Container();
   }
 
   Widget buildOtherLoginText() {
@@ -314,7 +291,7 @@ class _LoginPageState extends State<LoginPage>
 //            style: TextStyle(color: Colors.grey, fontSize: 14.0),
 //          ),
 //        ));
-    return Container();
+  return Container();
   }
 
   Widget _loginButton(BuildContext context) {
@@ -394,7 +371,6 @@ class LoginButton extends StatefulWidget {
   final AsyncCallback onPress;
 
   final IconData endIcon;
-
   LoginButton(
       {this.beginWidth,
       this.endWidth,
@@ -402,7 +378,6 @@ class LoginButton extends StatefulWidget {
       @required this.child,
       this.onPress,
       @required this.height});
-
   @override
   _LoginButtonState createState() => _LoginButtonState();
 }

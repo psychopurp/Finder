@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:finder/pages/check_code_login_page.dart';
 import 'package:finder/pages/fans_follow_page.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
 import 'package:finder/pages/message_page/chat_page.dart';
@@ -50,6 +51,10 @@ var rootHandler = Handler(
 var loginHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return LoginPage();
+});
+var checkCodeLoginHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return CheckCodeLoginPage();
 });
 
 //首页 -- 更多话题

@@ -23,7 +23,7 @@ class UserProvider with ChangeNotifier {
   Map<String, Set<int>> like = {"topicComment": Set()};
 
   //登陆
-  Future<bool> login(
+  Future<Map> login(
       {@required String phone, @required String password}) async {
     var data = await apiClient.login(phone, password);
     if (data['status'] == true) {
@@ -32,9 +32,9 @@ class UserProvider with ChangeNotifier {
       this.userInfo = UserModel.fromJson(userData['data']);
 
       notifyListeners();
-      return true;
+      return {"status": true};
     } else {
-      return false;
+      return {"status": false, "error": data["error"]};
     }
   }
 

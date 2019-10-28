@@ -63,15 +63,15 @@ class MessageModel implements Listenable {
     changeEvents = [save];
     SharedPreferences.getInstance().then((value) {
       prefs = value;
+      load();
+      init = true;
+      getSelf().then((status) {
+        if (status) {
+          getData();
+        }
+      });
+      getDataInterval();
     });
-    load();
-    init = true;
-    getSelf().then((status) {
-      if (status) {
-        getData();
-      }
-    });
-    getDataInterval();
   }
 
   void reset() async {
@@ -110,7 +110,7 @@ class MessageModel implements Listenable {
     print("Try Get Messages.");
     DateTime reqTime = DateTime.now();
     int time;
-    if(lastRequestTime != null){
+    if (lastRequestTime != null) {
       time = lastRequestTime.millisecondsSinceEpoch ~/ 1000;
     }
     await getMessages(time);
@@ -309,7 +309,7 @@ class MessageModel implements Listenable {
       bool isReceiveOnly,
       String sessionId}) async {
     Map<String, dynamic> queryParameters = {};
-    if(start != null){
+    if (start != null) {
       queryParameters["start"] = start;
     }
     if (isNotReadOnly != null) {
@@ -330,7 +330,7 @@ class MessageModel implements Listenable {
           response: response,
           message: data["error"],
           type: DioErrorType.RESPONSE);
-    } else{
+    } else {
       addAll(List<Map<String, dynamic>>.generate(
           data["data"].length, (index) => data["data"][index]));
     }
@@ -374,13 +374,13 @@ class MessageModel implements Listenable {
     }
   }
 
-  Future<void> readOne(Item item, {bool updateNow = true})async {
+  Future<void> readOne(Item item, {bool updateNow = true}) async {
     Response response = await dio.post('read_message/', data: {
       "id": item.id,
     });
     if (response.data["status"]) {
       item.isRead = true;
-      if(updateNow){
+      if (updateNow) {
         updateTipsCount();
         updateSystemsCount();
         updateSaysCount();
@@ -471,7 +471,6 @@ class MessageModel implements Listenable {
   bool addSystemMessage(SystemMessageItem messageItem, {bool addFirst: false}) {
     bool change = false;
     if (!systems.contains(messageItem)) {
-      //TODO 此写法没有优化, 可用二分查找优化
       if (addFirst)
         systems.insert(0, messageItem);
       else
@@ -546,7 +545,8 @@ class MessageModel implements Listenable {
       'user': self?.toJson(),
       'usersIndex': usersIndex,
       'saysIndex': saysIndex,
-      "noMoreHistory": noMoreHistory.toList()
+      "noMoreHistory": noMoreHistory.toList(),
+      "noMoreHistoryMessage": noMoreHistoryMessage
     };
     return json.encode(result);
   }
@@ -558,27 +558,37 @@ class MessageModel implements Listenable {
     var map = json.decode(data);
     lastRequestTime =
         DateTime.fromMillisecondsSinceEpoch(map["lastRequestTime"]);
-    systems = List<SystemMessageItem>.generate(map['system'].length,
-        (index) => SystemMessageItem.fromJson(map['system'][index]));
-    tips = List<TipItem>.generate(
-        map['tips'].length, (index) => TipItem.fromJson(map['tips'][index]));
-    users = Map<String, List<UserMessageItem>>.fromEntries(map['users']
-        .entries
-        .map((entity) => MapEntry<String, List<UserMessageItem>>(
-            entity.key,
-            List<UserMessageItem>.generate(map['users'].length,
-                (index) => UserMessageItem.fromJson(entity.value[index])))));
-    says = Map<String, List<SayToHeItem>>.fromEntries(map['says'].entries.map(
-        (entity) => MapEntry<String, List<SayToHeItem>>(
-            entity.key,
-            List<SayToHeItem>.generate(map['says'].length,
-                (index) => SayToHeItem.fromJson(entity.value[index])))));
+    systems = List<SystemMessageItem>.generate(map['systems']?.length ?? 0,
+        (index) => SystemMessageItem.fromJson(map['systems'][index]));
+    tips = List<TipItem>.generate(map['tips']?.length ?? 0,
+        (index) => TipItem.fromJson(map['tips'][index]));
+    users = Map<String, List<UserMessageItem>>.fromEntries(
+        List<MapEntry<String, List<UserMessageItem>>>.generate(
+            map['users']?.length ?? 0, (index) {
+      MapEntry entity = map['users'].entries.elementAt(index);
+      return MapEntry<String, List<UserMessageItem>>(
+          entity.key,
+          List<UserMessageItem>.generate(entity.value?.length ?? 0,
+              (index) => UserMessageItem.fromJson(entity.value[index])));
+    }));
+    says = Map<String, List<SayToHeItem>>.fromEntries(
+        List<MapEntry<String, List<SayToHeItem>>>.generate(
+            map['says']?.length ?? 0, (index) {
+      MapEntry entity = map['says'].entries.elementAt(index);
+      return MapEntry<String, List<SayToHeItem>>(
+          entity.key,
+          List<SayToHeItem>.generate(entity.value?.length ?? 0,
+              (index) => SayToHeItem.fromJson(entity.value[index])));
+    }));
     loadUser = UserProfile.fromJson(map["user"]);
-    usersIndex = map['usersIndex'];
-    saysIndex = map['saaysIndex'];
+    usersIndex = List<String>.generate(
+        map['usersIndex']?.length ?? 0, (index) => map['usersIndex'][index]);
+    saysIndex = List<String>.generate(
+        map['saysIndex']?.length ?? 0, (index) => map['saysIndex'][index]);
     noMoreHistory = List<String>.generate(
-            map["noMoreHistory"].length, (index) => map["noMoreHistory"][index])
+            map["noMoreHistory"]?.length ?? 0, (index) => map["noMoreHistory"][index])
         .toSet();
+    noMoreHistoryMessage = map['noMoreHistoryMessage'] ?? false;
   }
 
   void save() {

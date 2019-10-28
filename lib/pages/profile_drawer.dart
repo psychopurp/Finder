@@ -1,3 +1,6 @@
+import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
+import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/provider/user_provider.dart';
@@ -12,6 +15,12 @@ class ProfileDrawer extends StatelessWidget {
     'settings': {
       'icon': Icon(
         Icons.settings,
+        color: Colors.black54,
+      ),
+    },
+    'exit': {
+      'icon': Icon(
+        Icons.exit_to_app,
         color: Colors.black54,
       ),
     },
@@ -43,6 +52,19 @@ class ProfileDrawer extends StatelessWidget {
             title: Text('设置'),
             onTap: () {
               Application.router.navigateTo(context, Routes.settings);
+            },
+          ),
+          ListTile(
+            leading: listOption['exit']['icon'],
+            title: Text('注销'),
+            onTap: () {
+              Global.isLogin = false;
+              Global.token = "";
+              MessageModel().reset();
+              MessageModel().getDataInterval(duration: Duration(minutes: 10));
+              ApiClient.dio.options.headers['token'] = "";
+              Navigator.of(context).pop();
+              Navigator.of(context).pushNamed(Routes.login);
             },
           ),
         ],
