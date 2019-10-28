@@ -40,6 +40,7 @@ import 'package:finder/pages/home_page/topic_detail_page.dart';
 import 'package:finder/pages/mine_page/user_profile_page.dart';
 import 'package:finder/pages/home_page/activity_detail_page.dart';
 import 'package:finder/pages/login_page/privacy.dart';
+import 'package:finder/pages/login_page/serve_protocol.dart';
 
 //返回首页
 var rootHandler = Handler(
@@ -269,5 +270,8 @@ var fansFollowPageHandle = Handler(
 var privacyHandle = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return PrivacyRoute();
-  }
-);
+  });
+var serveProtocolHandle = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return ServeProtocolRoute();
+    });

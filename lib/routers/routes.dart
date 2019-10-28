@@ -57,6 +57,7 @@ class Routes {
   static String sayToHeChat = "/message/say_to_he_chat";
   //条款
   static String privacy = "/login_page/privacy";
+  static String serveProtocol = "/login_page/serve_protocol";
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = Handler(
@@ -160,5 +161,7 @@ class Routes {
     //条款
     router.define(privacy,
         handler: privacyHandle, transitionType: TransitionType.cupertino);
+    router.define(serve_protocol,
+        handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
   }
 }
