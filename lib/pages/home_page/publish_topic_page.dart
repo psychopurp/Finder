@@ -282,7 +282,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                   width: picWidth,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: FileImage(this._imageFile), fit: BoxFit.fill),
+                        image: FileImage(this._imageFile), fit: BoxFit.cover),
                   ))
               : Container(
                   margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),

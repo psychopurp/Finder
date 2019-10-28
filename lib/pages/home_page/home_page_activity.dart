@@ -142,7 +142,7 @@ class HomePageActivities extends StatelessWidget {
                     // border: Border.all(color: Colors.black, width: 2),
                     image: DecorationImage(
                       image: imageProvider,
-                      fit: BoxFit.fill,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),

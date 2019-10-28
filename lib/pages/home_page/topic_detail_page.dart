@@ -17,6 +17,7 @@ class TopicDetailPage extends StatefulWidget {
   final int topicId;
   final String topicImage;
   final String topicTitle;
+
   TopicDetailPage({this.topicId, this.topicImage, this.topicTitle});
 
   @override
@@ -124,11 +125,14 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               color: Colors.black.withOpacity(titileOpacity)),
         ),
         iconTheme: IconThemeData(color: Colors.black),
-        centerTitle: true, //标题居中
-        expandedHeight: 200.0, //展开高度200
+        centerTitle: true,
+        //标题居中
+        expandedHeight: 200.0,
+        //展开高度200
         // floating: true, //不随着滑动隐藏标题
         // snap: true,
-        pinned: true, //固定在顶部
+        pinned: true,
+        //固定在顶部
         // forceElevated: innerBoxIsScrolled,
         flexibleSpace: FlexibleSpaceBar(
             titlePadding: EdgeInsets.only(
@@ -157,7 +161,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               children: <Widget>[
                 CachedNetworkImage(
                   imageUrl: widget.topicImage,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                 ),
                 Opacity(
                   opacity: 0.35,
@@ -183,7 +187,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             // color: Colors.green,
             image: DecorationImage(
               image: imageProvider,
-              fit: BoxFit.fill,
+              fit: BoxFit.cover,
+
             ),
           ),
           child: Stack(
@@ -226,7 +231,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 class TopicComments extends StatefulWidget {
   final ScrollController controller;
   final int topicId;
+
   TopicComments({this.topicId, this.controller});
+
   @override
   _TopicCommentsState createState() => _TopicCommentsState();
 }
@@ -234,6 +241,7 @@ class TopicComments extends StatefulWidget {
 class _TopicCommentsState extends State<TopicComments> {
   EasyRefreshController _refreshController;
   TopicCommentsModel topicComments;
+
   // List collectList = [];
   List likeList = [];
   int pageCount = 2;
@@ -243,6 +251,7 @@ class _TopicCommentsState extends State<TopicComments> {
   FocusNode _commentFocusNode;
   FocusNode blackFocusNode;
   double commentHeight = 0;
+
   //FormState为Form的State类，可以通过 Form.of() 或GlobalKey获得。我们可以通过它来对
   //Form的子孙FormField进行统一操作。
   GlobalKey _formKey = new GlobalKey<FormState>();
@@ -739,7 +748,7 @@ class _TopicCommentsState extends State<TopicComments> {
                 var _singlePic = Container(
                   child: CachedNetworkImage(
                     imageUrl: images[index],
-                    fit: BoxFit.fitWidth,
+                    fit: BoxFit.cover,
                     placeholder: (context, _) {
                       return Center(
                         child: CupertinoActivityIndicator(),
@@ -759,6 +768,7 @@ class _TopicCommentsState extends State<TopicComments> {
                             return PicSwiper(
                               index: index,
                               pics: images,
+
                             );
                           }));
                     },
@@ -769,7 +779,7 @@ class _TopicCommentsState extends State<TopicComments> {
                             width: ScreenUtil().setWidth(220),
                             decoration: BoxDecoration(
                                 image: DecorationImage(
-                                    image: imageProvider, fit: BoxFit.fill)),
+                                    image: imageProvider, fit: BoxFit.cover)),
                           ),
                   ),
                 );

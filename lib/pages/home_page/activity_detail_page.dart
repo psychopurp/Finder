@@ -114,7 +114,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       ],
                       image: DecorationImage(
                           image: CachedNetworkImageProvider(activity.poster),
-                          fit: BoxFit.fill)),
+                          fit: BoxFit.cover)),
                 ),
               ),
               DefaultTextStyle(

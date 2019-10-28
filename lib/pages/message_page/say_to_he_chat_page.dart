@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/routers/application.dart';
+import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
@@ -371,17 +373,29 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
       alignment: Alignment.centerLeft,
       child: Row(
         children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 10),
-            width: AvatarHeight,
-            height: AvatarHeight,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AvatarHeight / 2),
+          MaterialButton(
+            minWidth: 0,
+            padding: EdgeInsets.all(0),
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            child: Container(
+              margin: EdgeInsets.only(left: 10),
+              width: AvatarHeight,
+              height: AvatarHeight,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AvatarHeight / 2),
+              ),
+              child: Avatar(
+                url: item.sender.avatar,
+                avatarHeight: AvatarHeight,
+              ),
             ),
-            child: Avatar(
-              url: item.sender.avatar,
-              avatarHeight: AvatarHeight,
-            ),
+            onPressed: () async {
+              if (item.sender.id != 0) {
+                Application.router.navigateTo(context,
+                    "${Routes.userProfile}?senderId=${item.sender.id}&heroTag=user:${item.sender.id}-${item.id}");
+              }
+            },
           ),
           Bubble(text: item.content),
         ],
