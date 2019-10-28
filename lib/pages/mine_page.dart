@@ -40,6 +40,13 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<UserProvider>(builder: (context, user, child) {
+        if (user.userInfo.backGround == null) {
+          imageToColors(user.userInfo.avatar).then((val) {
+            user.userInfo.backGround = val;
+            setState(() {});
+          });
+        }
+
         print(user.collection);
         return SafeArea(
           top: false,
@@ -188,7 +195,9 @@ class _MinePageState extends State<MinePage> {
 
   buildBackground(UserModel user) {
     double cardWidth = 130;
-    List<Color> backGroundColor = [Theme.of(context).primaryColor];
+    List<Color> backGroundColor = user.backGround != null
+        ? user.backGround
+        : [Theme.of(context).primaryColor];
 
     Widget getCard(item) => Card(
           color: Colors.white,
@@ -206,12 +215,20 @@ class _MinePageState extends State<MinePage> {
     List<Widget> content = [];
 
     Widget backGround = Container(
+      key: ValueKey(user.backGround),
       height: ScreenUtil.screenHeightDp,
       decoration: BoxDecoration(
           gradient: GradientGenerator.linear(
               backGroundColor[backGroundColor.length ~/ 2],
               begin: Alignment.bottomLeft,
               end: Alignment.topRight)),
+    );
+
+    backGround = AnimatedSwitcher(
+      switchInCurve: Curves.easeIn,
+      switchOutCurve: Curves.easeOut,
+      duration: Duration(milliseconds: 5000),
+      child: backGround,
     );
 
     // content.add(backGround);
