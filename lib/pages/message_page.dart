@@ -41,7 +41,7 @@ class _MessagePageState extends State<MessagePage> {
             minWidth: 10,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
-            child: Icon(Icons.clear_all, color: Colors.white),
+            child: Icon(IconData(0xe609, fontFamily: 'clear'), color: Colors.white),
             onPressed: () {
               data.readAll();
             },

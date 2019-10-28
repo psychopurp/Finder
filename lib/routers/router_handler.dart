@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:finder/models/user_model.dart';
 import 'package:finder/pages/check_code_login_page.dart';
 import 'package:finder/pages/fans_follow_page.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
@@ -10,6 +11,7 @@ import 'package:finder/pages/message_page/say_to_he_list_page.dart';
 import 'package:finder/pages/message_page/system_message_page.dart';
 import 'package:finder/pages/message_page/tips_page.dart';
 import 'package:finder/pages/mine_page.dart';
+import 'package:finder/pages/mine_page/change_profile_page.dart';
 import 'package:finder/pages/mine_page/collection_page.dart';
 import 'package:finder/pages/mine_page/modify_info_page.dart';
 import 'package:finder/pages/recruit_page/candidates_page.dart';
@@ -131,26 +133,25 @@ var publishActivityHandler = Handler(
 //招募页
 var recruitDetailHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      return RecruitDetailPage();
-    });
+  return RecruitDetailPage();
+});
 var recommendRecruitDetailHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      return RecommendRecruitDetailPage();
-    });
+  return RecommendRecruitDetailPage();
+});
 var publishRecruitHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      return RecruitPublishPage();
-    });
+  return RecruitPublishPage();
+});
 var engageRecruitHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      return EngageRecruitRoute();
-    });
+  return EngageRecruitRoute();
+});
 
 var candidatesHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      return CandidatesRoute();
-    });
-
+  return CandidatesRoute();
+});
 
 //服务页面 -- 失物招领
 var lostFoundHandler = Handler(
@@ -215,8 +216,8 @@ var internshipDetailHandler = Handler(
 });
 var recommendInternshipDetailHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      return RecommendInternshipDetailPage();
-    });
+  return RecommendInternshipDetailPage();
+});
 //用户详情页
 var userProfileHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -285,3 +286,7 @@ var serveProtocolHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       return ServeProtocolRoute();
     });
+var changeUserProfilePageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return ChangeProfilePage();
+});

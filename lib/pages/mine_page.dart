@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
+import 'package:finder/pages/mine_page/change_profile_page.dart';
 import 'package:finder/plugin/gradient_generator.dart';
 import 'package:finder/plugin/my_appbar.dart';
 import 'package:finder/public.dart';
@@ -40,6 +42,7 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<UserProvider>(builder: (context, user, child) {
+        // user.getUserProfile();
         if (user.userInfo.backGround == null) {
           imageToColors(user.userInfo.avatar).then((val) {
             user.userInfo.backGround = val;
@@ -220,10 +223,8 @@ class _MinePageState extends State<MinePage> {
       key: ValueKey(user.backGround),
       height: ScreenUtil.screenHeightDp,
       decoration: BoxDecoration(
-          gradient: GradientGenerator.linear(
-              backGroundColor[backGroundColor.length ~/ 2],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight)),
+          gradient: GradientGenerator.linear(backGroundColor.first,
+              begin: Alignment.bottomLeft, end: Alignment.topRight)),
     );
 
     backGround = AnimatedSwitcher(
@@ -284,8 +285,8 @@ class _MinePageState extends State<MinePage> {
         elevation: 10,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
-          padding: EdgeInsets.only(bottom: 15, top: 50),
-          width: ScreenUtil().setWidth(750),
+          padding: EdgeInsets.only(bottom: 15, top: 0),
+          width: ScreenUtil().setWidth(550),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               gradient: GradientGenerator.linear(Theme.of(context).primaryColor,
@@ -293,6 +294,22 @@ class _MinePageState extends State<MinePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(left: ScreenUtil().setWidth(430)),
+                child: MaterialButton(
+                  shape: CircleBorder(),
+                  onPressed: () {
+                    Navigator.push(context, CupertinoPageRoute(builder: (_) {
+                      return ChangeProfilePage(
+                        user: user,
+                      );
+                    }));
+                  },
+                  child: Icon(Icons.settings),
+                ),
+              ),
+              // SizedBox(height: 50),
+
               ///昵称
               Text(
                 user.nickname,

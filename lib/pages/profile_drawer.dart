@@ -96,8 +96,10 @@ class ProfileDrawer extends StatelessWidget {
                 MessageModel().reset();
                 MessageModel().getDataInterval(duration: Duration(minutes: 10));
                 ApiClient.dio.options.headers['token'] = "";
+                MessageModel().reset();
                 var prefs = await SharedPreferences.getInstance();
                 prefs.clear();
+                MessageModel.instance = null;
                 Provider.of<UserProvider>(context).userInfo = null;
                 Navigator.of(context).pushAndRemoveUntil(
                     new MaterialPageRoute(builder: (context) => LoginPage()),

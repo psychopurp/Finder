@@ -61,7 +61,9 @@ class MessageModel implements Listenable {
 
   MessageModel._init() {
     changeEvents = [save];
+    print(111111);
     SharedPreferences.getInstance().then((value) {
+      print(222222);
       prefs = value;
       load();
       init = true;
@@ -70,6 +72,8 @@ class MessageModel implements Listenable {
           getData();
         }
       });
+      print(333333);
+      getData();
       getDataInterval();
     });
   }

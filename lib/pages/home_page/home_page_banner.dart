@@ -7,13 +7,13 @@ import 'package:flutter/cupertino.dart';
 class HomePageBanner extends StatelessWidget {
   final BannerModel banner;
   HomePageBanner(this.banner);
-  final double bannerHeight = 135;
+  final double bannerHeight = 350;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: 10.0),
-      height: bannerHeight,
+      height: 200,
       width: ScreenUtil().setWidth(750),
       color: Colors.white,
       child: Swiper(

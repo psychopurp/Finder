@@ -206,6 +206,7 @@ class _SystemMessagePageState extends State<SystemMessagePage> {
             reverse: true,
             itemBuilder: (context, index) {
               SystemMessageItem item = messages[messages.length - 1 - index];
+              print(item.toJson());
               if (!item.receive) {
                 return timeDisplay(index, true, generateRightBubble(item));
               } else {
