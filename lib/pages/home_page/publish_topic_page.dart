@@ -165,12 +165,13 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                   ),
                 ),
               ),
+              Expanded(flex: 1,child: Container(),),
               IconButton(
-                icon: Icon(Icons.add),
+                icon: Icon(Icons.add, size: 30,),
                 onPressed: () {
                   _tag = _tagController.text.toString();
                   setState(() {
-                    if (_tag != null) {
+                    if (_tag != null && _tag != "") {
                       tags.add(_tag.toString());
                       _tagController.clear();
                     }

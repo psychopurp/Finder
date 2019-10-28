@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
           ),
           centerTitle: true,
         ),
-
+        backgroundColor: Colors.white,
         // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
         body: body);
   }
@@ -75,7 +75,9 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           children: <Widget>[
             HomePageBanner(this.formData['banner']),
+            Padding(padding: EdgeInsets.all(10),),
             HomePageTopics(this.formData['topics']),
+            Padding(padding: EdgeInsets.all(10),),
             HomePageActivities(this.formData['activities']),
           ],
         ),
