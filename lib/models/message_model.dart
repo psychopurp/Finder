@@ -556,8 +556,9 @@ class MessageModel implements Listenable {
     var data = prefs.getString("messages");
     if (data == null) return;
     var map = json.decode(data);
-    lastRequestTime =
-        DateTime.fromMillisecondsSinceEpoch(map["lastRequestTime"]);
+    var time = map["lastRequestTime"];
+    if (time != null)
+      lastRequestTime = DateTime.fromMillisecondsSinceEpoch(time);
     systems = List<SystemMessageItem>.generate(map['systems']?.length ?? 0,
         (index) => SystemMessageItem.fromJson(map['systems'][index]));
     tips = List<TipItem>.generate(map['tips']?.length ?? 0,
@@ -585,9 +586,8 @@ class MessageModel implements Listenable {
         map['usersIndex']?.length ?? 0, (index) => map['usersIndex'][index]);
     saysIndex = List<String>.generate(
         map['saysIndex']?.length ?? 0, (index) => map['saysIndex'][index]);
-    noMoreHistory = List<String>.generate(
-            map["noMoreHistory"]?.length ?? 0, (index) => map["noMoreHistory"][index])
-        .toSet();
+    noMoreHistory = List<String>.generate(map["noMoreHistory"]?.length ?? 0,
+        (index) => map["noMoreHistory"][index]).toSet();
     noMoreHistoryMessage = map['noMoreHistoryMessage'] ?? false;
   }
 
@@ -663,20 +663,24 @@ class UserMessageItem extends Item implements ToJson {
       int id,
       bool isRead,
       this.sessionId,
+      this.fail = false,
       this.sending = false})
       : super(id, isRead: isRead);
 
   factory UserMessageItem.fromJson(Map<String, dynamic> map) {
     UserProfile receiver = UserProfile.fromJson(map['receiver']);
     return UserMessageItem(
-        time: DateTime.fromMicrosecondsSinceEpoch(
-            (map['time'] * 1000000).toInt()),
-        sender: UserProfile.fromJson(map['sender']),
-        receiver: receiver,
-        content: map["content"],
-        isRead: !(!map["isRead"] && receiver == MessageModel().self),
-        sessionId: map["sessionId"],
-        id: map["id"]);
+      time:
+          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
+      sender: UserProfile.fromJson(map['sender']),
+      receiver: receiver,
+      content: map["content"],
+      isRead: !(!map["isRead"] && receiver == MessageModel().self),
+      sessionId: map["sessionId"],
+      id: map["id"],
+      sending: map['sending'] ?? false,
+      fail: map['fail'] ?? false,
+    );
   }
 
   DateTime time;
@@ -697,6 +701,8 @@ class UserMessageItem extends Item implements ToJson {
       "isRead": isRead,
       "sessionId": sessionId,
       "id": id,
+      "sending": sending,
+      "fail": fail
     };
   }
 }
@@ -708,19 +714,23 @@ class SystemMessageItem extends Item implements ToJson {
       this.content,
       this.isToAll,
       bool isRead,
+      this.fail = false,
       this.receive = true,
       this.sending = false})
       : super(id, isRead: isRead);
 
   factory SystemMessageItem.fromJson(Map<String, dynamic> map) {
     return SystemMessageItem(
-        time: DateTime.fromMicrosecondsSinceEpoch(
-            (map['time'] * 1000000).toInt()),
-        content: map["content"],
-        isRead: map["isRead"],
-        id: map["id"],
-        isToAll: map["isToAll"],
-        receive: map["receive"]);
+      time:
+          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
+      content: map["content"],
+      isRead: map["isRead"],
+      id: map["id"],
+      isToAll: map["isToAll"],
+      receive: map["receive"],
+      sending: map['sending'] ?? false,
+      fail: map['fail'] ?? false,
+    );
   }
 
   DateTime time;
@@ -728,7 +738,7 @@ class SystemMessageItem extends Item implements ToJson {
   final bool isToAll;
   final bool receive;
   bool sending;
-  bool fail = false;
+  bool fail;
 
   @override
   Map<String, dynamic> toJson() {
@@ -737,7 +747,10 @@ class SystemMessageItem extends Item implements ToJson {
       "content": content,
       "isRead": isRead,
       "id": id,
-      "isToAll": isToAll
+      "isToAll": isToAll,
+      "receive": receive,
+      "sending": sending,
+      "fail": fail
     };
   }
 }
@@ -750,6 +763,7 @@ class SayToHeItem extends Item implements ToJson {
       bool isRead,
       this.sessionId,
       int id,
+      this.fail = false,
       this.sender,
       this.sending = false,
       this.isShowName})
@@ -767,6 +781,8 @@ class SayToHeItem extends Item implements ToJson {
       sessionId: map["sessionId"],
       id: map["id"],
       isShowName: map["isShowName"],
+      sending: map['sending'] ?? false,
+      fail: map['fail'] ?? false,
     );
   }
 
@@ -789,7 +805,9 @@ class SayToHeItem extends Item implements ToJson {
       "isRead": isRead,
       "sessionId": sessionId,
       "id": id,
-      "isShowName": isShowName
+      "isShowName": isShowName,
+      "sending": sending,
+      "fail": fail
     };
   }
 }
