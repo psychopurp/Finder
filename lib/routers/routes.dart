@@ -7,6 +7,7 @@ class Routes {
   static String root = "/"; //首页
   static String serve = "/serve";
   static String login = '/login';
+  static String checkCodeLogin = '/checkCodeLogin';
   static String settings = '/settings'; //设置
 
   //首页
@@ -79,6 +80,8 @@ class Routes {
         handler: publishActivityHandler, transitionType: TransitionType.fadeIn);
     router.define(login,
         handler: loginHandler, transitionType: TransitionType.fadeIn);
+    router.define(checkCodeLogin,
+        handler: checkCodeLoginHandler, transitionType: TransitionType.cupertino);
     router.define(moreTopics,
         handler: moreTopicsHandler, transitionType: TransitionType.fadeIn);
     router.define(moreActivities,

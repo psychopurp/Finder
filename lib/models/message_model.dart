@@ -63,15 +63,15 @@ class MessageModel implements Listenable {
     changeEvents = [save];
     SharedPreferences.getInstance().then((value) {
       prefs = value;
+      load();
+      init = true;
+      getSelf().then((status) {
+        if (status) {
+          getData();
+        }
+      });
+      getDataInterval();
     });
-    load();
-    init = true;
-    getSelf().then((status) {
-      if (status) {
-        getData();
-      }
-    });
-    getDataInterval();
   }
 
   void reset() async {
@@ -108,13 +108,19 @@ class MessageModel implements Listenable {
 
   Future<void> getData() async {
     print("Try Get Messages.");
-    DateTime reqTime = DateTime.now();
-    int time;
-    if(lastRequestTime != null){
-      time = lastRequestTime.millisecondsSinceEpoch ~/ 1000;
+    DateTime old = lastRequestTime;
+    try{
+      DateTime reqTime = DateTime.now();
+      int time;
+      if (lastRequestTime != null) {
+        time = lastRequestTime.millisecondsSinceEpoch ~/ 1000;
+      }
+      await getMessages(time);
+      lastRequestTime = reqTime.subtract(Duration(seconds: 10));
+    }on DioError catch(e){
+      print(e);
+      lastRequestTime = old;
     }
-    await getMessages(time);
-    lastRequestTime = reqTime.subtract(Duration(seconds: 10));
   }
 
   Future<void> readSaysMessagesBySessionId(String sessionId) async {
@@ -162,7 +168,6 @@ class MessageModel implements Listenable {
     });
     if (value) return;
     Response response = await dio.post('read_system_messages/');
-    print(response.data);
     if (response.data["status"]) {
       systems.forEach((item) {
         item.isRead = true;
@@ -268,7 +273,6 @@ class MessageModel implements Listenable {
   }
 
   Future<void> getHistoryUserMessages(String sessionId) async {
-    print(noMoreHistory);
     if (noMoreHistory.contains(sessionId)) return;
     List<UserMessageItem> messages = users[sessionId];
     DateTime endTime;
@@ -303,13 +307,49 @@ class MessageModel implements Listenable {
     }
   }
 
+  Future<void> getHistorySays(String sessionId) async {
+    if (noMoreHistory.contains(sessionId)) return;
+    List<SayToHeItem> messages = says[sessionId];
+    DateTime endTime;
+    if (messages.length == 0)
+      endTime = DateTime.now();
+    else {
+      SayToHeItem first = messages[0];
+      endTime = first.time;
+    }
+    int end = endTime.millisecondsSinceEpoch ~/ 1000;
+    Map<String, dynamic> queryParameters = {
+      "end": end,
+      "sessionId": sessionId,
+    };
+    Response response =
+    await dio.get("get_history_message/", queryParameters: queryParameters);
+    Map<String, dynamic> data = response.data;
+    if (!data["status"]) {
+      throw DioError(
+          request: response.request,
+          response: response,
+          message: data["error"],
+          type: DioErrorType.RESPONSE);
+    } else {
+      if (data['data'].length == 0) {
+        noMoreHistory.add(sessionId);
+      } else
+        addAll(
+            List<Map<String, dynamic>>.generate(data["data"].length,
+                    (index) => data["data"][data["data"].length - index - 1]),
+            addFirst: true);
+    }
+  }
+
+
   Future<void> getMessages(int start,
       {int end,
       bool isNotReadOnly,
       bool isReceiveOnly,
       String sessionId}) async {
     Map<String, dynamic> queryParameters = {};
-    if(start != null){
+    if (start != null) {
       queryParameters["start"] = start;
     }
     if (isNotReadOnly != null) {
@@ -330,7 +370,7 @@ class MessageModel implements Listenable {
           response: response,
           message: data["error"],
           type: DioErrorType.RESPONSE);
-    } else{
+    } else {
       addAll(List<Map<String, dynamic>>.generate(
           data["data"].length, (index) => data["data"][index]));
     }
@@ -374,13 +414,13 @@ class MessageModel implements Listenable {
     }
   }
 
-  Future<void> readOne(Item item, {bool updateNow = true})async {
+  Future<void> readOne(Item item, {bool updateNow = true}) async {
     Response response = await dio.post('read_message/', data: {
       "id": item.id,
     });
     if (response.data["status"]) {
       item.isRead = true;
-      if(updateNow){
+      if (updateNow) {
         updateTipsCount();
         updateSystemsCount();
         updateSaysCount();
@@ -471,7 +511,6 @@ class MessageModel implements Listenable {
   bool addSystemMessage(SystemMessageItem messageItem, {bool addFirst: false}) {
     bool change = false;
     if (!systems.contains(messageItem)) {
-      //TODO 此写法没有优化, 可用二分查找优化
       if (addFirst)
         systems.insert(0, messageItem);
       else
@@ -546,7 +585,8 @@ class MessageModel implements Listenable {
       'user': self?.toJson(),
       'usersIndex': usersIndex,
       'saysIndex': saysIndex,
-      "noMoreHistory": noMoreHistory.toList()
+      "noMoreHistory": noMoreHistory.toList(),
+      "noMoreHistoryMessage": noMoreHistoryMessage
     };
     return json.encode(result);
   }
@@ -556,29 +596,39 @@ class MessageModel implements Listenable {
     var data = prefs.getString("messages");
     if (data == null) return;
     var map = json.decode(data);
-    lastRequestTime =
-        DateTime.fromMillisecondsSinceEpoch(map["lastRequestTime"]);
-    systems = List<SystemMessageItem>.generate(map['system'].length,
-        (index) => SystemMessageItem.fromJson(map['system'][index]));
-    tips = List<TipItem>.generate(
-        map['tips'].length, (index) => TipItem.fromJson(map['tips'][index]));
-    users = Map<String, List<UserMessageItem>>.fromEntries(map['users']
-        .entries
-        .map((entity) => MapEntry<String, List<UserMessageItem>>(
-            entity.key,
-            List<UserMessageItem>.generate(map['users'].length,
-                (index) => UserMessageItem.fromJson(entity.value[index])))));
-    says = Map<String, List<SayToHeItem>>.fromEntries(map['says'].entries.map(
-        (entity) => MapEntry<String, List<SayToHeItem>>(
-            entity.key,
-            List<SayToHeItem>.generate(map['says'].length,
-                (index) => SayToHeItem.fromJson(entity.value[index])))));
+    var time = map["lastRequestTime"];
+    if (time != null)
+      lastRequestTime = DateTime.fromMillisecondsSinceEpoch(time);
+    systems = List<SystemMessageItem>.generate(map['systems']?.length ?? 0,
+        (index) => SystemMessageItem.fromJson(map['systems'][index]));
+    tips = List<TipItem>.generate(map['tips']?.length ?? 0,
+        (index) => TipItem.fromJson(map['tips'][index]));
+    users = Map<String, List<UserMessageItem>>.fromEntries(
+        List<MapEntry<String, List<UserMessageItem>>>.generate(
+            map['users']?.length ?? 0, (index) {
+      MapEntry entity = map['users'].entries.elementAt(index);
+      return MapEntry<String, List<UserMessageItem>>(
+          entity.key,
+          List<UserMessageItem>.generate(entity.value?.length ?? 0,
+              (index) => UserMessageItem.fromJson(entity.value[index])));
+    }));
+    says = Map<String, List<SayToHeItem>>.fromEntries(
+        List<MapEntry<String, List<SayToHeItem>>>.generate(
+            map['says']?.length ?? 0, (index) {
+      MapEntry entity = map['says'].entries.elementAt(index);
+      return MapEntry<String, List<SayToHeItem>>(
+          entity.key,
+          List<SayToHeItem>.generate(entity.value?.length ?? 0,
+              (index) => SayToHeItem.fromJson(entity.value[index])));
+    }));
     loadUser = UserProfile.fromJson(map["user"]);
-    usersIndex = map['usersIndex'];
-    saysIndex = map['saaysIndex'];
-    noMoreHistory = List<String>.generate(
-            map["noMoreHistory"].length, (index) => map["noMoreHistory"][index])
-        .toSet();
+    usersIndex = List<String>.generate(
+        map['usersIndex']?.length ?? 0, (index) => map['usersIndex'][index]);
+    saysIndex = List<String>.generate(
+        map['saysIndex']?.length ?? 0, (index) => map['saysIndex'][index]);
+    noMoreHistory = List<String>.generate(map["noMoreHistory"]?.length ?? 0,
+        (index) => map["noMoreHistory"][index]).toSet();
+    noMoreHistoryMessage = map['noMoreHistoryMessage'] ?? false;
   }
 
   void save() {
@@ -640,7 +690,7 @@ class UserProfile extends Item implements ToJson {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'nickname': nickname, 'id': id, avatar: avatar};
+    return {'nickname': nickname, 'id': id, "avatar": avatar};
   }
 }
 
@@ -653,20 +703,24 @@ class UserMessageItem extends Item implements ToJson {
       int id,
       bool isRead,
       this.sessionId,
+      this.fail = false,
       this.sending = false})
       : super(id, isRead: isRead);
 
   factory UserMessageItem.fromJson(Map<String, dynamic> map) {
     UserProfile receiver = UserProfile.fromJson(map['receiver']);
     return UserMessageItem(
-        time: DateTime.fromMicrosecondsSinceEpoch(
-            (map['time'] * 1000000).toInt()),
-        sender: UserProfile.fromJson(map['sender']),
-        receiver: receiver,
-        content: map["content"],
-        isRead: !(!map["isRead"] && receiver == MessageModel().self),
-        sessionId: map["sessionId"],
-        id: map["id"]);
+      time:
+          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
+      sender: UserProfile.fromJson(map['sender']),
+      receiver: receiver,
+      content: map["content"],
+      isRead: !(!map["isRead"] && receiver == MessageModel().self),
+      sessionId: map["sessionId"],
+      id: map["id"],
+      sending: map['sending'] ?? false,
+      fail: map['fail'] ?? false,
+    );
   }
 
   DateTime time;
@@ -687,6 +741,8 @@ class UserMessageItem extends Item implements ToJson {
       "isRead": isRead,
       "sessionId": sessionId,
       "id": id,
+      "sending": sending,
+      "fail": fail
     };
   }
 }
@@ -698,19 +754,23 @@ class SystemMessageItem extends Item implements ToJson {
       this.content,
       this.isToAll,
       bool isRead,
+      this.fail = false,
       this.receive = true,
       this.sending = false})
       : super(id, isRead: isRead);
 
   factory SystemMessageItem.fromJson(Map<String, dynamic> map) {
     return SystemMessageItem(
-        time: DateTime.fromMicrosecondsSinceEpoch(
-            (map['time'] * 1000000).toInt()),
-        content: map["content"],
-        isRead: map["isRead"],
-        id: map["id"],
-        isToAll: map["isToAll"],
-        receive: map["receive"]);
+      time:
+          DateTime.fromMicrosecondsSinceEpoch((map['time'] * 1000000).toInt()),
+      content: map["content"],
+      isRead: map["isRead"],
+      id: map["id"],
+      isToAll: map["isToAll"],
+      receive: map["receive"],
+      sending: map['sending'] ?? false,
+      fail: map['fail'] ?? false,
+    );
   }
 
   DateTime time;
@@ -718,7 +778,7 @@ class SystemMessageItem extends Item implements ToJson {
   final bool isToAll;
   final bool receive;
   bool sending;
-  bool fail = false;
+  bool fail;
 
   @override
   Map<String, dynamic> toJson() {
@@ -727,7 +787,10 @@ class SystemMessageItem extends Item implements ToJson {
       "content": content,
       "isRead": isRead,
       "id": id,
-      "isToAll": isToAll
+      "isToAll": isToAll,
+      "receive": receive,
+      "sending": sending,
+      "fail": fail
     };
   }
 }
@@ -740,6 +803,7 @@ class SayToHeItem extends Item implements ToJson {
       bool isRead,
       this.sessionId,
       int id,
+      this.fail = false,
       this.sender,
       this.sending = false,
       this.isShowName})
@@ -757,6 +821,8 @@ class SayToHeItem extends Item implements ToJson {
       sessionId: map["sessionId"],
       id: map["id"],
       isShowName: map["isShowName"],
+      sending: map['sending'] ?? false,
+      fail: map['fail'] ?? false,
     );
   }
 
@@ -779,7 +845,9 @@ class SayToHeItem extends Item implements ToJson {
       "isRead": isRead,
       "sessionId": sessionId,
       "id": id,
-      "isShowName": isShowName
+      "isShowName": isShowName,
+      "sending": sending,
+      "fail": fail
     };
   }
 }

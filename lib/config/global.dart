@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/recruit_model.dart';
 import 'package:finder/public.dart';
@@ -30,25 +31,30 @@ class Global {
   //返回 isLogin
   Future init() async {
     print('...正在进行Global初始化...');
-    _prefs = await SharedPreferences.getInstance();
-    if (_prefs.getString('userToken') != null) {
-      Global.token = _prefs.getString("userToken");
+    try{
+      _prefs = await SharedPreferences.getInstance();
+      if (_prefs.getString('userToken') != null) {
+        Global.token = _prefs.getString("userToken");
+      }
+
+      //初始化网络请求相关配置
+      //给请求头加上token
+      ApiClient.init();
+
+      ///获取全局type
+      getGlobalData();
+
+      //能获得用户信息说明token有效
+      var data = await apiClient.getUserProfile();
+      if (data['status'] == true) {
+        Global.userInfo = UserModel.fromJson(data['data']);
+        Global.isLogin = true;
+      }
+      return data['status'];
+    }on DioError catch(e){
+      print(e);
     }
-
-    //初始化网络请求相关配置
-    //给请求头加上token
-    ApiClient.init();
-
-    ///获取全局type
-    getGlobalData();
-
-    //能获得用户信息说明token有效
-    var data = await apiClient.getUserProfile();
-    if (data['status'] == true) {
-      Global.userInfo = UserModel.fromJson(data['data']);
-      Global.isLogin = true;
-    }
-    return data['status'];
+    return false;
   }
 
   ///一些全局需要的参数，避免重复获取

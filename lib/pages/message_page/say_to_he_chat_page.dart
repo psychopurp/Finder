@@ -104,7 +104,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
   Future<bool> sendMessage() async {
     String text = _textController.value.text;
     if (text == null || text == "") return false;
-    await data.getData();
+    data.getData();
     SayToHeItem item = SayToHeItem(
         sessionId: widget.sessionId,
         content: text,
@@ -204,7 +204,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
       messagesList = RefreshIndicator(
           onRefresh: () async {
             await data.getData();
-            await data.getHistoryUserMessages(widget.sessionId);
+            await data.getHistorySays(widget.sessionId);
           },
           child: ListView.builder(
             physics: AlwaysScrollableScrollPhysics(),
@@ -244,7 +244,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
             await data.getData();
           },
           onLoad: () async {
-            await data.getHistoryUserMessages(widget.sessionId);
+            await data.getHistorySays(widget.sessionId);
             _loadController.finishLoad(
                 success: true,
                 noMore: (data.noMoreHistory.contains(widget.sessionId)));
