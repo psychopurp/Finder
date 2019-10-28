@@ -159,7 +159,7 @@ class TopicList extends StatelessWidget {
             margin: EdgeInsets.only(right: ScreenUtil().setWidth(20)),
             decoration: BoxDecoration(
               // color: Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(3)),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
               // border: Border.all(color: Colors.black, width: 2),
               image: DecorationImage(
                 image: imageProvider,
@@ -171,7 +171,7 @@ class TopicList extends StatelessWidget {
                 Positioned(
                     top: ScreenUtil().setHeight(10),
                     child: Container(
-                      padding: EdgeInsets.all(3),
+                      padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.only(

@@ -1,3 +1,4 @@
+import 'package:finder/models/message_model.dart';
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
@@ -49,10 +50,10 @@ class _HomePageState extends State<HomePage> {
           title: Text(
             'Finders',
             style: TextStyle(
-                // color: Theme.of(context).primaryColor.withRed(200),
-                fontFamily: 'Yellowtail',
-                fontWeight: FontWeight.w400,
-                fontSize: ScreenUtil().setSp(70)),
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           centerTitle: true,
         ),

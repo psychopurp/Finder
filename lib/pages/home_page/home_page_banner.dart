@@ -24,7 +24,7 @@ class HomePageBanner extends StatelessWidget {
         scale: 0.1,
         pagination: SwiperPagination(
             margin: const EdgeInsets.only(
-                top: 10.0, left: 10.0, right: 10.0, bottom: 5.0),
+                top: 10.0, left: .0, right: .0, bottom: 5.0),
             alignment: Alignment.bottomCenter,
             builder: DotSwiperPaginationBuilder(
                 size: 6,
@@ -48,7 +48,7 @@ class HomePageBanner extends StatelessWidget {
       imageBuilder: (context, imageProvider) => Container(
         decoration: BoxDecoration(
           // color: Colors.green,
-          borderRadius: BorderRadius.all(Radius.circular(3)),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
           // border: Border.all(color: Colors.black, width: 2),
           image: DecorationImage(
             image: imageProvider,

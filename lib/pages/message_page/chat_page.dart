@@ -20,6 +20,9 @@ class ChatRouter extends StatelessWidget {
     MessageModel data = MessageModel();
     int id1;
     int id2;
+    if(data.self == null){
+      data.getSelf();
+    }
     if (other.id < data.self.id) {
       id1 = other.id;
       id2 = data.self.id;

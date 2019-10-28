@@ -93,10 +93,9 @@ class ProfileDrawer extends StatelessWidget {
               onTap: () async {
                 Global.isLogin = false;
                 Global.token = "";
-                MessageModel().reset();
-                MessageModel().getDataInterval(duration: Duration(minutes: 10));
+                await MessageModel().cancelTimer();
+                await MessageModel().reset();
                 ApiClient.dio.options.headers['token'] = "";
-                MessageModel().reset();
                 var prefs = await SharedPreferences.getInstance();
                 prefs.clear();
                 MessageModel.instance = null;

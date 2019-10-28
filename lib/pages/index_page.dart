@@ -52,7 +52,9 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     super.dispose();
-    MessageModel().removeListener(update);
+    if(MessageModel.instance != null){
+      MessageModel().removeListener(update);
+    }
   }
 
   @override

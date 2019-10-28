@@ -34,14 +34,22 @@ class _MessagePageState extends State<MessagePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("消息"),
+        title: Text(
+          "消息",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         centerTitle: true,
         actions: <Widget>[
           MaterialButton(
             minWidth: 10,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
-            child: Icon(IconData(0xe609, fontFamily: 'clear'), color: Colors.white),
+            child: Icon(IconData(0xe609, fontFamily: 'clear'),
+                color: Colors.white),
             onPressed: () {
               data.readAll();
             },
@@ -77,8 +85,11 @@ class _MessagePageState extends State<MessagePage> {
               url: Routes.tips);
         } else if (index == 2) {
           return _generateOtherMessagePage("对Ta说", Icons.person, data.saysCount,
-              data: data.says.length == 0 ? "" :  data.says[data.saysIndex.last].last.content,
-              background: Color(0xFFFF6666), url: Routes.sayToHe);
+              data: data.says.length == 0
+                  ? ""
+                  : data.says[data.saysIndex.last].last.content,
+              background: Color(0xFFFF6666),
+              url: Routes.sayToHe);
         }
         return _generateUserMessage(index - 3);
       },
