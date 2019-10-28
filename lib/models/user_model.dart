@@ -67,7 +67,9 @@ class UserModel {
     final Map<String, dynamic> json = new Map<String, dynamic>();
     json['nickname'] = this.nickname;
     json['phone'] = this.phone;
-    json['avatar'] = this.avatar.substring(this.avatar.indexOf('/m'));
+    json['avatar'] = this.avatar.substring(this.avatar.indexOf('/s') == -1
+        ? this.avatar.indexOf("/1")
+        : this.avatar.indexOf('/s'));
     json['introduction'] = this.introduction;
     json['real_name'] = realName;
     json["student_id"] = studentId;

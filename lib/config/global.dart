@@ -18,7 +18,7 @@ class Global {
   static UserModel userInfo = new UserModel(
       nickname: '未登录',
       avatar:
-          'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=883611357,2149035107&fm=26&gp=0.jpg');
+          'https://image.finder-nk.com/static/default.png');
   static bool isLogin = false;
 
   // 是否为release版

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:finder/config/api_client.dart';
@@ -67,12 +66,12 @@ class _MinePageState extends State<MinePage> {
                   Positioned(
                       left: 0,
                       right: 0,
-                      top: topPartHeight * 0.5,
+                      top: topPartHeight * 1.5,
                       child: userCard(user.userInfo)),
                   Positioned(
                     // left: ScreenUtil().setWidth(0),
                     // right: 0,
-                    top: topPartHeight * 0.5 - 40,
+                    top: topPartHeight * 1.5 - 40,
                     child: avatar(user.userInfo),
                   )
                 ],
@@ -242,8 +241,8 @@ class _MinePageState extends State<MinePage> {
         spacing: 12,
         runSpacing: 14,
         children: <Widget>[
-          getCard(cards['topic']),
-          getCard(cards['activity']),
+//          getCard(cards['topic']),
+//          getCard(cards['activity']),
           // getCard(cards['toHeSay']),
           // getCard(cards['message'])
         ],

@@ -293,15 +293,18 @@ class _InternshipPageState extends State<InternshipPage> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 20),
-                      child: Text(
-                        company.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 17,
-                          color: ActionColor,
+                      child: Container(
+                        width: ScreenUtil.screenWidthDp - 180,
+                        child: Text(
+                          company.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: ActionColor,
+                          ),
                         ),
-                      ),
+                      )
                     ),
                   ],
                 ),

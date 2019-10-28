@@ -580,7 +580,11 @@ class _ContentWidgetState extends State<ContentWidget>
     controller = AnimationController(vsync: this, duration: _defaultDuration);
     double width = 350;
     int lineWords = (width / fontSize).ceil();
-    lines = (widget.content.length / lineWords).ceil();
+    List<String> contents = widget.content.split("\n");
+    lines = 0;
+    contents.forEach((e){
+      lines += (e.length / lineWords).ceil();
+    });
     if (lines < 5) {
       maxHeight = lines * 1.5 * fontSize;
     }

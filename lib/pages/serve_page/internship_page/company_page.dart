@@ -587,6 +587,7 @@ class CompanyPageHeader extends StatelessWidget {
         ((leftOffset + ScreenUtil.screenWidthDp) / ScreenUtil.screenWidthDp -
                 0.5) *
             132;
+    double nameWidth = ScreenUtil.screenWidthDp * 5 / 6 - (maxTabsBottom - tabsBottom) / maxTabsBottom * ScreenUtil.screenWidthDp / 3;
     TextStyle unSelectedStyle = TextStyle(
       fontSize: 15,
       color: Color(0xff555555),
@@ -693,11 +694,14 @@ class CompanyPageHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Text(
-                companyMainInfo.name,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
+              Container(
+                width: nameWidth,
+                child: Text(
+                  companyMainInfo.name,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Text(

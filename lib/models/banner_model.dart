@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/avatar.dart';
 
 //首页轮播图模型
 class BannerModel {
@@ -37,9 +38,7 @@ class BannerModelData {
 
   BannerModelData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    image = (json['image'][0] == '/')
-        ? ApiClient.host + json['image']
-        : ApiClient.host + '/' + json['image'];
+    image = Avatar.getImageUrl(json["image"]);
     type = json['type'];
     location = json['location'];
   }

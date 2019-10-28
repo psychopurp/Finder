@@ -72,7 +72,8 @@ class _MoreActivitiesState extends State<MoreActivities>
           bottom: new TabBar(
             isScrollable: true,
             labelColor: Colors.black,
-            indicatorColor: Colors.black,
+            indicatorColor: Theme.of(context).primaryColor,
+            indicatorWeight: 3,
             tabs: this.activityTypes.data.map((item) {
               return Tab(
                 child: Text(
