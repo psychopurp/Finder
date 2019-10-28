@@ -51,7 +51,7 @@ class UserModel {
     fanCount = json['fan_count'];
     followCount = json['follow_count'];
 
-    realName = json['real_name'] != null ? json['real_name'] : "";
+    realName = json['real_name'] != null ? json['real_name'] : null;
     isFollowed = json['is_followed'] != null ? json['is_followed'] : null;
     isBothFollowed =
         json['is_both_followed'] != null ? json['is_both_followed'] : null;

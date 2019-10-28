@@ -18,7 +18,7 @@ import 'package:finder/provider/user_provider.dart';
 void main() {
   global.init().then((isLogin) {
     runApp(MyApp(
-      isLogin: false,
+      isLogin: isLogin,
     ));
     if (Platform.isAndroid) {
       SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
