@@ -43,16 +43,9 @@ String contentToJson({List<String> images, String text}) {
   return jsonEncode(formData);
 }
 
-Future<Color> getColor(String imageUrl) async {
+Future<List<Color>> imageToColors(String imageUrl) async {
   PaletteGenerator paletteGenerator = await PaletteGenerator.fromImageProvider(
     CachedNetworkImageProvider(imageUrl),
   );
-  // print(paletteGenerator);
-  Color pageColor;
-  if (paletteGenerator.darkVibrantColor != null) {
-    pageColor = paletteGenerator.darkVibrantColor.color;
-  } else {
-    pageColor = paletteGenerator.mutedColor.color;
-  }
-  return pageColor;
+  return paletteGenerator.colors.toList();
 }

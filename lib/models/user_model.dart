@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:finder/config/api_client.dart';
 import 'package:finder/public.dart';
+import 'package:flutter/material.dart';
 
 class UserModel {
   int id;
@@ -19,6 +22,9 @@ class UserModel {
   bool isFollowed;
   bool isBothFollowed;
 
+  ///我加的
+  List<Color> backGround;
+
   UserModel(
       {this.avatar,
       this.id,
@@ -31,7 +37,8 @@ class UserModel {
       this.fanCount,
       this.followCount,
       this.isBothFollowed,
-      this.isFollowed});
+      this.isFollowed,
+      this.backGround});
   UserModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     nickname = json['nickname'];

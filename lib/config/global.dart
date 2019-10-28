@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/recruit_model.dart';
+import 'package:finder/public.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';

@@ -3,12 +3,14 @@ import 'package:finder/config/global.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/plugin/gradient_generator.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/plugin/my_appbar.dart';
+import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
 
 ///用户信息详情页
@@ -24,7 +26,7 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   UserModel user;
-  double topPartHeight = 150;
+  double topPartHeight = 200;
   var cards;
   ScrollController _scrollController;
   int userItSelfId;
@@ -63,14 +65,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
         top: false,
         child: Container(
           child: MyAppBar(
-              appbar: AppBar(
-                backgroundColor: Theme.of(context).primaryColor,
-                elevation: 0,
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(top: 80),
-                child: body,
-              )),
+            appbar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            ),
+            child: body,
+          ),
         ),
       ),
     );
@@ -88,7 +88,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         alignment: Alignment.topCenter,
         fit: StackFit.expand,
         children: <Widget>[
-          ListView(padding: EdgeInsets.all(0), children: buildBackground(user)),
+          buildBackground(),
           Positioned(
               left: 0,
               right: 0,
@@ -166,7 +166,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return child;
   }
 
-  buildBackground(UserModel user) {
+  buildBackground() {
     double cardWidth = 130;
 
     Widget getCard(item) => Card(
@@ -184,30 +184,53 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     List<Widget> content = [];
 
-    Widget topPart = Container(
-      height: topPartHeight,
+    Widget backGround = Container(
+      height: ScreenUtil.screenHeightDp,
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-      ),
+          color: user.backGround.first,
+          gradient: GradientGenerator.linear(
+              user.backGround[(user.backGround.length ~/ 2)],
+              gradient: 20,
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight)),
+    );
+    backGround = Opacity(
+      child: backGround,
+      opacity: 0.9,
     );
 
-    content.add(topPart);
-    content.add(Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.only(top: cardWidth + 10),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 14,
-        children: <Widget>[
-          // getCard(cards['topic']),
-          // getCard(cards['activity']),
-          // getCard(cards['toHeSay']),
-          // getCard(cards['message'])
-        ],
-      ),
-    ));
+    // user.backGround.forEach((item) {
+    //   content.add(Container(
+    //     color: item,
+    //     height: 20,
+    //   ));
+    // });
 
-    return content;
+    // content.add(backGround);
+    // content.add(Container(
+    //   alignment: Alignment.center,
+    //   padding: EdgeInsets.only(top: cardWidth + 10),
+    //   child: Wrap(
+    //     spacing: 12,
+    //     runSpacing: 14,
+    //     children: <Widget>[
+    //       // getCard(cards['topic']),
+    //       // getCard(cards['activity']),
+    //       // getCard(cards['toHeSay']),
+    //       // getCard(cards['message'])
+    //     ],
+    //   ),
+    // ));
+
+    return Stack(
+      children: <Widget>[
+        backGround,
+        ListView(
+          padding: EdgeInsets.all(0),
+          children: content,
+        )
+      ],
+    );
   }
 
   Widget userCard(UserModel user) {
@@ -221,12 +244,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           width: ScreenUtil().setWidth(750),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(colors: [
-                Theme.of(context).primaryColor.withOpacity(0.1),
-                Theme.of(context).primaryColor.withOpacity(0.4),
-                Theme.of(context).primaryColor.withOpacity(0.6),
-                Theme.of(context).primaryColor.withOpacity(0.9),
-              ])),
+              gradient:
+                  GradientGenerator.linear(Theme.of(context).primaryColor)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -296,9 +315,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   getUserProfile() async {
     var data = await apiClient.getOtherProfile(userId: widget.senderId);
     // print(data);
-
     UserModel userModel = UserModel.fromJson(data['data']);
 
+    userModel.backGround = await imageToColors(userModel.avatar);
     if (!mounted) return;
     setState(() {
       this.user = userModel;
