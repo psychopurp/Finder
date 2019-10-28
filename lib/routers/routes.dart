@@ -55,6 +55,8 @@ class Routes {
   static String tips = "/message/tips";
   static String sayToHe = "/message/say_to_he";
   static String sayToHeChat = "/message/say_to_he_chat";
+  //条款
+  static String privacy = "/login_page/privacy";
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = Handler(
@@ -155,5 +157,8 @@ class Routes {
     router.define(fansFollowPage,
         handler: fansFollowPageHandle,
         transitionType: TransitionType.cupertino);
+    //条款
+    router.define(privacy,
+        handler: privacyHandle, transitionType: TransitionType.cupertino);
   }
 }

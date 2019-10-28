@@ -39,6 +39,7 @@ import 'package:finder/pages/login_page.dart';
 import 'package:finder/pages/home_page/topic_detail_page.dart';
 import 'package:finder/pages/mine_page/user_profile_page.dart';
 import 'package:finder/pages/home_page/activity_detail_page.dart';
+import 'package:finder/pages/login_page/privacy.dart';
 
 //返回首页
 var rootHandler = Handler(
@@ -263,3 +264,10 @@ var fansFollowPageHandle = Handler(
     isFollow: (isFollow == 'true') ? true : false,
   );
 });
+
+//条款
+var privacyHandle = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return PrivacyRoute();
+  }
+);
