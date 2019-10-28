@@ -66,7 +66,7 @@ class UserModel {
     json['avatar'] = this.avatar.substring(this.avatar.indexOf('/m'));
     json['introduction'] = this.introduction;
     json["birthday"] = getTime(dateTime: this.birthday);
-    // print(json['birthday']);
+    print(json['birthday']);
     json['major'] = this.major;
     json['id'] = this.id;
     json['follow_count'] = this.followCount;
