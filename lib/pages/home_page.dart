@@ -39,7 +39,11 @@ class _HomePageState extends State<HomePage> {
             padding: EdgeInsets.all(0),
             // color: Colors.yellow,
             shape: CircleBorder(),
-            child: Icon(Icons.menu, color: Colors.white, size: 30,),
+            child: Icon(
+              Icons.menu,
+              color: Colors.white,
+              size: 30,
+            ),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
           title: Text(

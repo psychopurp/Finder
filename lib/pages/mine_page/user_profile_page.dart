@@ -1,8 +1,6 @@
 import 'package:finder/config/api_client.dart';
-import 'package:finder/config/global.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
-import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/gradient_generator.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/routers/application.dart';
@@ -10,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/plugin/my_appbar.dart';
-import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
 
 ///用户信息详情页

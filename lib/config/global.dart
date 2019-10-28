@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/recruit_model.dart';
-import 'package:finder/public.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
@@ -31,7 +30,7 @@ class Global {
   //返回 isLogin
   Future init() async {
     print('...正在进行Global初始化...');
-    try{
+    try {
       _prefs = await SharedPreferences.getInstance();
       if (_prefs.getString('userToken') != null) {
         Global.token = _prefs.getString("userToken");
@@ -51,7 +50,7 @@ class Global {
         Global.isLogin = true;
       }
       return data['status'];
-    }on DioError catch(e){
+    } on DioError catch (e) {
       print(e);
     }
     return false;

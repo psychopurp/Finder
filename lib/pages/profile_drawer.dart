@@ -2,14 +2,11 @@ import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
-import 'package:finder/plugin/avatar.dart';
-import 'package:finder/plugin/gradient_generator.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:extended_image/extended_image.dart';
 
 class ProfileDrawer extends StatelessWidget {
   final listOption = {
@@ -40,7 +37,7 @@ class ProfileDrawer extends StatelessWidget {
       return ListView(
         padding: EdgeInsets.all(0),
         children: <Widget>[
-          topAvatar(user.userInfo, context),
+          topUserInfo(user.userInfo, context),
           ListTile(
             leading: listOption['collection']['icon'],
             title: Text('收藏'),
@@ -73,8 +70,21 @@ class ProfileDrawer extends StatelessWidget {
     }));
   }
 
-  topAvatar(UserModel user, context) {
+  topUserInfo(UserModel user, context) {
     double borderRadius = 10;
+
+    Widget avatar = Container(
+        height: 100,
+        width: 100,
+        child: Avatar(
+          url: user.avatar,
+          avatarHeight: 100,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 3),
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+        ));
+
     return Card(
       margin: EdgeInsets.all(0),
       elevation: 4,
@@ -104,14 +114,7 @@ class ProfileDrawer extends StatelessWidget {
               },
               child: Hero(
                 tag: 'profile',
-                child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 3),
-                        borderRadius: BorderRadius.all(Radius.circular(50)),
-                        image: DecorationImage(
-                            image: CachedNetworkImageProvider(user.avatar)))),
+                child: avatar,
               ),
             ),
           ],

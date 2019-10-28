@@ -299,37 +299,37 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   Widget bottomBar(UserProvider user) {
     print(activity.isCollected);
-    return AnimatedSwitcher(
-      transitionBuilder: (child, anim) {
-        return ScaleTransition(child: child, scale: anim);
-      },
-      duration: Duration(milliseconds: 500),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(230)),
-        child: MaterialButton(
-          key: ValueKey<bool>(activity.isCollected),
-          onPressed: () {
-            collectHandle(user, activity);
-          },
-          shape: StadiumBorder(),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Icon(collect[activity.isCollected],
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(230)),
+      child: MaterialButton(
+        onPressed: () {
+          collectHandle(user, activity);
+        },
+        shape: StadiumBorder(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            AnimatedSwitcher(
+              duration: Duration(milliseconds: 400),
+              transitionBuilder: (child, anim) {
+                return ScaleTransition(child: child, scale: anim);
+              },
+              child: Icon(collect[activity.isCollected],
+                  key: ValueKey(activity.isCollected),
                   color: Theme.of(context).primaryColor),
-              Text(
-                "关注活动",
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: ScreenUtil().setSp(35)),
-              )
-            ],
-          ),
-          color: Colors.white,
-          splashColor: Colors.white,
-          minWidth: ScreenUtil().setWidth(226),
-          height: 35,
+            ),
+            Text(
+              "关注活动",
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: ScreenUtil().setSp(35)),
+            )
+          ],
         ),
+        color: Colors.white,
+        splashColor: Colors.white,
+        minWidth: ScreenUtil().setWidth(226),
+        height: 35,
       ),
     );
   }
