@@ -107,6 +107,7 @@ class _TabBodyState extends State<TabBody> {
   static const int FOLLOWED = 2;
 
   int pageCount = 2;
+  int userItSelfId;
 
   @override
   void initState() {
@@ -125,7 +126,10 @@ class _TabBodyState extends State<TabBody> {
 
   @override
   Widget build(BuildContext context) {
-    // final user = Provider.of<UserProvider>(context);
+    final user = Provider.of<UserProvider>(context);
+    setState(() {
+      userItSelfId = user.userInfo.id;
+    });
     return body;
   }
 
@@ -177,6 +181,7 @@ class _TabBodyState extends State<TabBody> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            ///头像
             GestureDetector(
               onTap: () {
                 Application.router.navigateTo(context,
@@ -192,6 +197,8 @@ class _TabBodyState extends State<TabBody> {
                 ),
               ),
             ),
+
+            ///名字/简介
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -217,12 +224,16 @@ class _TabBodyState extends State<TabBody> {
                 ],
               ),
             ),
+
+            ///关注按钮
             Container(
                 height: 40,
                 // color: Colors.amber,
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(right: 10),
-                child: getButton(item.status, item))
+                child: (item.id == userItSelfId)
+                    ? Container()
+                    : getButton(item.status, item))
           ],
         ),
       );
