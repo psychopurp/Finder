@@ -197,6 +197,7 @@ class _TopicsState extends State<Topics>
         controller: _refreshController,
         onRefresh: () async {
           await Future.delayed(Duration(microseconds: 500), () {
+            topics.data = [];
             _getInitialTopicsData(2);
           });
           _refreshController.resetLoadState();
