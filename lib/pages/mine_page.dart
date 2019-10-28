@@ -42,6 +42,7 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<UserProvider>(builder: (context, user, child) {
+        // user.getUserProfile();
         if (user.userInfo.backGround == null) {
           imageToColors(user.userInfo.avatar).then((val) {
             user.userInfo.backGround = val;
@@ -222,10 +223,8 @@ class _MinePageState extends State<MinePage> {
       key: ValueKey(user.backGround),
       height: ScreenUtil.screenHeightDp,
       decoration: BoxDecoration(
-          gradient: GradientGenerator.linear(
-              backGroundColor[backGroundColor.length ~/ 2],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight)),
+          gradient: GradientGenerator.linear(backGroundColor.first,
+              begin: Alignment.bottomLeft, end: Alignment.topRight)),
     );
 
     backGround = AnimatedSwitcher(

@@ -38,8 +38,9 @@ class UserProvider with ChangeNotifier {
 
   //修改用户信息
   Future upLoadUserProfile(UserModel userINfo) async {
-    await apiClient.upLoadUserProfile(userINfo);
+    var data = await apiClient.upLoadUserProfile(userINfo);
     getUserProfile();
+    return data;
   }
 
   //获取用户信息

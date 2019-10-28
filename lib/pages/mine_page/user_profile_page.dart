@@ -184,16 +184,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
     Widget backGround = Container(
       height: ScreenUtil.screenHeightDp,
       decoration: BoxDecoration(
-          color: user.backGround.first,
-          gradient: GradientGenerator.linear(
-              user.backGround[(user.backGround.length ~/ 2)],
-              gradient: 20,
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight)),
+          gradient: GradientGenerator.linear(user.backGround.first,
+              begin: Alignment.bottomLeft, end: Alignment.topRight)),
     );
     backGround = Opacity(
       child: backGround,
-      opacity: 0.9,
+      opacity: 1,
     );
 
     // user.backGround.forEach((item) {
