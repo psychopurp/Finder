@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:finder/config/api_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -17,35 +21,134 @@ class CheckCodeLoginPage extends StatefulWidget {
 class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  String _phone, _password;
+  String _phone = "";
+  String _sendPhone;
   FocusNode phoneNode;
-  FocusNode passwordNode;
-
-  bool _isObscure = true;
-  Color _eyeColor;
+  FocusNode checkCodeNode;
+  int leftTime = 0;
+  bool isRegister = false;
+  TextEditingController _checkCodeController;
+  bool isGet = false;
 
   @override
   void initState() {
     phoneNode = FocusNode();
-    passwordNode = FocusNode();
+    checkCodeNode = FocusNode();
+    _checkCodeController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
     phoneNode.dispose();
-    passwordNode.dispose();
+    checkCodeNode.dispose();
+    _checkCodeController.dispose();
     super.dispose();
+  }
+
+  void timer() {
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        leftTime -= 1;
+      });
+      if (leftTime != 0) {
+        timer();
+      }
+    });
+  }
+
+  void showToast(String msg) {
+    BotToast.showText(
+        text: msg,
+        align: Alignment(0, 0.8),
+        contentColor: Color(0xff888888),
+        duration: Duration(seconds: 5));
+  }
+
+  void showErrorHint(String text) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("提示"),
+            content: Text(text),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("确认"),
+                onPressed: () => Navigator.of(context).pop(), //关闭对话框
+              ),
+            ],
+          );
+        });
+  }
+
+  Future<bool> getCheckCode() async {
+    RegExp phoneReg = RegExp(r"1[35789]\d{9}");
+    bool right = phoneReg.hasMatch(_phone) && _phone.length == 11;
+    if (!right) {
+      showErrorHint("手机号格式错误");
+      return false;
+    }
+    try {
+      Dio dio = ApiClient.dio;
+      Response response = await dio.post('message_login/',
+          data: json.encode({"phone": _phone}));
+      Map<String, dynamic> result = response.data;
+      if (!result["status"]) {
+        showErrorHint("网络连接失败, 请稍后再试");
+      } else {
+        showToast("验证码发送成功, 五分钟有效");
+        setState(() {
+          leftTime = 60;
+          isGet = true;
+        });
+        timer();
+        _sendPhone = _phone;
+        isRegister = result["is_register"];
+        FocusScope.of(context).requestFocus(checkCodeNode);
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  Future<bool> checkCheckCode() async {
+    if(!isGet){
+      showErrorHint("请先获取验证码");
+      return false;
+    }
+    String _checkCode = _checkCodeController.value.text;
+    RegExp checkReg = RegExp(r"\d{6}");
+    bool right = checkReg.hasMatch(_checkCode) && _checkCode.length == 6;
+    if (!right) {
+      showErrorHint("验证码格式错误");
+      _checkCodeController.clear();
+      return false;
+    }
+    try {
+      Dio dio = ApiClient.dio;
+      Response response = await dio.post('message_check/',
+          data: json.encode({"phone": _sendPhone, "code": _checkCode}));
+      Map<String, dynamic> result = response.data;
+      if (!result["status"]) {
+        showErrorHint(result["error"]);
+      } else {
+        if (!isRegister) {
+          Provider.of<UserProvider>(context).loginWithToken(result["token"]);
+          Navigator.of(context).pushAndRemoveUntil(
+              new MaterialPageRoute(builder: (context) => new IndexPage()),
+              (route) => route == null);
+        }
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    Future<void>.delayed(Duration(milliseconds: 200), () {
-      SystemChrome.setSystemUIOverlayStyle(
-          SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark));
-    });
-    ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
-    final user = Provider.of<UserProvider>(context);
 
     return Scaffold(
         body: Form(
@@ -53,64 +156,34 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
             child: Container(
               // color: Colors.amber,
               child: ListView(
-              physics: NeverScrollableScrollPhysics(),
+                physics: NeverScrollableScrollPhysics(),
                 padding:
                     EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(30)),
                 children: <Widget>[
                   // title(),
+                  Padding(padding: EdgeInsets.all(10),),
                   topTitle(context),
+                  Padding(padding: EdgeInsets.all(10),),
                   phoneTextField(context),
                   Container(height: ScreenUtil().setHeight(60)),
-                  passwordTextField(context),
+                  checkCodeTextField(context),
                   //忘记密码
                   Padding(
-                    padding: EdgeInsets.all(30),
+                    padding: EdgeInsets.all(50),
                   ),
                   LoginButton(
-                      height: 100,
-                      beginWidth: 600,
-                      endWidth: 150,
-                      onPress: () async {
-                        Map result = await login(user);
-                        if (result["status"]) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                              new MaterialPageRoute(
-                                  builder: (context) => new IndexPage()),
-                              (route) => route == null);
-                        } else {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  content: Text(result["error"]),
-                                  title: Center(
-                                      child: Text(
-                                    '错误',
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold),
-                                  )),
-                                );
-                              });
-                        }
-                      },
-                      child: Text(
-                        '登录',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
+                    height: 100,
+                    beginWidth: 600,
+                    endWidth: 150,
+                    onPress: checkCheckCode,
+                    child: Text(
+                      '登录 | 注册',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
+                  ),
                   SizedBox(
                     height: ScreenUtil().setHeight(50),
                   ),
-                  buildOtherLoginText(),
-                  otherMethod(context),
-                  buildRegisterText(context),
-
-                  // AnimatedButton(),
-                  Container(
-                    height: 200,
-                  )
                 ],
               ),
             )));
@@ -132,12 +205,12 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Finders · 验证码登录',
+                'Finders · 登录 | 注册',
               ),
               Container(
                 margin: EdgeInsets.only(top: ScreenUtil().setHeight(15)),
                 color: Theme.of(context).primaryColor,
-                width: ScreenUtil().setWidth(270),
+                width: ScreenUtil().setWidth(350),
                 height: ScreenUtil().setHeight(2),
               ),
             ],
@@ -145,221 +218,62 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
         ),
       );
 
-  phoneTextField(context) => Container(
-        padding: EdgeInsets.all(5),
-        child: TextFormField(
-          focusNode: phoneNode,
-          onEditingComplete: () {
-            FocusScope.of(context).requestFocus(passwordNode);
-          },
-          autofocus: false,
-          keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-              // icon: Icon(Icons.person),
-              hintText: "",
-              labelText: '手机号',
-              contentPadding: EdgeInsets.only(bottom: 10)),
-          // validator: (String value) {
-          //   var emailReg = RegExp(
-          //       r"[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?");
-          //   if (!emailReg.hasMatch(value)) {
-          //     return '请输入正确的手机号';
-          //   } else {
-          //     return '正确';
-          //   }
-          // },
-          onChanged: (String value) => _phone = value,
-        ),
-      );
-
-  passwordTextField(context) => Container(
-        padding: EdgeInsets.all(5),
-        child: TextFormField(
-          focusNode: passwordNode,
-          onChanged: (String value) => _password = value,
-          obscureText: _isObscure,
-          validator: (value) {
-            if (value.isEmpty) {
-              return '请输入密码';
-            }
-          },
-          decoration: InputDecoration(
-              labelText: '密码',
-              // prefixIcon: Icon(Icons.person),
-              contentPadding: EdgeInsets.only(bottom: 10),
-              suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.remove_red_eye,
-                    color: _eyeColor,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isObscure = !_isObscure;
-                      _eyeColor = _isObscure
-                          ? Colors.grey
-                          : Theme.of(context).iconTheme.color;
-                    });
-                  })),
-        ),
-      );
-
-  Align buildCheckCode(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: Padding(
-        padding: EdgeInsets.only(top: 10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('不想输密码？'),
-            InkWell(
-              child: Text(
-                '验证码登录',
-                style: TextStyle(color: Theme.of(context).primaryColor),
+  phoneTextField(context) => Row(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: EdgeInsets.all(5),
+              child: TextFormField(
+                focusNode: phoneNode,
+                onEditingComplete: () {
+                  FocusScope.of(context).requestFocus(checkCodeNode);
+                },
+                autofocus: false,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                    // icon: Icon(Icons.person),
+                    hintText: "",
+                    labelText: '手机号',
+                    contentPadding: EdgeInsets.only(bottom: 10)),
+                onChanged: (String value) => _phone = value,
               ),
-              onTap: () {
-                //TODO 跳转到注册页面
-                print('去注册');
-                Navigator.pop(context);
-              },
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Align buildRegisterText(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: Padding(
-        padding: EdgeInsets.only(top: 10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('没有账号？'),
-            InkWell(
-              child: Text(
-                '点击注册',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              onTap: () {
-                //TODO 跳转到注册页面
-                print('去注册');
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget otherMethod(BuildContext context) {
-//    return ButtonBar(
-//      alignment: MainAxisAlignment.center,
-//      children: _loginMethod
-//          .map((item) => Builder(
-//                builder: (context) {
-//                  return IconButton(
-//                      icon: Icon(item['icon'],
-//                          color: Theme.of(context).iconTheme.color),
-//                      onPressed: () {
-//                        //TODO : 第三方登录方法
-//                        Scaffold.of(context).showSnackBar(new SnackBar(
-//                          content: new Text("${item['title']}登录"),
-//                          action: new SnackBarAction(
-//                            label: "取消",
-//                            onPressed: () {},
-//                          ),
-//                        ));
-//                      });
-//                },
-//              ))
-//          .toList(),
-//    );
-  return Container();
-  }
-
-  Widget buildOtherLoginText() {
-//    return Align(
-//        alignment: Alignment.center,
-//        child: Container(
-//          // color: Colors.green,
-//          child: Text(
-//            '其他账号登录',
-//            style: TextStyle(color: Colors.grey, fontSize: 14.0),
-//          ),
-//        ));
-  return Container();
-  }
-
-  Widget _loginButton(BuildContext context) {
-    return Align(
-      child: Container(
-        // color: Colors.green,
-        margin: EdgeInsets.only(
-            top: ScreenUtil().setHeight(20),
-            bottom: ScreenUtil().setHeight(40)),
-        width: ScreenUtil().setWidth(600),
-        height: ScreenUtil().setHeight(100),
-        child: RaisedButton(
-          child: Text(
-            '登录',
-            style: TextStyle(color: Colors.white, fontSize: 20),
           ),
-          color: Theme.of(context).primaryColor,
-          onPressed: () async {
-            print("pressed");
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
+          MaterialButton(
+            elevation: 1,
+            textColor: Colors.white,
+            color: Theme.of(context).primaryColor,
+            disabledColor: Theme.of(context).primaryColor.withOpacity(0.8),
+            disabledTextColor: Colors.white,
+            minWidth: ScreenUtil.screenWidthDp / 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Text(leftTime == 0 ? "获取验证码" : "$leftTime"),
+            onPressed: leftTime == 0
+                ? () {
+                    getCheckCode();
+                  }
+                : null,
+          )
+        ],
+      );
 
-            // if (_formKey.currentState.validate()) {
-            //   ///只有输入的内容符合要求通过才会到达此处
-
-            //   showDialog(
-            //       context: context,
-            //       builder: (context) => Padding(
-            //             padding: EdgeInsets.symmetric(
-            //                 vertical: ScreenUtil().setHeight(367),
-            //                 horizontal: ScreenUtil().setWidth(100)),
-            //             child: Container(
-            //               color: Colors.white,
-            //               child: CupertinoActivityIndicator(),
-            //             ),
-            //           ));
-            //   _formKey.currentState.save();
-            //   //TODO 执行登录方法
-            //   if (await user.login(phone: _phone, password: _password)) {
-            //     Navigator.of(context).pushAndRemoveUntil(
-            //         new MaterialPageRoute(builder: (context) => new IndexPage()),
-            //         (route) => route == null);
-            //   } else {
-            //     showDialog(
-            //         context: context,
-            //         builder: (context) => Padding(
-            //               padding: EdgeInsets.symmetric(
-            //                   vertical: ScreenUtil().setHeight(367),
-            //                   horizontal: ScreenUtil().setWidth(100)),
-            //               child: Container(
-            //                 color: Colors.white,
-            //                 child: Text('登录失败'),
-            //               ),
-            //             ));
-            //   }
-            //   print('email:$_phone , password:$_password');
-            // }
-          },
-          shape: StadiumBorder(),
+  checkCodeTextField(context) => Container(
+        padding: EdgeInsets.all(5),
+        child: TextFormField(
+          focusNode: checkCodeNode,
+          controller: _checkCodeController,
+          keyboardType: TextInputType.numberWithOptions(decimal: false, signed: false),
+          decoration: InputDecoration(
+            labelText: '验证码',
+            contentPadding: EdgeInsets.only(bottom: 10),
+          ),
         ),
-      ),
-    );
-  }
-
-  Future<Map> login(UserProvider user) async {
-    print(this._phone);
-    print(this._password);
-
-    return user.login(phone: this._phone, password: this._password);
-  }
+      );
 }
 
 //首页登录按钮动画
@@ -371,6 +285,7 @@ class LoginButton extends StatefulWidget {
   final AsyncCallback onPress;
 
   final IconData endIcon;
+
   LoginButton(
       {this.beginWidth,
       this.endWidth,
@@ -378,6 +293,7 @@ class LoginButton extends StatefulWidget {
       @required this.child,
       this.onPress,
       @required this.height});
+
   @override
   _LoginButtonState createState() => _LoginButtonState();
 }

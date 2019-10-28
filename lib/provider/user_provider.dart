@@ -38,6 +38,15 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  Future<void> loginWithToken(String token) async {
+      ApiClient.dio.options.headers['token'] = token;
+      Global.saveToken(newToken: token);
+      this.isLogIn = true;
+      var userData = await apiClient.getUserProfile();
+      this.userInfo = UserModel.fromJson(userData['data']);
+      notifyListeners();
+  }
+
   //修改用户信息
   Future upLoadUserProfile(UserModel userINfo) async {
     await apiClient.upLoadUserProfile(userINfo);
