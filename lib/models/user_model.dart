@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:finder/config/api_client.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 

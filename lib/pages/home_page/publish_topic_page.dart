@@ -382,8 +382,15 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
       errorHint = "图片上传失败, 请重试";
       return false;
     }
+    if(this.onlyInSchool && user.userInfo.school == null){
+      if (imagePath == null) {
+        errorHint = "家里蹲大学不能发布校内话题哟~ \n请尝试考个大学吧! ";
+        return false;
+      }
+    }
     var data = await user.addTopic(title, this.tags, imagePath,
         schoolId: this.onlyInSchool ? user.userInfo.school.id : null);
+    print(data);
     if (!data["status"]) {
       errorHint = '当前话题已存在！';
       return false;
