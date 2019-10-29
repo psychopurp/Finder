@@ -14,7 +14,9 @@ import 'package:provider/provider.dart';
 class CommentPage extends StatefulWidget {
   final int topicId;
   final int topicCommentId;
+
   CommentPage({this.topicCommentId, this.topicId});
+
   @override
   _CommentPageState createState() => _CommentPageState();
 }
@@ -289,23 +291,29 @@ class _CommentPageState extends State<CommentPage> {
     if (user.isLogIn) {
       if (user.userInfo.id == item.sender.id) {
         showDialog(
-            context: context,
-            builder: (_) {
-              return GestureDetector(
-                onTap: () async {
-                  FinderDialog.showLoading();
-                  var data =
-                      await apiClient.deleteTopicComment(commentId: item.id);
-                  Navigator.pop(context);
-                  _refreshController.callRefresh();
-                },
-                child: CupertinoAlertDialog(
-                  title: Text('删除话题评论',
-                      style: TextStyle(
-                          fontFamily: 'normal', fontWeight: FontWeight.w200)),
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text("提示"),
+              content: Text("确认要输出此条回复吗? "),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("取消"),
+                  onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                 ),
-              );
-            });
+                FlatButton(
+                    child: Text("删除"),
+                    onPressed: () async {
+                      FinderDialog.showLoading();
+                      var data = await apiClient.deleteTopicComment(
+                          commentId: item.id);
+                      Navigator.pop(context);
+                      _refreshController.callRefresh();
+                    }),
+              ],
+            );
+          },
+        );
       }
     }
   }
