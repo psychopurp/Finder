@@ -1,4 +1,3 @@
-import 'package:finder/pages/mine_page/change_profile_page.dart';
 import 'package:finder/pages/settings_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -51,13 +50,8 @@ class Routes {
   static String minePage = "/minePage"; //我的 页
   static String collectionPage = "/collectionPage"; //用户收藏页
   static String fansFollowPage = "/fansFollowPage"; //关注和粉丝页
-<<<<<<< HEAD
   static String modifyInfoPage = "/modifyInfoPage"; //关注和粉丝页
   static String changeProfilePage = "/changeProfilePage"; //关注和粉丝页
-=======
-  static String changeProfilePage = "/changeProfilePage"; //关注和粉丝页
-  static String modifyInfoPage = "/modifyInfoPage"; //关注和粉丝页
->>>>>>> 4efe1a026c4d865a17b84a25174fd0a58a8c054d
 
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
@@ -169,14 +163,9 @@ class Routes {
     router.define(fansFollowPage,
         handler: fansFollowPageHandle,
         transitionType: TransitionType.cupertino);
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);
-=======
->>>>>>> 4efe1a026c4d865a17b84a25174fd0a58a8c054d
     router.define(modifyInfoPage,
         handler: modifyInfoPageHandle,
         transitionType: TransitionType.cupertino);
@@ -185,12 +174,8 @@ class Routes {
         handler: privacyHandle, transitionType: TransitionType.cupertino);
     router.define(serveProtocol,
         handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
-<<<<<<< HEAD
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);
-=======
->>>>>>> 4bac0ec3348b31f71a46272909527ac8797c9f72
->>>>>>> 4efe1a026c4d865a17b84a25174fd0a58a8c054d
   }
 }

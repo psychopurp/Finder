@@ -277,25 +277,17 @@ var fansFollowPageHandle = Handler(
   );
 });
 
-<<<<<<< HEAD
-=======
 var changeUserProfilePageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ChangeProfilePage();
 });
->>>>>>> 4efe1a026c4d865a17b84a25174fd0a58a8c054d
 //条款
 var privacyHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-<<<<<<< HEAD
-      return ServeProtocolRoute();
+      return PrivacyRoute();
     });
-var changeUserProfilePageHandler = Handler(
-=======
-  return PrivacyRoute();
-});
+
 var serveProtocolHandle = Handler(
->>>>>>> 4efe1a026c4d865a17b84a25174fd0a58a8c054d
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ServeProtocolRoute();
 });
