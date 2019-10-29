@@ -33,6 +33,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
   int lastPage = 1;
   ScrollController _scrollController;
   String error = "网络连接失败, 请稍后再试";
+  bool isLiking = false;
 
   set time(DateTime time) {
     setState(() {
@@ -510,6 +511,8 @@ class _HeSaysPageState extends State<HeSaysPage> {
   }
 
   handleLike(HeSheSayItem item, bool status) async {
+    if(isLiking) return;
+    isLiking = true;
     Dio dio = ApiClient.dio;
     var data = {"like": status, "id": item.id};
     var jsonData = json.encode(data);
@@ -547,6 +550,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
             );
           });
     }
+    isLiking = false;
   }
 }
 
