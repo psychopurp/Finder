@@ -32,41 +32,59 @@ class _MessagePageState extends State<MessagePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "消息",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+    try {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "消息",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+          actions: <Widget>[
+            MaterialButton(
+              minWidth: 10,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              child: Icon(IconData(0xe609, fontFamily: 'clear'),
+                  color: Colors.white),
+              onPressed: () {
+                data.readAll();
+              },
+            )
+          ],
+        ),
+        body: Padding(
+          padding: EdgeInsets.only(left: 13, right: 13, top: 10),
+          child: RefreshIndicator(
+            onRefresh: () async {
+//            data.reset();
+              data.getData();
+            },
+            child: body,
           ),
         ),
-        centerTitle: true,
-        actions: <Widget>[
-          MaterialButton(
-            minWidth: 10,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Icon(IconData(0xe609, fontFamily: 'clear'),
-                color: Colors.white),
-            onPressed: () {
-              data.readAll();
-            },
-          )
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.only(left: 13, right: 13, top: 10),
-        child: RefreshIndicator(
-          onRefresh: () async {
-//            data.reset();
-            data.getData();
-          },
-          child: body,
+      );
+    } catch (e) {
+      List<VoidCallback> event = MessageModel().clearInstance();
+      MessageModel.instance = null;
+      MessageModel newInstance = MessageModel();
+      newInstance.changeEvents.addAll(event);
+      newInstance.onChange();
+      return Scaffold(
+        body: Center(
+          child: Column(
+            children: <Widget>[
+              CircularProgressIndicator(),
+              Text("加载中"),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget get body {

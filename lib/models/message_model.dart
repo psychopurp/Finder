@@ -92,6 +92,21 @@ class MessageModel implements Listenable {
     noMoreHistoryMessage = false;
   }
 
+   List<VoidCallback> clearInstance() {
+    systems = [];
+    tips = [];
+    users = {};
+    says = {};
+    usersIndex = [];
+    saysIndex = [];
+    noMoreHistory = Set();
+    lastRequestTime = null;
+    loadUser = self;
+    noMoreHistoryMessage = false;
+    changeEvents.remove(save);
+    return changeEvents;
+  }
+
   Future<bool> getSelf() async {
     var userData = await apiClient.getUserProfile();
     var user = userData['data'];

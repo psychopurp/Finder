@@ -49,7 +49,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
 //    print(widget.heroTag);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: userItSelfId == user?.id ? null : FloatingActionButton(
         child: Text("私信"),
         elevation: 1,
         onPressed: () {
