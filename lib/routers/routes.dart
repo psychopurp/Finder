@@ -54,6 +54,7 @@ class Routes {
   static String modifyInfoPage = "/modifyInfoPage"; //关注和粉丝页
   static String changeProfilePage = "/changeProfilePage"; //关注和粉丝页
 
+
   static String chat = "/message/chat";
   static String systemMessage = "/message/systemMessage";
   static String tips = "/message/tips";
@@ -164,9 +165,15 @@ class Routes {
     router.define(fansFollowPage,
         handler: fansFollowPageHandle,
         transitionType: TransitionType.cupertino);
+
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);
+
+    router.define(changeProfilePage,
+        handler: changeUserProfilePageHandler,
+        transitionType: TransitionType.cupertino);
+
     router.define(modifyInfoPage,
         handler: modifyInfoPageHandle,
         transitionType: TransitionType.cupertino);
@@ -174,10 +181,16 @@ class Routes {
     router.define(privacy,
         handler: privacyHandle, transitionType: TransitionType.cupertino);
     router.define(serveProtocol,
+
         handler: serveProtocolHandler,
         transitionType: TransitionType.cupertino);
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);
+        handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
+    router.define(changeProfilePage,
+        handler: changeUserProfilePageHandler,
+        transitionType: TransitionType.cupertino);
+
   }
 }
