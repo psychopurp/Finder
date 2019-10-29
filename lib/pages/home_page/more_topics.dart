@@ -241,6 +241,13 @@ class _TopicsState extends State<Topics>
       newTopics.data.addAll(topicsTemp.data);
     }
     // newTopics.data
+    List idList = [];
+    newTopics.data.forEach((item) {
+      idList.add(item.id);
+    });
+    idList.toSet();
+    newTopics.data.removeWhere((item) => !idList.contains(item.id));
+
     if (isSchoolTopics) {
       newTopics.data.removeWhere((item) => item.school == null);
     } else {
@@ -260,6 +267,14 @@ class _TopicsState extends State<Topics>
     var topicsData = await apiClient.getTopics(page: pageCount);
     // print(topicsData);
     TopicModel newTopics = TopicModel.fromJson(topicsData);
+
+    List idList = [];
+    newTopics.data.forEach((item) {
+      idList.add(item.id);
+    });
+    idList.toSet();
+    newTopics.data.removeWhere((item) => !idList.contains(item.id));
+
     if (isSchoolTopics) {
       newTopics.data.removeWhere((item) => item.school == null);
     } else {
