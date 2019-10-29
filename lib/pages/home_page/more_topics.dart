@@ -155,7 +155,7 @@ class _TopicsState extends State<Topics>
   _TopicsState({this.isSchoolTopics});
 
   TopicModel topics;
-  int pageCount = 2;
+  int pageCount = 0;
   int itemCount = 0;
   EasyRefreshController _refreshController;
 
@@ -203,9 +203,9 @@ class _TopicsState extends State<Topics>
           _refreshController.resetLoadState();
         },
         onLoad: () async {
-          var data = await _getMore(this.pageCount);
-          _refreshController.finishLoad(
-              success: true, noMore: (data.length == 0));
+          bool hasMore = await _getMore(this.pageCount);
+          print(hasMore);
+          _refreshController.finishLoad(success: true, noMore: (!hasMore));
         },
         slivers: <Widget>[
           SliverList(
@@ -231,7 +231,7 @@ class _TopicsState extends State<Topics>
         child: child);
   }
 
-  ///初始话数据
+  ///初始话数据 获取两页数据
   Future _getInitialTopicsData(int pageCount) async {
     var topicsData = await apiClient.getTopics(page: 1);
     TopicModel newTopics = TopicModel.fromJson(topicsData);
@@ -241,12 +241,6 @@ class _TopicsState extends State<Topics>
       newTopics.data.addAll(topicsTemp.data);
     }
     // newTopics.data
-    List idList = [];
-    newTopics.data.forEach((item) {
-      idList.add(item.id);
-    });
-    idList.toSet();
-    newTopics.data.removeWhere((item) => !idList.contains(item.id));
 
     if (isSchoolTopics) {
       newTopics.data.removeWhere((item) => item.school == null);
@@ -256,24 +250,17 @@ class _TopicsState extends State<Topics>
     // print('topicsData=======>${topicsData}');
     if (!mounted) return;
     setState(() {
-      this.pageCount = pageCount;
+      this.pageCount = pageCount + 1;
       this.topics = newTopics;
-      // this.topics.
       this.itemCount = topics.data.length;
     });
   }
 
-  Future _getMore(int pageCount) async {
+  ///return hasMore
+  Future<bool> _getMore(int pageCount) async {
     var topicsData = await apiClient.getTopics(page: pageCount);
-    // print(topicsData);
-    TopicModel newTopics = TopicModel.fromJson(topicsData);
 
-    List idList = [];
-    newTopics.data.forEach((item) {
-      idList.add(item.id);
-    });
-    idList.toSet();
-    newTopics.data.removeWhere((item) => !idList.contains(item.id));
+    TopicModel newTopics = TopicModel.fromJson(topicsData);
 
     if (isSchoolTopics) {
       newTopics.data.removeWhere((item) => item.school == null);
@@ -286,7 +273,7 @@ class _TopicsState extends State<Topics>
       this.itemCount = this.itemCount + newTopics.data.length;
       this.pageCount++;
     });
-    return topics.data;
+    return newTopics.hasMore;
   }
 
   _singleItem(BuildContext context, TopicModelData item, int index) {
