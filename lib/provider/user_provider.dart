@@ -37,12 +37,12 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> loginWithToken(String token) async {
-      ApiClient.dio.options.headers['token'] = token;
-      Global.saveToken(newToken: token);
-      this.isLogIn = true;
-      var userData = await apiClient.getUserProfile();
-      this.userInfo = UserModel.fromJson(userData['data']);
-      notifyListeners();
+    ApiClient.dio.options.headers['token'] = token;
+    Global.saveToken(newToken: token);
+    this.isLogIn = true;
+    var userData = await apiClient.getUserProfile();
+    this.userInfo = UserModel.fromJson(userData['data']);
+    notifyListeners();
   }
 
   Future<void> getData() async {
@@ -108,6 +108,13 @@ class UserProvider with ChangeNotifier {
         startTime: startTime,
         endTime: endTime,
         description: description);
+    return data;
+  }
+
+  ///关注
+  Future addFollower({int userId}) async {
+    var data = await apiClient.addFollowUser(userId: userId);
+    getUserProfile();
     return data;
   }
 
