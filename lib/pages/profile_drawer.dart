@@ -155,7 +155,7 @@ class ProfileDrawer extends StatelessWidget {
             InkWell(
               onTap: () {
                 Navigator.pop(context);
-                user.getUserProfile();
+                // user.getUserProfile();
                 Application.router.navigateTo(context, Routes.minePage);
               },
               child: Hero(
