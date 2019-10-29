@@ -516,7 +516,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
 
   Future<void> changeHeight() async {
     int length = _schools.length; // 获取较大的列表长度
-    double height = (length / 3).ceil() * 65.0 + 31;
+    double height = (length / 2).ceil() * 65.0 + 31;
     await changeHeightTo(height);
   }
 
