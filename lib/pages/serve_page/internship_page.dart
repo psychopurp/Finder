@@ -47,7 +47,7 @@ class _InternshipPageState extends State<InternshipPage> {
     getBigTypes();
     getInternships();
     _loadController = EasyRefreshController();
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(Duration(milliseconds: 200), () {
       setState(() {
         moreThanMoment = true;
       });

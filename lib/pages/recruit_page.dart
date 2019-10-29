@@ -44,7 +44,7 @@ class _RecruitPageState extends State<RecruitPage> {
     getTypes();
     getRecruitsData();
     _loadController = EasyRefreshController();
-    Future.delayed(Duration(milliseconds: 200), () {
+    Future.delayed(Duration(milliseconds: 50), () {
       setState(() {
         moreThanMoment = true;
       });

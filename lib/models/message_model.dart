@@ -48,7 +48,10 @@ class MessageModel implements Listenable {
     return instance;
   }
 
-  getDataInterval({Duration duration: const Duration(seconds: 30)}) {
+  getDataInterval({Duration duration: const Duration(seconds: 8), bool faster =  false}) {
+    if(faster){
+      duration = const Duration(seconds: 3);
+    }
     if (_timer != null) {
       cancelTimer();
     }

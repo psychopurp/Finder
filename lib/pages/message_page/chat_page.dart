@@ -82,7 +82,7 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     data = MessageModel();
     data.addListener(update);
-    data.getDataInterval(duration: Duration(seconds: 10));
+    data.getDataInterval(faster: true);
     if (!data.users.containsKey(widget.sessionId)) {
       messages = [];
       needSync = true;

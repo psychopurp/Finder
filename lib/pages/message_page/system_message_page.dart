@@ -46,7 +46,7 @@ class _SystemMessagePageState extends State<SystemMessagePage> {
     super.initState();
     data = MessageModel();
     data.addListener(update);
-    data.getDataInterval(duration: Duration(seconds: 10));
+    data.getDataInterval(faster: true);
     messages = data.systems;
     _textController = TextEditingController();
     _focusNode = FocusNode();

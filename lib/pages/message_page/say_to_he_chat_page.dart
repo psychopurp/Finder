@@ -69,7 +69,7 @@ class _SayToHeChatPageState extends State<SayToHeChatPage> {
     super.initState();
     data = MessageModel();
     data.addListener(update);
-    data.getDataInterval(duration: Duration(seconds: 10));
+    data.getDataInterval(faster: true);
     messages = data.says[widget.sessionId];
     data.readSaysMessagesBySessionId(widget.sessionId);
     _textController = TextEditingController();
