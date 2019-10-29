@@ -286,9 +286,8 @@ var privacyHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       return PrivacyRoute();
     });
-
-
-var serveProtocolHandler = Handler(
+//条款
+var serveProtocolHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ServeProtocolRoute();
 });
