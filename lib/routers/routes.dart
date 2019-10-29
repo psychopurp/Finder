@@ -164,11 +164,9 @@ class Routes {
     router.define(fansFollowPage,
         handler: fansFollowPageHandle,
         transitionType: TransitionType.cupertino);
-<<<<<<< HEAD
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);
-=======
     router.define(modifyInfoPage,
         handler: modifyInfoPageHandle,
         transitionType: TransitionType.cupertino);
@@ -177,6 +175,5 @@ class Routes {
         handler: privacyHandle, transitionType: TransitionType.cupertino);
     router.define(serveProtocol,
         handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
->>>>>>> 4bac0ec3348b31f71a46272909527ac8797c9f72
   }
 }
