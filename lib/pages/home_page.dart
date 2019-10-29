@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
             'Finders',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: 19,
               fontWeight: FontWeight.w600,
             ),
           ),
