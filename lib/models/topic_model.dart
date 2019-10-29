@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/avatar.dart';
 
 class TopicModel {
   List<TopicModelData> data;
@@ -48,9 +49,7 @@ class TopicModelData {
       json['image'] = 'null';
     }
 
-    image = (json['image'][0] == '/')
-        ? ApiClient.host + json['image']
-        : ApiClient.host + '/' + json['image'];
+    image = Avatar.getImageUrl(json['image']);
 
     time = json['time'];
     school =

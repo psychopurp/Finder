@@ -1,11 +1,12 @@
 import 'package:finder/routers/application.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
 
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
-  static double mainHeight = ScreenUtil().setHeight(500);
+  static double mainHeight = ScreenUtil().setHeight(480);
   static double titleHeight = ScreenUtil().setHeight(100);
   HomePageTopics(this.topics);
 
@@ -48,14 +49,6 @@ class HomePageTopics extends StatelessWidget {
                 Container(
                   width: ScreenUtil().setWidth(150),
                   height: titleHeight / 5,
-                  decoration: BoxDecoration(
-                    // color: Colors.amber,
-                    gradient: LinearGradient(colors: [
-                      Colors.white,
-                      Theme.of(context).primaryColor.withOpacity(0.5),
-                      Theme.of(context).primaryColor
-                    ]),
-                  ),
                 ),
                 Text('  与·话题',
                     style: TextStyle(
@@ -65,32 +58,33 @@ class HomePageTopics extends StatelessWidget {
               ],
             ),
           ),
-          InkWell(
+          Expanded(
+            flex: 1,
+            child: Container(),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               Application.router.navigateTo(context, '/home/moreTopics');
             },
-            child: Transform(
-              alignment: AlignmentDirectional(
-                  ScreenUtil().setWidth(14), ScreenUtil().setHeight(0)),
-              transform: Matrix4.identity()..scale(0.9),
               child: Chip(
                 // padding: EdgeInsets.all(0),
-                backgroundColor: Colors.black.withOpacity(0.04),
+                backgroundColor: Colors.white,
                 label: Row(
                   children: <Widget>[
                     Text(
                       '更多 ',
-                      style: TextStyle(fontSize: ScreenUtil().setSp(25)),
+                      style: TextStyle(fontSize: ScreenUtil().setSp(26)),
                     ),
                     Icon(
                       Icons.arrow_forward_ios,
-                      size: ScreenUtil().setSp(25),
+                      size: ScreenUtil().setSp(32),
                     )
                   ],
                 ),
               ),
-            ),
-          )
+          ),
+          Padding(padding: EdgeInsets.all(3),)
         ],
       ),
     );
@@ -99,15 +93,17 @@ class HomePageTopics extends StatelessWidget {
   List<TopicModelData> sortSchoolTopic(bool isSchoolTopics) {
     List<TopicModelData> topics = [];
     if (isSchoolTopics) {
-      for (var i = 0; i < this.topics.data.length; i++) {
-        // print(this.topics.data[i].school);
-        if (this.topics.data[i].school != null) {
-          topics.add(this.topics.data[i]);
+      this.topics.data.forEach((e){
+        if (e.school != null) {
+          topics.add(e);
         }
-      }
-      // this.topics.data.removeWhere((item) => item.school == null);
+      });
     } else {
-      topics.addAll(this.topics.data);
+      this.topics.data.forEach((e){
+        if (e.school == null) {
+          topics.add(e);
+        }
+      });
     }
     return topics;
   }
@@ -117,7 +113,7 @@ class TopicList extends StatelessWidget {
   final double topicListHeight =
       (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2;
   final double topicHeight =
-      (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2 - 5;
+      (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2 - 10;
 
   final bool isSchoolTopics;
   final List<TopicModelData> topicsData;
@@ -159,42 +155,43 @@ class TopicList extends StatelessWidget {
             margin: EdgeInsets.only(right: ScreenUtil().setWidth(20)),
             decoration: BoxDecoration(
               // color: Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(3)),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
               // border: Border.all(color: Colors.black, width: 2),
               image: DecorationImage(
                 image: imageProvider,
-                fit: BoxFit.fill,
+                fit: BoxFit.cover,
               ),
             ),
             child: Stack(
               children: <Widget>[
-                Positioned(
-                    top: ScreenUtil().setHeight(10),
-                    child: Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.only(
-                              // topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                              // bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(20))),
-                      child: Text(
-                        inSchool ? '校内话题' : '校际话题',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: ScreenUtil().setSp(20)),
-                      ),
-                    )),
                 Opacity(
                   opacity: 0.35,
                   child: Container(
                     // width: ScreenUtil().setWidth(750),
                     decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.all(Radius.circular(3))),
+                        color: Color(0xff444444),
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
                   ),
                 ),
+                Positioned(
+                    top: ScreenUtil().setHeight(13),
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 7),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor.withOpacity(0.8),
+                          borderRadius: BorderRadius.only(
+                            // topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                              // bottomLeft: Radius.circular(10),
+                              bottomRight: Radius.circular(20))),
+                      child: Text(
+                        inSchool ? '校内' : '校际',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: ScreenUtil().setSp(22)),
+                      ),
+                    )),
                 Container(
                   alignment: Alignment.center,
                   // color: Colors.blue,

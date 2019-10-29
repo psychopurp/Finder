@@ -58,9 +58,11 @@ class _FansFollowPageState extends State<FansFollowPage>
         bottom: TabBar(
           isScrollable: true,
           labelColor: Colors.black,
-          indicatorWeight: 1,
+          indicatorWeight: 3,
           indicatorColor: Theme.of(context).primaryColor,
           controller: _tabController,
+          labelPadding: EdgeInsets.symmetric(horizontal: 30),
+          labelStyle: TextStyle(fontSize: 16),
           tabs: <Widget>[
             Tab(
               text: "关注",

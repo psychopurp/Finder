@@ -89,12 +89,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
           Positioned(
               left: 0,
               right: 0,
-              top: topPartHeight * 0.5,
+              top: topPartHeight * 1.2,
               child: userCard(user)),
           Positioned(
             // left: ScreenUtil().setWidth(0),
             right: ScreenUtil.screenWidthDp / 2 - 45,
-            top: topPartHeight * 0.5 - 40,
+            top: topPartHeight * 1.2 - 40,
             child: avatar(),
           ),
           // Positioned(

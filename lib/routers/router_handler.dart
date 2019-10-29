@@ -284,9 +284,10 @@ var changeUserProfilePageHandler = Handler(
 //条款
 var privacyHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return PrivacyRoute();
+  return ServeProtocolRoute();
 });
-var serveProtocolHandle = Handler(
+
+var serveProtocolHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ServeProtocolRoute();
 });

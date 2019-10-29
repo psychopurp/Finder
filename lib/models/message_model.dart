@@ -42,6 +42,9 @@ class MessageModel implements Listenable {
     if (instance == null) {
       instance = MessageModel._init();
     }
+    if(instance.self == null){
+      instance.getSelf();
+    }
     return instance;
   }
 
@@ -70,11 +73,12 @@ class MessageModel implements Listenable {
           getData();
         }
       });
+      getData();
       getDataInterval();
     });
   }
 
-  void reset() async {
+  Future<void> reset() async {
     systems = [];
     tips = [];
     users = {};

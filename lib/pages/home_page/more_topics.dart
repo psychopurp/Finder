@@ -5,8 +5,10 @@ import 'package:finder/models/topic_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:flutter/rendering.dart';
+
 //easyrefresh
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+
 // import 'package:flutter_easyrefresh/bezier_circle_header.dart';
 // import 'package:flutter_easyrefresh/bezier_bounce_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
@@ -26,6 +28,7 @@ class MoreTopics extends StatefulWidget {
 class _MoreTopicsState extends State<MoreTopics>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
+
   @override
   void initState() {
     _tabController = new TabController(vsync: this, length: 2);
@@ -40,16 +43,38 @@ class _MoreTopicsState extends State<MoreTopics>
 
   @override
   Widget build(BuildContext context) {
+    var appBarColor = Color.fromARGB(255, 95, 95, 95);
+    var appBarIconColor = Color.fromARGB(255, 155, 155, 155);
     return Scaffold(
         appBar: AppBar(
-          title: Text('话题'),
+          brightness: Brightness.light,
+          backgroundColor: Colors.white,
+          leading: MaterialButton(
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: appBarIconColor,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            "话题",
+            style: TextStyle(
+              color: appBarColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          elevation: 0.5,
           centerTitle: true,
           bottom: new TabBar(
-            labelStyle: TextStyle(fontSize: 15),
+            labelStyle: TextStyle(fontSize: 16),
             isScrollable: true,
-            labelColor: Colors.white,
-            indicatorColor: Colors.white,
-            indicatorWeight: 1,
+            labelColor: appBarColor,
+            labelPadding: EdgeInsets.symmetric(horizontal: 30),
+            indicatorColor: Theme.of(context).primaryColor,
+            indicatorWeight: 3,
             tabs: <Widget>[
               new Tab(
                 child: Text(
@@ -115,7 +140,9 @@ class _MoreTopicsState extends State<MoreTopics>
 
 class Topics extends StatefulWidget {
   final bool isSchoolTopics;
+
   Topics({this.isSchoolTopics});
+
   @override
   _TopicsState createState() => _TopicsState(isSchoolTopics: isSchoolTopics);
 }
@@ -126,10 +153,12 @@ class _TopicsState extends State<Topics>
   final double topicHeight = ScreenUtil().setHeight(430);
 
   _TopicsState({this.isSchoolTopics});
+
   TopicModel topics;
   int pageCount = 2;
   int itemCount = 0;
   EasyRefreshController _refreshController;
+
   @override
   bool get wantKeepAlive => true;
 
@@ -168,6 +197,7 @@ class _TopicsState extends State<Topics>
         controller: _refreshController,
         onRefresh: () async {
           await Future.delayed(Duration(microseconds: 500), () {
+            topics.data = [];
             _getInitialTopicsData(2);
           });
           _refreshController.resetLoadState();
@@ -213,6 +243,8 @@ class _TopicsState extends State<Topics>
 
     if (isSchoolTopics) {
       topics.data.removeWhere((item) => item.school == null);
+    }else{
+      topics.data.removeWhere((item) => item.school != null);
     }
     // print('topicsData=======>${topicsData}');
     if (!mounted) return;
@@ -229,6 +261,8 @@ class _TopicsState extends State<Topics>
     TopicModel topics = TopicModel.fromJson(topicsData);
     if (isSchoolTopics) {
       topics.data.removeWhere((item) => item.school == null);
+    }else{
+      topics.data.removeWhere((item) => item.school != null);
     }
 
     setState(() {

@@ -65,7 +65,14 @@ class _ServePageState extends State<ServePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('服务'),
+        title: Text(
+          '服务',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         centerTitle: true,
       ),
       // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),

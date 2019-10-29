@@ -1,13 +1,18 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Avatar extends StatelessWidget {
   Avatar({@required this.url, this.avatarHeight = 50, this.iconSize = 30});
+
   final String url;
   final double avatarHeight;
   final double iconSize;
+
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
@@ -52,20 +57,24 @@ class Avatar extends StatelessWidget {
   }
 
   static String getImageUrl(String url) {
-    String baseUrl = ApiClient.host;
-    if(url == null){
-      return "/static/default.png";
-    }
-    if (url.startsWith("http")) {
-      return url;
-    } else
-      return baseUrl + url;
-//    String baseUrl = "https://image.finder-nk.com";    if(url == null){
-//      return "/static/default.jpg";
+//    String baseUrl = ApiClient.host;
+//    if (url == null) {
+//      return baseUrl + "/static/default.png";
 //    }
 //    if (url.startsWith("http")) {
 //      return url;
 //    } else
 //      return baseUrl + url;
+    String baseUrl = "https://image.finder-nk.com";
+    if (url == null) {
+      return baseUrl + "/static/default.png";
+    }
+    if (url.startsWith("http")) {
+      return url;
+    } else if (url.startsWith("/media")) {
+      return baseUrl + url.substring(6);
+    } else {
+      return baseUrl + url;
+    }
   }
 }

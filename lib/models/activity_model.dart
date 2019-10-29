@@ -88,13 +88,7 @@ class ActivityModelData {
     if (json['poster'] == null) {
       json['poster'] = 'null';
     }
-    if (!json['poster'].startsWith("http")) {
-      poster = (json['poster'][0] == '/')
-          ? ApiClient.host + json['poster']
-          : ApiClient.host + '/' + json['poster'];
-    } else {
-      poster = json['poster'];
-    }
+    poster = Avatar.getImageUrl(json['poster']);
     description = json['description'];
     signUpLocation = json['sign_up_location'];
     position = json['position'];

@@ -19,6 +19,7 @@ class HeSaysDetail extends StatefulWidget {
 
 class _HeSaysDetailState extends State<HeSaysDetail> {
   Map<String, Map<String, dynamic>> menuItem;
+  bool isLike = false;
 
   void _handleShare() {
     print("handleShare");
@@ -36,6 +37,8 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
   }
 
   handleLike(HeSheSayItem item, bool status) async {
+    if(isLike) return;
+    isLike = true;
     Dio dio = ApiClient.dio;
     var data = {"like": status, "id": item.id};
     var jsonData = json.encode(data);
@@ -72,6 +75,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
               ],
             );
           });
+      isLike = false;
     }
 //    setState(() {
 //      item.isLike = status;

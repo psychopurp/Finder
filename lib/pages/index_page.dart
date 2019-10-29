@@ -37,7 +37,6 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    MessageModel().addListener(update);
     Future.delayed(Duration(milliseconds: 300), () {
       String nickName = Provider.of<UserProvider>(context).userInfo.nickname;
       bool notRegister = nickName == "" || nickName == null;
@@ -46,13 +45,16 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
             new MaterialPageRoute(builder: (context) => new RegisterPage()),
             (route) => route == null);
       }
+      MessageModel().addListener(update);
     });
   }
 
   @override
   void dispose() {
     super.dispose();
-    MessageModel().removeListener(update);
+    if(MessageModel.instance != null){
+      MessageModel().removeListener(update);
+    }
   }
 
   @override

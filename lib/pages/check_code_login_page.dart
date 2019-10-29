@@ -30,6 +30,7 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
   bool isRegister = false;
   TextEditingController _checkCodeController;
   bool isGet = false;
+  bool loading = false;
 
   @override
   void initState() {
@@ -67,6 +68,10 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
   }
 
   Future<bool> getCheckCode() async {
+    if (loading) return false;
+    setState(() {
+      loading = true;
+    });
     RegExp phoneReg = RegExp(r"1[35789]\d{9}");
     bool right = phoneReg.hasMatch(_phone) && _phone.length == 11;
     if (!right) {
@@ -94,6 +99,9 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
     } on DioError catch (e) {
       print(e);
     }
+    setState(() {
+      loading = false;
+    });
     return null;
   }
 
@@ -252,7 +260,8 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
             minWidth: ScreenUtil.screenWidthDp / 3,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Text(leftTime == 0 ? "获取验证码" : "$leftTime"),
+            child: Text(
+                leftTime == 0 ? loading ? "加载中..." : "获取验证码" : "$leftTime"),
             onPressed: leftTime == 0
                 ? () {
                     getCheckCode();

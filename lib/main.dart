@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:finder/pages/index_page.dart';
 import 'package:finder/pages/login_page.dart';
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
             navigatorObservers: [BotToastNavigatorObserver()],
             onGenerateRoute: Application.router.generator,
             theme: _buildAppTheme(), //设置App主题
-            title: 'Finder',
+            title: 'Findes寻你',
             debugShowCheckedModeBanner: false,
             home: isLogin  ? IndexPage() : LoginPage(),
 //            home: isLogin && false ? IndexPage() : RegisterPage(),

@@ -7,7 +7,7 @@ import 'package:finder/models/activity_model.dart';
 
 class HomePageActivities extends StatelessWidget {
   final ActivityModel activities;
-  final double mainHeight = ScreenUtil().setHeight(500);
+  final double mainHeight = ScreenUtil().setHeight(480);
   final double titleHeight = ScreenUtil().setHeight(80);
   HomePageActivities(this.activities);
   @override
@@ -44,14 +44,14 @@ class HomePageActivities extends StatelessWidget {
                 Container(
                   width: ScreenUtil().setWidth(150),
                   height: titleHeight / 4,
-                  decoration: BoxDecoration(
-                    // color: Colors.amber,
-                    gradient: LinearGradient(colors: [
-                      Colors.white,
-                      Theme.of(context).primaryColor.withOpacity(0.5),
-                      Theme.of(context).primaryColor
-                    ]),
-                  ),
+//                  decoration: BoxDecoration(
+//                    // color: Colors.amber,
+//                    gradient: LinearGradient(colors: [
+//                      Colors.white,
+//                      Theme.of(context).primaryColor.withOpacity(0.5),
+//                      Theme.of(context).primaryColor
+//                    ]),
+//                  ),
                 ),
                 Text('  知·活动',
                     style: TextStyle(
@@ -60,33 +60,33 @@ class HomePageActivities extends StatelessWidget {
                         fontWeight: FontWeight.w600)),
               ],
             ),
+          ),          Expanded(
+            flex: 1,
+            child: Container(),
           ),
-          InkWell(
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               Application.router.navigateTo(context, '/home/moreActivities');
             },
-            child: Transform(
-              alignment: AlignmentDirectional(
-                  ScreenUtil().setWidth(14), ScreenUtil().setHeight(0)),
-              transform: Matrix4.identity()..scale(0.9),
-              child: Chip(
-                // padding: EdgeInsets.all(0),
-                backgroundColor: Colors.black.withOpacity(0.04),
-                label: Row(
-                  children: <Widget>[
-                    Text(
-                      '更多 ',
-                      style: TextStyle(fontSize: ScreenUtil().setSp(25)),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: ScreenUtil().setSp(25),
-                    )
-                  ],
-                ),
+            child: Chip(
+              // padding: EdgeInsets.all(0),
+              backgroundColor: Colors.white,
+              label: Row(
+                children: <Widget>[
+                  Text(
+                    '更多 ',
+                    style: TextStyle(fontSize: ScreenUtil().setSp(26)),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: ScreenUtil().setSp(32),
+                  )
+                ],
               ),
             ),
-          )
+          ),
+          Padding(padding: EdgeInsets.all(3),)
         ],
       ),
     );
@@ -110,7 +110,7 @@ class HomePageActivities extends StatelessWidget {
 
   _singleItem(BuildContext context, ActivityModelData item, int index) {
     // bool isLastItem = (index == this.activities.data.length - 1);
-    double picWidth = ScreenUtil().setWidth(220);
+    double picWidth = ScreenUtil().setWidth(230);
 
     ///宽高比 1/1.4
     double picHeight = picWidth * 1.4;
@@ -125,7 +125,7 @@ class HomePageActivities extends StatelessWidget {
         child: Align(
           child: Container(
             width: picWidth,
-            height: picWidth * 1.8,
+            height: picWidth * 1.9,
             // color: Colors.yellow,
             margin: EdgeInsets.only(
               right: ScreenUtil().setWidth(20),
@@ -138,14 +138,15 @@ class HomePageActivities extends StatelessWidget {
                   width: picWidth,
                   decoration: BoxDecoration(
                     // color: Colors.green,
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(10),
                     // border: Border.all(color: Colors.black, width: 2),
                     image: DecorationImage(
                       image: imageProvider,
-                      fit: BoxFit.fill,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
+                Padding(padding: EdgeInsets.all(5),),
                 Container(
                   width: picWidth,
                   padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),

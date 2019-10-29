@@ -257,22 +257,22 @@ class MySwiperPlugin extends StatelessWidget {
                 Container(
                   width: 10.0,
                 ),
-                GestureDetector(
-                  child: Container(
-                    padding: EdgeInsets.only(right: 10.0),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Save",
-                    ),
-                  ),
-                  onTap: () {
-                    // saveNetworkImageToPhoto(pics[index].picUrl)
-                    //     .then((bool done) {
-                    //   showToast(done ? "save succeed" : "save failed",
-                    //       position: ToastPosition(align: Alignment.topCenter));
-                    // });
-                  },
-                )
+//                GestureDetector(
+//                  child: Container(
+//                    padding: EdgeInsets.only(right: 10.0),
+//                    alignment: Alignment.center,
+//                    child: Text(
+//                      "Save",
+//                    ),
+//                  ),
+//                  onTap: () {
+////                     saveNetworkImageToPhoto(pics[index].picUrl)
+////                         .then((bool done) {
+////                       showToast(done ? "save succeed" : "save failed",
+////                           position: ToastPosition(align: Alignment.topCenter));
+////                     });
+//                  },
+//                )
               ],
             ),
           ),

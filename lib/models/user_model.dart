@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:finder/config/api_client.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 
@@ -50,9 +49,8 @@ class UserModel {
     major = json['major'];
     fanCount = json['fan_count'];
     followCount = json['follow_count'];
-
-    realName = json['real_name'] != null ? json['real_name'] : null;
     studentId = json["student_id"];
+    realName = json['real_name'] != null ? json['real_name'] : "";
     isFollowed = json['is_followed'] != null ? json['is_followed'] : null;
     isBothFollowed =
         json['is_both_followed'] != null ? json['is_both_followed'] : null;
@@ -68,7 +66,9 @@ class UserModel {
     final Map<String, dynamic> json = new Map<String, dynamic>();
     json['nickname'] = this.nickname;
     json['phone'] = this.phone;
-    json['avatar'] = this.avatar.substring(this.avatar.indexOf('/m'));
+    json['avatar'] = this.avatar.substring(this.avatar.indexOf('/s') == -1
+        ? this.avatar.indexOf("/1")
+        : this.avatar.indexOf('/s'));
     json['introduction'] = this.introduction;
     json['real_name'] = realName;
     json["student_id"] = studentId;

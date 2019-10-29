@@ -123,7 +123,7 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
         Provider.of<UserProvider>(context).getData();
         Navigator.of(context).pop();
       } else {
-        showErrorHint(context, "网络连接失败, 请稍后再试");
+        showErrorHint(context, result["error"]);
       }
     } on DioError catch (e) {
       print(e);
