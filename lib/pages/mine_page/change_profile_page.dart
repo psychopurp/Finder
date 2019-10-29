@@ -62,7 +62,7 @@ class _ChangeProfilePageState extends State<ChangeProfilePage> {
       },
       'school': {
         'name': '学校',
-        'data': widget.user.school.name,
+        'data': widget.user.school != null ? widget.user.school.name : null,
         'handler': handleIntroduction
       },
       'major': {

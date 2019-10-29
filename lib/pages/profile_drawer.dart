@@ -71,7 +71,7 @@ class ProfileDrawer extends StatelessWidget {
             ["专业", user.userInfo.major ?? "专业"],
           ];
           List<Widget> children = <Widget>[
-            topUserInfo(user.userInfo, context),
+            topUserInfo(user, context),
             ListTile()
           ];
           children.addAll(List<Widget>.generate(
@@ -115,14 +115,14 @@ class ProfileDrawer extends StatelessWidget {
     );
   }
 
-  topUserInfo(UserModel user, context) {
+  topUserInfo(UserProvider user, context) {
     double borderRadius = 10;
 
     Widget avatar = Container(
         height: 100,
         width: 100,
         child: Avatar(
-          url: user.avatar,
+          url: user.userInfo.avatar,
           avatarHeight: 100,
         ),
         decoration: BoxDecoration(
@@ -155,6 +155,7 @@ class ProfileDrawer extends StatelessWidget {
             InkWell(
               onTap: () {
                 Navigator.pop(context);
+                user.getUserProfile();
                 Application.router.navigateTo(context, Routes.minePage);
               },
               child: Hero(

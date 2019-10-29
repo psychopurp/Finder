@@ -7,7 +7,7 @@ import 'package:finder/models/activity_model.dart';
 
 class HomePageActivities extends StatelessWidget {
   final ActivityModel activities;
-  final double mainHeight = ScreenUtil().setHeight(480);
+  final double mainHeight = ScreenUtil().setHeight(510);
   final double titleHeight = ScreenUtil().setHeight(80);
   HomePageActivities(this.activities);
   @override
@@ -16,7 +16,7 @@ class HomePageActivities extends StatelessWidget {
       // height: mainHeight,
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 20),
-      color: Colors.white,
+      // color: Colors.blue,
       child: Column(
         children: <Widget>[_title(context), _activityPart()],
       ),
@@ -60,7 +60,8 @@ class HomePageActivities extends StatelessWidget {
                         fontWeight: FontWeight.w600)),
               ],
             ),
-          ),          Expanded(
+          ),
+          Expanded(
             flex: 1,
             child: Container(),
           ),
@@ -86,7 +87,9 @@ class HomePageActivities extends StatelessWidget {
               ),
             ),
           ),
-          Padding(padding: EdgeInsets.all(3),)
+          Padding(
+            padding: EdgeInsets.all(3),
+          )
         ],
       ),
     );
@@ -125,7 +128,7 @@ class HomePageActivities extends StatelessWidget {
         child: Align(
           child: Container(
             width: picWidth,
-            height: picWidth * 1.9,
+            // height: picWidth * 1.9,
             // color: Colors.yellow,
             margin: EdgeInsets.only(
               right: ScreenUtil().setWidth(20),
@@ -146,7 +149,9 @@ class HomePageActivities extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(padding: EdgeInsets.all(5),),
+                Padding(
+                  padding: EdgeInsets.all(5),
+                ),
                 Container(
                   width: picWidth,
                   padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
