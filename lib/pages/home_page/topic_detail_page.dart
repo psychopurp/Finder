@@ -520,34 +520,34 @@ class _TopicCommentsState extends State<TopicComments> {
     if (user.isLogIn) {
       if (user.userInfo.id == item.sender.id) {
         showDialog(
-            context: context,
-            builder: (_) {
-              return GestureDetector(
-                onTap: () async {
-                  Navigator.pop(context);
-                  showDialog(
-                      context: context,
-                      builder: (_) {
-                        return FinderDialog.showLoading();
-                      });
-
-                  var data =
-                      await apiClient.deleteTopicComment(commentId: item.id);
-                  await getInitialData();
-
-                  widget.controller.animateTo(0,
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.bounceIn);
-
-                  Navigator.pop(context);
-                },
-                child: CupertinoAlertDialog(
-                  title: Text('删除话题评论',
-                      style: TextStyle(
-                          fontFamily: 'normal', fontWeight: FontWeight.w200)),
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text("提示"),
+              content: Text("确认要输出此条回复吗? "),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("取消"),
+                  onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                 ),
-              );
-            });
+                FlatButton(
+                    child: Text("删除"),
+                    onPressed: () async {
+                      FinderDialog.showLoading();
+                      var data =
+                      await apiClient.deleteTopicComment(commentId: item.id);
+                      await getInitialData();
+
+                      widget.controller.animateTo(0,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.bounceIn);
+
+                      Navigator.pop(context);
+                    }),
+              ],
+            );
+          },
+        );
       }
     }
   }
