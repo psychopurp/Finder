@@ -1,4 +1,3 @@
-import 'package:finder/config/api_client.dart';
 import 'package:finder/plugin/avatar.dart';
 
 //首页轮播图模型

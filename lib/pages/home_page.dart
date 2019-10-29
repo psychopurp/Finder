@@ -1,9 +1,7 @@
-import 'package:finder/models/message_model.dart';
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
 import 'package:finder/provider/user_provider.dart';
-import 'package:finder/public.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';

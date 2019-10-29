@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/pages/mine_page/change_profile_page.dart';
 import 'package:finder/plugin/gradient_generator.dart';
@@ -26,61 +27,83 @@ class _MinePageState extends State<MinePage> {
   List<Asset> images = [];
   var cards;
 
+  bool isUpdateBackground = false;
+
+  UserModel updateUser;
+
   @override
   void initState() {
+    getInitialData();
     cards = {
       'topic': {'name': '话题 (待完善)'},
       'activity': {'name': '活动(待完善)'},
       'toHeSay': {'name': '表白Ta'},
       'message': {'name': '私信Ta'}
     };
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Consumer<UserProvider>(builder: (context, user, child) {
-        // user.getUserProfile();
-        if (user.userInfo.backGround == null) {
-          imageToColors(user.userInfo.avatar).then((val) {
-            user.userInfo.backGround = val;
-            setState(() {});
-          });
-        }
+    // final user = Provider.of<UserProvider>(context);
+    // user.userInfo = updateUser != null ? updateUser : user.userInfo;
 
-        print(user.collection);
-        return SafeArea(
-          top: false,
-          child: Container(
-            child: MyAppBar(
-              appbar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-              ),
-              child: Stack(
-                alignment: Alignment.topCenter,
-                fit: StackFit.expand,
-                children: <Widget>[
-                  buildBackground(user.userInfo),
-                  Positioned(
-                      left: 0,
-                      right: 0,
-                      top: topPartHeight * 1.5,
-                      child: userCard(user.userInfo)),
-                  Positioned(
-                    // left: ScreenUtil().setWidth(0),
-                    // right: 0,
-                    top: topPartHeight * 1.5 - 40,
-                    child: avatar(user.userInfo),
-                  )
-                ],
-              ),
+    return Scaffold(
+        body: SafeArea(
+      top: false,
+      child: Container(
+        child: MyAppBar(
+            appbar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
             ),
-          ),
-        );
-      }),
-    );
+            child: body),
+      ),
+    ));
+  }
+
+  Widget get body {
+    // print(this.updateUser);
+    Widget child;
+    if (this.updateUser == null) {
+      child = Stack(children: <Widget>[
+        buildBackground(),
+        Container(
+            alignment: Alignment.center,
+            height: double.infinity,
+            child: CupertinoActivityIndicator())
+      ]);
+    } else {
+      child = Stack(
+        alignment: Alignment.topCenter,
+        fit: StackFit.expand,
+        children: <Widget>[
+          buildBackground(),
+          Positioned(
+              left: 0,
+              right: 0,
+              top: topPartHeight * 1.5,
+              child: userCard(this.updateUser)),
+          Positioned(
+            // left: ScreenUtil().setWidth(0),
+            // right: 0,
+            top: topPartHeight * 1.5 - 40,
+            child: avatar(this.updateUser),
+          )
+        ],
+      );
+    }
+
+    return AnimatedSwitcher(
+        duration: Duration(milliseconds: 3000),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+              child: child,
+              opacity:
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+        },
+        child: Container(key: ValueKey(this.updateUser == null), child: child));
   }
 
   avatar(UserModel userInfo) => GestureDetector(
@@ -197,10 +220,10 @@ class _MinePageState extends State<MinePage> {
         ),
       );
 
-  buildBackground(UserModel user) {
+  buildBackground() {
     double cardWidth = 130;
-    List<Color> backGroundColor = user.backGround != null
-        ? user.backGround
+    List<Color> backGroundColor = this.isUpdateBackground
+        ? this.updateUser.backGround
         : [Theme.of(context).primaryColor];
 
     Widget getCard(item) => Card(
@@ -219,7 +242,7 @@ class _MinePageState extends State<MinePage> {
     List<Widget> content = [];
 
     Widget backGround = Container(
-      key: ValueKey(user.backGround),
+      key: ValueKey(this.isUpdateBackground),
       height: ScreenUtil.screenHeightDp,
       decoration: BoxDecoration(
           gradient: GradientGenerator.linear(backGroundColor.first,
@@ -229,7 +252,7 @@ class _MinePageState extends State<MinePage> {
     backGround = AnimatedSwitcher(
       switchInCurve: Curves.easeIn,
       switchOutCurve: Curves.easeOut,
-      duration: Duration(milliseconds: 5000),
+      duration: Duration(milliseconds: 3000),
       child: backGround,
     );
 
@@ -278,7 +301,8 @@ class _MinePageState extends State<MinePage> {
   }
 
   Widget userCard(UserModel user) {
-    return Card(
+    Widget card = Card(
+        key: ValueKey(this.updateUser),
         margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(100)),
         color: Colors.white,
         elevation: 10,
@@ -369,5 +393,21 @@ class _MinePageState extends State<MinePage> {
             ],
           ),
         ));
+    return card;
+  }
+
+  getInitialData() async {
+    var data = await apiClient.getUserProfile();
+    UserModel userData = UserModel.fromJson(data['data']);
+    setState(() {
+      this.updateUser = userData;
+      print('更新用户信息');
+    });
+    List<Color> colors = await imageToColors(userData.avatar);
+    this.updateUser.backGround = colors;
+    setState(() {
+      print('更新背景');
+      this.isUpdateBackground = true;
+    });
   }
 }

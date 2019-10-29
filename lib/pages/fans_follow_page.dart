@@ -1,12 +1,8 @@
-import 'dart:convert';
-
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/follower_model.dart';
-import 'package:finder/models/user_model.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
-import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -155,11 +151,10 @@ class _TabBodyState extends State<TabBody> {
           _refreshController.resetLoadState();
         },
         onLoad: () async {
-          var data = await getMore(pageCount: this.pageCount);
-          await Future.delayed(Duration(seconds: 2), () {});
-          print("data===$data");
-          _refreshController.finishLoad(
-              success: true, noMore: (data.length == 0));
+          bool hasMore = await getMore(pageCount: this.pageCount);
+          await Future.delayed(Duration(seconds: 1), () {});
+          // print("data===$data");
+          _refreshController.finishLoad(success: true, noMore: (!hasMore));
         },
       );
     }
@@ -219,7 +214,7 @@ class _TabBodyState extends State<TabBody> {
                   Padding(
                     padding: EdgeInsets.only(left: 10.0, top: 5.0),
                     child: Text(
-                      item.introduction,
+                      item.introduction != null ? item.introduction : "",
                       style: Theme.of(context).textTheme.body2,
                     ),
                   ),
@@ -319,8 +314,9 @@ class _TabBodyState extends State<TabBody> {
   Future getInitialData() async {
     var data = await apiClient.getFollowers(
         userId: widget.userId, isFan: !widget.isFollow);
-
+    print(data);
     FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFollow);
+    // print(followerModel);
 
     if (!mounted) return;
     setState(() {
@@ -329,7 +325,7 @@ class _TabBodyState extends State<TabBody> {
     });
   }
 
-  Future getMore({int pageCount}) async {
+  Future<bool> getMore({int pageCount}) async {
     var data = await apiClient.getFollowers(
         page: pageCount, userId: widget.userId, isFan: !widget.isFollow);
 
@@ -339,6 +335,6 @@ class _TabBodyState extends State<TabBody> {
       this.follower.data.addAll(followerModel.data);
       this.pageCount++;
     });
-    return followerModel.data;
+    return followerModel.hasMore;
   }
 }
