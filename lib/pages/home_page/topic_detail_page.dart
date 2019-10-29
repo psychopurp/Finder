@@ -188,7 +188,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             image: DecorationImage(
               image: imageProvider,
               fit: BoxFit.cover,
-
             ),
           ),
           child: Stack(
@@ -768,7 +767,6 @@ class _TopicCommentsState extends State<TopicComments> {
                             return PicSwiper(
                               index: index,
                               pics: images,
-
                             );
                           }));
                     },

@@ -29,11 +29,11 @@ class _MinePageState extends State<MinePage> {
 
   bool isUpdateBackground = false;
 
-  UserModel updateUser;
+  UserModel userInfo;
 
   @override
   void initState() {
-    getInitialData();
+    // getInitialData();
     cards = {
       'topic': {'name': '话题 (待完善)'},
       'activity': {'name': '活动(待完善)'},
@@ -46,8 +46,17 @@ class _MinePageState extends State<MinePage> {
 
   @override
   Widget build(BuildContext context) {
-    // final user = Provider.of<UserProvider>(context);
-    // user.userInfo = updateUser != null ? updateUser : user.userInfo;
+    final user = Provider.of<UserProvider>(context);
+    this.userInfo = user.userInfo;
+    if (this.userInfo.backGround == null) {
+      imageToColors(userInfo.avatar).then((val) {
+        this.userInfo.backGround = val;
+        setState(() {
+          print('更新背景');
+          this.isUpdateBackground = true;
+        });
+      });
+    }
 
     return Scaffold(
         body: SafeArea(
@@ -64,9 +73,9 @@ class _MinePageState extends State<MinePage> {
   }
 
   Widget get body {
-    // print(this.updateUser);
+    // print(this.userInfo);
     Widget child;
-    if (this.updateUser == null) {
+    if (this.userInfo == null) {
       child = Stack(children: <Widget>[
         buildBackground(),
         Container(
@@ -84,12 +93,12 @@ class _MinePageState extends State<MinePage> {
               left: 0,
               right: 0,
               top: topPartHeight * 1.5,
-              child: userCard(this.updateUser)),
+              child: userCard(this.userInfo)),
           Positioned(
             // left: ScreenUtil().setWidth(0),
             // right: 0,
             top: topPartHeight * 1.5 - 40,
-            child: avatar(this.updateUser),
+            child: avatar(this.userInfo),
           )
         ],
       );
@@ -103,7 +112,7 @@ class _MinePageState extends State<MinePage> {
               opacity:
                   CurvedAnimation(curve: Curves.easeInOut, parent: animation));
         },
-        child: Container(key: ValueKey(this.updateUser == null), child: child));
+        child: Container(key: ValueKey(this.userInfo == null), child: child));
   }
 
   avatar(UserModel userInfo) => GestureDetector(
@@ -222,8 +231,8 @@ class _MinePageState extends State<MinePage> {
 
   buildBackground() {
     double cardWidth = 130;
-    List<Color> backGroundColor = this.isUpdateBackground
-        ? this.updateUser.backGround
+    List<Color> backGroundColor = this.userInfo.backGround != null
+        ? this.userInfo.backGround
         : [Theme.of(context).primaryColor];
 
     Widget getCard(item) => Card(
@@ -302,7 +311,7 @@ class _MinePageState extends State<MinePage> {
 
   Widget userCard(UserModel user) {
     Widget card = Card(
-        key: ValueKey(this.updateUser),
+        key: ValueKey(this.userInfo),
         margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(100)),
         color: Colors.white,
         elevation: 10,
@@ -400,11 +409,11 @@ class _MinePageState extends State<MinePage> {
     var data = await apiClient.getUserProfile();
     UserModel userData = UserModel.fromJson(data['data']);
     setState(() {
-      this.updateUser = userData;
+      this.userInfo = userData;
       print('更新用户信息');
     });
     List<Color> colors = await imageToColors(userData.avatar);
-    this.updateUser.backGround = colors;
+    this.userInfo.backGround = colors;
     setState(() {
       print('更新背景');
       this.isUpdateBackground = true;

@@ -66,14 +66,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
               backgroundColor: Colors.transparent,
               elevation: 0,
             ),
-            child: body,
+            child: body(userProvider),
           ),
         ),
       ),
     );
   }
 
-  Widget get body {
+  Widget body(UserProvider userProvider) {
     Widget child;
     if (this.user == null) {
       child = Container(
@@ -90,7 +90,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               left: 0,
               right: 0,
               top: topPartHeight * 1.2,
-              child: userCard(user)),
+              child: userCard(user, userProvider)),
           Positioned(
             // left: ScreenUtil().setWidth(0),
             right: ScreenUtil.screenWidthDp / 2 - 45,
@@ -132,7 +132,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
       );
 
-  followButton() {
+  followButton(UserProvider userProvider) {
     Widget child = Text(user.isFollowed ? '已关注' : '关注',
         style:
             TextStyle(color: user.isFollowed ? Colors.black38 : Colors.white));
@@ -142,7 +142,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       onPressed: () async {
         user.isFollowed = !user.isFollowed;
         user.fanCount = user.isFollowed ? user.fanCount + 1 : user.fanCount - 1;
-        var data = await apiClient.addFollowUser(userId: user.id);
+        var data = await userProvider.addFollower(userId: user.id);
         // print(data);
         setState(() {});
       },
@@ -226,7 +226,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget userCard(UserModel user) {
+  Widget userCard(UserModel user, UserProvider userProvider) {
     return Card(
         margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(100)),
         color: Colors.white,
@@ -299,7 +299,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
-              (user.id == userItSelfId) ? Container() : followButton(),
+              (user.id == userItSelfId)
+                  ? Container()
+                  : followButton(userProvider),
             ],
           ),
         ));
