@@ -293,21 +293,21 @@ class _MinePageState extends State<MinePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: ScreenUtil().setWidth(430)),
-                child: MaterialButton(
-                  shape: CircleBorder(),
-                  onPressed: () {
-                    Navigator.push(context, CupertinoPageRoute(builder: (_) {
-                      return ChangeProfilePage(
-                        user: user,
-                      );
-                    }));
-                  },
-                  child: Icon(Icons.settings),
-                ),
-              ),
-              // SizedBox(height: 50),
+              // Padding(
+              //   padding: EdgeInsets.only(left: ScreenUtil().setWidth(430)),
+              //   child: MaterialButton(
+              //     shape: CircleBorder(),
+              //     onPressed: () {
+              //       Navigator.push(context, CupertinoPageRoute(builder: (_) {
+              //         return ChangeProfilePage(
+              //           user: user,
+              //         );
+              //       }));
+              //     },
+              //     child: Icon(Icons.settings),
+              //   ),
+              // ),
+              SizedBox(height: 50),
 
               ///昵称
               Text(

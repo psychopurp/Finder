@@ -67,45 +67,48 @@ class HomePageTopics extends StatelessWidget {
             onTap: () {
               Application.router.navigateTo(context, '/home/moreTopics');
             },
-              child: Chip(
-                // padding: EdgeInsets.all(0),
-                backgroundColor: Colors.white,
-                label: Row(
-                  children: <Widget>[
-                    Text(
-                      '更多 ',
-                      style: TextStyle(fontSize: ScreenUtil().setSp(26)),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: ScreenUtil().setSp(32),
-                    )
-                  ],
-                ),
+            child: Chip(
+              // padding: EdgeInsets.all(0),
+              backgroundColor: Colors.white,
+              label: Row(
+                children: <Widget>[
+                  Text(
+                    '更多 ',
+                    style: TextStyle(fontSize: ScreenUtil().setSp(26)),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: ScreenUtil().setSp(32),
+                  )
+                ],
               ),
+            ),
           ),
-          Padding(padding: EdgeInsets.all(3),)
+          Padding(
+            padding: EdgeInsets.all(3),
+          )
         ],
       ),
     );
   }
 
   List<TopicModelData> sortSchoolTopic(bool isSchoolTopics) {
-    List<TopicModelData> topics = [];
+    List<TopicModelData> newTopics = [];
     if (isSchoolTopics) {
-      this.topics.data.forEach((e){
+      this.topics.data.forEach((e) {
         if (e.school != null) {
-          topics.add(e);
+          newTopics.add(e);
         }
       });
     } else {
-      this.topics.data.forEach((e){
+      this.topics.data.forEach((e) {
         if (e.school == null) {
-          topics.add(e);
+          newTopics.add(e);
         }
       });
     }
-    return topics;
+
+    return newTopics;
   }
 }
 
@@ -179,9 +182,10 @@ class TopicList extends StatelessWidget {
                       alignment: Alignment.center,
                       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 7),
                       decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.8),
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.8),
                           borderRadius: BorderRadius.only(
-                            // topLeft: Radius.circular(20),
+                              // topLeft: Radius.circular(20),
                               topRight: Radius.circular(20),
                               // bottomLeft: Radius.circular(10),
                               bottomRight: Radius.circular(20))),

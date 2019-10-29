@@ -173,7 +173,7 @@ class Routes {
     router.define(privacy,
         handler: privacyHandle, transitionType: TransitionType.cupertino);
     router.define(serveProtocol,
-        handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
+        handler: serveProtocolHandler, transitionType: TransitionType.cupertino);
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);

@@ -234,23 +234,31 @@ class _TopicsState extends State<Topics>
   ///初始话数据
   Future _getInitialTopicsData(int pageCount) async {
     var topicsData = await apiClient.getTopics(page: 1);
-    TopicModel topics = TopicModel.fromJson(topicsData);
+    TopicModel newTopics = TopicModel.fromJson(topicsData);
     for (int i = 2; i <= pageCount; i++) {
       var topicsDataTemp = await apiClient.getTopics(page: i);
       TopicModel topicsTemp = TopicModel.fromJson(topicsDataTemp);
-      topics.data.addAll(topicsTemp.data);
+      newTopics.data.addAll(topicsTemp.data);
     }
+    // newTopics.data
+    List idList = [];
+    newTopics.data.forEach((item) {
+      idList.add(item.id);
+    });
+    idList.toSet();
+    newTopics.data.removeWhere((item) => !idList.contains(item.id));
 
     if (isSchoolTopics) {
-      topics.data.removeWhere((item) => item.school == null);
-    }else{
-      topics.data.removeWhere((item) => item.school != null);
+      newTopics.data.removeWhere((item) => item.school == null);
+    } else {
+      newTopics.data.removeWhere((item) => item.school != null);
     }
     // print('topicsData=======>${topicsData}');
     if (!mounted) return;
     setState(() {
       this.pageCount = pageCount;
-      this.topics = topics;
+      this.topics = newTopics;
+      // this.topics.
       this.itemCount = topics.data.length;
     });
   }
@@ -258,16 +266,24 @@ class _TopicsState extends State<Topics>
   Future _getMore(int pageCount) async {
     var topicsData = await apiClient.getTopics(page: pageCount);
     // print(topicsData);
-    TopicModel topics = TopicModel.fromJson(topicsData);
+    TopicModel newTopics = TopicModel.fromJson(topicsData);
+
+    List idList = [];
+    newTopics.data.forEach((item) {
+      idList.add(item.id);
+    });
+    idList.toSet();
+    newTopics.data.removeWhere((item) => !idList.contains(item.id));
+
     if (isSchoolTopics) {
-      topics.data.removeWhere((item) => item.school == null);
-    }else{
-      topics.data.removeWhere((item) => item.school != null);
+      newTopics.data.removeWhere((item) => item.school == null);
+    } else {
+      newTopics.data.removeWhere((item) => item.school != null);
     }
 
     setState(() {
-      this.topics.data.addAll(topics.data);
-      this.itemCount = this.itemCount + topics.data.length;
+      this.topics.data.addAll(newTopics.data);
+      this.itemCount = this.itemCount + newTopics.data.length;
       this.pageCount++;
     });
     return topics.data;

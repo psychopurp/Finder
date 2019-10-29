@@ -287,7 +287,8 @@ var privacyHandle = Handler(
       return PrivacyRoute();
     });
 
-var serveProtocolHandle = Handler(
+
+var serveProtocolHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ServeProtocolRoute();
 });
