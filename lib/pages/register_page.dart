@@ -591,6 +591,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                               onTap: () {
                                 setState(() {
                                   _tempSelected = _schools[index];
+                                  (widget.onChange ?? (b) {})(_tempSelected);
                                 });
                               },
                               child: getTag(_schools[index].name,
