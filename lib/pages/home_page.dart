@@ -116,12 +116,6 @@ class _HomePageState extends State<HomePage> {
       var topicsData2 = await apiClient.getTopics(page: i);
       topics.data.addAll(TopicModel.fromJson(topicsData2).data);
     }
-    List idList = [];
-    topics.data.forEach((item) {
-      idList.add(item.id);
-    });
-    idList.toSet();
-    topics.data.removeWhere((item) => !idList.contains(item.id));
 
     return topics;
   }
