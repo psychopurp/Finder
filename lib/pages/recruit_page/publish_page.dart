@@ -73,7 +73,7 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
           data: json.encode({
             "title": title,
             "introduction": content,
-            "types": _types.map((e)=>e.id).toList(),
+            "types": _nowTypes.map((e)=>e.id).toList(),
             "tags": tags
           }));
       var data = response.data;

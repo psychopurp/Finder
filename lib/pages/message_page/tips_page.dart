@@ -225,6 +225,10 @@ class _TipsPageState extends State<TipsPage> {
         break;
       case "he_she_say":
         Navigator.of(context).pushNamed(Routes.heSays);
+        break;
+      case "user":
+        Application.router.navigateTo(context,
+            "${Routes.userProfile}?senderId=$id&heroTag=user:$id");
     }
   }
 

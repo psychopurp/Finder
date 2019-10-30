@@ -3,8 +3,13 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/config/global.dart';
+import 'package:finder/pages/login_page.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/provider/user_provider.dart';
+import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MessageType {
@@ -37,6 +42,7 @@ class MessageModel implements Listenable {
   bool init = false;
   Timer _timer;
   static int failCount = -1;
+  BuildContext indexContext;
 
   factory MessageModel({VoidCallback onChange}) {
     if (instance == null) {
@@ -76,7 +82,6 @@ class MessageModel implements Listenable {
           getData();
         }
       });
-      getData();
       getDataInterval();
     });
   }
@@ -112,6 +117,9 @@ class MessageModel implements Listenable {
 
   Future<bool> getSelf() async {
     var userData = await apiClient.getUserProfile();
+    if(userData == null){
+
+    }
     var user = userData['data'];
     self = UserProfile.fromJson(user);
     if (loadUser != null && loadUser != self) {
@@ -365,6 +373,21 @@ class MessageModel implements Listenable {
   }
 
 
+  toLogin() async {
+    Global.isLogin = false;
+    Global.token = "";
+    await MessageModel().cancelTimer();
+    await MessageModel().reset();
+    ApiClient.dio.options.headers['token'] = "";
+    var prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    MessageModel.instance = null;
+    Provider.of<UserProvider>(indexContext).userInfo = null;
+    Navigator.of(indexContext).pushAndRemoveUntil(
+        new MaterialPageRoute(builder: (context) => LoginPage()),
+            (route) => route == null);
+  }
+
   Future<void> getMessages(int start,
       {int end,
       bool isNotReadOnly,
@@ -387,11 +410,12 @@ class MessageModel implements Listenable {
         await dio.get("get_messages/", queryParameters: queryParameters);
     Map<String, dynamic> data = response.data;
     if (!data["status"]) {
-      throw DioError(
-          request: response.request,
-          response: response,
-          message: data["error"],
-          type: DioErrorType.RESPONSE);
+      BotToast.showText(
+          text: "登录状态失效，请重新登录",
+          align: Alignment(0, 0.8),
+          contentColor: Color(0xff888888),
+          duration: Duration(seconds: 5));
+      toLogin();
     } else {
       addAll(List<Map<String, dynamic>>.generate(
           data["data"].length, (index) => data["data"][index]));
@@ -518,10 +542,8 @@ class MessageModel implements Listenable {
     } else {
       change = true;
       users[messageItem.sessionId] = [messageItem];
-      if (!addFirst) {
-        if (init) {
-          usersIndex.add(messageItem.sessionId);
-        }
+      if (init) {
+        usersIndex.add(messageItem.sessionId);
       }
     }
     if (change) {

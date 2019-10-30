@@ -1,3 +1,4 @@
+import 'package:finder/plugin/callback.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,8 @@ class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
   static double mainHeight = ScreenUtil().setHeight(480);
   static double titleHeight = ScreenUtil().setHeight(100);
-  HomePageTopics(this.topics);
+  final PushCallback push;
+  HomePageTopics(this.topics, this.push);
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +21,11 @@ class HomePageTopics extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _title(context),
-          TopicList(isSchoolTopics: true, topicsData: sortSchoolTopic(true)),
+          TopicList(isSchoolTopics: true, topicsData: sortSchoolTopic(true), push: push,),
           TopicList(
             isSchoolTopics: false,
             topicsData: sortSchoolTopic(false),
+            push: push,
           )
         ],
       ),
@@ -120,7 +123,8 @@ class TopicList extends StatelessWidget {
 
   final bool isSchoolTopics;
   final List<TopicModelData> topicsData;
-  TopicList({this.topicsData, this.isSchoolTopics});
+  final PushCallback push;
+  TopicList({this.topicsData, this.isSchoolTopics, this.push});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -147,8 +151,10 @@ class TopicList extends StatelessWidget {
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          Application.router.navigateTo(context,
-              '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
+          push(()async{
+            await Application.router.navigateTo(context,
+                '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
+          });
         },
         child: Align(
           alignment: Alignment.topCenter,

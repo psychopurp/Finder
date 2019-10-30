@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:finder/config/global.dart';
+import 'package:finder/plugin/callback.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +102,9 @@ class _MoreActivitiesState extends State<MoreActivities>
 
 class ChildActivities extends StatefulWidget {
   final ActivityTypesModelData activityType;
+
   ChildActivities({this.activityType});
+
   @override
   _ChildActivitiesState createState() =>
       _ChildActivitiesState(activityType: activityType);
@@ -110,14 +113,25 @@ class ChildActivities extends StatefulWidget {
 class _ChildActivitiesState extends State<ChildActivities>
     with AutomaticKeepAliveClientMixin<ChildActivities> {
   final ActivityTypesModelData activityType;
+
   _ChildActivitiesState({this.activityType});
 
   ActivityModel activities;
   int pageCount = 2;
   int itemCount = 0;
+  bool atHear = true;
   EasyRefreshController _refreshController = EasyRefreshController();
+
   @override
   bool get wantKeepAlive => true;
+
+  Future<void> push(FutureCallback code) async {
+    atHear = false;
+    if (code != null) {
+      await code();
+    }
+    atHear = true;
+  }
 
   @override
   void initState() {
@@ -134,6 +148,7 @@ class _ChildActivitiesState extends State<ChildActivities>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    if (!atHear) return Container();
     return body;
   }
 
@@ -245,8 +260,10 @@ class _ChildActivitiesState extends State<ChildActivities>
       imageUrl: item.poster,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          Application.router.navigateTo(
-              context, "${Routes.activityDetail}?activityId=${item.id}");
+          push(() async {
+            Application.router.navigateTo(
+                context, "${Routes.activityDetail}?activityId=${item.id}");
+          });
         },
         child: Align(
           alignment: Alignment.topCenter,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:finder/plugin/callback.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -9,7 +10,10 @@ class HomePageActivities extends StatelessWidget {
   final ActivityModel activities;
   final double mainHeight = ScreenUtil().setHeight(510);
   final double titleHeight = ScreenUtil().setHeight(80);
-  HomePageActivities(this.activities);
+  final PushCallback push;
+
+  HomePageActivities(this.activities, this.push);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -68,7 +72,9 @@ class HomePageActivities extends StatelessWidget {
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
-              Application.router.navigateTo(context, '/home/moreActivities');
+              push(() async {
+                Application.router.navigateTo(context, '/home/moreActivities');
+              });
             },
             child: Chip(
               // padding: EdgeInsets.all(0),
@@ -122,8 +128,10 @@ class HomePageActivities extends StatelessWidget {
       imageUrl: item.poster,
       imageBuilder: (context, imageProvider) => GestureDetector(
         onTap: () {
-          Application.router.navigateTo(
-              context, "${Routes.activityDetail}?activityId=${item.id}");
+          push(() async {
+            Application.router.navigateTo(
+                context, "${Routes.activityDetail}?activityId=${item.id}");
+          });
         },
         child: Align(
           child: Container(

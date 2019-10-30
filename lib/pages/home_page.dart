@@ -1,11 +1,13 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
+import 'package:finder/plugin/callback.dart';
 import 'package:finder/provider/user_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:flutter/cupertino.dart';
+
 //data model
 import 'package:finder/models/banner_model.dart';
 import 'package:finder/models/topic_model.dart';
@@ -21,6 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var formData;
+  bool atHear = true;
 
   @override
   void initState() {
@@ -61,6 +64,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget get body {
+    if (!atHear) return Container();
     Widget child;
     if (this.formData == null) {
       child = Container(
@@ -76,11 +80,11 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: EdgeInsets.all(10),
             ),
-            HomePageTopics(this.formData['topics']),
+            HomePageTopics(this.formData['topics'], push),
             Padding(
               padding: EdgeInsets.all(10),
             ),
-            HomePageActivities(this.formData['activities']),
+            HomePageActivities(this.formData['activities'], push),
           ],
         ),
         onRefresh: () async {
@@ -95,7 +99,7 @@ class _HomePageState extends State<HomePage> {
           return FadeTransition(
               child: child,
               opacity:
-                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+              CurvedAnimation(curve: Curves.easeInOut, parent: animation));
         },
         child: child);
   }
@@ -112,7 +116,9 @@ class _HomePageState extends State<HomePage> {
     TopicModel topics = TopicModel.fromJson(topicsData);
     for (int i = 2; i <= pageCount; i++) {
       var topicsData2 = await apiClient.getTopics(page: i);
-      topics.data.addAll(TopicModel.fromJson(topicsData2).data);
+      topics.data.addAll(TopicModel
+          .fromJson(topicsData2)
+          .data);
     }
 
     return topics;
@@ -139,5 +145,13 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       this.formData = formData;
     });
+  }
+
+  Future<void> push(FutureCallback code) async {
+    atHear = false;
+    if (code != null) {
+      await code();
+    }
+    atHear = true;
   }
 }

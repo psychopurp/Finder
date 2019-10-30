@@ -1,3 +1,5 @@
+import 'package:finder/plugin/callback.dart';
+import 'package:finder/provider/store.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -28,6 +30,15 @@ class MoreTopics extends StatefulWidget {
 class _MoreTopicsState extends State<MoreTopics>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
+  bool atHear = true;
+
+  Future<void> push(FutureCallback code) async {
+    atHear = false;
+    if (code != null) {
+      await code();
+    }
+    atHear = true;
+  }
 
   @override
   void initState() {
@@ -43,6 +54,7 @@ class _MoreTopicsState extends State<MoreTopics>
 
   @override
   Widget build(BuildContext context) {
+    if(!atHear)return  Scaffold(appBar:  AppBar(title: const Text("话题"),),);
     var appBarColor = Color.fromARGB(255, 95, 95, 95);
     var appBarIconColor = Color.fromARGB(255, 155, 155, 155);
     return Scaffold(
@@ -105,9 +117,11 @@ class _MoreTopicsState extends State<MoreTopics>
               children: <Widget>[
                 Topics(
                   isSchoolTopics: true,
+                  push: push,
                 ),
                 Topics(
                   isSchoolTopics: false,
+                  push: push,
                 ),
               ],
             ),
@@ -115,7 +129,10 @@ class _MoreTopicsState extends State<MoreTopics>
               bottom: ScreenUtil().setHeight(30),
               child: InkWell(
                 onTap: () {
-                  Application.router.navigateTo(context, '/publishTopic');
+                  push(() async {
+                    await Application.router
+                        .navigateTo(context, '/publishTopic');
+                  });
                 },
                 child: Chip(
                   elevation: 5,
@@ -140,8 +157,9 @@ class _MoreTopicsState extends State<MoreTopics>
 
 class Topics extends StatefulWidget {
   final bool isSchoolTopics;
+  final PushCallback push;
 
-  Topics({this.isSchoolTopics});
+  Topics({this.isSchoolTopics, this.push});
 
   @override
   _TopicsState createState() => _TopicsState(isSchoolTopics: isSchoolTopics);
@@ -283,8 +301,10 @@ class _TopicsState extends State<Topics>
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
-          Application.router.navigateTo(context,
-              '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
+          widget.push(() async {
+            Application.router.navigateTo(context,
+                '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
+          });
         },
         child: Align(
           alignment: Alignment.topCenter,
