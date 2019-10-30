@@ -7,6 +7,7 @@ import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/pages/serve_page/he_says_page.dart';
 import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/models/recruit_model.dart';
+import 'package:finder/provider/store.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
@@ -25,15 +26,14 @@ class RecruitPage extends StatefulWidget {
 }
 
 class _RecruitPageState extends State<RecruitPage> {
-  List<RecruitModelData> _bannerData = [];
-  List<RecruitModelData> _data = [];
+  static List<RecruitModelData> _bannerData = [];
+  static List<RecruitModelData> _data = [];
   static RecruitTypesModelData all = RecruitTypesModelData(id: 0, name: "全部");
   static List<RecruitTypesModelData> _types = [all];
   static RecruitTypesModelData _nowType = all;
   EasyRefreshController _loadController;
   int _nowPage = 1;
   bool loading = true;
-  bool moreThanMoment = false;
   bool hasMore = true;
   String query = "";
 
@@ -44,11 +44,6 @@ class _RecruitPageState extends State<RecruitPage> {
     getTypes();
     getRecruitsData();
     _loadController = EasyRefreshController();
-    Future.delayed(Duration(milliseconds: 50), () {
-      setState(() {
-        moreThanMoment = true;
-      });
-    });
   }
 
   @override
@@ -83,7 +78,7 @@ class _RecruitPageState extends State<RecruitPage> {
   Widget get body {
     Widget child;
     List<Widget> preItems = [];
-    if (loading || !moreThanMoment) {
+    if (loading && _bannerData.length == 0 && _data.length == 0) {
       child = Center(
         child: Column(
           children: <Widget>[
@@ -161,7 +156,7 @@ class _RecruitPageState extends State<RecruitPage> {
           return FadeTransition(
               child: child,
               opacity:
-              CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
         },
         child: child);
   }
@@ -270,7 +265,7 @@ class _RecruitPageState extends State<RecruitPage> {
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(25)),
+                                    BorderRadius.all(Radius.circular(25)),
                                 image: DecorationImage(
                                   image: imageProvider,
                                   fit: BoxFit.cover,
@@ -351,7 +346,7 @@ class _RecruitPageState extends State<RecruitPage> {
             child: Wrap(
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
-                      (index) => getTag(item.tags[index]?.name ?? "Default")),
+                  (index) => getTag(item.tags[index]?.name ?? "Default")),
             ),
           ),
           Padding(
@@ -382,7 +377,7 @@ class _RecruitPageState extends State<RecruitPage> {
 
   Future<void> changeType(RecruitTypesModelData type) async {
     setState(() {
-      this._data = [];
+      _data = [];
       this._nowPage = 1;
       _nowType = type;
       this.hasMore = true;
@@ -419,7 +414,7 @@ class _RecruitPageState extends State<RecruitPage> {
       if (result["status"]) {
         setState(() {
           _bannerData = List<RecruitModelData>.generate(result["data"].length,
-                  (index) => RecruitModelData.fromRecommend(result["data"][index]));
+              (index) => RecruitModelData.fromRecommend(result["data"][index]));
         });
       }
     } on DioError catch (e) {
@@ -478,10 +473,10 @@ class _RecruitPageHeaderState extends State<RecruitPageHeader>
     super.initState();
     inputWidth = ScreenUtil.screenWidthDp - 110;
     _animationController =
-    AnimationController(vsync: this, duration: Duration(milliseconds: 400))
-      ..addListener(() {
-        setState(() {});
-      });
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400))
+          ..addListener(() {
+            setState(() {});
+          });
     _opacityAnimation = Tween<double>(begin: 1, end: 0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
@@ -560,7 +555,7 @@ class _RecruitPageHeaderState extends State<RecruitPageHeader>
                   controller: _searchController,
                   decoration: InputDecoration(
                     contentPadding:
-                    EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                        EdgeInsets.symmetric(vertical: 7, horizontal: 10),
                     filled: true,
                     fillColor: Color.fromARGB(255, 245, 241, 241),
                     border: OutlineInputBorder(
@@ -736,15 +731,15 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                   Wrap(
                     children: List<Widget>.generate(
                         _types.length,
-                            (index) => GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _tempType = _types[index];
-                            });
-                          },
-                          child: getTag(_types[index].name,
-                              select: _types[index].id == _tempType.id),
-                        )),
+                        (index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _tempType = _types[index];
+                                });
+                              },
+                              child: getTag(_types[index].name,
+                                  select: _types[index].id == _tempType.id),
+                            )),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,

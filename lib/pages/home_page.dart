@@ -22,7 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var formData;
+  static var formData;
   bool atHear = true;
 
   @override
@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
   Widget get body {
     if (!atHear) return Container();
     Widget child;
-    if (this.formData == null) {
+    if (formData == null) {
       child = Container(
           alignment: Alignment.center,
           height: double.infinity,
@@ -76,15 +76,15 @@ class _HomePageState extends State<HomePage> {
         header: MaterialHeader(),
         child: ListView(
           children: <Widget>[
-            HomePageBanner(this.formData['banner']),
+            HomePageBanner(formData['banner']),
             Padding(
               padding: EdgeInsets.all(10),
             ),
-            HomePageTopics(this.formData['topics'], push),
+            HomePageTopics(formData['topics'], push),
             Padding(
               padding: EdgeInsets.all(10),
             ),
-            HomePageActivities(this.formData['activities'], push),
+            HomePageActivities(formData['activities'], push),
           ],
         ),
         onRefresh: () async {
@@ -135,15 +135,14 @@ class _HomePageState extends State<HomePage> {
 
   //获取首页数据并解析
   Future _getHomePageData() async {
-    var formData = {
+    var newFormData = {
       'banner': await _getBannerData(),
       'topics': await _getTopicsData(3),
       'activities': await _getAcitivitiesData()
     };
     if (!mounted) return;
-    // print(formData);
     setState(() {
-      this.formData = formData;
+      formData = newFormData;
     });
   }
 

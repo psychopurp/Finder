@@ -65,7 +65,7 @@ class Avatar extends StatelessWidget {
     String baseUrl = "https://image.finder-nk.com";
     String target;
     if (url == null) {
-      target = baseUrl + "/static/default.png";
+      return baseUrl + "/static/default.png?x-oss-process=style/50zip";
     }
     if (url.startsWith("http")) {
       target = url;
