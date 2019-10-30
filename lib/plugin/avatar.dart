@@ -77,9 +77,10 @@ class Avatar extends StatelessWidget {
     } else {
       target = baseUrl + url;
     }
-    if(!target.endsWith("gif")) {
+    if(!target.endsWith("gif") || !target.endsWith("50zip")) {
       target = target + "?x-oss-process=style/50zip";
     }
+    print(target);
     return target;
   }
 }
