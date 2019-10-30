@@ -145,9 +145,12 @@ class _RegisterPageState extends State<RegisterPage> {
             new MaterialPageRoute(builder: (context) => IndexPage()),
             (route) => route == null);
       } else {
+        Navigator.of(context).pop();
         showErrorHint(context, result["error"]);
       }
     } on DioError catch (e) {
+      Navigator.of(context).pop();
+      showErrorHint(context, "网络连接失败, 请稍后重试!");
       print(e);
       print(url);
     }

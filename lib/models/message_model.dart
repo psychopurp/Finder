@@ -48,7 +48,10 @@ class MessageModel implements Listenable {
     return instance;
   }
 
-  getDataInterval({Duration duration: const Duration(seconds: 30)}) {
+  getDataInterval({Duration duration: const Duration(seconds: 8), bool faster =  false}) {
+    if(faster){
+      duration = const Duration(seconds: 3);
+    }
     if (_timer != null) {
       cancelTimer();
     }
@@ -90,6 +93,21 @@ class MessageModel implements Listenable {
     lastRequestTime = null;
     loadUser = self;
     noMoreHistoryMessage = false;
+  }
+
+   List<VoidCallback> clearInstance() {
+    systems = [];
+    tips = [];
+    users = {};
+    says = {};
+    usersIndex = [];
+    saysIndex = [];
+    noMoreHistory = Set();
+    lastRequestTime = null;
+    loadUser = self;
+    noMoreHistoryMessage = false;
+    changeEvents.remove(save);
+    return changeEvents;
   }
 
   Future<bool> getSelf() async {

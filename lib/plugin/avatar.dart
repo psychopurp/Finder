@@ -1,8 +1,5 @@
-import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:finder/config/api_client.dart';
-import 'package:finder/config/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -57,6 +54,14 @@ class Avatar extends StatelessWidget {
   }
 
   static String getImageUrl(String url) {
+//    String baseUrl = ApiClient.host;
+//    if(url == null){
+//      return "/static/default.png";
+//    }
+//    if (url.startsWith("http")) {
+//      return url;
+//    } else
+//      return baseUrl + url;
     String baseUrl = "https://image.finder-nk.com";
     if (url == null) {
       return baseUrl + "/static/default.png";

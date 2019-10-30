@@ -1,4 +1,3 @@
-import 'package:finder/pages/mine_page/change_profile_page.dart';
 import 'package:finder/pages/settings_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -164,15 +163,9 @@ class Routes {
     router.define(fansFollowPage,
         handler: fansFollowPageHandle,
         transitionType: TransitionType.cupertino);
-
     router.define(changeProfilePage,
         handler: changeUserProfilePageHandler,
         transitionType: TransitionType.cupertino);
-
-    router.define(changeProfilePage,
-        handler: changeUserProfilePageHandler,
-        transitionType: TransitionType.cupertino);
-
     router.define(modifyInfoPage,
         handler: modifyInfoPageHandle,
         transitionType: TransitionType.cupertino);
@@ -181,11 +174,5 @@ class Routes {
         handler: privacyHandle, transitionType: TransitionType.cupertino);
     router.define(serveProtocol,
         handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
-    router.define(changeProfilePage,
-        handler: changeUserProfilePageHandler,
-        transitionType: TransitionType.cupertino);
-    router.define(changeProfilePage,
-        handler: changeUserProfilePageHandler,
-        transitionType: TransitionType.cupertino);
   }
 }

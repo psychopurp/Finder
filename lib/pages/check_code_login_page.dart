@@ -72,7 +72,7 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
     setState(() {
       loading = true;
     });
-    RegExp phoneReg = RegExp(r"1[35789]\d{9}");
+    RegExp phoneReg = RegExp(r"1[356789]\d{9}");
     bool right = phoneReg.hasMatch(_phone) && _phone.length == 11;
     if (!right) {
       showErrorHint(context, "手机号格式错误");

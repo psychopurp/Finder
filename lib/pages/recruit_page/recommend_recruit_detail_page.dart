@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/models/recruit_model.dart';
+import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 
 const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
@@ -12,10 +12,12 @@ const Color PageBackgroundColor = Color.fromARGB(255, 233, 229, 228);
 
 class RecommendRecruitDetailPage extends StatefulWidget {
   @override
-  _RecommendRecruitDetailPageState createState() => _RecommendRecruitDetailPageState();
+  _RecommendRecruitDetailPageState createState() =>
+      _RecommendRecruitDetailPageState();
 }
 
-class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage> {
+class _RecommendRecruitDetailPageState
+    extends State<RecommendRecruitDetailPage> {
   Map<String, Map<String, dynamic>> menuItem;
 
   void _handleShare() {
@@ -51,7 +53,8 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
         child: Text("参与"),
         elevation: 1,
         onPressed: () {
-          Navigator.of(context).pushNamed(Routes.engageRecruit, arguments: item.id);
+          Navigator.of(context)
+              .pushNamed(Routes.engageRecruit, arguments: item.id);
         },
         backgroundColor: Theme.of(context).primaryColor,
       ),
@@ -118,25 +121,24 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
       body: ListView(
         children: <Widget>[
           Container(
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
-            width: double.infinity,
-            height: 250,
-            child: Hero(
-              tag: item.image,
-              child: CachedNetworkImage(
-                imageUrl: item.image,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
+              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
+              width: double.infinity,
+              height: 250,
+              child: Hero(
+                tag: item.image,
+                child: CachedNetworkImage(
+                  imageUrl: item.image,
+                  imageBuilder: (context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          ),
+              )),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             width: double.infinity,
@@ -182,8 +184,8 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(Routes.internshipCompany, arguments: item);
+                Application.router.navigateTo(context,
+                    "${Routes.userProfile}?senderId=${item.sender.id}&heroTag=user:${item.sender.id}-${item.id}");
               },
               padding: EdgeInsets.all(0),
               child: Row(
@@ -214,7 +216,7 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
                           return Container(
                             decoration: BoxDecoration(
                               borderRadius:
-                              BorderRadius.all(Radius.circular(25)),
+                                  BorderRadius.all(Radius.circular(25)),
                               image: DecorationImage(
                                 image: imageProvider,
                                 fit: BoxFit.cover,
@@ -268,10 +270,13 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
             child: Wrap(
               direction: Axis.horizontal,
               children: List<Widget>.generate(item.tags.length,
-                      (index) => getTag(item.tags[index]?.name ?? "Default")),
+                  (index) => getTag(item.tags[index]?.name ?? "Default")),
             ),
-          ),         split,
-          Padding(padding: EdgeInsets.all(20),),
+          ),
+          split,
+          Padding(
+            padding: EdgeInsets.all(20),
+          ),
           MaterialButton(
             onPressed: () {
               Navigator.of(context)
@@ -287,6 +292,7 @@ class _RecommendRecruitDetailPageState extends State<RecommendRecruitDetailPage>
       ),
     );
   }
+
   Widget getTag(String tag) {
     return Builder(
       builder: (context) {

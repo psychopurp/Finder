@@ -3,10 +3,13 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:finder/models/banner_model.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePageBanner extends StatelessWidget {
   final BannerModel banner;
+
   HomePageBanner(this.banner);
+
   final double bannerHeight = 350;
 
   @override
@@ -36,7 +39,15 @@ class HomePageBanner extends StatelessWidget {
         autoplay: true,
         itemCount: banner.data.length,
         itemBuilder: (context, index) {
-          return _singleItem(context, banner.data[index]);
+          return GestureDetector(
+            child: _singleItem(context, banner.data[index]),
+            onTap: () async {
+              String url = banner.data[index].location;
+              if (await canLaunch(url)) {
+                await launch(url);
+              }
+            },
+          );
         },
       ),
     );

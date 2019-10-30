@@ -26,7 +26,7 @@ class TopicDetailPage extends StatefulWidget {
 
 class _TopicDetailPageState extends State<TopicDetailPage> {
   ScrollController _controller;
-  double titileOpacity = 0;
+  double titleOpacity = 0;
   double bottomTitleOpacity = 0;
 
   @override
@@ -36,7 +36,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 //        print(_controller.offset);
         if (_controller.offset < 160 && _controller.offset > 108) {
           setState(() {
-            titileOpacity = (_controller.offset / 100) % 1;
+            titleOpacity = (_controller.offset / 100) % 1;
             bottomTitleOpacity = ((_controller.offset / 100) > 1)
                 ? 1
                 : (_controller.offset / 100);
@@ -44,15 +44,15 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           });
         } else if (_controller.offset > 160) {
           setState(() {
-            titileOpacity = 1;
+            titleOpacity = 1;
           });
         } else if (_controller.offset < 80) {
           setState(() {
-            titileOpacity = 0;
+            titleOpacity = 0;
             bottomTitleOpacity = 0;
           });
         }
-        // print(titileOpacity);
+        // print(titleOpacity);
       });
     super.initState();
   }
@@ -65,7 +65,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    var joinTopicButtton = Padding(
+    var joinTopicButton = Padding(
         padding: EdgeInsets.symmetric(horizontal: 120),
         child: MaterialButton(
           onPressed: () {
@@ -96,7 +96,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             ),
           ),
           Positioned(
-            child: joinTopicButtton,
+            child: joinTopicButton,
             bottom: 20,
             left: 0,
             right: 0,
@@ -122,7 +122,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           this.widget.topicTitle,
           style: TextStyle(
               fontSize: ScreenUtil().setSp(30),
-              color: Colors.black.withOpacity(titileOpacity)),
+              color: Colors.black.withOpacity(titleOpacity)),
         ),
         iconTheme: IconThemeData(color: Colors.black),
         centerTitle: true,
@@ -519,34 +519,34 @@ class _TopicCommentsState extends State<TopicComments> {
     if (user.isLogIn) {
       if (user.userInfo.id == item.sender.id) {
         showDialog(
-            context: context,
-            builder: (_) {
-              return GestureDetector(
-                onTap: () async {
-                  Navigator.pop(context);
-                  showDialog(
-                      context: context,
-                      builder: (_) {
-                        return FinderDialog.showLoading();
-                      });
-
-                  var data =
-                      await apiClient.deleteTopicComment(commentId: item.id);
-                  await getInitialData();
-
-                  widget.controller.animateTo(0,
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.bounceIn);
-
-                  Navigator.pop(context);
-                },
-                child: CupertinoAlertDialog(
-                  title: Text('删除话题评论',
-                      style: TextStyle(
-                          fontFamily: 'normal', fontWeight: FontWeight.w200)),
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text("提示"),
+              content: Text("确认要输出此条回复吗? "),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("取消"),
+                  onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                 ),
-              );
-            });
+                FlatButton(
+                    child: Text("删除"),
+                    onPressed: () async {
+                      FinderDialog.showLoading();
+                      var data =
+                      await apiClient.deleteTopicComment(commentId: item.id);
+                      await getInitialData();
+
+                      widget.controller.animateTo(0,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.bounceIn);
+
+                      Navigator.pop(context);
+                    }),
+              ],
+            );
+          },
+        );
       }
     }
   }
