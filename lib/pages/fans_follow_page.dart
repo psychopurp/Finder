@@ -106,6 +106,7 @@ class _TabBodyState extends State<TabBody> {
 
   int pageCount = 2;
   int userItSelfId;
+  bool hasMore = true;
 
   @override
   void initState() {
@@ -128,10 +129,10 @@ class _TabBodyState extends State<TabBody> {
     setState(() {
       userItSelfId = user.userInfo.id;
     });
-    return body;
+    return body(user);
   }
 
-  Widget get body {
+  Widget body(UserProvider userProvider) {
     Widget child;
     if (this.follower == null) {
       child = Container(
@@ -143,18 +144,24 @@ class _TabBodyState extends State<TabBody> {
         enableControlFinishLoad: true,
         header: MaterialHeader(),
         footer: MaterialFooter(),
-        key: ValueKey(child),
+        // key: ValueKey(child),
         controller: _refreshController,
-        child: ListView(children: buildUserList()),
+        child: ListView(
+            // physics: AlwaysScrollableScrollPhysics(),
+            // padding: EdgeInsets.only(bottom: 100),
+            children: buildUserList(userProvider)),
         onRefresh: () async {
           await getInitialData();
           _refreshController.resetLoadState();
         },
         onLoad: () async {
-          bool hasMore = await getMore(pageCount: this.pageCount);
-          await Future.delayed(Duration(seconds: 1), () {});
+          await getMore(pageCount: this.pageCount);
+          await Future.delayed(Duration(seconds: 1), () {
+            _refreshController.finishLoad(
+                success: true, noMore: (!this.hasMore));
+          });
+
           // print("data===$data");
-          _refreshController.finishLoad(success: true, noMore: (!hasMore));
         },
       );
     }
@@ -170,7 +177,7 @@ class _TabBodyState extends State<TabBody> {
         child: child);
   }
 
-  buildUserList() {
+  buildUserList(UserProvider userProvider) {
     List<Widget> content = [];
     this.follower.data.forEach((item) {
       Widget userRow = Container(
@@ -230,18 +237,22 @@ class _TabBodyState extends State<TabBody> {
                 padding: EdgeInsets.only(right: 10),
                 child: (item.id == userItSelfId)
                     ? Container()
-                    : getButton(item.status, item))
+                    : getButton(item.status, item, userProvider))
           ],
         ),
       );
 
       content.add(userRow);
     });
+    // content.addAll(content);
+    // content.addAll(content);
+    // content.addAll(content);
+    // content.addAll(content);
 
     return content;
   }
 
-  getButton(int typeId, FollowerModelData userInfo) {
+  getButton(int typeId, FollowerModelData userInfo, UserProvider userProvider) {
     String buttonText = "";
     if (typeId == FOLLOW) {
       buttonText = "关注";
@@ -254,7 +265,7 @@ class _TabBodyState extends State<TabBody> {
     return GestureDetector(
       onTap: () async {
         // handleFollow(user, userInfo);
-        var data = await apiClient.addFollowUser(userId: userInfo.id);
+        var data = await userProvider.addFollower(userId: userInfo.id);
         print(data);
         if (widget.isFollow) {
           //本来是相互关注
@@ -320,6 +331,7 @@ class _TabBodyState extends State<TabBody> {
 
     if (!mounted) return;
     setState(() {
+      this.hasMore = followerModel.hasMore;
       this.follower = followerModel;
       this.pageCount = 2;
     });
@@ -333,6 +345,7 @@ class _TabBodyState extends State<TabBody> {
 
     setState(() {
       this.follower.data.addAll(followerModel.data);
+      this.hasMore = followerModel.hasMore;
       this.pageCount++;
     });
     return followerModel.hasMore;

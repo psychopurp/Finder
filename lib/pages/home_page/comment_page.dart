@@ -29,6 +29,7 @@ class _CommentPageState extends State<CommentPage> {
   String defaultHint = '喜欢就评论告诉Ta';
   String hintText = '喜欢就评论告诉Ta';
   int pageCount = 2;
+  bool hasMore = true;
 
   @override
   void initState() {
@@ -97,10 +98,12 @@ class _CommentPageState extends State<CommentPage> {
                 _refreshController.resetLoadState();
               },
               onLoad: () async {
-                var data = await getMore(this.pageCount);
-                print("data===$data");
-                _refreshController.finishLoad(
-                    success: true, noMore: (data.length == 0));
+                await getMore(this.pageCount);
+
+                await Future.delayed(Duration(seconds: 1), () {
+                  _refreshController.finishLoad(
+                      success: true, noMore: (!this.hasMore));
+                });
               },
               child: (this.comment != null)
                   ? ListView(
@@ -347,6 +350,7 @@ class _CommentPageState extends State<CommentPage> {
     setState(() {
       this.comment = topicComment;
       this.pageCount = 2;
+      this.hasMore = topicComment.hasMore;
     });
   }
 
@@ -360,6 +364,7 @@ class _CommentPageState extends State<CommentPage> {
     setState(() {
       this.comment.data.addAll(topicComment.data);
       this.pageCount++;
+      this.hasMore = topicComment.hasMore;
     });
     return topicComment.data;
   }
