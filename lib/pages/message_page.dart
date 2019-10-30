@@ -256,8 +256,6 @@ class _MessagePageState extends State<MessagePage> {
         ),
       ),
     );
-    print(other.avatar);
-
     Widget child = _withBottomBorder(
       Row(
         children: <Widget>[
