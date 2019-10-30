@@ -26,7 +26,7 @@ class TopicDetailPage extends StatefulWidget {
 
 class _TopicDetailPageState extends State<TopicDetailPage> {
   ScrollController _controller;
-  double titileOpacity = 0;
+  double titleOpacity = 0;
   double bottomTitleOpacity = 0;
 
   @override
@@ -36,7 +36,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 //        print(_controller.offset);
         if (_controller.offset < 160 && _controller.offset > 108) {
           setState(() {
-            titileOpacity = (_controller.offset / 100) % 1;
+            titleOpacity = (_controller.offset / 100) % 1;
             bottomTitleOpacity = ((_controller.offset / 100) > 1)
                 ? 1
                 : (_controller.offset / 100);
@@ -44,15 +44,15 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           });
         } else if (_controller.offset > 160) {
           setState(() {
-            titileOpacity = 1;
+            titleOpacity = 1;
           });
         } else if (_controller.offset < 80) {
           setState(() {
-            titileOpacity = 0;
+            titleOpacity = 0;
             bottomTitleOpacity = 0;
           });
         }
-        // print(titileOpacity);
+        // print(titleOpacity);
       });
     super.initState();
   }
@@ -65,7 +65,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    var joinTopicButtton = Padding(
+    var joinTopicButton = Padding(
         padding: EdgeInsets.symmetric(horizontal: 120),
         child: MaterialButton(
           onPressed: () {
@@ -96,7 +96,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             ),
           ),
           Positioned(
-            child: joinTopicButtton,
+            child: joinTopicButton,
             bottom: 20,
             left: 0,
             right: 0,
@@ -122,7 +122,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           this.widget.topicTitle,
           style: TextStyle(
               fontSize: ScreenUtil().setSp(30),
-              color: Colors.black.withOpacity(titileOpacity)),
+              color: Colors.black.withOpacity(titleOpacity)),
         ),
         iconTheme: IconThemeData(color: Colors.black),
         centerTitle: true,
