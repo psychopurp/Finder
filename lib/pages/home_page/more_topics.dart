@@ -369,11 +369,11 @@ class ImageItem extends StatelessWidget {
   final TopicModelData item;
   final ImageProvider imageProvider;
   final VoidCallback onTap;
-  static final double topicHeight = ScreenUtil().setHeight(430);
-  static final double topicWidth = topicHeight * 1.6;
+  final double topicWidth = ScreenUtil.screenWidthDp;
 
   @override
   Widget build(BuildContext context) {
+    final double topicHeight = topicWidth / 1.6;
     return InkWell(
       onTap: onTap,
       child: Align(

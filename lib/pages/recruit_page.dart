@@ -4,10 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/topic_comments_model.dart';
-import 'package:finder/pages/serve_page/he_says_page.dart';
+import 'package:finder/plugin/drop_down_text.dart';
 import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/models/recruit_model.dart';
-import 'package:finder/provider/store.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
@@ -40,9 +39,9 @@ class _RecruitPageState extends State<RecruitPage> {
   @override
   void initState() {
     super.initState();
-    getRecommend();
+    getRecommend(refresh: true);
     getTypes();
-    getRecruitsData();
+    getRecruitsData(refresh: true);
     _loadController = EasyRefreshController();
   }
 
@@ -162,7 +161,7 @@ class _RecruitPageState extends State<RecruitPage> {
   Widget get banner {
     return Container(
       padding: EdgeInsets.only(bottom: 15.0),
-      height: 250,
+      height: ScreenUtil().setHeight(392),
       width: double.infinity,
       color: Colors.white,
       child: Swiper(
@@ -333,7 +332,7 @@ class _RecruitPageState extends State<RecruitPage> {
                 Container(
                     padding: EdgeInsets.only(left: 13),
                     width: ScreenUtil.screenWidthDp,
-                    child: ContentWidget(
+                    child: DropDownTextWidget(
                       content: item.introduction,
                     )),
               ],
