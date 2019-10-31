@@ -48,6 +48,10 @@ class _MoreTopicsState extends State<MoreTopics>
 
   @override
   void dispose() {
+    _TopicsState.interSchoolTopics = null;
+    _TopicsState.schoolTopics = null;
+    _TopicsState.schoolOffset = 0;
+    _TopicsState.interSchoolOffset = 0;
     _tabController.dispose();
     super.dispose();
   }
@@ -176,8 +180,8 @@ class _TopicsState extends State<Topics> {
   static double schoolOffset = 0;
   static double interSchoolOffset = 0;
 
-
   _TopicsState({this.isSchoolTopics});
+  ScrollController _scrollController;
 
   static TopicModel schoolTopics;
   static TopicModel interSchoolTopics;
@@ -185,35 +189,58 @@ class _TopicsState extends State<Topics> {
   int itemCount = 0;
   EasyRefreshController _refreshController;
 
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     print('topics正在initstate');
+    if(isSchoolTopics){
+      if(schoolTopics == null) {
+        _getInitialTopicsData(2);
+        _scrollController =ScrollController();
+      }
+      else
+      _scrollController = ScrollController(initialScrollOffset: schoolOffset);
+    }else{
+      if(interSchoolTopics == null) {
+        _getInitialTopicsData(2);
+        _scrollController =ScrollController();
+      }
+      else
+        _scrollController = ScrollController(initialScrollOffset: interSchoolOffset);
+    }
+    _scrollController.addListener((){
+      if(isSchoolTopics){
+        schoolOffset = _scrollController.offset;
+      }else{
+        interSchoolOffset = _scrollController.offset;
+      }
+    });
     _refreshController = EasyRefreshController();
-    _getInitialTopicsData(2);
-    print("init");
     super.initState();
   }
 
   @override
   void dispose() {
     _refreshController.dispose();
-    print("dispose");
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     print("build $isSchoolTopics");
-    super.build(context);
     return body;
   }
 
   Widget get body {
+    TopicModel topics;
+    if(isSchoolTopics){
+      topics = schoolTopics;
+    }else{
+      topics = interSchoolTopics;
+    }
     Widget child;
-    if (this.topics == null) {
+    if (topics == null) {
       child = Container(
           alignment: Alignment.center,
           height: double.infinity,
@@ -236,11 +263,12 @@ class _TopicsState extends State<Topics> {
           print(hasMore);
           _refreshController.finishLoad(success: true, noMore: (!hasMore));
         },
+        scrollController: _scrollController,
         slivers: <Widget>[
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                return _singleItem(context, this.topics.data[index], index);
+                return _singleItem(context, topics.data[index], index);
               },
               childCount: this.itemCount,
             ),
@@ -280,8 +308,12 @@ class _TopicsState extends State<Topics> {
     if (!mounted) return;
     setState(() {
       this.pageCount = pageCount + 1;
-      this.topics = newTopics;
-      this.itemCount = topics.data.length;
+      if(isSchoolTopics){
+        schoolTopics = newTopics;
+      }else{
+        interSchoolTopics = newTopics;
+      }
+      this.itemCount = schoolTopics.data.length;
     });
   }
 
@@ -298,7 +330,11 @@ class _TopicsState extends State<Topics> {
     }
 
     setState(() {
-      this.topics.data.addAll(newTopics.data);
+      if(isSchoolTopics){
+        schoolTopics.data.addAll(newTopics.data);
+      }else{
+        interSchoolTopics.data.addAll(newTopics.data);
+      }
       this.itemCount = this.itemCount + newTopics.data.length;
       this.pageCount++;
     });
