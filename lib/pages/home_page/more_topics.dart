@@ -343,6 +343,7 @@ class _TopicsState extends State<Topics> {
   _singleItem(BuildContext context, TopicModelData item, int index) {
     ///宽高比 1.6/1
     return CachedNetworkImage(
+      key: ValueKey(item.image + item.title),
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) {
         return ImageItem(

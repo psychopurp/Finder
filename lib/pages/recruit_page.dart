@@ -136,10 +136,8 @@ class _RecruitPageState extends State<RecruitPage> {
           onRefresh: () async {
             loading = true;
             _nowPage = 1;
-            _bannerData = [];
-            await getRecommend();
-            _data = [];
-            await getRecruitsData();
+            await getRecommend(refresh: true);
+            await getRecruitsData(refresh: true);
             loading = false;
           },
           onLoad: () async {
@@ -385,7 +383,7 @@ class _RecruitPageState extends State<RecruitPage> {
     await getRecruitsData();
   }
 
-  Future getRecruitsData() async {
+  Future getRecruitsData({bool refresh = false}) async {
     var data;
     Map<String, dynamic> query = {'page': _nowPage, 'query': this.query};
     if (_nowType.id != 0) {
@@ -394,6 +392,9 @@ class _RecruitPageState extends State<RecruitPage> {
     data = await apiClient.getRecruits(query);
     RecruitModel recruits = RecruitModel.fromJson(data);
     if (recruits.status) {
+      if(refresh){
+        _data = [];
+      }
       _nowPage += 1;
       hasMore = recruits.hasMore;
       setState(() {
@@ -405,13 +406,16 @@ class _RecruitPageState extends State<RecruitPage> {
     });
   }
 
-  Future<void> getRecommend() async {
+  Future<void> getRecommend({bool refresh = false}) async {
     String url = 'get_recommend_recruits/';
     try {
       Dio dio = ApiClient.dio;
       Response response = await dio.get(url);
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
+        if(refresh){
+          _bannerData = [];
+        }
         setState(() {
           _bannerData = List<RecruitModelData>.generate(result["data"].length,
               (index) => RecruitModelData.fromRecommend(result["data"][index]));

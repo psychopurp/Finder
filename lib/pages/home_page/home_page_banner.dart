@@ -9,20 +9,25 @@ class HomePageBanner extends StatelessWidget {
   final BannerModel banner;
 
   HomePageBanner(this.banner);
-
-  final double bannerHeight = 350;
+  static final  double bannerWight = ScreenUtil().setWidth(750);
+  static final double bannerHeight = bannerWight * 0.47;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: 10.0),
-      height: 200,
-      width: ScreenUtil().setWidth(750),
+      height: bannerHeight,
+      width: bannerWight,
       color: Colors.white,
       child: Swiper(
         // layout: SwiperLayout.CUSTOM,
         // autoplayDelay: 100,
-        onTap: (index) {},
+        onTap: (index)async {
+            String url = banner.data[index].location;
+            if (await canLaunch(url)) {
+              await launch(url);
+            }
+        },
         viewportFraction: 0.9,
         scale: 0.1,
         pagination: SwiperPagination(
@@ -39,15 +44,7 @@ class HomePageBanner extends StatelessWidget {
         autoplay: true,
         itemCount: banner.data.length,
         itemBuilder: (context, index) {
-          return GestureDetector(
-            child: _singleItem(context, banner.data[index]),
-            onTap: () async {
-              String url = banner.data[index].location;
-              if (await canLaunch(url)) {
-                await launch(url);
-              }
-            },
-          );
+          return _singleItem(context, banner.data[index]);
         },
       ),
     );

@@ -55,6 +55,7 @@ class _MoreActivitiesState extends State<MoreActivities>
     return Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.black),
+          brightness: Brightness.dark,
           textTheme: TextTheme(
               title: TextStyle(
                   color: Colors.black,
@@ -224,7 +225,7 @@ class _ChildActivitiesState extends State<ChildActivities>
     if (!mounted) return;
     // print('activities=======>${activities.data}');
     setState(() {
-      this.pageCount = pageCount;
+      this.pageCount = pageCount + 1;
       this.activities = activities;
       this.itemCount = activities.data.length;
     });
