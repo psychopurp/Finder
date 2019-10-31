@@ -69,7 +69,7 @@ class Avatar extends StatelessWidget {
     }
     if (url.startsWith("http")) {
       target = url;
-      if(!target.startsWith("https://image.finder-nk.com")) {
+      if(!target.startsWith(baseUrl)) {
         return target;
       }
     } else if (url.startsWith("/media")) {
@@ -77,10 +77,9 @@ class Avatar extends StatelessWidget {
     } else {
       target = baseUrl + url;
     }
-    if(!target.endsWith("gif") || !target.endsWith("50zip")) {
+    if(!target.endsWith("gif") && !target.endsWith("50zip")) {
       target = target + "?x-oss-process=style/50zip";
     }
-    print(target);
     return target;
   }
 }

@@ -54,7 +54,12 @@ class _MoreTopicsState extends State<MoreTopics>
 
   @override
   Widget build(BuildContext context) {
-    if(!atHear)return  Scaffold(appBar:  AppBar(title: const Text("话题"),),);
+    if (!atHear)
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("话题"),
+        ),
+      );
     var appBarColor = Color.fromARGB(255, 95, 95, 95);
     var appBarIconColor = Color.fromARGB(255, 155, 155, 155);
     return Scaffold(
@@ -165,14 +170,17 @@ class Topics extends StatefulWidget {
   _TopicsState createState() => _TopicsState(isSchoolTopics: isSchoolTopics);
 }
 
-class _TopicsState extends State<Topics>
-    with AutomaticKeepAliveClientMixin<Topics> {
+class _TopicsState extends State<Topics> {
   final bool isSchoolTopics;
   final double topicHeight = ScreenUtil().setHeight(430);
+  static double schoolOffset = 0;
+  static double interSchoolOffset = 0;
+
 
   _TopicsState({this.isSchoolTopics});
 
-  TopicModel topics;
+  static TopicModel schoolTopics;
+  static TopicModel interSchoolTopics;
   int pageCount = 0;
   int itemCount = 0;
   EasyRefreshController _refreshController;
@@ -185,17 +193,20 @@ class _TopicsState extends State<Topics>
     print('topics正在initstate');
     _refreshController = EasyRefreshController();
     _getInitialTopicsData(2);
+    print("init");
     super.initState();
   }
 
   @override
   void dispose() {
     _refreshController.dispose();
+    print("dispose");
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("build $isSchoolTopics");
     super.build(context);
     return body;
   }
@@ -299,79 +310,102 @@ class _TopicsState extends State<Topics>
     double topicWidth = topicHeight * 1.6;
     return CachedNetworkImage(
       imageUrl: item.image,
-      imageBuilder: (context, imageProvider) => InkWell(
-        onTap: () {
-          widget.push(() async {
-            Application.router.navigateTo(context,
-                '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
-          });
-        },
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            margin: EdgeInsets.only(top: ScreenUtil().setWidth(20)),
-            height: topicHeight,
-            width: topicWidth,
-            decoration: BoxDecoration(
-              // color: Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(3)),
-              // border: Border.all(color: Colors.black, width: 2),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.fill,
+      imageBuilder: (context, imageProvider) {
+        return ImageItem(
+          item: item,
+          imageProvider: imageProvider,
+          onTap: (){
+            widget.push(() async {
+              Application.router.navigateTo(context,
+                  '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
+            });
+          },
+          key: ValueKey(item.image),
+        );
+      },
+      errorWidget: (context, url, error) => Icon(Icons.error),
+    );
+  }
+}
+
+class ImageItem extends StatelessWidget{
+  ImageItem({this.item, this.imageProvider, this.onTap, Key key}):super(key:key);
+  final TopicModelData item;
+  final ImageProvider imageProvider;
+  final VoidCallback onTap;
+  static final double topicHeight = ScreenUtil().setHeight(430);
+  static final double topicWidth = topicHeight * 1.6;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          margin: EdgeInsets.only(top: ScreenUtil().setWidth(20)),
+          height: topicHeight,
+          width: topicWidth,
+          decoration: BoxDecoration(
+            // color: Colors.green,
+            borderRadius: BorderRadius.all(Radius.circular(3)),
+            // border: Border.all(color: Colors.black, width: 2),
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.fill,
+            ),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              Opacity(
+                opacity: 0.2,
+                child: Container(
+                  // width: ScreenUtil().setWidth(750),
+                  color: Colors.black,
+                ),
               ),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: <Widget>[
-                Opacity(
-                  opacity: 0.2,
+              Container(
+                height: ScreenUtil().setHeight(200),
+                width: ScreenUtil().setWidth(550),
+                alignment: Alignment.center,
+                // padding: EdgeInsets.symmetric(horizontal: 80),
+                decoration: BoxDecoration(
+                  // color: Colors.white,
+                    border:
+                    Border.all(color: Colors.white.withOpacity(0.3))),
+                child: Text(
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Colors.white,
+                    fontSize: ScreenUtil().setSp(40),
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Positioned(
+                  bottom: topicHeight / 4.5,
                   child: Container(
-                    // width: ScreenUtil().setWidth(750),
-                    color: Colors.black,
-                  ),
-                ),
-                Container(
-                  height: ScreenUtil().setHeight(200),
-                  width: ScreenUtil().setWidth(550),
-                  alignment: Alignment.center,
-                  // padding: EdgeInsets.symmetric(horizontal: 80),
-                  decoration: BoxDecoration(
-                      // color: Colors.white,
-                      border: Border.all(color: Colors.white.withOpacity(0.3))),
-                  child: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      color: Colors.white,
-                      fontSize: ScreenUtil().setSp(40),
-                      fontWeight: FontWeight.bold,
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Positioned(
-                    bottom: topicHeight / 4.5,
-                    child: Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                      ),
-                      child: Text(
-                        '点击查看详情',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: ScreenUtil().setSp(20)),
-                      ),
-                    )),
-              ],
-            ),
+                    child: Text(
+                      '点击查看详情',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil().setSp(20)),
+                    ),
+                  )),
+            ],
           ),
         ),
       ),
-      errorWidget: (context, url, error) => Icon(Icons.error),
     );
   }
 }
