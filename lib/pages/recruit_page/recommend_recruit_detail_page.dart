@@ -123,7 +123,7 @@ class _RecommendRecruitDetailPageState
           Container(
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 1),
               width: double.infinity,
-              height: 250,
+              height:  ScreenUtil().setHeight(392),
               child: Hero(
                 tag: item.image,
                 child: CachedNetworkImage(

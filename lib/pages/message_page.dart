@@ -111,7 +111,7 @@ class _MessagePageState extends State<MessagePage> {
         }
         return _generateUserMessage(index - 3);
       },
-      itemCount: data.users.length + 3,
+      itemCount: data.usersIndex.length + 3,
     );
   }
 

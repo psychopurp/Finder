@@ -63,15 +63,23 @@ class Avatar extends StatelessWidget {
 //    } else
 //      return baseUrl + url;
     String baseUrl = "https://image.finder-nk.com";
+    String target;
     if (url == null) {
-      return baseUrl + "/static/default.png";
+      return baseUrl + "/static/default.png?x-oss-process=style/50zip";
     }
     if (url.startsWith("http")) {
-      return url;
+      target = url;
+      if(!target.startsWith(baseUrl)) {
+        return target;
+      }
     } else if (url.startsWith("/media")) {
-      return baseUrl + url.substring(6);
+      target = baseUrl + url.substring(6);
     } else {
-      return baseUrl + url;
+      target = baseUrl + url;
     }
+    if(!target.endsWith("gif") && !target.endsWith("50zip")) {
+      target = target + "?x-oss-process=style/50zip";
+    }
+    return target;
   }
 }

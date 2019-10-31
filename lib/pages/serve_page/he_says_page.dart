@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/he_says_item.dart';
+import 'package:finder/plugin/drop_down_text.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -412,7 +413,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                   ],
                 ),
               ),
-              ContentWidget(content: item.content),
+              DropDownTextWidget(content: item.content),
             ],
           ),
           Container(
@@ -551,123 +552,6 @@ class _HeSaysPageState extends State<HeSaysPage> {
           });
     }
     isLiking = false;
-  }
-}
-
-class ContentWidget extends StatefulWidget {
-  ContentWidget({@required this.content});
-
-  final String content;
-
-  @override
-  _ContentWidgetState createState() => _ContentWidgetState();
-}
-
-class _ContentWidgetState extends State<ContentWidget>
-    with SingleTickerProviderStateMixin {
-  AnimationController controller;
-  Animation animation;
-  Tween<double> tween;
-  bool isShowMore = false;
-  bool isMoreText = false;
-  int lines;
-  double fontSize;
-  double maxHeight;
-  Duration _defaultDuration = Duration(milliseconds: 200);
-  Curve curve = Curves.easeInOut;
-
-  @override
-  void initState() {
-    super.initState();
-    fontSize = 14;
-    maxHeight = fontSize * 7.5;
-    controller = AnimationController(vsync: this, duration: _defaultDuration);
-    double width = 350;
-    int lineWords = (width / fontSize).ceil();
-    List<String> contents = widget.content.split("\n");
-    lines = 0;
-    contents.forEach((e){
-      lines += (e.length / lineWords).ceil();
-    });
-    if (lines < 5) {
-      maxHeight = lines * 1.5 * fontSize;
-    }
-    tween = Tween<double>(begin: maxHeight, end: lines * fontSize * 1.5);
-    animation =
-        tween.animate(CurvedAnimation(curve: curve, parent: controller));
-    animation.addListener(() {
-      setState(() {
-        maxHeight = animation.value;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    controller.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget mainContent = Container(
-      constraints: BoxConstraints(maxHeight: maxHeight, minHeight: 0),
-      margin: EdgeInsets.only(top: 10),
-      alignment: Alignment.topLeft,
-      child: Text(
-        widget.content,
-        textAlign: TextAlign.left,
-        overflow: TextOverflow.ellipsis,
-        maxLines: isMoreText ? 1000 : 5,
-        style: TextStyle(fontSize: fontSize),
-      ),
-    );
-    TextStyle style = TextStyle(fontSize: 13, color: Color(0xFFF0AA89));
-    return lines < 5
-        ? mainContent
-        : Column(
-            children: <Widget>[
-              mainContent,
-              Container(
-                child: MaterialButton(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  padding: EdgeInsets.all(0),
-                  child: isShowMore
-                      ? Text(
-                          "收起",
-                          style: style,
-                        )
-                      : Text(
-                          "查看全文",
-                          style: style,
-                        ),
-                  onPressed: () {
-                    setState(() {
-                      if (isShowMore) {
-                        controller.reverse();
-                      } else {
-                        controller.forward();
-                      }
-                      isShowMore = !isShowMore;
-                      if (!isMoreText) {
-                        isMoreText = true;
-                      }
-                    });
-                    if (!isShowMore) {
-                      Future.delayed(_defaultDuration).then((_) {
-                        setState(() {
-                          isMoreText = !isMoreText;
-                        });
-                      });
-                    }
-                  },
-                ),
-                width: double.infinity,
-                alignment: Alignment.topRight,
-              )
-            ],
-          );
   }
 }
 

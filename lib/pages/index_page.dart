@@ -46,6 +46,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
             (route) => route == null);
       }
       MessageModel().addListener(update);
+      MessageModel().indexContext = context;
     });
   }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:finder/config/api_client.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/plugin/drop_down_text.dart';
 import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
@@ -533,8 +534,8 @@ class _TopicCommentsState extends State<TopicComments> {
                     child: Text("删除"),
                     onPressed: () async {
                       FinderDialog.showLoading();
-                      var data =
-                      await apiClient.deleteTopicComment(commentId: item.id);
+                      var data = await apiClient.deleteTopicComment(
+                          commentId: item.id);
                       await getInitialData();
 
                       widget.controller.animateTo(0,
@@ -724,14 +725,17 @@ class _TopicCommentsState extends State<TopicComments> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            text,
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontFamily: 'normal',
-                fontSize: ScreenUtil().setSp(30)),
+//          Text(
+//            text,
+//            maxLines: 5,
+//            overflow: TextOverflow.ellipsis,
+//            style: TextStyle(
+//                fontWeight: FontWeight.w500,
+//                fontFamily: 'normal',
+//                fontSize: ScreenUtil().setSp(30)),
+//          ),
+          DropDownTextWidget(
+            content: text,
           ),
           SizedBox(
             height: (text == "" || text == null) ? 0 : 10,
