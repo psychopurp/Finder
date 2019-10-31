@@ -177,19 +177,16 @@ class Topics extends StatefulWidget {
 }
 
 class _TopicsState extends State<Topics> {
+  _TopicsState({this.isSchoolTopics});
+  ScrollController _scrollController;
   final bool isSchoolTopics;
   static double schoolOffset = 0;
   static double interSchoolOffset = 0;
-
-  _TopicsState({this.isSchoolTopics});
-
-  ScrollController _scrollController;
-
   static TopicModel schoolTopics;
   static TopicModel interSchoolTopics;
   static int schoolPageCount = 0;
   static int interSchoolPageCount = 0;
-  int itemCount = 0;
+
   EasyRefreshController _refreshController;
 
   @override
@@ -201,7 +198,6 @@ class _TopicsState extends State<Topics> {
         _scrollController = ScrollController();
       } else {
         _scrollController = ScrollController(initialScrollOffset: schoolOffset);
-        itemCount = schoolTopics.data.length;
       }
     } else {
       if (interSchoolTopics == null) {
@@ -210,7 +206,6 @@ class _TopicsState extends State<Topics> {
       } else {
         _scrollController =
             ScrollController(initialScrollOffset: interSchoolOffset);
-        itemCount = interSchoolTopics.data.length;
       }
     }
     _scrollController.addListener(() {
@@ -266,7 +261,6 @@ class _TopicsState extends State<Topics> {
           int pageCount =
               isSchoolTopics ? schoolPageCount : interSchoolPageCount;
           bool hasMore = await _getMore(pageCount);
-          print(hasMore);
           _refreshController.finishLoad(success: true, noMore: (!hasMore));
         },
         scrollController: _scrollController,
@@ -276,7 +270,7 @@ class _TopicsState extends State<Topics> {
               (context, index) {
                 return _singleItem(context, topics.data[index], index);
               },
-              childCount: this.itemCount,
+              childCount: isSchoolTopics ? schoolTopics.data.length : interSchoolTopics.data.length,
             ),
           ),
         ],
@@ -311,17 +305,15 @@ class _TopicsState extends State<Topics> {
       newTopics.data.removeWhere((item) => item.school != null);
     }
     // print('topicsData=======>${topicsData}');
+    if (isSchoolTopics) {
+      schoolTopics = newTopics;
+      schoolPageCount = pageCount + 1;
+    } else {
+      interSchoolTopics = newTopics;
+      interSchoolPageCount = pageCount + 1;
+    }
     if (!mounted) return;
-    setState(() {
-      if (isSchoolTopics) {
-        schoolTopics = newTopics;
-        schoolPageCount = pageCount + 1;
-      } else {
-        interSchoolTopics = newTopics;
-        interSchoolPageCount = pageCount + 1;
-      }
-      this.itemCount = schoolTopics.data.length;
-    });
+    setState(() {});
   }
 
   ///return hasMore
@@ -335,17 +327,16 @@ class _TopicsState extends State<Topics> {
     } else {
       newTopics.data.removeWhere((item) => item.school != null);
     }
-
-    setState(() {
-      if (isSchoolTopics) {
-        schoolTopics.data.addAll(newTopics.data);
-        schoolPageCount ++;
-      } else {
-        interSchoolTopics.data.addAll(newTopics.data);
-        interSchoolPageCount ++;
-      }
-      this.itemCount = this.itemCount + newTopics.data.length;
-    });
+    if (isSchoolTopics) {
+      schoolTopics.data.addAll(newTopics.data);
+      schoolPageCount ++;
+    } else {
+      interSchoolTopics.data.addAll(newTopics.data);
+      interSchoolPageCount ++;
+    }
+    if(mounted){
+      setState(() {});
+    }
     return newTopics.hasMore;
   }
 
