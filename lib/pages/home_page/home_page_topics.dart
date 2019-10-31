@@ -118,8 +118,6 @@ class HomePageTopics extends StatelessWidget {
 class TopicList extends StatelessWidget {
   final double topicListHeight =
       (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2;
-  final double topicHeight =
-      (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2 - 10;
 
   final bool isSchoolTopics;
   final List<TopicModelData> topicsData;
@@ -146,85 +144,107 @@ class TopicList extends StatelessWidget {
   _singleItem(
       BuildContext context, TopicModelData item, int index, bool inSchool) {
     ///宽高比 1.6/1
-    double topicWidth = topicHeight * 1.6;
     return CachedNetworkImage(
       imageUrl: item.image,
-      imageBuilder: (context, imageProvider) => InkWell(
-        onTap: () {
+      imageBuilder: (context, imageProvider) => ImageItem(
+        onTap: (){
           push(()async{
             await Application.router.navigateTo(context,
                 '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
           });
         },
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            height: topicHeight,
-            width: topicWidth,
-            margin: EdgeInsets.only(right: ScreenUtil().setWidth(20)),
-            decoration: BoxDecoration(
-              // color: Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              // border: Border.all(color: Colors.black, width: 2),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
-              ),
+        imageProvider: imageProvider,
+        inSchool: inSchool,
+        item: item,
+        key: ValueKey(item.image)
+      ),
+      errorWidget: (context, url, error) => Icon(Icons.error),
+    );
+  }
+}
+
+class ImageItem extends StatelessWidget{
+  ImageItem({this.item, this.imageProvider, this.onTap, this.inSchool, Key key}):super(key:key);
+  final TopicModelData item;
+  final ImageProvider imageProvider;
+  final VoidCallback onTap;
+  final bool inSchool;
+  static final double topicHeight =
+      (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2 - 10;
+  static final double topicWidth = topicHeight * 1.6;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          height: topicHeight,
+          width: topicWidth,
+          margin: EdgeInsets.only(right: ScreenUtil().setWidth(20)),
+          decoration: BoxDecoration(
+            // color: Colors.green,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            // border: Border.all(color: Colors.black, width: 2),
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
             ),
-            child: Stack(
-              children: <Widget>[
-                Opacity(
-                  opacity: 0.35,
-                  child: Container(
-                    // width: ScreenUtil().setWidth(750),
-                    decoration: BoxDecoration(
-                        color: Color(0xff444444),
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                  ),
+          ),
+          child: Stack(
+            children: <Widget>[
+              Opacity(
+                opacity: 0.35,
+                child: Container(
+                  // width: ScreenUtil().setWidth(750),
+                  decoration: BoxDecoration(
+                      color: Color(0xff444444),
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
                 ),
-                Positioned(
-                    top: ScreenUtil().setHeight(13),
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 7),
-                      decoration: BoxDecoration(
-                          color:
-                              Theme.of(context).primaryColor.withOpacity(0.8),
-                          borderRadius: BorderRadius.only(
-                              // topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                              // bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(20))),
-                      child: Text(
-                        inSchool ? '校内' : '校际',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: ScreenUtil().setSp(22)),
-                      ),
-                    )),
-                Container(
-                  alignment: Alignment.center,
-                  // color: Colors.blue,
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Montserrat',
-                      fontSize: ScreenUtil().setSp(28),
-                      fontWeight: FontWeight.w600,
+              ),
+              Positioned(
+                  top: ScreenUtil().setHeight(13),
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 7),
+                    decoration: BoxDecoration(
+                        color:
+                        Theme.of(context).primaryColor.withOpacity(0.8),
+                        borderRadius: BorderRadius.only(
+                          // topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                            // bottomLeft: Radius.circular(10),
+                            bottomRight: Radius.circular(20))),
+                    child: Text(
+                      inSchool ? '校内' : '校际',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil().setSp(22)),
                     ),
-                    textAlign: TextAlign.center,
+                  )),
+              Container(
+                alignment: Alignment.center,
+                // color: Colors.blue,
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Montserrat',
+                    fontSize: ScreenUtil().setSp(28),
+                    fontWeight: FontWeight.w600,
                   ),
-                )
-              ],
-            ),
+                  textAlign: TextAlign.center,
+                ),
+              )
+            ],
           ),
         ),
       ),
-      errorWidget: (context, url, error) => Icon(Icons.error),
     );
   }
 }

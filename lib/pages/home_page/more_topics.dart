@@ -52,6 +52,8 @@ class _MoreTopicsState extends State<MoreTopics>
     _TopicsState.schoolTopics = null;
     _TopicsState.schoolOffset = 0;
     _TopicsState.interSchoolOffset = 0;
+    _TopicsState.schoolPageCount = 0;
+    _TopicsState.interSchoolPageCount = 0;
     _tabController.dispose();
     super.dispose();
   }
@@ -176,42 +178,45 @@ class Topics extends StatefulWidget {
 
 class _TopicsState extends State<Topics> {
   final bool isSchoolTopics;
-  final double topicHeight = ScreenUtil().setHeight(430);
   static double schoolOffset = 0;
   static double interSchoolOffset = 0;
 
   _TopicsState({this.isSchoolTopics});
+
   ScrollController _scrollController;
 
   static TopicModel schoolTopics;
   static TopicModel interSchoolTopics;
-  int pageCount = 0;
+  static int schoolPageCount = 0;
+  static int interSchoolPageCount = 0;
   int itemCount = 0;
   EasyRefreshController _refreshController;
-
 
   @override
   void initState() {
     print('topics正在initstate');
-    if(isSchoolTopics){
-      if(schoolTopics == null) {
+    if (isSchoolTopics) {
+      if (schoolTopics == null) {
         _getInitialTopicsData(2);
-        _scrollController =ScrollController();
+        _scrollController = ScrollController();
+      } else {
+        _scrollController = ScrollController(initialScrollOffset: schoolOffset);
+        itemCount = schoolTopics.data.length;
       }
-      else
-      _scrollController = ScrollController(initialScrollOffset: schoolOffset);
-    }else{
-      if(interSchoolTopics == null) {
+    } else {
+      if (interSchoolTopics == null) {
         _getInitialTopicsData(2);
-        _scrollController =ScrollController();
+        _scrollController = ScrollController();
+      } else {
+        _scrollController =
+            ScrollController(initialScrollOffset: interSchoolOffset);
+        itemCount = interSchoolTopics.data.length;
       }
-      else
-        _scrollController = ScrollController(initialScrollOffset: interSchoolOffset);
     }
-    _scrollController.addListener((){
-      if(isSchoolTopics){
+    _scrollController.addListener(() {
+      if (isSchoolTopics) {
         schoolOffset = _scrollController.offset;
-      }else{
+      } else {
         interSchoolOffset = _scrollController.offset;
       }
     });
@@ -228,15 +233,14 @@ class _TopicsState extends State<Topics> {
 
   @override
   Widget build(BuildContext context) {
-    print("build $isSchoolTopics");
     return body;
   }
 
   Widget get body {
     TopicModel topics;
-    if(isSchoolTopics){
+    if (isSchoolTopics) {
       topics = schoolTopics;
-    }else{
+    } else {
       topics = interSchoolTopics;
     }
     Widget child;
@@ -259,7 +263,9 @@ class _TopicsState extends State<Topics> {
           _refreshController.resetLoadState();
         },
         onLoad: () async {
-          bool hasMore = await _getMore(this.pageCount);
+          int pageCount =
+              isSchoolTopics ? schoolPageCount : interSchoolPageCount;
+          bool hasMore = await _getMore(pageCount);
           print(hasMore);
           _refreshController.finishLoad(success: true, noMore: (!hasMore));
         },
@@ -307,11 +313,12 @@ class _TopicsState extends State<Topics> {
     // print('topicsData=======>${topicsData}');
     if (!mounted) return;
     setState(() {
-      this.pageCount = pageCount + 1;
-      if(isSchoolTopics){
+      if (isSchoolTopics) {
         schoolTopics = newTopics;
-      }else{
+        schoolPageCount = pageCount + 1;
+      } else {
         interSchoolTopics = newTopics;
+        interSchoolPageCount = pageCount + 1;
       }
       this.itemCount = schoolTopics.data.length;
     });
@@ -330,27 +337,27 @@ class _TopicsState extends State<Topics> {
     }
 
     setState(() {
-      if(isSchoolTopics){
+      if (isSchoolTopics) {
         schoolTopics.data.addAll(newTopics.data);
-      }else{
+        schoolPageCount ++;
+      } else {
         interSchoolTopics.data.addAll(newTopics.data);
+        interSchoolPageCount ++;
       }
       this.itemCount = this.itemCount + newTopics.data.length;
-      this.pageCount++;
     });
     return newTopics.hasMore;
   }
 
   _singleItem(BuildContext context, TopicModelData item, int index) {
     ///宽高比 1.6/1
-    double topicWidth = topicHeight * 1.6;
     return CachedNetworkImage(
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) {
         return ImageItem(
           item: item,
           imageProvider: imageProvider,
-          onTap: (){
+          onTap: () {
             widget.push(() async {
               Application.router.navigateTo(context,
                   '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
@@ -364,14 +371,14 @@ class _TopicsState extends State<Topics> {
   }
 }
 
-class ImageItem extends StatelessWidget{
-  ImageItem({this.item, this.imageProvider, this.onTap, Key key}):super(key:key);
+class ImageItem extends StatelessWidget {
+  ImageItem({this.item, this.imageProvider, this.onTap, Key key})
+      : super(key: key);
   final TopicModelData item;
   final ImageProvider imageProvider;
   final VoidCallback onTap;
   static final double topicHeight = ScreenUtil().setHeight(430);
   static final double topicWidth = topicHeight * 1.6;
-
 
   @override
   Widget build(BuildContext context) {
@@ -408,9 +415,8 @@ class ImageItem extends StatelessWidget{
                 alignment: Alignment.center,
                 // padding: EdgeInsets.symmetric(horizontal: 80),
                 decoration: BoxDecoration(
-                  // color: Colors.white,
-                    border:
-                    Border.all(color: Colors.white.withOpacity(0.3))),
+                    // color: Colors.white,
+                    border: Border.all(color: Colors.white.withOpacity(0.3))),
                 child: Text(
                   item.title,
                   maxLines: 2,
