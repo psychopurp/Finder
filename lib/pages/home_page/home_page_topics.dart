@@ -116,13 +116,13 @@ class HomePageTopics extends StatelessWidget {
 }
 
 class TopicList extends StatelessWidget {
+  TopicList({this.topicsData, this.isSchoolTopics, this.push});
   final double topicListHeight =
       (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2;
 
   final bool isSchoolTopics;
   final List<TopicModelData> topicsData;
   final PushCallback push;
-  TopicList({this.topicsData, this.isSchoolTopics, this.push});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -132,7 +132,7 @@ class TopicList extends StatelessWidget {
       padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: this.topicsData.length,
+        itemCount: this.topicsData.length < 7 ? topicsData.length : 7,
         itemBuilder: (context, index) {
           return _singleItem(
               context, this.topicsData[index], index, isSchoolTopics);
