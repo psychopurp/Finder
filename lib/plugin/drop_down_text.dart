@@ -1,3 +1,4 @@
+import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 
 class DropDownTextWidget extends StatefulWidget {
@@ -12,7 +13,7 @@ class DropDownTextWidget extends StatefulWidget {
 class _DropDownTextWidgetState extends State<DropDownTextWidget>
     with SingleTickerProviderStateMixin {
   static double lineHeight = 1.4;
-  double fontSize = 14;
+  double fontSize = ScreenUtil().setSp(30);
   AnimationController controller;
   Animation animation;
   Tween<double> tween;
