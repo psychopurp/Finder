@@ -715,7 +715,7 @@ class _TopicCommentsState extends State<TopicComments> {
     List<String> images = [];
     String text = json['text'];
     imagesJson.forEach((i) {
-      images.add(i);
+      images.add(Avatar.getImageUrl(i));
     });
 
     return Container(
