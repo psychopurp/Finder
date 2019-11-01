@@ -98,7 +98,7 @@ class Avatar extends StatelessWidget {
     } else {
       target = baseUrl + url;
     }
-    if (!target.endsWith(style)) {
+    if (!target.endsWith(style) && !target.contains("x-oss-process=style")) {
       target = target + style;
     }
     return target;
