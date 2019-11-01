@@ -1,15 +1,18 @@
+import 'package:finder/config/global.dart';
 import 'package:finder/plugin/callback.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
+import "package:system_info/system_info.dart";
 
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
   static double mainHeight = ScreenUtil().setHeight(480);
   static double titleHeight = ScreenUtil().setHeight(100);
   final PushCallback push;
+
   HomePageTopics(this.topics, this.push);
 
   @override
@@ -21,7 +24,11 @@ class HomePageTopics extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _title(context),
-          TopicList(isSchoolTopics: true, topicsData: sortSchoolTopic(true), push: push,),
+          TopicList(
+            isSchoolTopics: true,
+            topicsData: sortSchoolTopic(true),
+            push: push,
+          ),
           TopicList(
             isSchoolTopics: false,
             topicsData: sortSchoolTopic(false),
@@ -117,14 +124,28 @@ class HomePageTopics extends StatelessWidget {
 
 class TopicList extends StatelessWidget {
   TopicList({this.topicsData, this.isSchoolTopics, this.push});
+
   final double topicListHeight =
       (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2;
 
   final bool isSchoolTopics;
   final List<TopicModelData> topicsData;
   final PushCallback push;
+
   @override
   Widget build(BuildContext context) {
+    int maxSize;
+    if(Global.totalMemory == null){
+      maxSize = 7;
+    }else if (Global.totalMemory < 3 * 1024) {
+      maxSize = 5;
+    } else if (Global.totalMemory < 4 * 1024) {
+      maxSize = 7;
+    } else if (Global.totalMemory < 6 * 1024) {
+      maxSize = 8;
+    } else {
+      maxSize = 10;
+    }
     return Container(
       height: topicListHeight,
       width: ScreenUtil().setWidth(750),
@@ -132,7 +153,8 @@ class TopicList extends StatelessWidget {
       padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: this.topicsData.length < 7 ? topicsData.length : 7,
+        itemCount:
+            this.topicsData.length < maxSize ? topicsData.length : maxSize,
         itemBuilder: (context, index) {
           return _singleItem(
               context, this.topicsData[index], index, isSchoolTopics);
@@ -148,24 +170,24 @@ class TopicList extends StatelessWidget {
       key: ValueKey(item.image + item.title),
       imageUrl: item.image,
       imageBuilder: (context, imageProvider) => ImageItem(
-        onTap: (){
-          push(()async{
-            await Application.router.navigateTo(context,
-                '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
-          });
-        },
-        imageProvider: imageProvider,
-        inSchool: inSchool,
-        item: item,
-        key: ValueKey(item.image)
-      ),
+          onTap: () {
+            push(() async {
+              await Application.router.navigateTo(context,
+                  '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
+            });
+          },
+          imageProvider: imageProvider,
+          inSchool: inSchool,
+          item: item,
+          key: ValueKey(item.image)),
       errorWidget: (context, url, error) => Icon(Icons.error),
     );
   }
 }
 
-class ImageItem extends StatelessWidget{
-  ImageItem({this.item, this.imageProvider, this.onTap, this.inSchool, Key key}):super(key:key);
+class ImageItem extends StatelessWidget {
+  ImageItem({this.item, this.imageProvider, this.onTap, this.inSchool, Key key})
+      : super(key: key);
   final TopicModelData item;
   final ImageProvider imageProvider;
   final VoidCallback onTap;
@@ -173,7 +195,6 @@ class ImageItem extends StatelessWidget{
   static final double topicHeight =
       (HomePageTopics.mainHeight - HomePageTopics.titleHeight) / 2 - 10;
   static final double topicWidth = topicHeight * 1.6;
-
 
   @override
   Widget build(BuildContext context) {
@@ -211,10 +232,9 @@ class ImageItem extends StatelessWidget{
                     alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 7),
                     decoration: BoxDecoration(
-                        color:
-                        Theme.of(context).primaryColor.withOpacity(0.8),
+                        color: Theme.of(context).primaryColor.withOpacity(0.8),
                         borderRadius: BorderRadius.only(
-                          // topLeft: Radius.circular(20),
+                            // topLeft: Radius.circular(20),
                             topRight: Radius.circular(20),
                             // bottomLeft: Radius.circular(10),
                             bottomRight: Radius.circular(20))),

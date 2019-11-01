@@ -43,6 +43,7 @@ dependencies:
   extended_image: ^0.6.3
   bot_toast: ^2.0.0
   palette_generator: ^0.2.0
+  system_info: ^0.1.1
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,7 @@ flutter:
   assets:
     - assets/bubble.png
     - assets/bubble_right.png
+    - assets/logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

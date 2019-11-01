@@ -9,43 +9,147 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:finder/config/global.dart';
+
 //路由管理
 import 'routers/application.dart';
 import 'package:fluro/fluro.dart';
 import 'routers/routes.dart';
+
 //状态管理
 import 'package:finder/provider/user_provider.dart';
 
-void main() {
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown
-  ]);
+const Color ActionColor = Color(0xFFDB6B5C);
 
-  global.init().then((isLogin) {
-    runApp(MyApp(
-      isLogin: isLogin,
-    ));
-    if (Platform.isAndroid) {
-      SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
-          // statusBarColor: Colors.white,
-          );
-      SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-      // print("systemUiOverlayStyle");
-    }
-  });
+void main() {
+  MyApp app = MyApp();
+  runApp(app);
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) {
+    print(flutterErrorDetails);
+    return Center(
+      child: Column(
+        children: <Widget>[
+          Icon(
+            Icons.error,
+            color: ActionColor,
+            size: 40,
+          ),
+          Text(
+            "出错了",
+            style: TextStyle(color: ActionColor, fontSize: 18),
+            textDirection: TextDirection.ltr,
+          ),
+          Text(
+            "请尝试刷新或重启App, 如未能解决, 请反馈问题!",
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+            textDirection: TextDirection.ltr,
+          )
+        ],
+      ),
+    );
+  };
 }
 
-class MyApp extends StatelessWidget {
-  final bool isLogin;
-  MyApp({this.isLogin}) {
-    final router = Router();
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isLogin;
+  bool error = false;
+  final Router router = Router();
+
+  _MyAppState() {
     Routes.configureRoutes(router);
     Application.router = router;
   }
 
   @override
+  void initState() {
+    super.initState();
+    globalInit();
+  }
+
+  Future<void> globalInit() async {
+    global.init().then((isLogin) {
+      if (isLogin == null) {
+        setState(() {
+          error = true;
+        });
+      } else {
+        setState(() {
+          this.isLogin = isLogin;
+        });
+      }
+      if (Platform.isAndroid) {
+        SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(
+            // statusBarColor: Colors.white,
+            );
+        SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+        // print("systemUiOverlayStyle");
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (error) {
+      return Container(
+        color: Colors.white,
+        height: double.infinity,
+        width: double.infinity,
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              InkWell(
+                child: Icon(
+                  Icons.error,
+                  color: ActionColor,
+                  size: 40,
+                ),
+                onTap: globalInit,
+              ),
+              InkWell(
+                child: Text(
+                  "网络连接失败, 点击重试",
+                  textDirection: TextDirection.ltr,
+                ),
+                onTap: globalInit,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (isLogin == null) {
+      return Container(
+        color: Colors.white,
+        height: double.infinity,
+        width: double.infinity,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Padding(padding: EdgeInsets.all(60),),
+              Image.asset("assets/logo.png"),
+              Text(
+                "Finders",
+                style: TextStyle(
+                  color: ActionColor,
+                  fontSize: 60,
+                  fontFamily: "Yellowtail"
+                ),
+                textDirection: TextDirection.ltr,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return MultiProvider(
         //全局状态管理
         providers: [
@@ -65,10 +169,11 @@ class MyApp extends StatelessWidget {
             ],
             navigatorObservers: [BotToastNavigatorObserver()],
             onGenerateRoute: Application.router.generator,
-            theme: _buildAppTheme(), //设置App主题
+            theme: _buildAppTheme(),
+            //设置App主题
             title: 'Findes寻你',
             debugShowCheckedModeBanner: false,
-            home: isLogin  ? IndexPage() : LoginPage(),
+            home: isLogin ? IndexPage() : LoginPage(),
 //            home: isLogin && false ? IndexPage() : RegisterPage(),
           ),
         ));
