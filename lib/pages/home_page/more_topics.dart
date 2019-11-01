@@ -276,6 +276,7 @@ class _TopicsState extends State<Topics> {
     } else {
       checkCount++;
       if (checkCount > 10) {
+        BotToast.showText(text: "主人对不起~ \n您的内存爆炸了~ \n休息一下再来看看吧~", align: Alignment(0, 0.5));
         Navigator.pop(context);
       } else {
         Future.delayed(

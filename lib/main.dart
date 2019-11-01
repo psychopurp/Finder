@@ -132,9 +132,8 @@ class _MyAppState extends State<MyApp> {
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Padding(padding: EdgeInsets.all(60),),
               Image.asset("assets/logo.png"),
               Text(
                 "Finders",
@@ -145,6 +144,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 textDirection: TextDirection.ltr,
               ),
+              Padding(padding: EdgeInsets.all(60),),
             ],
           ),
         ),
