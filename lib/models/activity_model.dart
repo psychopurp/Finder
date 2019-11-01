@@ -85,9 +85,6 @@ class ActivityModelData {
 
     place = json['place'];
 
-    if (json['poster'] == null) {
-      json['poster'] = 'null';
-    }
     poster = Avatar.getImageUrl(json['poster']);
     description = json['description'];
     signUpLocation = json['sign_up_location'];
