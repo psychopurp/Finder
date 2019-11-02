@@ -49,15 +49,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
 //    print(widget.heroTag);
     return Scaffold(
-      floatingActionButton: userItSelfId == user?.id ? null : FloatingActionButton(
-        child: Text("私信"),
-        elevation: 1,
-        onPressed: () {
-          Navigator.of(context).pushNamed(Routes.chat,
-              arguments: UserProfile.fromJson(user.toJson()));
-        },
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
+      floatingActionButton: userItSelfId == user?.id
+          ? null
+          : FloatingActionButton(
+              child: Text("私信"),
+              elevation: 1,
+              onPressed: () {
+                Navigator.of(context).pushNamed(Routes.chat,
+                    arguments: UserProfile.fromJson(user.toJson()));
+              },
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
       body: SafeArea(
         top: false,
         child: Container(
@@ -263,10 +265,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ],
               ),
 
+              Container(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: Text("简介：" + user.introduction ?? "")),
+
               ///关注
               Container(
                 // color: Colors.amber,
-                padding: EdgeInsets.only(top: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[

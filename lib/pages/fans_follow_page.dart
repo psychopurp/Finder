@@ -100,6 +100,7 @@ class _TabBodyState extends State<TabBody> {
   EasyRefreshController _refreshController;
   ScrollController _controller;
   UserProvider userProvider;
+  List<FollowerModelData> followers = [];
 
   int userItSelfId;
   bool hasMore = true;
@@ -108,13 +109,13 @@ class _TabBodyState extends State<TabBody> {
   static const int BOTHFOLLOW = 1;
   static const int FOLLOWED = 2;
 
-  int pageCount = 2;
+  int pageCount = 1;
 
   @override
   void initState() {
     _controller = ScrollController();
     _refreshController = EasyRefreshController();
-    getInitialData();
+    getData(pageCount: pageCount);
     super.initState();
   }
 
@@ -137,7 +138,7 @@ class _TabBodyState extends State<TabBody> {
 
   Widget body() {
     Widget child;
-    if (this.follower == null) {
+    if (this.followers.length == 0) {
       child = Container(
           alignment: Alignment.center,
           height: double.infinity,
@@ -153,16 +154,17 @@ class _TabBodyState extends State<TabBody> {
           SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
             // index = index % this.follower.data.length;
-            return buildUserRow(this.follower.data[index]);
-          }, childCount: this.follower.data.length)),
+            return buildUserRow(this.followers[index]);
+          }, childCount: this.followers.length)),
         ],
         onRefresh: () async {
-          await getInitialData();
+          this.followers = [];
+          await getData(pageCount: 1);
           _refreshController.resetLoadState();
         },
         onLoad: () async {
           await Future.delayed(Duration(milliseconds: 500), () {
-            getMore(pageCount: this.pageCount);
+            getData(pageCount: this.pageCount);
           });
 
           _refreshController.finishLoad(success: true, noMore: (!this.hasMore));
@@ -182,6 +184,7 @@ class _TabBodyState extends State<TabBody> {
   }
 
   buildUserRow(FollowerModelData item) {
+    // print(item.nickname);
     Widget userRow = Container(
       padding: EdgeInsets.only(top: 10.0, left: 15.0, bottom: 5),
       child: Row(
@@ -304,32 +307,39 @@ class _TabBodyState extends State<TabBody> {
     );
   }
 
-  Future getInitialData() async {
-    var data = await apiClient.getFollowers(
-        userId: widget.userId, isFan: widget.isFan);
-    print(data);
-    FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFan);
-    // print(followerModel);
+  Future getData({int pageCount}) async {
+    List<FollowerModelData> moreFollowers = [];
+    bool hasMore = true;
+    int nowPageAt;
+
+    ///如果是初始化状态
+    if (this.followers.length == 0) {
+      for (int i = 1; i <= pageCount; i++) {
+        var data = await apiClient.getFollowers(
+            page: i, userId: widget.userId, isFan: widget.isFan);
+        // print(data);
+        FollowerModel followerModel =
+            FollowerModel.fromJson(data, widget.isFan);
+        hasMore = followerModel.hasMore;
+        print(hasMore);
+        moreFollowers.addAll(followerModel.data);
+      }
+      nowPageAt = pageCount + 1;
+    } else {
+      var data = await apiClient.getFollowers(
+          page: pageCount, userId: widget.userId, isFan: widget.isFan);
+      // print(data);
+      FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFan);
+      hasMore = followerModel.hasMore;
+      moreFollowers.addAll(followerModel.data);
+      nowPageAt = this.pageCount + 1;
+    }
 
     if (!mounted) return;
     setState(() {
-      this.hasMore = followerModel.hasMore;
-      this.follower = followerModel;
-      this.pageCount = 2;
+      this.hasMore = hasMore;
+      this.followers.addAll(moreFollowers);
+      this.pageCount = nowPageAt;
     });
-  }
-
-  Future<bool> getMore({int pageCount}) async {
-    var data = await apiClient.getFollowers(
-        page: pageCount, userId: widget.userId, isFan: widget.isFan);
-
-    FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFan);
-
-    setState(() {
-      this.follower.data.addAll(followerModel.data);
-      this.hasMore = followerModel.hasMore;
-      this.pageCount++;
-    });
-    return followerModel.hasMore;
   }
 }
