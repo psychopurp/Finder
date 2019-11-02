@@ -276,7 +276,8 @@ class _TopicsState extends State<Topics> {
     } else {
       checkCount++;
       if (checkCount > 10) {
-        BotToast.showText(text: "主人对不起~ \n您的内存爆炸了~ \n休息一下再来看看吧~", align: Alignment(0, 0.5));
+        BotToast.showText(
+            text: "主人对不起~ \n您的内存爆炸了~ \n休息一下再来看看吧~", align: Alignment(0, 0.5));
         Navigator.pop(context);
       } else {
         Future.delayed(
@@ -363,6 +364,7 @@ class _TopicsState extends State<Topics> {
   ///初始话数据 获取两页数据
   Future _getInitialTopicsData(int pageCount) async {
     var topicsData = await apiClient.getTopics(page: 1);
+    print(topicsData);
     TopicModel newTopics = TopicModel.fromJson(topicsData);
     for (int i = 2; i <= pageCount; i++) {
       var topicsDataTemp = await apiClient.getTopics(page: i);
