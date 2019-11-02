@@ -363,17 +363,20 @@ class _MinePageState extends State<MinePage> {
                 ],
               ),
 
+              Container(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: Text("简介：" + user.introduction ?? "")),
+
               ///关注
               Container(
                 // color: Colors.amber,
-                padding: EdgeInsets.only(top: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     MaterialButton(
                       onPressed: () {
                         Application.router.navigateTo(context,
-                            "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=true");
+                            "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFan=false");
                       },
                       shape: RoundedRectangleBorder(),
                       child: Column(
@@ -386,7 +389,7 @@ class _MinePageState extends State<MinePage> {
                     MaterialButton(
                       onPressed: () {
                         Application.router.navigateTo(context,
-                            "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFollow=false");
+                            "${Routes.fansFollowPage}?userId=${user.id.toString()}&isFan=true");
                       },
                       shape: RoundedRectangleBorder(),
                       child: Column(

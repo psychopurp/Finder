@@ -269,11 +269,11 @@ var collectionPageHandler = Handler(
 var fansFollowPageHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   String userId = params['userId']?.first;
-  String isFollow = params['isFollow']?.first;
+  String isFan = params['isFan']?.first;
 
   return FansFollowPage(
     userId: int.parse(userId),
-    isFollow: (isFollow == 'true') ? true : false,
+    isFan: (isFan == 'true') ? true : false,
   );
 });
 
@@ -284,8 +284,8 @@ var changeUserProfilePageHandler = Handler(
 //条款
 var privacyHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      return PrivacyRoute();
-    });
+  return PrivacyRoute();
+});
 //条款
 var serveProtocolHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {

@@ -12,8 +12,8 @@ import 'package:provider/provider.dart';
 
 class FansFollowPage extends StatefulWidget {
   final int userId;
-  final bool isFollow;
-  FansFollowPage({this.userId, this.isFollow});
+  final bool isFan;
+  FansFollowPage({this.userId, this.isFan});
 
   @override
   _FansFollowPageState createState() => _FansFollowPageState();
@@ -28,7 +28,7 @@ class _FansFollowPageState extends State<FansFollowPage>
     super.initState();
 
     _tabController = TabController(
-        vsync: this, initialIndex: widget.isFollow ? 0 : 1, length: 2);
+        vsync: this, initialIndex: widget.isFan ? 1 : 0, length: 2);
   }
 
   @override
@@ -54,7 +54,7 @@ class _FansFollowPageState extends State<FansFollowPage>
         bottom: TabBar(
           isScrollable: true,
           labelColor: Colors.black,
-          indicatorWeight: 3,
+          indicatorWeight: 2,
           indicatorColor: Theme.of(context).primaryColor,
           controller: _tabController,
           labelPadding: EdgeInsets.symmetric(horizontal: 30),
@@ -75,11 +75,11 @@ class _FansFollowPageState extends State<FansFollowPage>
         children: <Widget>[
           TabBody(
             userId: widget.userId,
-            isFollow: true,
+            isFan: false,
           ),
           TabBody(
             userId: widget.userId,
-            isFollow: false,
+            isFan: true,
           )
         ],
       ),
@@ -89,8 +89,8 @@ class _FansFollowPageState extends State<FansFollowPage>
 
 class TabBody extends StatefulWidget {
   final int userId;
-  final bool isFollow;
-  TabBody({this.userId, this.isFollow});
+  final bool isFan;
+  TabBody({this.userId, this.isFan});
   @override
   _TabBodyState createState() => _TabBodyState();
 }
@@ -99,14 +99,16 @@ class _TabBodyState extends State<TabBody> {
   FollowerModel follower;
   EasyRefreshController _refreshController;
   ScrollController _controller;
+  UserProvider userProvider;
+
+  int userItSelfId;
+  bool hasMore = true;
 
   static const int FOLLOW = 0;
   static const int BOTHFOLLOW = 1;
   static const int FOLLOWED = 2;
 
   int pageCount = 2;
-  int userItSelfId;
-  bool hasMore = true;
 
   @override
   void initState() {
@@ -118,21 +120,22 @@ class _TabBodyState extends State<TabBody> {
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
     _refreshController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
+
     setState(() {
-      userItSelfId = user.userInfo.id;
+      userItSelfId = userProvider.userInfo.id;
     });
-    return body(user);
+    return body();
   }
 
-  Widget body(UserProvider userProvider) {
+  Widget body() {
     Widget child;
     if (this.follower == null) {
       child = Container(
@@ -140,28 +143,29 @@ class _TabBodyState extends State<TabBody> {
           height: double.infinity,
           child: CupertinoActivityIndicator());
     } else {
-      child = EasyRefresh(
+      child = EasyRefresh.custom(
         enableControlFinishLoad: true,
+        primary: true,
         header: MaterialHeader(),
         footer: MaterialFooter(),
-        // key: ValueKey(child),
         controller: _refreshController,
-        child: ListView(
-            // physics: AlwaysScrollableScrollPhysics(),
-            // padding: EdgeInsets.only(bottom: 100),
-            children: buildUserList(userProvider)),
+        slivers: <Widget>[
+          SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+            // index = index % this.follower.data.length;
+            return buildUserRow(this.follower.data[index]);
+          }, childCount: this.follower.data.length)),
+        ],
         onRefresh: () async {
           await getInitialData();
           _refreshController.resetLoadState();
         },
         onLoad: () async {
-          await getMore(pageCount: this.pageCount);
-          await Future.delayed(Duration(seconds: 1), () {
-            _refreshController.finishLoad(
-                success: true, noMore: (!this.hasMore));
+          await Future.delayed(Duration(milliseconds: 500), () {
+            getMore(pageCount: this.pageCount);
           });
 
-          // print("data===$data");
+          _refreshController.finishLoad(success: true, noMore: (!this.hasMore));
         },
       );
     }
@@ -177,88 +181,75 @@ class _TabBodyState extends State<TabBody> {
         child: child);
   }
 
-  buildUserList(UserProvider userProvider) {
-    List<Widget> content = [];
-    this.follower.data.forEach((item) {
-      Widget userRow = Container(
-        padding: EdgeInsets.only(top: 10.0, left: 15.0, bottom: 5),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            ///头像
-            GestureDetector(
-              onTap: () {
-                Application.router.navigateTo(context,
-                    "${Routes.userProfile}?senderId=${item.id.toString()}&heroTag=${item.id.toString() + widget.isFollow.toString() + 'follower'}");
-              },
-              child: Hero(
-                tag: item.id.toString() +
-                    widget.isFollow.toString() +
-                    'follower',
-                child: Avatar(
-                  url: item.avatar,
-                  avatarHeight: 40,
+  buildUserRow(FollowerModelData item) {
+    Widget userRow = Container(
+      padding: EdgeInsets.only(top: 10.0, left: 15.0, bottom: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ///头像
+          GestureDetector(
+            onTap: () {
+              Application.router.navigateTo(context,
+                  "${Routes.userProfile}?senderId=${item.id.toString()}&heroTag=${item.id.toString() + widget.isFan.toString() + 'follower'}");
+            },
+            child: Hero(
+              tag: item.id.toString() + widget.isFan.toString() + 'follower',
+              child: Avatar(
+                url: item.avatar,
+                avatarHeight: 40,
+              ),
+            ),
+          ),
+
+          ///名字/简介
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(left: 10.0),
+                  child: Text(
+                    item.nickname,
+                    style: Theme.of(context)
+                        .textTheme
+                        .body1
+                        .copyWith(fontSize: 15),
+                  ),
                 ),
-              ),
-            ),
-
-            ///名字/简介
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      item.nickname,
-                      style: Theme.of(context)
-                          .textTheme
-                          .body1
-                          .copyWith(fontSize: 15),
-                    ),
+                Padding(
+                  padding: EdgeInsets.only(left: 10.0, top: 5.0),
+                  child: Text(
+                    item.introduction != null ? item.introduction : "",
+                    style: Theme.of(context).textTheme.body2,
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10.0, top: 5.0),
-                    child: Text(
-                      item.introduction != null ? item.introduction : "",
-                      style: Theme.of(context).textTheme.body2,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
 
-            ///关注按钮
-            Container(
-                height: 40,
-                // color: Colors.amber,
-                alignment: Alignment.center,
-                padding: EdgeInsets.only(right: 10),
-                child: (item.id == userItSelfId)
-                    ? Container()
-                    : getButton(item.status, item, userProvider))
-          ],
-        ),
-      );
+          ///关注按钮
+          Container(
+              height: 40,
+              // color: Colors.amber,
+              alignment: Alignment.center,
+              padding: EdgeInsets.only(right: 10),
+              child: (item.id == userItSelfId) ? Container() : getButton(item))
+        ],
+      ),
+    );
 
-      content.add(userRow);
-    });
-    // content.addAll(content);
-    // content.addAll(content);
-    // content.addAll(content);
-    // content.addAll(content);
-
-    return content;
+    return userRow;
   }
 
-  getButton(int typeId, FollowerModelData userInfo, UserProvider userProvider) {
+  getButton(FollowerModelData userInfo) {
     String buttonText = "";
-    if (typeId == FOLLOW) {
+    if (userInfo.status == FOLLOW) {
       buttonText = "关注";
-    } else if (typeId == FOLLOWED) {
+    } else if (userInfo.status == FOLLOWED) {
       buttonText = "已关注";
-    } else if (typeId == BOTHFOLLOW) {
+    } else if (userInfo.status == BOTHFOLLOW) {
       buttonText = "相互关注";
     }
 
@@ -267,7 +258,7 @@ class _TabBodyState extends State<TabBody> {
         // handleFollow(user, userInfo);
         var data = await userProvider.addFollower(userId: userInfo.id);
         print(data);
-        if (widget.isFollow) {
+        if (!widget.isFan) {
           //本来是相互关注
           if (userInfo.isBothFollowed) {
             if (userInfo.status == BOTHFOLLOW) {
@@ -285,19 +276,10 @@ class _TabBodyState extends State<TabBody> {
           }
         } else {
           //本来是相互关注
-          if (userInfo.isBothFollowed) {
-            if (userInfo.status == BOTHFOLLOW) {
-              userInfo.status = FOLLOW;
-            } else {
-              userInfo.status = BOTHFOLLOW;
-            }
+          if (userInfo.status == BOTHFOLLOW) {
+            userInfo.status = FOLLOW;
           } else {
-            //本来不是相互关注
-            if (userInfo.status == FOLLOW) {
-              userInfo.status = BOTHFOLLOW;
-            } else {
-              userInfo.status = FOLLOWED;
-            }
+            userInfo.status = BOTHFOLLOW;
           }
         }
         setState(() {});
@@ -307,7 +289,7 @@ class _TabBodyState extends State<TabBody> {
           alignment: Alignment.center,
           decoration: BoxDecoration(
               border: Border.all(
-                  color: (typeId == FOLLOW)
+                  color: (userInfo.status == FOLLOW)
                       ? Theme.of(context).primaryColor
                       : Colors.black12),
               borderRadius: BorderRadius.circular(30)),
@@ -315,7 +297,7 @@ class _TabBodyState extends State<TabBody> {
           child: Text(
             buttonText,
             style: TextStyle(
-                color: (typeId == FOLLOW)
+                color: (userInfo.status == FOLLOW)
                     ? Theme.of(context).primaryColor
                     : Colors.black45),
           )),
@@ -324,9 +306,9 @@ class _TabBodyState extends State<TabBody> {
 
   Future getInitialData() async {
     var data = await apiClient.getFollowers(
-        userId: widget.userId, isFan: !widget.isFollow);
+        userId: widget.userId, isFan: widget.isFan);
     print(data);
-    FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFollow);
+    FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFan);
     // print(followerModel);
 
     if (!mounted) return;
@@ -339,9 +321,9 @@ class _TabBodyState extends State<TabBody> {
 
   Future<bool> getMore({int pageCount}) async {
     var data = await apiClient.getFollowers(
-        page: pageCount, userId: widget.userId, isFan: !widget.isFollow);
+        page: pageCount, userId: widget.userId, isFan: widget.isFan);
 
-    FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFollow);
+    FollowerModel followerModel = FollowerModel.fromJson(data, widget.isFan);
 
     setState(() {
       this.follower.data.addAll(followerModel.data);
