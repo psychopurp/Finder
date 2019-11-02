@@ -66,9 +66,9 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
           widgetsBinding.addPostFrameCallback((outContext){
             if(!init){
               totalHeight = context.size.height;
-              lines = ((totalHeight - marginTop) / (fontSize * lineHeight)).ceil();
-//              print("${widget.content.substring(0, 5)}- $lines");
-//              print("${widget.content.substring(0, 5)}- $totalHeight");
+              lines = ((totalHeight) / (fontSize * lineHeight)).round();
+//              print("${widget.content.substring(0, 5)}- ${(totalHeight - marginTop) / (fontSize * lineHeight)}");
+//              print("${widget.content.substring(0, 5)}- ${totalHeight - marginTop}");
 //              print("${widget.content.substring(0, 5)}- ${totalHeight / (fontSize * lineHeight)}");
               if(lines < 5){
                 maxHeight = lines * lineHeight * fontSize + marginTop;
@@ -85,7 +85,7 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
           textAlign: TextAlign.left,
           overflow: TextOverflow.ellipsis,
           maxLines: init ?  isMoreText ? 1000 : 5 : 1000,
-          style: TextStyle(fontSize: fontSize),
+          style: TextStyle(fontSize: fontSize, height: lineHeight),
         );
       })
     );
@@ -96,10 +96,9 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
       children: <Widget>[
         mainContent,
         Container(
-          child: MaterialButton(
+          child: InkWell(
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
-            padding: EdgeInsets.all(0),
             child: isShowMore
                 ? Text(
               "收起",
@@ -109,7 +108,7 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
               "查看全文",
               style: style,
             ),
-            onPressed: () {
+            onTap: () {
               setState(() {
                 if (isShowMore) {
                   controller.reverse();
