@@ -85,11 +85,11 @@ var topicDetailsHandler = Handler(
 //活动详情页
 var acitvityDetailsHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  String activityId = params['activityId']?.first;
+  // String activityId = params['activityId']?.first;
 
   return ActivityDetailPage(
-    activityId: int.parse(activityId),
-  );
+      // activityId: int.parse(activityId),
+      );
 });
 
 //首页 -- 更多活动

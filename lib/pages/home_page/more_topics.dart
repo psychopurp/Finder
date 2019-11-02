@@ -1,4 +1,5 @@
 import 'package:finder/config/global.dart';
+import 'package:finder/pages/home_page/topic/topic_search_page.dart';
 import 'package:finder/plugin/callback.dart';
 import 'package:finder/provider/store.dart';
 import 'package:finder/routers/application.dart';
@@ -91,6 +92,19 @@ class _MoreTopicsState extends State<MoreTopics>
               fontWeight: FontWeight.w600,
             ),
           ),
+          actions: <Widget>[
+            MaterialButton(
+              child: Icon(Icons.search),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) {
+                  return TopicSearchPage();
+                }));
+                // showSearch(
+                //     context: context,
+                //     delegate: ActivitySearchDelegate(hintText: "搜索你喜欢的话题"));
+              },
+            ),
+          ],
           elevation: 0.5,
           centerTitle: true,
           bottom: new TabBar(

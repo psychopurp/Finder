@@ -129,8 +129,8 @@ class HomePageActivities extends StatelessWidget {
       imageBuilder: (context, imageProvider) => GestureDetector(
         onTap: () {
           push(() async {
-            Application.router.navigateTo(
-                context, "${Routes.activityDetail}?activityId=${item.id}");
+            Navigator.pushNamed(context, Routes.activityDetail,
+                arguments: item);
           });
         },
         child: Align(

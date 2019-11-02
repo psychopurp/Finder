@@ -20,7 +20,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   void initState() {
-    getInitialData();
+    // getInitialData();
     collect = {
       true: Icons.favorite,
       false: Icons.favorite_border,
@@ -38,6 +38,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     double picWidth = ScreenUtil().setWidth(220);
     double picHeight = picWidth * 1.4;
     final user = Provider.of<UserProvider>(context);
+    this.activity = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
         appBar: AppBar(),
