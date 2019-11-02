@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:finder/config/api_client.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/pages/profile_drawer.dart';
 import 'package:finder/pages/register_page.dart';
@@ -6,7 +8,9 @@ import 'package:finder/routers/application.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'home_page.dart';
 import 'message_page.dart';
 import 'serve_page.dart';
@@ -34,10 +38,48 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  static Future<void> checkUpdate(BuildContext context) async {
+    print("check update");
+    String url = "https://apk.finder-nk.com/lastest";
+    Dio dio = ApiClient.dio;
+    Response response = await dio.get(url);
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = response.data;
+    String nowVersion = packageInfo.version;
+    if (nowVersion.compareTo(version) < 0) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("提示"),
+              content:
+                  Text("检测到新版本? \n是否前往更新? \n(当前处于公测版本, 每个版本都将有大量变动, 建议立即更新!)"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("取消"),
+                  onPressed: () => Navigator.of(context).pop(), //关闭对话框
+                ),
+                FlatButton(
+                  child: Text("确认"),
+                  onPressed: () async {
+                    String url = "https://apk.finder-nk.com/finders.apk";
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                      BotToast.showText(text: "下载成功! 请点击安装!", align: Alignment(0, 0.4));
+                    }
+                    Navigator.of(context).pop();
+                  }, //关闭对话框
+                ),
+              ],
+            );
+          });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 300), () {
+    Future.delayed(Duration(milliseconds: 200), () {
       String nickName = Provider.of<UserProvider>(context).userInfo.nickname;
       bool notRegister = nickName == "" || nickName == null;
       if (notRegister) {
@@ -48,12 +90,13 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
       MessageModel().addListener(update);
       MessageModel().indexContext = context;
     });
+    checkUpdate(context);
   }
 
   @override
   void dispose() {
     super.dispose();
-    if(MessageModel.instance != null){
+    if (MessageModel.instance != null) {
       MessageModel().removeListener(update);
     }
   }

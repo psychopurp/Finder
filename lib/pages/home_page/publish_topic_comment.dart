@@ -292,8 +292,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
     List<String> imageString = [];
     for (var image in this.images) {
       String path = await image.filePath;
-      String imagePath =
-          Avatar.getImageUrl(await apiClient.uploadImage(File(path)));
+      String imagePath = await apiClient.uploadImage(File(path));
       imageString.add(imagePath);
     }
 

@@ -6,6 +6,7 @@ import 'package:finder/models/recruit_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
+import 'package:system_info/system_info.dart';
 
 ///**
 ///  全局信息类
@@ -20,7 +21,7 @@ class Global {
       avatar:
           'https://image.finder-nk.com/static/default.png');
   static bool isLogin = false;
-
+  static int totalMemory;
   // 是否为release版
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
   ActivityTypesModel activityTypes;
@@ -28,7 +29,12 @@ class Global {
 
   //初始化全局信息，会在APP启动时执行
   //返回 isLogin
-  Future init() async {
+  Future<bool> init() async {
+    try{
+      totalMemory = SysInfo.getTotalPhysicalMemory() ~/ (1024 * 1024);
+    }catch(e){
+      totalMemory = null;
+    }
     print('...正在进行Global初始化...');
     try {
       _prefs = await SharedPreferences.getInstance();
@@ -54,8 +60,8 @@ class Global {
       return data['status'];
     } on DioError catch (e) {
       print(e);
+      return null;
     }
-    return false;
   }
 
   ///一些全局需要的参数，避免重复获取

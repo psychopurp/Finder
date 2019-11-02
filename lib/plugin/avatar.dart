@@ -1,5 +1,5 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:finder/config/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -53,6 +53,27 @@ class Avatar extends StatelessWidget {
     );
   }
 
+  static String baseUrl = "https://image.finder-nk.com";
+  static String style;
+
+  static addPost() {
+    if (style == null) {
+      int memory = Global.totalMemory;
+      if (memory == null) {
+        style = "?x-oss-process=style/50zip";
+      } else {
+        if (memory < 3072) {
+          baseUrl = "http://nogif.finder-nk.com";
+          style = "?x-oss-process=style/30zip";
+        } else if (memory < 5120) {
+          style = "?x-oss-process=style/30zip";
+        } else {
+          style = "?x-oss-process=style/50zip";
+        }
+      }
+    }
+  }
+
   static String getImageUrl(String url) {
 //    String baseUrl = ApiClient.host;
 //    if(url == null){
@@ -62,14 +83,14 @@ class Avatar extends StatelessWidget {
 //      return url;
 //    } else
 //      return baseUrl + url;
-    String baseUrl = "https://image.finder-nk.com";
+    addPost();
     String target;
     if (url == null) {
-      return baseUrl + "/static/default.png?x-oss-process=style/50zip";
+      return baseUrl + "/static/default.png" + style;
     }
     if (url.startsWith("http")) {
       target = url;
-      if(!target.startsWith(baseUrl)) {
+      if (!target.startsWith(baseUrl)) {
         return target;
       }
     } else if (url.startsWith("/media")) {
@@ -77,8 +98,8 @@ class Avatar extends StatelessWidget {
     } else {
       target = baseUrl + url;
     }
-    if(!target.endsWith("gif") && !target.endsWith("50zip")) {
-      target = target + "?x-oss-process=style/50zip";
+    if (!target.endsWith(style) && !target.contains("x-oss-process=style")) {
+      target = target + style;
     }
     return target;
   }

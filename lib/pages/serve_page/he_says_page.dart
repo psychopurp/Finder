@@ -142,34 +142,48 @@ class _HeSaysPageState extends State<HeSaysPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        bottom: TimeSelector(
-          time: _time,
-          onSelected: (time) {
-            setState(() {
-              this.time = time;
-              page = 1;
-              isRequest = true;
-              data = [];
-            });
-            getLeadHeSheSays();
-            getHeSheSays();
-          },
-        ),
+        bottom: TimeSelector(time: _time, onSelected: changeDate),
         elevation: 0.5,
         centerTitle: true,
       ),
       backgroundColor: PageBackgroundColor,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            data = [];
-            page = 1;
-            isRequest = true;
-          });
-          await getLeadHeSheSays();
-          await getHeSheSays();
-        },
-        child: body,
+      body: Container(
+        width: ScreenUtil.screenWidthDp,
+        height: ScreenUtil.screenHeightDp,
+        child: GestureDetector(
+          onHorizontalDragEnd: (detail) {
+            double x = detail.primaryVelocity;
+            if ((x > 0 ? x : -x) < 500) {
+              return;
+            }
+            if (x < 0) {
+              var now = DateTime.now();
+              if (_time.day == now.day && _time.difference(now).inHours < 24) {
+                BotToast.showText(
+                    text: "已经是今天咯~\n明天再来试试吧~", align: Alignment(0, 0.5));
+              }else{
+                var nextDate = _time.add(Duration(days: 1));
+                print(nextDate);
+                changeDate(nextDate);
+              }
+            } else {
+              var lastDate = _time.add(Duration(days: -1));
+              print(lastDate);
+              changeDate(lastDate);
+            }
+          },
+          child: RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  data = [];
+                  page = 1;
+                  isRequest = true;
+                });
+                await getLeadHeSheSays();
+                await getHeSheSays();
+              },
+              child: body),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
 //        highlightColor: ActionColorActive,
@@ -512,7 +526,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
   }
 
   handleLike(HeSheSayItem item, bool status) async {
-    if(isLiking) return;
+    if (isLiking) return;
     isLiking = true;
     Dio dio = ApiClient.dio;
     var data = {"like": status, "id": item.id};
@@ -552,6 +566,17 @@ class _HeSaysPageState extends State<HeSaysPage> {
           });
     }
     isLiking = false;
+  }
+
+  changeDate(DateTime time) {
+    setState(() {
+      this.time = time;
+      page = 1;
+      isRequest = true;
+      data = [];
+    });
+    getLeadHeSheSays();
+    getHeSheSays();
   }
 }
 

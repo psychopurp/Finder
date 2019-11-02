@@ -1,3 +1,4 @@
+import 'package:finder/config/global.dart';
 import 'package:finder/plugin/callback.dart';
 import 'package:finder/provider/store.dart';
 import 'package:finder/routers/application.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 // import 'package:flutter_easyrefresh/bezier_bounce_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:system_info/system_info.dart';
 
 /// 此页面定义了三个statefull 页面
 
@@ -178,6 +180,7 @@ class Topics extends StatefulWidget {
 
 class _TopicsState extends State<Topics> {
   _TopicsState({this.isSchoolTopics});
+
   ScrollController _scrollController;
   final bool isSchoolTopics;
   static double schoolOffset = 0;
@@ -186,6 +189,11 @@ class _TopicsState extends State<Topics> {
   static TopicModel interSchoolTopics;
   static int schoolPageCount = 0;
   static int interSchoolPageCount = 0;
+  double lastOffset;
+  bool lock = false;
+  double lockOffset;
+  int checkCount = 10;
+  int count = 0;
 
   EasyRefreshController _refreshController;
 
@@ -215,8 +223,70 @@ class _TopicsState extends State<Topics> {
         interSchoolOffset = _scrollController.offset;
       }
     });
+    int total = Global.totalMemory;
+    if (total != null) {
+      if (total < 5 * 1024) {
+        int scale;
+        if (total < 2048) {
+          scale = 8;
+        } else if (total < 3072) {
+          scale = 10;
+        } else if (total < 4096) {
+          scale = 20;
+        } else {
+          scale = 64;
+        }
+        _scrollController.addListener(() {
+          if (count % scale == 0) {
+            memoryJudge();
+          }
+          count++;
+        });
+      }
+    }
+
     _refreshController = EasyRefreshController();
     super.initState();
+  }
+
+  Future<void> memoryJudge() async {
+    try {
+      int memory = SysInfo.getFreePhysicalMemory() ~/ (1024 * 1024);
+      if (memory < 50) {
+        if (!lock) {
+          lock = true;
+          print("lock");
+          lockOffset = _scrollController.offset;
+          checkCount = 0;
+          _scrollController.addListener(scrollLock);
+          Future.delayed(Duration(milliseconds: 50), checkToUnLock);
+        }
+      }
+    } catch (e) {
+      print("ios");
+    }
+  }
+
+  Future<void> checkToUnLock() async {
+    int memory = SysInfo.getFreePhysicalMemory() ~/ (1024 * 1024);
+    if (memory > 50) {
+      lock = false;
+      _scrollController.removeListener(scrollLock);
+      print("unlock");
+    } else {
+      checkCount++;
+      if (checkCount > 10) {
+        BotToast.showText(text: "主人对不起~ \n您的内存爆炸了~ \n休息一下再来看看吧~", align: Alignment(0, 0.5));
+        Navigator.pop(context);
+      } else {
+        Future.delayed(
+            Duration(milliseconds: 100 + checkCount * 50), checkToUnLock);
+      }
+    }
+  }
+
+  void scrollLock() {
+    _scrollController.jumpTo(lockOffset);
   }
 
   @override
@@ -270,7 +340,9 @@ class _TopicsState extends State<Topics> {
               (context, index) {
                 return _singleItem(context, topics.data[index], index);
               },
-              childCount: isSchoolTopics ? schoolTopics.data.length : interSchoolTopics.data.length,
+              childCount: isSchoolTopics
+                  ? schoolTopics.data.length
+                  : interSchoolTopics.data.length,
             ),
           ),
         ],
@@ -329,12 +401,12 @@ class _TopicsState extends State<Topics> {
     }
     if (isSchoolTopics) {
       schoolTopics.data.addAll(newTopics.data);
-      schoolPageCount ++;
+      schoolPageCount++;
     } else {
       interSchoolTopics.data.addAll(newTopics.data);
-      interSchoolPageCount ++;
+      interSchoolPageCount++;
     }
-    if(mounted){
+    if (mounted) {
       setState(() {});
     }
     return newTopics.hasMore;
