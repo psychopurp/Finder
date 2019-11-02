@@ -122,15 +122,41 @@ class _UserProfilePageState extends State<UserProfilePage> {
   avatar() => Hero(
         tag: widget.heroTag,
         child: Container(
-          // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-          height: 90,
-          width: 90,
-          decoration: BoxDecoration(
-              // shape: CircleBorder(),
-              border: Border.all(color: Colors.white, width: 3),
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              image: DecorationImage(
-                  image: CachedNetworkImageProvider(user.avatar))),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (_) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            constraints: BoxConstraints.expand(height: 500),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                CachedNetworkImage(imageUrl: this.user.avatar),
+                              ],
+                            ),
+                          ),
+                        );
+                      }));
+            },
+            child: Container(
+              // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+              height: 90,
+              width: 90,
+              decoration: BoxDecoration(
+                  // shape: CircleBorder(),
+                  border: Border.all(color: Colors.white, width: 3),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  image: DecorationImage(
+                      image: CachedNetworkImageProvider(user.avatar))),
+            ),
+          ),
         ),
       );
 
@@ -267,7 +293,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
               Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text("简介：" + user.introduction ?? "")),
+                  child: Text((user.introduction != null)
+                      ? "简介：" + user.introduction
+                      : "简介：")),
 
               ///关注
               Container(

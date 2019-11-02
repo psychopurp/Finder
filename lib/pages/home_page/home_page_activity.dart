@@ -103,7 +103,7 @@ class HomePageActivities extends StatelessWidget {
 
   Widget _activityPart() {
     return Container(
-      height: mainHeight - titleHeight,
+      height: mainHeight - 20,
       width: ScreenUtil().setWidth(750),
       padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
       // color: Colors.green,
@@ -144,16 +144,19 @@ class HomePageActivities extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  height: picHeight,
-                  width: picWidth,
-                  decoration: BoxDecoration(
-                    // color: Colors.green,
-                    borderRadius: BorderRadius.circular(10),
-                    // border: Border.all(color: Colors.black, width: 2),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
+                Hero(
+                  tag: item.id.toString() + "activityDetail",
+                  child: Container(
+                    height: picHeight,
+                    width: picWidth,
+                    decoration: BoxDecoration(
+                      // color: Colors.green,
+                      borderRadius: BorderRadius.circular(10),
+                      // border: Border.all(color: Colors.black, width: 2),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),

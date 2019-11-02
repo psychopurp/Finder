@@ -100,22 +100,25 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                         );
                       }));
                 },
-                child: Container(
-                  height: picHeight,
-                  width: picWidth,
-                  decoration: BoxDecoration(
-                      // color: Colors.yellow,
-                      borderRadius: BorderRadius.circular(5),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black38,
-                            offset: Offset(-1.0, 2.0),
-                            blurRadius: 2.0,
-                            spreadRadius: 1.0),
-                      ],
-                      image: DecorationImage(
-                          image: CachedNetworkImageProvider(activity.poster),
-                          fit: BoxFit.cover)),
+                child: Hero(
+                  tag: activity.id.toString() + "activityDetail",
+                  child: Container(
+                    height: picHeight,
+                    width: picWidth,
+                    decoration: BoxDecoration(
+                        // color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black38,
+                              offset: Offset(-1.0, 2.0),
+                              blurRadius: 2.0,
+                              spreadRadius: 1.0),
+                        ],
+                        image: DecorationImage(
+                            image: CachedNetworkImageProvider(activity.poster),
+                            fit: BoxFit.cover)),
+                  ),
                 ),
               ),
               DefaultTextStyle(

@@ -120,12 +120,12 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             Navigator.pop(context);
           },
         ),
-        actions: <Widget>[
-          MaterialButton(
-              onPressed: () {},
-              shape: CircleBorder(),
-              child: Icon(Icons.star_border))
-        ],
+        // actions: <Widget>[
+        //   MaterialButton(
+        //       onPressed: () {},
+        //       shape: CircleBorder(),
+        //       child: Icon(Icons.star_border))
+        // ],
         title: Text(
           this.widget.topicTitle,
           style: TextStyle(
