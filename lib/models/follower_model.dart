@@ -58,9 +58,9 @@ class FollowerModelData {
     id = json['id'];
     nickname = json['nickname'];
     avatar = Avatar.getImageUrl(json['avatar']);
-    introduction = json['introduction'];
-    isBothFollowed = json['is_both_followed'];
-    isFollowed = json['isFollowed'];
+    introduction = json['introduction'] ?? "";
+    isBothFollowed = json['is_both_followed'] ?? true;
+    isFollowed = json['isFollowed'] ?? true;
 
     if (isFan) {
       ///粉丝页

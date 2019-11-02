@@ -136,7 +136,7 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   @override
   void initState() {
-    _getInitialActivitiesData(2);
+    _getInitialActivitiesData(1);
     super.initState();
   }
 
@@ -167,7 +167,7 @@ class _ChildActivitiesState extends State<ChildActivities>
         footer: MaterialFooter(),
         controller: _refreshController,
         onRefresh: () async {
-          await _getInitialActivitiesData(2);
+          await _getInitialActivitiesData(1);
 
           _refreshController.resetLoadState();
         },

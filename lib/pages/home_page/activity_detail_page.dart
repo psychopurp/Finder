@@ -269,19 +269,19 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         var data = await apiClient.deleteCollection(
             modelId: item.id, type: ApiClient.ACTIVITY);
         if (data['status'] == true) {
-          showText = '取消收藏成功';
+          showText = '取消关注成功';
           item.isCollected = false;
         } else {
-          showText = '取消收藏失败';
+          showText = '取消关注失败';
         }
       } else {
         var data = await apiClient.addCollection(
             type: ApiClient.ACTIVITY, id: item.id);
         if (data['status'] == true) {
-          showText = '收藏成功';
+          showText = '关注成功';
           item.isCollected = true;
         } else {
-          showText = '收藏失败';
+          showText = '关注失败';
         }
       }
       Future.delayed(Duration(milliseconds: 300), () {

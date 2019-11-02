@@ -94,6 +94,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             body: TopicComments(
               topicId: widget.topicId,
               controller: _controller,
+              topicTitle: widget.topicTitle,
             ),
           ),
           Positioned(
@@ -235,8 +236,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 class TopicComments extends StatefulWidget {
   final ScrollController controller;
   final int topicId;
+  final String topicTitle;
 
-  TopicComments({this.topicId, this.controller});
+  TopicComments({this.topicId, this.controller, this.topicTitle});
 
   @override
   _TopicCommentsState createState() => _TopicCommentsState();
@@ -345,6 +347,7 @@ class _TopicCommentsState extends State<TopicComments> {
         bottomBouncing: false,
         controller: _refreshController,
         child: ListView(
+          padding: EdgeInsets.only(top: 10),
           children: widgets,
         ),
         onLoad: () async {
@@ -528,7 +531,7 @@ class _TopicCommentsState extends State<TopicComments> {
           builder: (_) {
             return AlertDialog(
               title: Text("提示"),
-              content: Text("确认要输出此条回复吗? "),
+              content: Text("确认要删除此条话题评论吗? "),
               actions: <Widget>[
                 FlatButton(
                   child: Text("取消"),
@@ -557,6 +560,29 @@ class _TopicCommentsState extends State<TopicComments> {
   }
 
   Widget _singleItem(TopicCommentsModelData item, UserProvider user) {
+    String getTimeString(DateTime time) {
+      DateTime now = DateTime.now();
+
+      if (now.month == now.month) {
+        if (now.difference(time).inMinutes < 60) {
+          if (now.difference(time).inMinutes == 0) {
+            return "刚刚";
+          } else {
+            return now.difference(time).inMinutes.toString() + '分钟前';
+          }
+        }
+        if ((now.difference(time).inHours) < 24) {
+          return (now.difference(time).inHours).toString() + '小时前';
+        } else {
+          if ((now.difference(time).inDays) > 3) {
+            return time.month.toString() + '月' + time.day.toString() + '日';
+          }
+          return (now.difference(time).inDays).toString() + '天前';
+        }
+      }
+      return time.month.toString() + '月' + time.day.toString() + '日';
+    }
+
     String likeCount = item.likes.toString();
     String replyCount = item.replyCount.toString();
     if (item.likes == 0) {
@@ -570,9 +596,18 @@ class _TopicCommentsState extends State<TopicComments> {
       replyCount = "999+";
     }
 
-    return InkWell(
+    Widget child = InkWell(
       onLongPress: () {
         handleDelete(user, item);
+      },
+      onTap: () {
+        var formData = {
+          'item': item,
+          'topicId': widget.topicId,
+          'topicTitle': widget.topicTitle
+        };
+        Navigator.pushNamed(context, Routes.topicCommentDetail,
+            arguments: formData);
       },
       child: Container(
         padding: EdgeInsets.only(
@@ -609,12 +644,27 @@ class _TopicCommentsState extends State<TopicComments> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
-                      child: Text(
-                        item.sender.nickname,
-                        style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w200,
-                            fontSize: ScreenUtil().setSp(35)),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            item.sender.nickname,
+                            style: TextStyle(
+                                fontFamily: 'normal',
+                                fontWeight: FontWeight.w600,
+                                fontSize: ScreenUtil().setSp(30)),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            getTimeString(item.time),
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontFamily: 'normal',
+                                fontWeight: FontWeight.w200,
+                                fontSize: ScreenUtil().setSp(25)),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -647,7 +697,7 @@ class _TopicCommentsState extends State<TopicComments> {
                     child: buttonItem['collect'][item.isCollected],
                     // color: Colors.amber,
                     splashColor: Colors.white,
-                    minWidth: ScreenUtil().setWidth(226),
+                    // minWidth: ScreenUtil().setWidth(226),
                     height: 30,
                   ),
                 ),
@@ -655,10 +705,15 @@ class _TopicCommentsState extends State<TopicComments> {
                 ///评论
                 MaterialButton(
                   onPressed: () {
-                    // onComment(item, user);
-                    String topicId = widget.topicId.toString();
-                    Application.router.navigateTo(context,
-                        "${Routes.commentPage}?topicCommentId=${item.id}&topicId=$topicId");
+                    var formData = {
+                      'item': item,
+                      'topicId': widget.topicId,
+                      'topicTitle': widget.topicTitle
+                    };
+                    Navigator.pushNamed(context, Routes.topicCommentDetail,
+                        arguments: formData);
+                    // Application.router.navigateTo(context,
+                    //     "${Routes.commentPage}?topicCommentId=${item.id}&topicId=$topicId");
                   },
                   shape: RoundedRectangleBorder(),
                   child: Row(
@@ -673,7 +728,7 @@ class _TopicCommentsState extends State<TopicComments> {
                   ),
                   // color: Colors.amber,
                   splashColor: Colors.white,
-                  minWidth: ScreenUtil().setWidth(226),
+                  // minWidth: ScreenUtil().setWidth(226),
                   height: 30,
                 ),
 
@@ -697,7 +752,7 @@ class _TopicCommentsState extends State<TopicComments> {
                         )
                       ],
                     ),
-                    minWidth: ScreenUtil().setWidth(226),
+                    // minWidth: ScreenUtil().setWidth(226),
                     // color: Colors.amber,
                     splashColor: Colors.white,
                     height: 30,
@@ -709,10 +764,19 @@ class _TopicCommentsState extends State<TopicComments> {
         ),
       ),
     );
+
+    child = Card(
+      elevation: 1,
+      color: Colors.white,
+      child: child,
+    );
+
+    return child;
   }
 
   ///话题评论--内容部分
   Widget contentPart(String content) {
+    double picWidth = ScreenUtil().setWidth(210);
     bool isSinglePic = false;
     var json = jsonDecode(content);
     List imagesJson = json['images'];
@@ -745,7 +809,7 @@ class _TopicCommentsState extends State<TopicComments> {
             height: (text == "" || text == null) ? 0 : 10,
           ),
           Container(
-            width: ScreenUtil().setWidth(680),
+            // width: ScreenUtil().setWidth(680),
             // color: Colors.green,
             child: Wrap(
               spacing: ScreenUtil().setWidth(10),
@@ -781,8 +845,8 @@ class _TopicCommentsState extends State<TopicComments> {
                     child: (isSinglePic)
                         ? _singlePic
                         : Container(
-                            height: ScreenUtil().setHeight(220),
-                            width: ScreenUtil().setWidth(220),
+                            height: picWidth,
+                            width: picWidth,
                             decoration: BoxDecoration(
                                 image: DecorationImage(
                                     image: imageProvider, fit: BoxFit.cover)),

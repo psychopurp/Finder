@@ -4,6 +4,7 @@ import 'package:finder/models/user_model.dart';
 import 'package:finder/pages/check_code_login_page.dart';
 import 'package:finder/pages/fans_follow_page.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
+import 'package:finder/pages/home_page/topici_comment_detail.dart';
 import 'package:finder/pages/message_page/chat_page.dart';
 import 'package:finder/pages/home_page/publish_topic_comment.dart';
 import 'package:finder/pages/message_page/say_to_he_chat_page.dart';
@@ -25,6 +26,7 @@ import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/pages/serve_page/internship_page/company_page.dart';
 import 'package:finder/pages/serve_page/internship_page/internship_detail_page.dart';
 import 'package:finder/pages/serve_page/internship_page/recommend_internship_detail_page.dart';
+import 'package:finder/pages/web_view.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/serve_page/lost_found_page.dart';
@@ -290,4 +292,18 @@ var privacyHandle = Handler(
 var serveProtocolHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ServeProtocolRoute();
+});
+
+var webViewPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  String url = params['url']?.first;
+  // print("url========$url");
+  return WebViewPage(
+    url: url,
+  );
+});
+
+var topicCommentDetailHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return TopicCommentDetailPage();
 });

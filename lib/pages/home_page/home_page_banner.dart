@@ -1,3 +1,4 @@
+import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:finder/models/banner_model.dart';
@@ -9,7 +10,7 @@ class HomePageBanner extends StatelessWidget {
   final BannerModel banner;
 
   HomePageBanner(this.banner);
-  static final  double bannerWight = ScreenUtil().setWidth(750);
+  static final double bannerWight = ScreenUtil().setWidth(750);
   static final double bannerHeight = bannerWight * 0.47;
 
   @override
@@ -22,11 +23,14 @@ class HomePageBanner extends StatelessWidget {
       child: Swiper(
         // layout: SwiperLayout.CUSTOM,
         // autoplayDelay: 100,
-        onTap: (index)async {
-            String url = banner.data[index].location;
-            if (await canLaunch(url)) {
-              await launch(url);
-            }
+        onTap: (index) async {
+          String url = banner.data[index].location;
+          url = Uri.encodeComponent(url);
+          Application.router
+              .navigateTo(context, "${Routes.webViewPage}?url=${url}");
+          if (await canLaunch(url)) {
+            await launch(url);
+          }
         },
         viewportFraction: 0.9,
         scale: 0.1,

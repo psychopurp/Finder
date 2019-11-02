@@ -104,6 +104,7 @@ class _TabBodyState extends State<TabBody> {
 
   int userItSelfId;
   bool hasMore = true;
+  bool isLoading = true;
 
   static const int FOLLOW = 0;
   static const int BOTHFOLLOW = 1;
@@ -138,7 +139,7 @@ class _TabBodyState extends State<TabBody> {
 
   Widget body() {
     Widget child;
-    if (this.followers.length == 0) {
+    if (this.isLoading) {
       child = Container(
           alignment: Alignment.center,
           height: double.infinity,
@@ -337,6 +338,7 @@ class _TabBodyState extends State<TabBody> {
 
     if (!mounted) return;
     setState(() {
+      this.isLoading = false;
       this.hasMore = hasMore;
       this.followers.addAll(moreFollowers);
       this.pageCount = nowPageAt;
