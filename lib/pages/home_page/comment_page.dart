@@ -102,7 +102,7 @@ class _CommentPageState extends State<CommentPage> {
               onLoad: () async {
                 await getMore(this.pageCount);
 
-                await Future.delayed(Duration(seconds: 1), () {
+                await Future.delayed(Duration(milliseconds: 500), () {
                   _refreshController.finishLoad(
                       success: true, noMore: (!this.hasMore));
                 });

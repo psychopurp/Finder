@@ -119,6 +119,12 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
             Navigator.pop(context);
           },
         ),
+        actions: <Widget>[
+          MaterialButton(
+              onPressed: () {},
+              shape: CircleBorder(),
+              child: Icon(Icons.star_border))
+        ],
         title: Text(
           this.widget.topicTitle,
           style: TextStyle(
@@ -127,9 +133,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         ),
         iconTheme: IconThemeData(color: Colors.black),
         centerTitle: true,
-        //标题居中
         expandedHeight: 200.0,
-        //展开高度200
         // floating: true, //不随着滑动隐藏标题
         // snap: true,
         pinned: true,
