@@ -480,6 +480,20 @@ class ApiClient {
     }
   }
 
+  ///获取参与的话题
+  Future getEngageTopics({int page = 1}) async {
+    var formData = {"page": page};
+    try {
+      Response response =
+          await dio.get('get_engage_topics/', queryParameters: formData);
+      // print(dio.options.headers['token']);
+      // print('获取参与的话题成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取参与的话题错误==========>$e');
+    }
+  }
+
   //接口初始化
   static void init() {
     //初始化时带上默认token
