@@ -365,7 +365,9 @@ class _MinePageState extends State<MinePage> {
 
               Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text("简介：" + user.introduction ?? "")),
+                  child: Text((user.introduction != null)
+                      ? "简介：" + user.introduction
+                      : "简介：")),
 
               ///关注
               Container(
