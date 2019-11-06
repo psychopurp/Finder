@@ -173,15 +173,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
             }
           },
           child: RefreshIndicator(
-              onRefresh: () async {
-                setState(() {
-                  data = [];
-                  page = 1;
-                  isRequest = true;
-                });
-                await getLeadHeSheSays();
-                await getHeSheSays();
-              },
+              onRefresh: refresh,
               child: body),
         ),
       ),
@@ -198,11 +190,22 @@ class _HeSaysPageState extends State<HeSaysPage> {
           size: 30,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-        onPressed: () {
-          Application.router.navigateTo(context, '/serve/heSays/heSaysPublish');
+        onPressed: () async {
+          await Application.router.navigateTo(context, '/serve/heSays/heSaysPublish');
+          refresh();
         },
       ),
     );
+  }
+
+  Future<void> refresh() async {
+      setState(() {
+        data = [];
+        page = 1;
+        isRequest = true;
+      });
+      await getLeadHeSheSays();
+      await getHeSheSays();
   }
 
   get body {

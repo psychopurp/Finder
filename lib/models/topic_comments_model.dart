@@ -45,6 +45,10 @@ class TopicCommentsModelData {
   bool isCollected;
   bool hasReply;
 
+  //单个获取时后端才会返回此数据
+  int topicId;
+  String topicTitle;
+
   TopicCommentsModelData(
       {this.id,
       this.sender,
@@ -77,6 +81,8 @@ class TopicCommentsModelData {
     isCollected = json['is_collected'];
 
     hasReply = json['has_reply'];
+    topicId = (json['topic'] ?? {})['topic_id'];
+    topicTitle = (json['topic'] ?? {})['topic_title'];
   }
 
   Map<String, dynamic> toJson() {
