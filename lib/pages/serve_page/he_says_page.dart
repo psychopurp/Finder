@@ -34,7 +34,6 @@ class _HeSaysPageState extends State<HeSaysPage> {
   int lastPage = 1;
   ScrollController _scrollController;
   String error = "网络连接失败, 请稍后再试";
-  bool isLiking = false;
 
   set time(DateTime time) {
     setState(() {
@@ -529,8 +528,6 @@ class _HeSaysPageState extends State<HeSaysPage> {
   }
 
   handleLike(HeSheSayItem item, bool status) async {
-    if (isLiking) return;
-    isLiking = true;
     Dio dio = ApiClient.dio;
     var data = {"like": status, "id": item.id};
     var jsonData = json.encode(data);
@@ -546,29 +543,8 @@ class _HeSaysPageState extends State<HeSaysPage> {
         }
       });
     } else {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("提示"),
-              content: Text("请先登录再点赞!"),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text("取消"),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                FlatButton(
-                  child: Text("确认"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/login');
-                  },
-                ),
-              ],
-            );
-          });
+      BotToast.showText(text: "不要点太快啦!", align: Alignment(0, 0.5));
     }
-    isLiking = false;
   }
 
   changeDate(DateTime time) {
