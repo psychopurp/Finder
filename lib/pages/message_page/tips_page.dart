@@ -222,6 +222,7 @@ class _TipsPageState extends State<TipsPage> {
           'topicId': item.topicId,
           'topicTitle': item.topicTitle
         };
+        print("formData $formData ============================================");
         Navigator.pushNamed(context, Routes.topicCommentDetail,
             arguments: formData);
         break;

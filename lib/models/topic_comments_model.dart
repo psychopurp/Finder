@@ -81,8 +81,8 @@ class TopicCommentsModelData {
     isCollected = json['is_collected'];
 
     hasReply = json['has_reply'];
-    topicId = (json['topic'] ?? {})['topic_id'];
-    topicTitle = (json['topic'] ?? {})['topic_title'];
+    topicId = (json['topic'] ?? {})['id'];
+    topicTitle = (json['topic'] ?? {})['title'];
   }
 
   Map<String, dynamic> toJson() {
