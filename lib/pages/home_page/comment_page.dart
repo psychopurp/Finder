@@ -31,6 +31,7 @@ class _CommentPageState extends State<CommentPage> {
   String defaultHint = '喜欢就评论告诉Ta';
   String hintText = '喜欢就评论告诉Ta';
   int pageCount = 2;
+  bool hasMore = true;
 
   @override
   void initState() {
@@ -71,57 +72,65 @@ class _CommentPageState extends State<CommentPage> {
     final user = Provider.of<UserProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("评论"),
-        textTheme: TextTheme(
-            title: Theme.of(context)
-                .appBarTheme
-                .textTheme
-                .title
-                .copyWith(color: Colors.black)),
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              _commentFocusNode.unfocus();
-            },
-            child: EasyRefresh(
-              enableControlFinishLoad: true,
-              header: MaterialHeader(),
-              footer: MaterialFooter(),
-              controller: _refreshController,
-              onRefresh: () async {
-                await getReplies();
-                _refreshController.resetLoadState();
+      // appBar: AppBar(
+      //   title: Text("评论"),
+      //   textTheme: TextTheme(
+      //       title: Theme.of(context)
+      //           .appBarTheme
+      //           .textTheme
+      //           .title
+      //           .copyWith(color: Colors.black)),
+      //   iconTheme: IconThemeData(color: Colors.black),
+      //   backgroundColor: Colors.white,
+      //   centerTitle: true,
+      // ),
+      body: Padding(
+        padding: EdgeInsets.only(top: 0),
+        child: Stack(
+          children: <Widget>[
+            GestureDetector(
+              onTap: () {
+                _commentFocusNode.unfocus();
               },
-              onLoad: () async {
-                var data = await getMore(this.pageCount);
-                print("data===$data");
-                _refreshController.finishLoad(
-                    success: true, noMore: (data.length == 0));
-              },
-              child: (this.comment != null)
-                  ? ListView(
-                      controller: _controller,
-                      padding: EdgeInsets.only(bottom: 20),
-                      children: buildContent(user))
-                  : Container(
-                      height: 400,
-                      child: CupertinoActivityIndicator(),
-                    ),
+              child: EasyRefresh(
+                enableControlFinishLoad: true,
+                bottomBouncing: false,
+                topBouncing: false,
+                header: MaterialHeader(),
+                footer: MaterialFooter(),
+                controller: _refreshController,
+                onRefresh: () async {
+                  await getReplies();
+                  _refreshController.resetLoadState();
+                },
+                onLoad: () async {
+                  await getMore(this.pageCount);
+
+                  await Future.delayed(Duration(milliseconds: 500), () {
+                    _refreshController.finishLoad(
+                        success: true, noMore: (!this.hasMore));
+                  });
+                },
+                child: (this.comment != null)
+                    ? ListView(
+                        controller: _controller,
+                        padding: EdgeInsets.only(
+                            bottom: 20, top: kToolbarHeight / 2),
+                        children: buildContent(user))
+                    : Container(
+                        height: 400,
+                        child: CupertinoActivityIndicator(),
+                      ),
+              ),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: commentBar(user),
-          )
-        ],
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: commentBar(user),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -295,7 +304,7 @@ class _CommentPageState extends State<CommentPage> {
           builder: (_) {
             return AlertDialog(
               title: Text("提示"),
-              content: Text("确认要输出此条回复吗? "),
+              content: Text("确认要删除此条回复吗? "),
               actions: <Widget>[
                 FlatButton(
                   child: Text("取消"),
@@ -355,6 +364,7 @@ class _CommentPageState extends State<CommentPage> {
     setState(() {
       this.comment = topicComment;
       this.pageCount = 2;
+      this.hasMore = topicComment.hasMore;
     });
   }
 
@@ -368,6 +378,7 @@ class _CommentPageState extends State<CommentPage> {
     setState(() {
       this.comment.data.addAll(topicComment.data);
       this.pageCount++;
+      this.hasMore = topicComment.hasMore;
     });
     return topicComment.data;
   }

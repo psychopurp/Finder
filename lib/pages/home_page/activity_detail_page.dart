@@ -20,7 +20,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   void initState() {
-    getInitialData();
+    // getInitialData();
     collect = {
       true: Icons.favorite,
       false: Icons.favorite_border,
@@ -38,6 +38,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     double picWidth = ScreenUtil().setWidth(220);
     double picHeight = picWidth * 1.4;
     final user = Provider.of<UserProvider>(context);
+    this.activity = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
         appBar: AppBar(),
@@ -99,22 +100,25 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                         );
                       }));
                 },
-                child: Container(
-                  height: picHeight,
-                  width: picWidth,
-                  decoration: BoxDecoration(
-                      // color: Colors.yellow,
-                      borderRadius: BorderRadius.circular(5),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black38,
-                            offset: Offset(-1.0, 2.0),
-                            blurRadius: 2.0,
-                            spreadRadius: 1.0),
-                      ],
-                      image: DecorationImage(
-                          image: CachedNetworkImageProvider(activity.poster),
-                          fit: BoxFit.cover)),
+                child: Hero(
+                  tag: activity.id.toString() + "activityDetail",
+                  child: Container(
+                    height: picHeight,
+                    width: picWidth,
+                    decoration: BoxDecoration(
+                        // color: Colors.yellow,
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black38,
+                              offset: Offset(-1.0, 2.0),
+                              blurRadius: 2.0,
+                              spreadRadius: 1.0),
+                        ],
+                        image: DecorationImage(
+                            image: CachedNetworkImageProvider(activity.poster),
+                            fit: BoxFit.cover)),
+                  ),
                 ),
               ),
               DefaultTextStyle(
@@ -269,19 +273,19 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         var data = await apiClient.deleteCollection(
             modelId: item.id, type: ApiClient.ACTIVITY);
         if (data['status'] == true) {
-          showText = '取消收藏成功';
+          showText = '取消关注成功';
           item.isCollected = false;
         } else {
-          showText = '取消收藏失败';
+          showText = '取消关注失败';
         }
       } else {
         var data = await apiClient.addCollection(
             type: ApiClient.ACTIVITY, id: item.id);
         if (data['status'] == true) {
-          showText = '收藏成功';
+          showText = '关注成功';
           item.isCollected = true;
         } else {
-          showText = '收藏失败';
+          showText = '关注失败';
         }
       }
       Future.delayed(Duration(milliseconds: 300), () {

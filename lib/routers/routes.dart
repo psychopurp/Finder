@@ -9,6 +9,7 @@ class Routes {
   static String login = '/login';
   static String checkCodeLogin = '/checkCodeLogin';
   static String settings = '/settings'; //设置
+  static String webViewPage = '/webViewPage';
 
   //首页
   static String publishTopic = '/publishTopic'; //首页-- 发布话题
@@ -19,6 +20,7 @@ class Routes {
   static String moreActivities = '/home/moreActivities'; //首页 -- 更多活动
   static String topicDetail = '/home/topicDetail'; //首页 -- 话题详情
   static String activityDetail = '/home/activityDetail'; //首页 -- 活动详情
+  static String topicCommentDetail = '/home/topicCommentDetail'; //首页 -- 活动详情
   //招募页
   static String recruitDetail = '/home/recruitDetail'; //首页 -- 活动详情
   static String recommendRecruitDetail =
@@ -98,6 +100,9 @@ class Routes {
         handler: acitvityDetailsHandler, transitionType: TransitionType.fadeIn);
     router.define(commentPage,
         handler: commentPageHandler, transitionType: TransitionType.cupertino);
+    router.define(topicCommentDetail,
+        handler: topicCommentDetailHandler,
+        transitionType: TransitionType.cupertino);
 
     //招募页 --导航
     router.define(recruitDetail,
@@ -174,5 +179,10 @@ class Routes {
         handler: privacyHandle, transitionType: TransitionType.cupertino);
     router.define(serveProtocol,
         handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
+
+    //webview
+
+    router.define(webViewPage,
+        handler: webViewPageHandler, transitionType: TransitionType.cupertino);
   }
 }

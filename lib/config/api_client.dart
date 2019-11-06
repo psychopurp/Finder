@@ -467,6 +467,19 @@ class ApiClient {
     }
   }
 
+  ///获取评论点赞列表
+  Future getTopicCommentLikeUsers({int topicCommentId, int page = 1}) async {
+    var formData = {'topic_comment_id': topicCommentId, "page": page};
+    try {
+      Response response = await dio.get('get_topic_comment_like_users/',
+          queryParameters: formData);
+      print('获取用户点赞成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取用户点赞错误==========>$e');
+    }
+  }
+
   //接口初始化
   static void init() {
     //初始化时带上默认token

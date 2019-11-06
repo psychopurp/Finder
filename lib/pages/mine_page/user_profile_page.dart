@@ -49,15 +49,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
 //    print(widget.heroTag);
     return Scaffold(
-      floatingActionButton: userItSelfId == user?.id ? null : FloatingActionButton(
-        child: Text("私信"),
-        elevation: 1,
-        onPressed: () {
-          Navigator.of(context).pushNamed(Routes.chat,
-              arguments: UserProfile.fromJson(user.toJson()));
-        },
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
+      floatingActionButton: userItSelfId == user?.id
+          ? null
+          : FloatingActionButton(
+              child: Text("私信"),
+              elevation: 1,
+              onPressed: () {
+                Navigator.of(context).pushNamed(Routes.chat,
+                    arguments: UserProfile.fromJson(user.toJson()));
+              },
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
       body: SafeArea(
         top: false,
         child: Container(
@@ -120,15 +122,41 @@ class _UserProfilePageState extends State<UserProfilePage> {
   avatar() => Hero(
         tag: widget.heroTag,
         child: Container(
-          // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
-          height: 90,
-          width: 90,
-          decoration: BoxDecoration(
-              // shape: CircleBorder(),
-              border: Border.all(color: Colors.white, width: 3),
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              image: DecorationImage(
-                  image: CachedNetworkImageProvider(user.avatar))),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (_) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            constraints: BoxConstraints.expand(height: 500),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                CachedNetworkImage(imageUrl: this.user.avatar),
+                              ],
+                            ),
+                          ),
+                        );
+                      }));
+            },
+            child: Container(
+              // margin: EdgeInsets.only(top: ScreenUtil().setHeight(0)),
+              height: 90,
+              width: 90,
+              decoration: BoxDecoration(
+                  // shape: CircleBorder(),
+                  border: Border.all(color: Colors.white, width: 3),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  image: DecorationImage(
+                      image: CachedNetworkImageProvider(user.avatar))),
+            ),
+          ),
         ),
       );
 
@@ -263,10 +291,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ],
               ),
 
+              Container(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: Text((user.introduction != null)
+                      ? "简介：" + user.introduction
+                      : "简介：")),
+
               ///关注
               Container(
                 // color: Colors.amber,
-                padding: EdgeInsets.only(top: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[

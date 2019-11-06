@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:finder/config/global.dart';
+import 'package:finder/pages/home_page/activity/activity_search_page.dart';
 import 'package:finder/plugin/callback.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,7 +66,14 @@ class _MoreActivitiesState extends State<MoreActivities>
           actions: <Widget>[
             MaterialButton(
               child: Icon(Icons.search),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) {
+                  return ActivitySearchPage();
+                }));
+                // showSearch(
+                //     context: context,
+                //     delegate: ActivitySearchDelegate(hintText: "搜索你喜欢的话题"));
+              },
             ),
           ],
           elevation: 0,
@@ -136,7 +144,7 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   @override
   void initState() {
-    _getInitialActivitiesData(2);
+    _getInitialActivitiesData(1);
     super.initState();
   }
 
@@ -167,7 +175,7 @@ class _ChildActivitiesState extends State<ChildActivities>
         footer: MaterialFooter(),
         controller: _refreshController,
         onRefresh: () async {
-          await _getInitialActivitiesData(2);
+          await _getInitialActivitiesData(1);
 
           _refreshController.resetLoadState();
         },
@@ -262,8 +270,8 @@ class _ChildActivitiesState extends State<ChildActivities>
       imageBuilder: (context, imageProvider) => InkWell(
         onTap: () {
           push(() async {
-            Application.router.navigateTo(
-                context, "${Routes.activityDetail}?activityId=${item.id}");
+            Navigator.pushNamed(context, Routes.activityDetail,
+                arguments: item);
           });
         },
         child: Align(
