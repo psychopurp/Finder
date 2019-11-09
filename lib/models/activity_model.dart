@@ -1,4 +1,3 @@
-import 'package:finder/config/api_client.dart';
 import 'package:finder/models/tag_model.dart';
 import 'package:finder/public.dart';
 

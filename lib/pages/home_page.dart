@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context);
+    // final user = Provider.of<UserProvider>(context);
     return Scaffold(
         appBar: AppBar(
           leading: MaterialButton(
@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
           return FadeTransition(
               child: child,
               opacity:
-              CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
         },
         child: child);
   }
@@ -116,9 +116,7 @@ class _HomePageState extends State<HomePage> {
     TopicModel topics = TopicModel.fromJson(topicsData);
     for (int i = 2; i <= pageCount; i++) {
       var topicsData2 = await apiClient.getTopics(page: i);
-      topics.data.addAll(TopicModel
-          .fromJson(topicsData2)
-          .data);
+      topics.data.addAll(TopicModel.fromJson(topicsData2).data);
     }
 
     return topics;

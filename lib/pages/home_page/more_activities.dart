@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:finder/config/global.dart';
 import 'package:finder/pages/home_page/activity/activity_search_page.dart';
 import 'package:finder/plugin/callback.dart';
-import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';

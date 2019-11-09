@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:convert' as prefix0;
 
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/follower_model.dart';
@@ -12,7 +11,6 @@ import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
