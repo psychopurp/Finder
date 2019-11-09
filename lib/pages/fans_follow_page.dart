@@ -318,11 +318,11 @@ class _TabBodyState extends State<TabBody> {
       for (int i = 1; i <= pageCount; i++) {
         var data = await apiClient.getFollowers(
             page: i, userId: widget.userId, isFan: widget.isFan);
-        // print(data);
+        print(data);
         FollowerModel followerModel =
             FollowerModel.fromJson(data, widget.isFan);
         hasMore = followerModel.hasMore;
-        print(hasMore);
+        // print(hasMore);
         moreFollowers.addAll(followerModel.data);
       }
       nowPageAt = pageCount + 1;

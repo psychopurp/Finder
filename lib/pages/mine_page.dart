@@ -318,16 +318,19 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
   }
 
   sliverTabBody() {
-    Widget child = SliverFillRemaining(
+    Widget child = SliverToBoxAdapter(
       // 剩余补充内容TabBarView
-      child: Padding(
-        padding: EdgeInsets.only(top: 0.0),
-        child: TabBarView(
-          controller: this.tabController,
-          children: this.tabs.map((tab) {
-            Widget body = tab['body'];
-            return body;
-          }).toList(),
+      child: SizedBox(
+        height: 500,
+        child: Padding(
+          padding: EdgeInsets.only(top: 0.0),
+          child: TabBarView(
+            controller: this.tabController,
+            children: this.tabs.map((tab) {
+              Widget body = tab['body'];
+              return body;
+            }).toList(),
+          ),
         ),
       ),
     );

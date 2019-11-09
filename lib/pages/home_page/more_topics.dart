@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/pages/home_page/topic/topic_search_page.dart';
 import 'package:finder/plugin/callback.dart';
