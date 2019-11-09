@@ -25,7 +25,7 @@ class _UserTopicPageState extends State<UserTopicPage> {
 
   @override
   void initState() {
-    getData(pageCount: 1);
+    getData(pageCount: 3);
     _refreshController = EasyRefreshController();
     super.initState();
   }
@@ -39,7 +39,7 @@ class _UserTopicPageState extends State<UserTopicPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).dividerColor,
+      // color: Theme.of(context).dividerColor,
       child: body,
     );
   }
@@ -66,7 +66,6 @@ class _UserTopicPageState extends State<UserTopicPage> {
             return buildContent(this.topicComments[index]);
           },
         ),
-
         onLoad: () async {
           await Future.delayed(Duration(milliseconds: 500), () {
             getData(pageCount: this.pageCount);
@@ -91,9 +90,13 @@ class _UserTopicPageState extends State<UserTopicPage> {
     String time =
         item.time.month.toString() + '月' + item.time.day.toString() + '日';
     Widget child;
-    child = InkWell(
-      onTap: () {},
+    child = GestureDetector(
+      onTap: () {
+        // Navigator.pushNamed(context, Routes.topicDetail,
+        //     arguments: {"item": item});
+      },
       child: Container(
+        // width: 100,
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
@@ -202,24 +205,37 @@ class _UserTopicPageState extends State<UserTopicPage> {
   }
 
   Future getData({int pageCount}) async {
-    var data = await apiClient.getEngageTopics(page: pageCount);
-    EngageTopicCommentModel topicComments =
-        EngageTopicCommentModel.fromJson(data);
-    topicComments.data.removeWhere((item) {
-      print(item.content.toString());
-      print(item.content.toString().startsWith('{"images"'));
+    List<EngageTopicCommentModelData> temp = [];
+    bool hasMore;
+    if (this.topicComments.length == 0) {
+      for (int i = 1; i <= pageCount; i++) {
+        var data = await apiClient.getEngageTopics(page: i);
+        EngageTopicCommentModel topicComments =
+            EngageTopicCommentModel.fromJson(data);
+        hasMore = topicComments.hasMore;
+        temp.addAll(topicComments.data);
+      }
+
+      this.pageCount = pageCount;
+    } else {
+      var data = await apiClient.getEngageTopics(page: pageCount);
+      EngageTopicCommentModel topicComments =
+          EngageTopicCommentModel.fromJson(data);
+      temp.addAll(topicComments.data);
+    }
+    temp.removeWhere((item) {
+      // print(item.content.toString());
+      // print(item.content.toString().startsWith('{"images"'));
       // print('json' + jsonDecode(item.content));
       if (item.content.toString().startsWith('{"images"') == true)
         return false;
       else
         return true;
     });
-    // print(topicComments);
-
     setState(() {
       this.isLoading = false;
-      this.topicComments.addAll(topicComments.data);
-      this.hasMore = topicComments.hasMore;
+      this.topicComments.addAll(temp);
+      this.hasMore = hasMore;
       this.pageCount++;
     });
   }

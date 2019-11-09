@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
 
 ///图片预览插件
 class PicSwiper extends StatefulWidget {
@@ -257,22 +258,30 @@ class MySwiperPlugin extends StatelessWidget {
                 Container(
                   width: 10.0,
                 ),
-//                GestureDetector(
-//                  child: Container(
-//                    padding: EdgeInsets.only(right: 10.0),
-//                    alignment: Alignment.center,
-//                    child: Text(
-//                      "Save",
-//                    ),
-//                  ),
-//                  onTap: () {
-////                     saveNetworkImageToPhoto(pics[index].picUrl)
-////                         .then((bool done) {
-////                       showToast(done ? "save succeed" : "save failed",
-////                           position: ToastPosition(align: Alignment.topCenter));
-////                     });
-//                  },
-//                )
+                GestureDetector(
+                  child: Container(
+                    padding: EdgeInsets.only(right: 10.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "保存图片",
+                    ),
+                  ),
+                  onTap: () async {
+                    Future<bool> saveNetworkImageToPhoto(String url,
+                        {bool useCache: true}) async {
+                      var data =
+                          await getNetworkImageData(url, useCache: useCache);
+                      var filePath =
+                          await ImagePickerSaver.saveFile(fileData: data);
+                      return filePath != null && filePath != "";
+                    }
+
+                    bool isOk = await saveNetworkImageToPhoto(pics[index]);
+                    BotToast.showText(
+                        text: isOk ? "保存成功" : "保存失败",
+                        duration: Duration(milliseconds: 700));
+                  },
+                )
               ],
             ),
           ),

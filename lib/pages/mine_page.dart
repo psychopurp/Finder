@@ -37,6 +37,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
   final GlobalKey globalKey = GlobalKey();
 
   UserModel userInfo;
+  UserProvider userProvider;
 
   @override
   void initState() {
@@ -48,9 +49,9 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
       'message': {'name': '私信Ta'}
     };
     tabs = [
-      {'name': '我的话题', 'body': UserTopicPage()},
+      {'name': '我参与的话题', 'body': UserTopicPage()},
+      {'name': '我发布的话题', 'body': UserTopicPage()},
       {'name': '我的活动', 'body': UserTopicPage()},
-      {'name': '我的参与', 'body': UserTopicPage()},
       {'name': '最近浏览', 'body': UserTopicPage()},
     ];
     tabController = TabController(length: tabs.length, vsync: this);
@@ -87,6 +88,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
     this.userInfo = user.userInfo;
+    this.userProvider = user;
     if (this.userInfo.backGround == null) {
       imageToColors(userInfo.avatar).then((val) {
         this.userInfo.backGround = val;
@@ -399,7 +401,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
     var imageStr = await apiClient.uploadImage(image);
     imageStr = Avatar.getImageUrl(imageStr);
     user.avatar = imageStr;
-    var data = await apiClient.upLoadUserProfile(user);
+    var data = await userProvider.upLoadUserProfile(user);
     String text = "";
     if (data['status'] == true) {
       text = '修改成功';
@@ -531,7 +533,8 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
 
 class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar child;
-  StickyTabBarDelegate({@required this.child});
+  final Color color;
+  StickyTabBarDelegate({@required this.child, this.color});
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -540,8 +543,7 @@ class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
       height: 200,
       child: this.child,
       decoration: BoxDecoration(
-          color: Colors.white.withOpacity(1),
-          border: Border(top: border, bottom: border)),
+          color: Colors.white, border: Border(top: border, bottom: border)),
     );
   }
 

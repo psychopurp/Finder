@@ -46,6 +46,7 @@ dependencies:
   system_info: ^0.1.1
   package_info: ^0.4.0+10
   flutter_webview_plugin: ^0.3.8
+  image_picker_saver: ^0.3.0
 
 dev_dependencies:
   flutter_test:
