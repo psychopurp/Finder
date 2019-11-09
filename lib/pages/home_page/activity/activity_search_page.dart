@@ -1,6 +1,5 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/activity_model.dart';
-import 'package:finder/provider/store.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
