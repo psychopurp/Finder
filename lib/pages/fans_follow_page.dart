@@ -256,6 +256,13 @@ class _TabBodyState extends State<TabBody> {
     } else if (userInfo.status == BOTHFOLLOW) {
       buttonText = "相互关注";
     }
+    // if (userInfo.isBothFollowed) {
+    //   buttonText = "相互关注";
+    // } else if (userInfo.isFollowed) {
+    //   buttonText = "已关注";
+    // } else if (userInfo.isFollowed == false) {
+    //   buttonText = "关注";
+    // }
 
     return GestureDetector(
       onTap: () async {
@@ -265,6 +272,8 @@ class _TabBodyState extends State<TabBody> {
         if (!widget.isFan) {
           //本来是相互关注
           if (userInfo.isBothFollowed) {
+            // userInfo.isBothFollowed = false;
+            // userInfo.isFollowed = false;
             if (userInfo.status == BOTHFOLLOW) {
               userInfo.status = FOLLOW;
             } else {
@@ -272,6 +281,9 @@ class _TabBodyState extends State<TabBody> {
             }
           } else {
             //本来不是相互关注
+            // userInfo.isBothFollowed = true;
+            // userInfo.isFollowed = true;
+
             if (userInfo.status == FOLLOWED) {
               userInfo.status = FOLLOW;
             } else {
@@ -318,11 +330,11 @@ class _TabBodyState extends State<TabBody> {
       for (int i = 1; i <= pageCount; i++) {
         var data = await apiClient.getFollowers(
             page: i, userId: widget.userId, isFan: widget.isFan);
-        // print(data);
+        print(data);
         FollowerModel followerModel =
             FollowerModel.fromJson(data, widget.isFan);
         hasMore = followerModel.hasMore;
-        print(hasMore);
+        // print(hasMore);
         moreFollowers.addAll(followerModel.data);
       }
       nowPageAt = pageCount + 1;

@@ -5,8 +5,8 @@ import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 
 class ApiClient {
-//  static const host = "http://47.94.247.8";
-//  static const baseURL = "http://47.94.247.8/api/";
+  // static const host = "http://47.94.247.8";
+  // static const baseURL = "http://47.94.247.8/api/";
   static const host = "https://www.finder-nk.com";
   static const baseURL = "https://www.finder-nk.com/api/";
 
