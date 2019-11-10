@@ -47,6 +47,8 @@ class Routes {
   static String internshipDetail = "/serve/internship/detail"; //服务页面 -- 实习 公司
   static String recommendInternshipDetail =
       "/serve/internship/recommend"; //服务页面 -- 实习 公司
+  static String courseTablePage =
+      "/serve/courseTablePage"; //服务页面 -- 实习 公司
   //用户页
   static String userProfile = "/userProfile"; //个人详情页
   static String minePage = "/minePage"; //我的 页
@@ -145,6 +147,9 @@ class Routes {
         transitionType: TransitionType.cupertino);
     router.define(recommendInternshipDetail,
         handler: recommendInternshipDetailHandler,
+        transitionType: TransitionType.cupertino);
+    router.define(courseTablePage,
+        handler: courseTablePageHandler,
         transitionType: TransitionType.cupertino);
 
     //我的页

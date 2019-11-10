@@ -78,9 +78,9 @@ class ApiClient {
     String path = image.path;
     var name = path.substring(path.lastIndexOf('/') + 1);
     print('图片名===========>$name');
-    var formData = new FormData.from({
-      'image': new UploadFileInfo(image, name,
-          contentType: ContentType.parse('multipart/form-data'))
+    print(path);
+    var formData = new FormData.fromMap({
+      'image': MultipartFile.fromBytes(image.readAsBytesSync(), filename: name)
     });
     try {
       Response response = await dio.post('upload_image/', data: formData,

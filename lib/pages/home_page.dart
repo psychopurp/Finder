@@ -36,31 +36,32 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
     return Scaffold(
-        appBar: AppBar(
-          leading: MaterialButton(
-            padding: EdgeInsets.all(0),
-            // color: Colors.yellow,
-            shape: CircleBorder(),
-            child: Icon(
-              Icons.menu,
-              color: Colors.white,
-              size: 30,
-            ),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+      appBar: AppBar(
+        leading: MaterialButton(
+          padding: EdgeInsets.all(0),
+          // color: Colors.yellow,
+          shape: CircleBorder(),
+          child: Icon(
+            Icons.menu,
+            color: Colors.white,
+            size: 30,
           ),
-          title: Text(
-            'Finders',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 19,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          centerTitle: true,
+          onPressed: () => Scaffold.of(context).openDrawer(),
         ),
-        backgroundColor: Colors.white,
-        // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-        body: body);
+        title: Text(
+          'Finders',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 19,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.white,
+      // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+      body: body,
+    );
   }
 
   Widget get body {
@@ -99,7 +100,7 @@ class _HomePageState extends State<HomePage> {
           return FadeTransition(
               child: child,
               opacity:
-              CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
         },
         child: child);
   }
@@ -116,9 +117,7 @@ class _HomePageState extends State<HomePage> {
     TopicModel topics = TopicModel.fromJson(topicsData);
     for (int i = 2; i <= pageCount; i++) {
       var topicsData2 = await apiClient.getTopics(page: i);
-      topics.data.addAll(TopicModel
-          .fromJson(topicsData2)
-          .data);
+      topics.data.addAll(TopicModel.fromJson(topicsData2).data);
     }
 
     return topics;
