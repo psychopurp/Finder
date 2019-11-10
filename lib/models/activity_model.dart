@@ -38,15 +38,15 @@ class ActivityModelData {
   String title;
   int senderId;
   String sponsor;
-  String startTime;
-  String endTime;
+  DateTime startTime;
+  DateTime endTime;
   String place;
   String poster;
   String description;
   String signUpLocation;
   bool isCollected;
 
-  String position;
+  int position;
   List<ActivityTypesModelData> types;
   List<TagModel> tags;
 
@@ -72,15 +72,13 @@ class ActivityModelData {
     title = json['title'];
     senderId = json['sender_id'];
     sponsor = json['sponsor'];
-    if (json['start_time'].runtimeType == String) {
-      startTime = json['start_time'];
-      endTime = json['end_time'];
-    } else {
-      num time = json['start_time'];
-      startTime = timestampToDateTime(time).toString();
-      time = json['end_time'];
-      endTime = timestampToDateTime(time).toString();
-    }
+
+    startTime = json['start_time'] != null
+        ? timestampToDateTime(json["start_time"])
+        : null;
+
+    endTime =
+        json['end_time'] != null ? timestampToDateTime(json["end_time"]) : null;
 
     place = json['place'];
 
@@ -108,8 +106,8 @@ class ActivityModelData {
     data['title'] = this.title;
     data['sender_id'] = this.senderId;
     data['sponsor'] = this.sponsor;
-    data['start_time'] = this.startTime;
-    data['end_time'] = this.endTime;
+    data['start_time'] = getTime(dateTime: this.startTime);
+    data['end_time'] = getTime(dateTime: this.endTime);
     data['place'] = this.place;
     data['poster'] = this.poster;
     data['description'] = this.description;

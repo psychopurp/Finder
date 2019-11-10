@@ -26,8 +26,8 @@ class TopicCommentDetailPage extends StatefulWidget {
 class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
     with TickerProviderStateMixin {
   TopicCommentsModelData topicComment;
-  int topicId;
-  String topicTitle;
+  // int topicId;
+  // String topicTitle;
   UserProvider userProvider;
   TabController tabController;
   List<FollowerModelData> liker = [];
@@ -55,17 +55,12 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
     userProvider = Provider.of<UserProvider>(context);
     var data = ModalRoute.of(context).settings.arguments;
     topicComment = Map.from(data)['item'];
-    topicId = Map.from(data)['topicId'];
-    topicTitle = Map.from(data)['topicTitle'];
-    // buildLikeUserList();
-    // Object object = {'item': "elyar"};
-    // print(Map.from(object)['item']);
-    // print(data);
-    // topicComment = formData['item'];
+    // topicId = Map.from(data)['topicId'];
+    // topicTitle = Map.from(data)['topicTitle'];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(topicTitle),
+        title: Text(topicComment.topicTitle),
         elevation: 1,
         textTheme: TextTheme(
             title: Theme.of(context)
@@ -155,7 +150,21 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
               controller: this.tabController,
               children: <Widget>[
                 CommentPage(
-                    topicId: this.topicId, topicCommentId: topicComment.id),
+                    topicId: this.topicComment.topicId,
+                    topicCommentId: this.topicComment.id,
+                    onDelete: (isDelete) {
+                      if (isDelete) {
+                        topicComment.replyCount--;
+                        setState(() {});
+                      }
+                    },
+                    onComment: (isComment) {
+                      if (isComment) {
+                        setState(() {
+                          topicComment.replyCount++;
+                        });
+                      }
+                    }),
                 Padding(
                   padding: EdgeInsets.only(top: 20.0),
                   child: UserLikeWidget(topicCommentId: this.topicComment.id),

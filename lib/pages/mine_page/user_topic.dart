@@ -1,38 +1,45 @@
 import 'dart:convert';
 
 import 'package:finder/config/api_client.dart';
-import 'package:finder/models/engage_topic_comment_model.dart';
+import 'package:finder/models/topic_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/public.dart';
+import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserTopicPage extends StatefulWidget {
+  final int userId;
+  UserTopicPage({this.userId});
   @override
   _UserTopicPageState createState() => _UserTopicPageState();
 }
 
 class _UserTopicPageState extends State<UserTopicPage> {
-  List<EngageTopicCommentModelData> topicComments = [];
+  List<TopicModelData> topics = [];
   bool isLoading = true;
   bool hasMore = true;
   EasyRefreshController _refreshController;
   int pageCount = 1;
+  ScrollController controller;
 
   @override
   void initState() {
-    getData(pageCount: 3);
+    getData(pageCount: 1);
     _refreshController = EasyRefreshController();
+    controller = ScrollController();
     super.initState();
   }
 
   @override
   void dispose() {
     _refreshController.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -56,16 +63,26 @@ class _UserTopicPageState extends State<UserTopicPage> {
         enableControlFinishLoad: true,
         // primary: true,
         footer: MaterialFooter(),
+        header: MaterialHeader(),
         controller: _refreshController,
+        topBouncing: false,
+        bottomBouncing: false,
         child: ListView.builder(
-          primary: false,
-          physics: AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.only(top: kToolbarHeight * 2 + 20),
-          itemCount: this.topicComments.length,
+          controller: controller,
+          // primary: true,
+          // physics: AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.only(top: 10),
+          itemCount: this.topics.length,
           itemBuilder: (context, index) {
-            return buildContent(this.topicComments[index]);
+            return buildContent(this.topics[index]);
           },
         ),
+
+        // onRefresh: () async {
+        //   this.topicComments = [];
+        //   await getData(pageCount: 3);
+        //   _refreshController.resetLoadState();
+        // },
         onLoad: () async {
           await Future.delayed(Duration(milliseconds: 500), () {
             getData(pageCount: this.pageCount);
@@ -86,155 +103,125 @@ class _UserTopicPageState extends State<UserTopicPage> {
         child: child);
   }
 
-  buildContent(EngageTopicCommentModelData item) {
+  buildContent(TopicModelData item) {
+    final double topicHeight = 200;
+    final double topicWidth = topicHeight * 1.6;
     String time =
         item.time.month.toString() + '月' + item.time.day.toString() + '日';
     Widget child;
-    child = GestureDetector(
-      onTap: () {
-        // Navigator.pushNamed(context, Routes.topicDetail,
-        //     arguments: {"item": item});
-      },
-      child: Container(
-        // width: 100,
-        padding: EdgeInsets.all(10),
-        margin: EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.white.withOpacity(0.5)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              width: ScreenUtil().setWidth(130),
-              // color: Colors.amber,
-              child: Text(time),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 0, left: 10),
-              child: contentPart(item.content),
-            )
-          ],
-        ),
-      ),
-    );
-
-    return child;
-  }
-
-  Widget contentPart(String content) {
-    double picWidth = ScreenUtil().setWidth(160);
-    bool isSinglePic = false;
-    var json = jsonDecode(content);
-    List imagesJson = json['images'];
-    List<String> images = [];
-    String text = json['text'];
-    imagesJson.forEach((i) {
-      images.add(Avatar.getImageUrl(i));
-    });
-
-    return Container(
-      // color: Colors.amber,
-      // height: ScreenUtil().setHeight(400),
-      // width: ScreenUtil().setWidth(750),
+    child = Container(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      margin: EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), color: Colors.white),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            text,
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontFamily: 'normal',
-                fontSize: ScreenUtil().setSp(30)),
-          ),
-          SizedBox(
-            height: (text == "" || text == null) ? 0 : 10,
+          Container(
+            child: Text(
+              time,
+              style: TextStyle(fontSize: 16),
+            ),
           ),
           Container(
-            width: ScreenUtil().setWidth(500),
-            // color: Colors.green,
-            child: Wrap(
-              spacing: ScreenUtil().setWidth(10),
-              runSpacing: 5,
-              children: images.asMap().keys.map((index) {
-                isSinglePic = (images.length == 1) ? true : false;
-                var _singlePic = Container(
-                  child: CachedNetworkImage(
-                    imageUrl: images[index],
-                    fit: BoxFit.cover,
-                    placeholder: (context, _) {
-                      return Center(
-                        child: CupertinoActivityIndicator(),
-                      );
-                    },
-                  ),
-                  constraints: BoxConstraints(maxHeight: 400, minWidth: 400),
-                );
-                return CachedNetworkImage(
-                  imageUrl: images[index],
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                  imageBuilder: (content, imageProvider) => InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          fullscreenDialog: false,
-                          builder: (_) {
-                            return PicSwiper(
-                              index: index,
-                              pics: images,
-                            );
-                          }));
-                    },
-                    child: Container(
-                      height: picWidth,
-                      width: picWidth,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: imageProvider, fit: BoxFit.cover)),
-                    ),
-                  ),
-                );
-              }).toList(),
+            width: double.infinity,
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(bottom: 5),
+            child: Text(
+              '#' + item.title,
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor, fontSize: 17),
             ),
+          ),
+          Container(
+            height: topicHeight,
+            width: topicWidth,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: CachedNetworkImageProvider(item.image),
+                    fit: BoxFit.cover),
+                borderRadius: BorderRadius.circular(10)),
           )
         ],
       ),
     );
+
+    child = GestureDetector(
+      onTap: () {
+        Application.router.navigateTo(context,
+            "${Routes.topicDetail}?id=${item.id}&title=${Uri.encodeComponent(item.title)}");
+      },
+      child: child,
+    );
+
+    child = Stack(children: <Widget>[
+      child,
+      Positioned(
+        right: 0,
+        top: 10,
+        child: MaterialButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (_) {
+                return AlertDialog(
+                  title: Text("提示"),
+                  content: Text("确认要删除此条话题吗? "),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("取消"),
+                      onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+                    ),
+                    FlatButton(
+                        child: Text("删除"),
+                        onPressed: () async {
+                          FinderDialog.showLoading();
+                          var data = await apiClient.deleteTopicComment(
+                              commentId: item.id);
+                          if (data['status']) {
+                            // this.topicComments.remove(item);
+                            setState(() {});
+                          }
+                          Navigator.pop(context);
+                        }),
+                  ],
+                );
+              },
+            );
+          },
+          shape: CircleBorder(),
+          child: Icon(Icons.delete_outline),
+        ),
+      )
+    ]);
+
+    return child;
   }
 
   Future getData({int pageCount}) async {
-    List<EngageTopicCommentModelData> temp = [];
+    List<TopicModelData> temp = [];
     bool hasMore;
-    if (this.topicComments.length == 0) {
+    if (this.topics.length == 0) {
       for (int i = 1; i <= pageCount; i++) {
-        var data = await apiClient.getEngageTopics(page: i);
-        EngageTopicCommentModel topicComments =
-            EngageTopicCommentModel.fromJson(data);
-        hasMore = topicComments.hasMore;
-        temp.addAll(topicComments.data);
+        var data =
+            await apiClient.getUserTopics(page: i, userId: widget.userId);
+        TopicModel topics = TopicModel.fromJson(data);
+        hasMore = topics.hasMore;
+        temp.addAll(topics.data);
+        // print(data);
       }
 
       this.pageCount = pageCount;
     } else {
-      var data = await apiClient.getEngageTopics(page: pageCount);
-      EngageTopicCommentModel topicComments =
-          EngageTopicCommentModel.fromJson(data);
-      temp.addAll(topicComments.data);
+      var data =
+          await apiClient.getUserTopics(page: pageCount, userId: widget.userId);
+      TopicModel topics = TopicModel.fromJson(data);
+      hasMore = topics.hasMore;
+      temp.addAll(topics.data);
     }
-    temp.removeWhere((item) {
-      // print(item.content.toString());
-      // print(item.content.toString().startsWith('{"images"'));
-      // print('json' + jsonDecode(item.content));
-      if (item.content.toString().startsWith('{"images"') == true)
-        return false;
-      else
-        return true;
-    });
+
     setState(() {
       this.isLoading = false;
-      this.topicComments.addAll(temp);
+      this.topics.addAll(temp);
       this.hasMore = hasMore;
       this.pageCount++;
     });

@@ -147,9 +147,10 @@ class ActivitySearchDelegate extends SearchDelegate<String> {
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
-                        item.startTime.split(" ")[0].replaceAll('-', '.') +
-                            "-" +
-                            item.endTime.split(' ')[0].replaceAll('-', '.'),
+                        // item.startTime.split(" ")[0].replaceAll('-', '.') +
+                        //     "-" +
+                        //     item.endTime.split(' ')[0].replaceAll('-', '.'),
+                        'asf',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.left,
@@ -326,6 +327,18 @@ class _ActivitySearchPageState extends State<ActivitySearchPage> {
   }
 
   buildActivityList(ActivityModelData item) {
+    DateTime start = item.startTime;
+    DateTime end = item.endTime;
+    String startTime = start.year.toString() +
+        '-' +
+        start.month.toString() +
+        '-' +
+        start.day.toString();
+    String endTime = end.year.toString() +
+        '-' +
+        end.month.toString() +
+        '-' +
+        end.day.toString();
     Widget child;
     child = Container(
       // margin: EdgeInsets.only(
@@ -386,9 +399,7 @@ class _ActivitySearchPageState extends State<ActivitySearchPage> {
                 width: ScreenUtil().setWidth(420),
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
-                  item.startTime.split(" ")[0].replaceAll('-', '.') +
-                      "-" +
-                      item.endTime.split(' ')[0].replaceAll('-', '.'),
+                  startTime,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,

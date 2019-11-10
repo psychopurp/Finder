@@ -49,17 +49,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
 //    print(widget.heroTag);
     return Scaffold(
-      floatingActionButton: userItSelfId == user?.id
-          ? null
-          : FloatingActionButton(
-              child: Text("私信"),
-              elevation: 1,
-              onPressed: () {
-                Navigator.of(context).pushNamed(Routes.chat,
-                    arguments: UserProfile.fromJson(user.toJson()));
-              },
-              backgroundColor: Theme.of(context).primaryColor,
-            ),
       body: SafeArea(
         top: false,
         child: Container(
@@ -332,9 +321,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
+
+              ///私信 和关注 按钮
               (user.id == userItSelfId)
                   ? Container()
-                  : followButton(userProvider),
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                          followButton(userProvider),
+                          MaterialButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed(Routes.chat,
+                                  arguments:
+                                      UserProfile.fromJson(user.toJson()));
+                            },
+                            elevation: 1,
+                            shape: StadiumBorder(),
+                            color: Theme.of(context).primaryColor,
+                            child: Text("私信TA",
+                                style: TextStyle(color: Colors.black)),
+                          )
+                        ])
             ],
           ),
         ));

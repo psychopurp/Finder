@@ -118,7 +118,7 @@ var commentPageHandler = Handler(
   String topicId = params['topicId']?.first;
 
   return CommentPage(
-    topicCommentId: int.parse(topicCommentId),
+    // topicCommentId: int.parse(topicCommentId),
     topicId: int.parse(topicId),
   );
 });

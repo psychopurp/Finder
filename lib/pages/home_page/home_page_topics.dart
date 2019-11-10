@@ -197,6 +197,7 @@ class ImageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print(topicHeight);
     return InkWell(
       onTap: onTap,
       child: Align(

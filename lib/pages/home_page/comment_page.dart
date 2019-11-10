@@ -1,5 +1,6 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/topic_comments_model.dart';
+import 'package:finder/pages/serve_page/he_says_page.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -14,8 +15,11 @@ import 'package:provider/provider.dart';
 class CommentPage extends StatefulWidget {
   final int topicId;
   final int topicCommentId;
+  final BoolCallback onDelete;
+  final BoolCallback onComment;
 
-  CommentPage({this.topicCommentId, this.topicId});
+  CommentPage(
+      {this.topicCommentId, this.topicId, this.onDelete, this.onComment});
 
   @override
   _CommentPageState createState() => _CommentPageState();
@@ -157,7 +161,7 @@ class _CommentPageState extends State<CommentPage> {
     }
 
     List<Widget> content = [];
-    this.comment.data.forEach((item) {
+    this.comment.topicReplies.forEach((item) {
       Widget singleItem = InkWell(
           onLongPress: () => handleDelete(user, item),
           onTap: () {
@@ -316,6 +320,7 @@ class _CommentPageState extends State<CommentPage> {
                       FinderDialog.showLoading();
                       var data = await apiClient.deleteTopicComment(
                           commentId: item.id);
+                      widget.onDelete(data['status']);
                       Navigator.pop(context);
                       _refreshController.callRefresh();
                     }),
@@ -340,6 +345,7 @@ class _CommentPageState extends State<CommentPage> {
       currentComment = widget.topicCommentId;
       // _commentController.clear();
       _commentFocusNode.unfocus();
+      widget.onComment(data['status']);
       _refreshController.callRefresh();
 
       msg = (data['status']) ? "评论成功" : "评论失败";
@@ -359,7 +365,7 @@ class _CommentPageState extends State<CommentPage> {
     var data = await apiClient.getTopicComments(
         topicId: widget.topicId, page: 1, rootId: widget.topicCommentId);
     TopicCommentsModel topicComment = TopicCommentsModel.fromJson(data);
-    // print("reply ==== ${jsonEncode(data)}");
+    // print("reply ==== $data");
     if (!mounted) return;
     setState(() {
       this.comment = topicComment;

@@ -262,6 +262,19 @@ class _ChildActivitiesState extends State<ChildActivities>
   }
 
   _singleItem(BuildContext context, ActivityModelData item, int index) {
+    DateTime start = item.startTime;
+    DateTime end = item.endTime;
+    String startTime = start.year.toString() +
+        '-' +
+        start.month.toString() +
+        '-' +
+        start.day.toString();
+    String endTime = end.year.toString() +
+        '-' +
+        end.month.toString() +
+        '-' +
+        end.day.toString();
+
     return CachedNetworkImage(
       imageUrl: item.poster,
       imageBuilder: (context, imageProvider) => InkWell(
@@ -331,9 +344,7 @@ class _ChildActivitiesState extends State<ChildActivities>
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
-                        item.startTime.split(" ")[0].replaceAll('-', '.') +
-                            "-" +
-                            item.endTime.split(' ')[0].replaceAll('-', '.'),
+                        startTime,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.left,

@@ -1,16 +1,16 @@
 import 'dart:io';
 
 import 'package:finder/config/api_client.dart';
-import 'package:finder/config/global.dart';
+import 'package:finder/models/engage_topic_comment_model.dart';
 import 'package:finder/models/user_model.dart';
-import 'package:finder/pages/mine_page/change_profile_page.dart';
+import 'package:finder/pages/mine_page/user_activity.dart';
+import 'package:finder/pages/mine_page/user_content_tabview.dart';
 import 'package:finder/pages/mine_page/user_topic.dart';
+import 'package:finder/pages/mine_page/user_topic_comments.dart';
 import 'package:finder/plugin/gradient_generator.dart';
-import 'package:finder/plugin/my_appbar.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/cupertino.dart' as prefix0;
 import 'package:flutter/material.dart';
 
 import 'package:finder/provider/user_provider.dart';
@@ -31,7 +31,14 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
   List<Map<String, dynamic>> tabs;
   TabController tabController;
   ScrollController scrollController;
+  ScrollController innerController;
+  PageController pageController;
+
+  double firstPosition = 0;
+  double lastPosition = 0;
+
   double appBarOpacity = 0;
+  EngageTopicCommentModel topic;
 
   bool isUpdateBackground = false;
   final GlobalKey globalKey = GlobalKey();
@@ -42,6 +49,8 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
   @override
   void initState() {
     // getInitialData();
+    pageController = PageController();
+    // getTopicData();
     cards = {
       'topic': {'name': '话题 (待完善)'},
       'activity': {'name': '活动(待完善)'},
@@ -49,15 +58,17 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
       'message': {'name': '私信Ta'}
     };
     tabs = [
-      {'name': '我参与的话题', 'body': UserTopicPage()},
-      {'name': '我发布的话题', 'body': UserTopicPage()},
-      {'name': '我的活动', 'body': UserTopicPage()},
-      {'name': '最近浏览', 'body': UserTopicPage()},
+      {'name': '我参与的话题', 'body': UserTopicCommentsPage()},
+      {'name': '我发布的话题', 'body': Container()},
+      {'name': '我的活动', 'body': Container()},
+      {'name': '最近浏览', 'body': Container()},
     ];
     tabController = TabController(length: tabs.length, vsync: this);
+    innerController = ScrollController();
     scrollController = ScrollController()
       ..addListener(() {
         double offset = scrollController.offset;
+        // print("offset==>$offset");
         if (offset > 108 && offset < 160) {
           setState(() {
             appBarOpacity = (offset / 100) % 1;
@@ -81,6 +92,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
   void dispose() {
     tabController.dispose();
     scrollController.dispose();
+    innerController.dispose();
     super.dispose();
   }
 
@@ -123,7 +135,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
           // color: Colors.amber,
           key: globalKey,
           alignment: Alignment.center,
-          padding: EdgeInsets.only(bottom: 230),
+          padding: EdgeInsets.only(bottom: 100, top: 80),
           child: Stack(
             fit: StackFit.loose,
             alignment: Alignment.topCenter,
@@ -141,7 +153,16 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
           ));
 
       Widget scrollBody = CustomScrollView(
+        // primary: true,
+        // padding: EdgeInsets.only(top: 0),
         controller: scrollController,
+        // children: <Widget>[
+        //   userInfoCard,
+        //   myTopic(),
+        //   myTopicComments()
+        //   // Container(height: 500, child: TabView())
+        //   // sliverTabBar()
+        // ],
         slivers: <Widget>[
           SliverPersistentHeader(
               floating: true,
@@ -161,14 +182,31 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
             child: userInfoCard,
           ),
           sliverTabBar(),
-          sliverTabBody()
+          // sliverTabBody()
         ],
       );
 
       child = Stack(
         alignment: Alignment.topCenter,
         fit: StackFit.expand,
-        children: <Widget>[buildBackground(), scrollBody],
+        children: <Widget>[
+          buildBackground(),
+          scrollBody,
+          // Positioned(
+          //   top: 0,
+          //   left: 0,
+          //   right: 0,
+          //   child: UserAppBar(
+          //       color: Colors.white.withOpacity(appBarOpacity),
+          //       title: Padding(
+          //         padding: EdgeInsets.only(top: 18.0),
+          //         child: Text(userInfo.nickname,
+          //             style: TextStyle(
+          //                 fontSize: 20,
+          //                 color: Colors.black.withOpacity(appBarOpacity))),
+          //       )),
+          // ),
+        ],
       );
     }
 
@@ -177,6 +215,268 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
         width: double.infinity,
         // color: Colors.amber,
         child: child);
+  }
+
+  myTopic() {
+    final double topicHeight = 80;
+    final double topicWidth = topicHeight * 1.6;
+    double titleHeight = 40;
+    cardBuilder(double width, double height, Widget child, VoidCallback ontap) {
+      return InkWell(
+        onTap: ontap,
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(10)),
+          height: height,
+          width: width,
+          child: child,
+        ),
+      );
+    }
+
+    Widget child;
+
+    if (this.topic != null) {
+      if (this.topic.topics.length != 0) {
+        child = ListView(
+            scrollDirection: Axis.horizontal,
+            children: this.topic.topics.map((item) {
+              return Align(
+                child: Container(
+                  height: topicHeight,
+                  width: topicWidth,
+                  margin: EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(
+                          image: CachedNetworkImageProvider(item.image),
+                          fit: BoxFit.cover)),
+                  child: Stack(
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 0.35,
+                        child: Container(
+                          // width: ScreenUtil().setWidth(750),
+                          decoration: BoxDecoration(
+                              color: Color(0xff444444),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                        ),
+                      ),
+                      Positioned(
+                          top: ScreenUtil().setHeight(13),
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 7),
+                            decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.8),
+                                borderRadius: BorderRadius.only(
+                                    // topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                    // bottomLeft: Radius.circular(10),
+                                    bottomRight: Radius.circular(20))),
+                            child: Text(
+                              item.school != null ? '校内' : '校际',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: ScreenUtil().setSp(22)),
+                            ),
+                          )),
+                      Container(
+                        alignment: Alignment.center,
+                        // color: Colors.blue,
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Text(
+                          item.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Montserrat',
+                            fontSize: ScreenUtil().setSp(28),
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }).toList());
+      } else {
+        child = Container(
+          height: topicHeight,
+          width: topicWidth,
+          child: Text("添加话题"),
+        );
+      }
+    } else {
+      child = Center(
+        child: Container(
+            alignment: Alignment.center,
+            height: topicHeight,
+            width: topicWidth,
+            child: CupertinoActivityIndicator()),
+      );
+    }
+    child = Container(
+      // color: Colors.white,
+      padding: EdgeInsets.only(left: 10, bottom: 5, right: 10),
+      height: topicHeight + 10,
+      child: child,
+    );
+    Widget title = Container(
+      height: titleHeight,
+      // color: Colors.blue,
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: ScreenUtil().setWidth(500),
+            height: titleHeight,
+            // color: Colors.yellow,
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(
+                // top: ScreenUtil().setHeight(20),
+                left: ScreenUtil().setWidth(20)),
+            child: Stack(
+              alignment: AlignmentDirectional(-1, 0.6),
+              children: <Widget>[
+                Container(
+                  width: ScreenUtil().setWidth(150),
+                  height: titleHeight / 5,
+                ),
+                Text('  我的话题',
+                    style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: ScreenUtil().setSp(35),
+                        fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              // Application.router.navigateTo(context, '/home/moreTopics');
+              Navigator.push(
+                  context, CupertinoPageRoute(builder: (_) => TabView()));
+            },
+            child: Chip(
+              // padding: EdgeInsets.all(0),
+              backgroundColor: Colors.white,
+              label: Row(
+                children: <Widget>[
+                  Text(
+                    '更多 ',
+                    style: TextStyle(fontSize: ScreenUtil().setSp(26)),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: ScreenUtil().setSp(32),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(3),
+          )
+        ],
+      ),
+    );
+    child = Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15), color: Colors.white),
+      // color: Colors.white,
+      child: Column(
+        children: <Widget>[title, child],
+      ),
+    );
+    return child;
+    List<Widget> row = [];
+    row.add(Container(width: 10));
+    row.add(cardBuilder(100, 100, Text("发布的话题"), () {}));
+    // row.add(cardBuilder(100, 100, Text("参与的话题"), () {}));
+    row.add(Container(width: 10));
+    row.add(Column(
+      children: <Widget>[
+        cardBuilder(100, 45, Text("发布的活动"), () {}),
+        SizedBox(height: 10),
+        cardBuilder(100, 45, Text("发布的活动"), () {}),
+      ],
+    ));
+    row.add(Container(width: 10));
+    row.add(Column(
+      children: <Widget>[
+        cardBuilder(100, 45, Text("发布的活动"), () {}),
+        SizedBox(height: 10),
+        cardBuilder(100, 45, Text("发布的活动"), () {}),
+      ],
+    ));
+    // row.add(cardBuilder(100, 100, Text("发布的活动"), () {}));
+    // row.add(cardBuilder(100, 100, Text("参与的话题"), () {}));
+
+    child = Container(
+      height: 570,
+      // color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(left: 10.0, top: 8.0, bottom: 8.0),
+            child: Text(
+              "我的话题",
+              style: TextStyle(fontSize: 20),
+            ),
+          ),
+          Row(
+            children: row,
+          )
+        ],
+      ),
+    );
+
+    return child;
+  }
+
+  myTopicComments() {
+    Widget child;
+    child = Container(
+      child: UserTopicCommentsPage(),
+      height: 500,
+      // color: Colors.amber,
+    );
+    child = Container(
+      height: 560,
+      margin: EdgeInsets.only(top: 40),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+      padding: EdgeInsets.only(top: 0, bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+              height: 40,
+              padding: EdgeInsets.only(left: 17, top: 5),
+              child: Text('我参与的话题',
+                  style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: ScreenUtil().setSp(35),
+                      fontWeight: FontWeight.w600))),
+          child
+        ],
+      ),
+    );
+
+    return child;
   }
 
   avatar(UserModel userInfo) => GestureDetector(
@@ -295,44 +595,124 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
 
   sliverTabBar() {
     Widget child = SliverPersistentHeader(
-      pinned: true,
-      // floating: true,
-      delegate: StickyTabBarDelegate(
-        child: TabBar(
-            isScrollable: true,
-            labelColor: Theme.of(context).primaryColor,
-            indicatorColor: Theme.of(context).primaryColor,
-            indicatorWeight: 1,
-            indicatorSize: TabBarIndicatorSize.label,
-            // labelPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
-            unselectedLabelColor: Color(0xff333333),
-            controller: this.tabController,
-            tabs: this.tabs.map((tab) {
-              return Tab(
-                text: tab['name'],
-              );
-            }).toList()),
-      ),
-    );
+        pinned: true,
+        // floating: true,
+        delegate: StickyTabBarDelegate(
+            child: PreferredSize(
+          preferredSize: Size.fromHeight(ScreenUtil.screenHeightDp),
+          child: Stack(
+            children: <Widget>[
+              TabView(userId: userInfo.id),
+              Listener(
+                onPointerDown: (detail) {
+                  // print("down==>${detail.position}");
+                  setState(() {
+                    firstPosition = detail.position.dy;
+                  });
+                },
+                onPointerMove: (detail) {
+                  // print(firstPosition);
+                  double del = detail.position.dy - firstPosition;
+                  // print(
+                  //     "scrollController.offset===>${scrollController.offset}");
+                  // print("del===>$del");
+                  // print("detail======>${detail.position.dy}");
+                  // if (scrollController.offset > 470) {
+                  //   scrollController.jumpTo(scrollController.offset - del);
+                  // }
+                  // if (del > 0) {
+                  //   scrollController.jumpTo(scrollController.offset - del);
+                  // }
+                  // print("del=====>$del");
+                  // if (scrollController.offset > 50) {
+                  //   scrollController.jumpTo(scrollController.offset - del);
+                  // }
+
+                  // print("move==>${detail.position}");
+                },
+                onPointerUp: (detail) {
+                  // print(firstPosition);
+                  // double del = detail.position.dy - firstPosition;
+                  // print("up==>${detail.position}");
+                  // // if ((detail.position.dy - firstPosition) > 140) {
+                  // // print('ok');
+                  // // print("offset=====>${scrollController.offset}");
+                  // scrollController.jumpTo(scrollController.offset - del);
+                },
+                behavior: HitTestBehavior.translucent,
+                child: Container(
+                  height: ScreenUtil.screenHeightDp,
+                  width: ScreenUtil.screenWidthDp,
+                ),
+              )
+            ],
+          ),
+        ))
+
+        //   isScrollable: true,
+        //   labelColor: Theme.of(context).primaryColor,
+        //   indicatorColor: Theme.of(context).primaryColor,
+        //   indicatorWeight: 1,
+        //   indicatorSize: TabBarIndicatorSize.label,
+        //   // labelPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
+        //   unselectedLabelColor: Color(0xff333333),
+        //   controller: this.tabController,
+        //   tabs: tabs.map((tab) {
+        //     return Tab(
+        //       text: tab['name'],
+        //     );
+        //   }).toList(),
+        // ),
+        // preferredSize: Size.fromHeight(kToolbarHeight),
+        // child: TabBar(
+        //     isScrollable: true,
+        //     labelColor: Theme.of(context).primaryColor,
+        //     indicatorColor: Theme.of(context).primaryColor,
+        //     indicatorWeight: 1,
+        //     indicatorSize: TabBarIndicatorSize.label,
+        //     // labelPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
+        //     unselectedLabelColor: Color(0xff333333),
+        //     controller: this.tabController,
+        //     tabs: this.tabs.map((tab) {
+        //       return Tab(
+        //         text: tab['name'],
+        //       );
+        //     }).toList()),
+        );
     return child;
   }
 
   sliverTabBody() {
-    Widget child = SliverToBoxAdapter(
+    Widget child = SliverFillRemaining(
       // 剩余补充内容TabBarView
-      child: SizedBox(
-        height: 500,
-        child: Padding(
-          padding: EdgeInsets.only(top: 0.0),
-          child: TabBarView(
-            controller: this.tabController,
-            children: this.tabs.map((tab) {
-              Widget body = tab['body'];
-              return body;
-            }).toList(),
-          ),
-        ),
+      // child: Padding(
+      //   padding: EdgeInsets.only(top: 50.0),
+      //   child: PageView(
+      //     controller: pageController,
+      //     children: this.tabs.map((tab) {
+      //       Widget child = tab['body'];
+      //       return child;
+      //     }).toList(),
+      //   ),
+      child: TabBarView(
+        controller: this.tabController,
+        children: this.tabs.map((tab) {
+          Widget body = tab['body'];
+          return body;
+        }).toList(),
       ),
+
+      // child: Padding(
+      //   padding: EdgeInsets.only(top: 0.0),
+      //   child: TabBarView(
+      //     physics: AlwaysScrollableScrollPhysics(),
+      //     controller: this.tabController,
+      //     children: this.tabs.map((tab) {
+      //       Widget body = tab['body'];
+      //       return body;
+      //     }).toList(),
+      //   ),
+      // ),
     );
     return child;
   }
@@ -532,10 +912,24 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
       this.isUpdateBackground = true;
     });
   }
+
+  // getTopicData() async {
+  //   var data = await apiClient.getEngageTopics(page: 1);
+  //   EngageTopicCommentModel topic = EngageTopicCommentModel.fromJson(data);
+  //   // print(topic);
+  //   topic.topics.forEach((f) {
+  //     print(f.title);
+  //   });
+
+  //   setState(() {
+  //     this.topic = topic;
+  //   });
+  //   // print(data);
+  // }
 }
 
 class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar child;
+  final PreferredSizeWidget child;
   final Color color;
   StickyTabBarDelegate({@required this.child, this.color});
   @override
@@ -543,11 +937,16 @@ class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     var border = BorderSide(color: Colors.black12, width: 0.5);
     return Container(
-      height: 200,
+      height: this.child.preferredSize.height,
+      // alignment: Alignment.center,
       child: this.child,
+      // margin: EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
-          color: Colors.white, border: Border(top: border, bottom: border)),
+        color: Colors.white,
+        border: Border(top: border, bottom: border),
+      ),
     );
+    // return child;
   }
 
   @override
