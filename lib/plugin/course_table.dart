@@ -20,7 +20,7 @@ class Eamis {
   clear() {
     cookieJar.deleteAll();
     instance = null;
-    prefs.remove("course_table");
+    prefs?.remove("course_table");
   }
 
   Eamis._init() {
@@ -173,6 +173,10 @@ class Eamis {
     String firstUrl =
         "http://eamis.nankai.edu.cn/eams/courseTableForStd.action?_=${DateTime.now().millisecondsSinceEpoch}";
     Response res = await dio.get(firstUrl);
+    String secondUrl = "http://eamis.nankai.edu.cn/eams/courseTableForStd!innerIndex.action?projectId=1&_=${DateTime.now().millisecondsSinceEpoch}";
+    if(res.data.contains("本科")){
+      res = await dio.get(secondUrl);
+    }
     var id = exp.firstMatch(res.data)?.group(0);
     if (id == null) {
       id = exp2.firstMatch(res.data)?.group(0);

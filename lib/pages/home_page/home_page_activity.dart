@@ -127,8 +127,9 @@ class HomePageActivities extends StatelessWidget {
       imageBuilder: (context, imageProvider) => GestureDetector(
         onTap: () {
           push(() async {
+            var formData = {'item': item, 'heroTag': item.id.toString()};
             Navigator.pushNamed(context, Routes.activityDetail,
-                arguments: item);
+                arguments: formData);
           });
         },
         child: Align(

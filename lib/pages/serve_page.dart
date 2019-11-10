@@ -63,7 +63,7 @@ class _ServePageState extends State<ServePage> {
       'name': '课表',
       'preIcon': Icons.calendar_today,
       'backIcon': IconData(0xe63a, fontFamily: 'myIcon'),
-      'color': Colors.blue,
+      'color': Colors.orangeAccent,
       'url': Routes.courseTablePage
     }
   ];
