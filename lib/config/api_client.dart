@@ -5,10 +5,10 @@ import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 
 class ApiClient {
-  static const host = "http://47.94.247.8";
-  static const baseURL = "http://47.94.247.8/api/";
-  // static const host = "https://www.finder-nk.com";
-  // static const baseURL = "https://www.finder-nk.com/api/";
+  // static const host = "http://47.94.247.8";
+  // static const baseURL = "http://47.94.247.8/api/";
+  static const host = "https://www.finder-nk.com";
+  static const baseURL = "https://www.finder-nk.com/api/";
 
   static Dio dio = new Dio(BaseOptions(baseUrl: baseURL));
 
@@ -351,7 +351,7 @@ class ApiClient {
     var formData = {'activity_id': activityId};
     try {
       Response response =
-          await dio.get('delete_activity/', queryParameters: formData);
+          await dio.post('delete_activity/', data: jsonEncode(formData));
       print(response.data);
       return response.data;
     } catch (e) {
@@ -536,6 +536,19 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('获取参与的活动错误==========>$e');
+    }
+  }
+
+  ///删除用户活动
+  Future deleteTopic({int topicId}) async {
+    var formData = {'topic_id': topicId};
+    try {
+      Response response =
+          await dio.post('delete_topic/', data: jsonEncode(formData));
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      print('删除话题错误==========>$e');
     }
   }
 

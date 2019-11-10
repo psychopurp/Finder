@@ -264,12 +264,19 @@ class _UserActivityPageState extends State<UserActivityPage> {
                           child: Text("删除"),
                           onPressed: () async {
                             FinderDialog.showLoading();
-                            var data = await apiClient.deleteTopicComment(
-                                commentId: item.id);
+                            var data = await apiClient.deleteActivity(
+                                activityId: item.id);
                             if (data['status']) {
-                              // this.topicComments.remove(item);
+                              this.activities.remove(item);
                               setState(() {});
                             }
+                            String msg = data['status'] ? "删除成功" : "删除失败";
+                            Future.delayed(Duration(milliseconds: 500), () {
+                              BotToast.showText(
+                                  text: msg,
+                                  align: Alignment(0, 0.5),
+                                  duration: Duration(milliseconds: 500));
+                            });
                             Navigator.pop(context);
                           }),
                     ],

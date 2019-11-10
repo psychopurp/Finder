@@ -187,6 +187,13 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
                               this.topicComments.remove(item);
                               setState(() {});
                             }
+                            String msg = data['status'] ? "删除成功" : "删除失败";
+                            Future.delayed(Duration(milliseconds: 500), () {
+                              BotToast.showText(
+                                  text: msg,
+                                  align: Alignment(0, 0.5),
+                                  duration: Duration(milliseconds: 500));
+                            });
                             Navigator.pop(context);
                           }),
                     ],
@@ -294,8 +301,6 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
       for (int i = 1; i <= pageCount; i++) {
         var data = await apiClient.getUserTopicComments(
             page: i, userId: widget.userId);
-
-        print('=====${widget.userId}');
         TopicCommentsModel topicComments = TopicCommentsModel.fromJson(data);
         hasMore = topicComments.hasMore;
         temp.addAll(topicComments.topicComments);

@@ -33,7 +33,7 @@ class _MoreActivitiesState extends State<MoreActivities>
         this
             .activityTypes
             .data
-            .insert(0, ActivityTypesModelData(id: -1, name: "全部"));
+            .insert(1, ActivityTypesModelData(id: -1, name: "全部"));
         _tabController = new TabController(
             vsync: this, length: this.activityTypes.data.length);
       });
