@@ -2,6 +2,7 @@ import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
 import 'package:finder/plugin/callback.dart';
+import 'package:finder/routers/routes.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
@@ -22,6 +23,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static var formData;
   bool atHear = true;
+  Offset first;
+  Offset last;
+  bool down;
+  bool hold;
+  DateTime holdTime;
 
   @override
   void initState() {
@@ -58,7 +64,56 @@ class _HomePageState extends State<HomePage> {
       ),
       backgroundColor: Colors.white,
       // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-      body: body,
+      body: Stack(
+        children: <Widget>[
+          body,
+          Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (detail) {
+              first = detail.position;
+            },
+            onPointerMove: (detail) {
+              if (down == null && first != null) {
+                Offset diff = detail.position - first;
+                down = diff.dx.abs() < diff.dy.abs() && diff.dy > 0;
+                last = detail.position;
+              } else {
+                if (down == null) {
+                } else if (down) {
+                  Offset diff = detail.position - last;
+                  if ((diff.dy < -1)) {
+                    holdTime = null;
+                    down = null;
+                    first = null;
+                  } else if ((detail.position - last).distance < 5) {
+                    if (holdTime == null) {
+                      holdTime = DateTime.now();
+                    }else{
+                      DateTime now = DateTime.now();
+                      if(now.difference(holdTime).inMilliseconds > 300){
+                        Navigator.pushNamed(context, Routes.courseTablePage);
+                        holdTime = null;
+                        down = null;
+                        first = null;
+                      }
+                    }
+                  } else {
+                    holdTime = null;
+                  }
+                  last = detail.position;
+                }
+              }
+            },
+            onPointerUp: (detail) {
+              down = null;
+            },
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

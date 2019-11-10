@@ -159,6 +159,28 @@ class _CourseTablePageState extends State<CourseTablePage> {
   }
 
   Widget get body {
+    if(!eamis.ok){
+      return Container(
+        width: ScreenUtil.screenWidthDp,
+        height: ScreenUtil.screenHeightDp,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              child: CircularProgressIndicator(),
+              height: 40,
+              width: 40,
+            ),
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            Text("加载中"),
+          ],
+        ),
+      );
+    }
     return GestureDetector(
       onHorizontalDragEnd: (detail) {
         if (detail.primaryVelocity > 0) {
