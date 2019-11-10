@@ -224,7 +224,7 @@ class _TipsPageState extends State<TipsPage> {
         };
         print("formData $formData ============================================");
         Navigator.pushNamed(context, Routes.topicCommentDetail,
-            arguments: formData);
+            arguments: item);
         break;
       case "lead_say":
         var data = await getLeadHeSheSays(id);

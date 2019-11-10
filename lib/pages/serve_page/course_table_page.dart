@@ -3,7 +3,6 @@ import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CourseTablePage extends StatefulWidget {
   @override
@@ -110,7 +109,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
   }
 
   getData() async {
-    eamis.load();
+    await eamis.load();
     setState(() {});
   }
 
@@ -159,6 +158,8 @@ class _CourseTablePageState extends State<CourseTablePage> {
       body: eamis.username == null || eamis.password == null
           ? CourseTableRegister(() {
               setState(() {});
+              showErrorHint(context,
+                  "课表包含三个模式：\n  1.最近三天的课程.\n  2.我有课程的日子的课程. \n  3.一个星期的完整课程表.\n大家可以通过左右滑动切换模式.\n欢迎大家酌情使用!");
             })
           : body,
     );
@@ -208,8 +209,15 @@ class _CourseTablePageState extends State<CourseTablePage> {
             ),
             transitionBuilder: (child, animation) {
               return SlideTransitionX(
-                child: SingleChildScrollView(
-                    physics: BouncingScrollPhysics(), child: child),
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await eamis.getData();
+                  },
+                  child: SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics()),
+                      child: child),
+                ),
                 direction: direction,
                 position: animation,
               );
@@ -466,7 +474,7 @@ class SlideTransitionX extends AnimatedWidget {
 class CourseTableRegister extends StatefulWidget {
   CourseTableRegister(this.onLogin);
 
-  VoidCallback onLogin;
+  final VoidCallback onLogin;
 
   @override
   _CourseTableRegisterState createState() => _CourseTableRegisterState();
@@ -480,7 +488,8 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
     super.initState();
     _password = TextEditingController();
     Future.delayed(Duration(milliseconds: 200), () {
-      showErrorHint(context, "本系统使用教务系统账号密码登录.\n\nFinders使用您的账号在本地登录教务系统获取课表.\n\nFinders承诺, 您的密码将不会上传到服务器, 我们也不会以任何形式记录您的密码.\n\n使用本系统, 将默认您同意此行为, 如果不能接受, 请返回首页.\n");
+      showErrorHint(context,
+          "本系统使用教务系统账号密码登录.\n\nFinders使用您的账号在本地登录教务系统获取课表.\n\nFinders承诺, 您的密码将不会上传到服务器, 我们也不会以任何形式记录您的密码.\n\n使用本系统, 将默认您同意此行为, 如果不能接受, 请返回首页.\n");
     });
   }
 

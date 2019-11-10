@@ -95,6 +95,10 @@ class Eamis {
     load();
     if (password == null || username == null) return;
     if (ok) return;
+    await getData();
+  }
+
+  Future<void> getData() async {
     await login();
     await getTermSelector();
     String data = await getSchedule();
@@ -120,8 +124,10 @@ class Eamis {
         }));
   }
 
-  void load() {
-    if (prefs == null) return;
+  Future<void> load() async {
+    if (prefs == null) {
+      prefs = await SharedPreferences.getInstance();
+    }
     var data = prefs.getString("course_table");
     if (data == null) return;
     var loadData = json.decode(data);
