@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Eamis {
   static Eamis instance;
+  SharedPreferences prefs;
 
   factory Eamis() {
     if (instance == null) instance = Eamis._init();
@@ -15,6 +18,9 @@ class Eamis {
   Eamis._init() {
     dio.interceptors.add(CookieManager(cookieJar));
     dio.options.headers = headers;
+    SharedPreferences.getInstance().then((value) {
+      prefs = value;
+    });
   }
 
   bool ok = false;
@@ -23,6 +29,7 @@ class Eamis {
     if (!ok) {
       await init();
       ok = true;
+      save();
     }
   }
 
@@ -65,11 +72,49 @@ class Eamis {
   String ids;
 
   Future<void> init() async {
+    prefs = await SharedPreferences.getInstance();
+    load();
+    if(ok) return;
     await login();
     await getTermSelector();
     String data = await getSchedule();
     var parser = NKUCourseParser(data, course);
     unitCount = parser.unitCount;
+  }
+
+  void save() {
+    Map<String, dynamic> courseJson = {};
+    course.forEach((key, value) {
+      courseJson[key.toString()] =
+          List<Map<String, dynamic>>.generate(value.length, (i) => value[i]?.toJson());
+    });
+    prefs.setString(
+        "course_table",
+        json.encode({
+          "username": username,
+          "password": password,
+          "course": courseJson,
+          "unitCount": unitCount,
+          "ids": ids,
+          "ok": ok
+        }));
+  }
+
+  void load() {
+    if (prefs == null) return;
+    var data = prefs.getString("course_table");
+    if(data == null) return;
+    var loadData = json.decode(data);
+    username = loadData["username"];
+    password = loadData["password"];
+    course = {};
+    loadData["course"].forEach((key, value) {
+      course[int.parse(key)] =
+      List<Lesson>.generate(value.length, (i) => value[i] == null ? null : Lesson.fromJson(value[i]));
+    });
+    unitCount = loadData["unitCount"];
+    ids = loadData["ids"];
+    ok = loadData['ok'];
   }
 
   Future<void> login() async {
@@ -149,7 +194,6 @@ class Eamis {
             validateStatus: (status) {
               return status < 400;
             }));
-    // print(req.data);
     return req.data;
   }
 }
@@ -161,6 +205,14 @@ class Lesson {
   int day;
   int index;
 
+  factory Lesson.fromJson(Map<String, dynamic> json) {
+    return Lesson(Course.fromJson(json['course']), json['day'], json['index']);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {"course": course.toJson(), "day": day, "index": index};
+  }
+
   @override
   String toString() {
     return "Lesson: ${course.name}";
@@ -169,6 +221,25 @@ class Lesson {
 
 class Course {
   static Map<String, Course> courses = {};
+
+  factory Course.fromJson(Map<String, dynamic> json) {
+    return Course(
+        name: json["name"],
+        teacher: json['teacher'],
+        courseId: json['courseId'],
+        position: json['postion'],
+        validWeeks: List<bool>.generate(json['validWeeks'].length, (i)=>json['validWeeks'][i]));
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "teacher": teacher,
+      "courseId": courseId,
+      "postion": position,
+      "validWeeks": validWeeks
+    };
+  }
 
   factory Course(
       {String name,
@@ -180,16 +251,16 @@ class Course {
     var key = "$courseId-$position";
     if (courses.containsKey(key)) {
       course = courses[key];
-      if(position == "停课"){
-        for(int i = 0; i < (validWeeks?.length ?? 0); i++){
-          if(validWeeks[i]){
+      if (position == "停课") {
+        for (int i = 0; i < (validWeeks?.length ?? 0); i++) {
+          if (validWeeks[i]) {
             course.validWeeks[i] = false;
           }
         }
-      }else{
+      } else {
         course.position = position;
-        for(int i = 0; i < (validWeeks?.length ?? 0); i++){
-          if(validWeeks[i]){
+        for (int i = 0; i < (validWeeks?.length ?? 0); i++) {
+          if (validWeeks[i]) {
             course.validWeeks[i] = true;
           }
         }
@@ -256,12 +327,15 @@ class NKUCourseParser {
     for (int i = 1; i <= 7; i++) {
       courses[i] = List.generate(unitCount, (e) => null);
     }
-    courses[0] = List.generate(unitCount,
-        (e) => Lesson(Course(name: (e + 1).toString(), position: "", courseId: -e), null, e));
+    courses[0] = List.generate(
+        unitCount,
+        (e) => Lesson(
+            Course(name: (e + 1).toString(), position: "", courseId: -e),
+            null,
+            e));
     _coursesBlock.forEach((e) {
       parseSingleCourse(e.group(0));
     });
-    print(courses);
   }
 
   void parseSingleCourse(String course) {
