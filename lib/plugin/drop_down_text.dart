@@ -58,7 +58,7 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
   @override
   Widget build(BuildContext context) {
     Widget mainContent = Container(
-      constraints: init ? BoxConstraints(maxHeight: maxHeight, minHeight: 0) : null,
+      constraints: init ? lines > 5 ?  BoxConstraints(maxHeight: maxHeight, minHeight: 0) : null : null,
       margin: EdgeInsets.only(top: marginTop),
       alignment: Alignment.topLeft,
       child: Builder(builder: (context){

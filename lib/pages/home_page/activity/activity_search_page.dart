@@ -1,6 +1,5 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/activity_model.dart';
-import 'package:finder/provider/store.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
@@ -148,9 +147,10 @@ class ActivitySearchDelegate extends SearchDelegate<String> {
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
-                        item.startTime.split(" ")[0].replaceAll('-', '.') +
-                            "-" +
-                            item.endTime.split(' ')[0].replaceAll('-', '.'),
+                        // item.startTime.split(" ")[0].replaceAll('-', '.') +
+                        //     "-" +
+                        //     item.endTime.split(' ')[0].replaceAll('-', '.'),
+                        'asf',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.left,
@@ -327,122 +327,142 @@ class _ActivitySearchPageState extends State<ActivitySearchPage> {
   }
 
   buildActivityList(ActivityModelData item) {
+    String heroTag = item.title + item.id.toString() + 'search';
+    DateTime start = item.startTime;
+    DateTime end = item.endTime;
+    String startTime = start.year.toString() +
+        '-' +
+        start.month.toString() +
+        '-' +
+        start.day.toString();
+    String endTime = end.year.toString() +
+        '-' +
+        end.month.toString() +
+        '-' +
+        end.day.toString();
+
     Widget child;
     child = Container(
-      // margin: EdgeInsets.only(
-      //   left: ScreenUtil().setWidth(40),
-      //   right: ScreenUtil().setWidth(40),
-      // ),
-      padding: EdgeInsets.only(left: 20),
-      height: ScreenUtil().setHeight(400),
-      width: ScreenUtil().setWidth(670),
-      decoration: BoxDecoration(
-          // color: Colors.blue,
-          border: Border(bottom: BorderSide(color: Colors.black12))),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Container(
-              height: ScreenUtil().setHeight(320),
-              width: ScreenUtil().setWidth(250),
-              decoration: BoxDecoration(
-                // color: Colors.green,
-                borderRadius: BorderRadius.all(Radius.circular(3)),
-                // border: Border.all(color: Colors.black, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black38,
-                      offset: Offset(-1.0, 2.0),
-                      blurRadius: 2.0,
-                      spreadRadius: 1.0),
-                ],
-                image: DecorationImage(
-                  image: CachedNetworkImageProvider(item.poster),
-                  fit: BoxFit.cover,
-                ),
-              )),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Container(
-                // color: Colors.cyan,
-                width: ScreenUtil().setWidth(420),
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  item.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.lerp(
-                          FontWeight.w400, FontWeight.w800, 0.8)),
-                ),
-              ),
-              Container(
-                // color: Colors.amber,
-                width: ScreenUtil().setWidth(420),
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  item.startTime.split(" ")[0].replaceAll('-', '.') +
-                      "-" +
-                      item.endTime.split(' ')[0].replaceAll('-', '.'),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil().setSp(30),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              Container(
-                // color: Colors.amber,
-                // margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
-                width: ScreenUtil().setWidth(420),
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  item.place,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil().setSp(25),
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(
-                  right: ScreenUtil().setWidth(40),
-                  // top: ScreenUtil().setHeight(20)),
-                ),
-                padding: EdgeInsets.all(7),
+        margin: EdgeInsets.only(bottom: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: Colors.black12, width: 1),
+              // top: BorderSide(color: Colors.black12, width: 1)),
+            ),
+            // borderRadius: BorderRadius.circular(10),
+            color: Colors.white),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            ///活动海报
+            Hero(
+              tag: heroTag,
+              child: Container(
+                height: ScreenUtil().setHeight(320),
+                width: ScreenUtil().setWidth(250),
                 decoration: BoxDecoration(
-                    // color: Colors.amber,
-                    border: Border.all(color: Color(0xFFF0AA89)),
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                child: Text(
-                  "  详情  ",
-                  style: TextStyle(
-                      fontSize: ScreenUtil().setSp(22),
-                      color: Color(0xFFF0AA89)),
+                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(-1.0, 2.0),
+                          blurRadius: 2.0,
+                          spreadRadius: 2.0),
+                    ],
+                    image: DecorationImage(
+                        image: CachedNetworkImageProvider(item.poster),
+                        fit: BoxFit.cover)),
+              ),
+            ),
+
+            ///活动信息
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.only(left: 10),
+                // color: Colors.amber,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ///活动标题
+                    Container(
+                      // color: Colors.cyan,
+                      padding: EdgeInsets.symmetric(vertical: 0),
+                      child: Text(
+                        '#' + item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: ScreenUtil().setSp(30),
+                            fontWeight: FontWeight.lerp(
+                                FontWeight.w400, FontWeight.w800, 0.8)),
+                      ),
+                    ),
+
+                    Container(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Text(
+                        '主办方：' + item.sponsor,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+
+                    ///活动时间
+                    Container(
+                      // color: Colors.amber,
+                      padding: EdgeInsets.only(bottom: 10, top: 5),
+                      child: Text(
+                        '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+
+                    ///活动地点
+                    Container(
+                      // color: Colors.amber,
+                      padding: EdgeInsets.symmetric(vertical: 0),
+                      child: Text(
+                        '活动地点：' + item.place,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
                 ),
-              )
-            ],
-          )
-        ],
-      ),
-    );
+              ),
+            )
+          ],
+        ));
 
     child = GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(context, Routes.activityDetail, arguments: item);
-        },
-        child: child);
+      onTap: () {
+        var formData = {'item': item, 'heroTag': heroTag};
+        Navigator.pushNamed(context, Routes.activityDetail,
+            arguments: formData);
+      },
+      child: child,
+    );
 
     return child;
   }

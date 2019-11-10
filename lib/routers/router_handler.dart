@@ -1,10 +1,7 @@
-import 'dart:convert';
-
-import 'package:finder/models/user_model.dart';
 import 'package:finder/pages/check_code_login_page.dart';
 import 'package:finder/pages/fans_follow_page.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
-import 'package:finder/pages/home_page/topici_comment_detail.dart';
+import 'package:finder/pages/home_page/topic_comment_detail.dart';
 import 'package:finder/pages/message_page/chat_page.dart';
 import 'package:finder/pages/home_page/publish_topic_comment.dart';
 import 'package:finder/pages/message_page/say_to_he_chat_page.dart';
@@ -121,7 +118,7 @@ var commentPageHandler = Handler(
   String topicId = params['topicId']?.first;
 
   return CommentPage(
-    topicCommentId: int.parse(topicCommentId),
+    // topicCommentId: int.parse(topicCommentId),
     topicId: int.parse(topicId),
   );
 });

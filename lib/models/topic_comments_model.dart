@@ -1,6 +1,8 @@
 import 'package:finder/public.dart';
 
 class TopicCommentsModel {
+  List<TopicCommentsModelData> topicReplies;
+  List<TopicCommentsModelData> topicComments;
   List<TopicCommentsModelData> data;
   int totalPage;
   bool status;
@@ -11,8 +13,23 @@ class TopicCommentsModel {
   TopicCommentsModel.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
       data = new List<TopicCommentsModelData>();
+      topicReplies = new List<TopicCommentsModelData>();
+      topicComments = new List<TopicCommentsModelData>();
       json['data'].forEach((v) {
-        data.add(new TopicCommentsModelData.fromJson(v));
+        if (v['type'] != null) {
+          if (v['type'] == 3) {
+            topicComments.add(new TopicCommentsModelData.fromJson(v));
+          } else if (v['type'] == 5) {
+            topicReplies.add(new TopicCommentsModelData.fromJson(v));
+          }
+        } else {
+          if (v['reply_to'] == null) {
+            topicComments.add(new TopicCommentsModelData.fromJson(v));
+          } else {
+            topicReplies.add(new TopicCommentsModelData.fromJson(v));
+          }
+          // data.add(new TopicCommentsModelData.fromJson(v));
+        }
       });
     }
     totalPage = json['total_page'];
@@ -44,6 +61,10 @@ class TopicCommentsModelData {
   bool isLike;
   bool isCollected;
   bool hasReply;
+
+  //单个获取时后端才会返回此数据
+  int topicId;
+  String topicTitle;
 
   TopicCommentsModelData(
       {this.id,
@@ -77,6 +98,8 @@ class TopicCommentsModelData {
     isCollected = json['is_collected'];
 
     hasReply = json['has_reply'];
+    topicId = (json['topic'] ?? {})['id'];
+    topicTitle = (json['topic'] ?? {})['title'];
   }
 
   Map<String, dynamic> toJson() {

@@ -1,6 +1,7 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/models/user_model.dart';
+import 'package:finder/pages/mine_page/user_content_tabview.dart';
 import 'package:finder/plugin/gradient_generator.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/routers/application.dart';
@@ -27,11 +28,31 @@ class _UserProfilePageState extends State<UserProfilePage> {
   var cards;
   ScrollController _scrollController;
   int userItSelfId;
+  UserProvider userProvider;
+  double appBarOpacity = 0;
 
   @override
   void initState() {
     getUserProfile();
-    _scrollController = ScrollController();
+    _scrollController = ScrollController()
+      ..addListener(() {
+        double offset = _scrollController.offset;
+        // print("offset==>$offset");
+        if (offset > 108 && offset < 160) {
+          setState(() {
+            appBarOpacity = (offset / 100) % 1;
+          });
+        } else if (offset > 160) {
+          setState(() {
+            appBarOpacity = 1;
+          });
+        } else if (offset < 60) {
+          setState(() {
+            appBarOpacity = 0;
+          });
+        }
+        // print(scrollController.offset);
+      });
     super.initState();
   }
 
@@ -49,17 +70,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
 //    print(widget.heroTag);
     return Scaffold(
-      floatingActionButton: userItSelfId == user?.id
-          ? null
-          : FloatingActionButton(
-              child: Text("私信"),
-              elevation: 1,
-              onPressed: () {
-                Navigator.of(context).pushNamed(Routes.chat,
-                    arguments: UserProfile.fromJson(user.toJson()));
-              },
-              backgroundColor: Theme.of(context).primaryColor,
-            ),
       body: SafeArea(
         top: false,
         child: Container(
@@ -68,14 +78,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
               backgroundColor: Colors.transparent,
               elevation: 0,
             ),
-            child: body(userProvider),
+            child: body,
           ),
         ),
       ),
     );
   }
 
-  Widget body(UserProvider userProvider) {
+  Widget get body {
     Widget child;
     if (this.user == null) {
       child = Container(
@@ -83,28 +93,74 @@ class _UserProfilePageState extends State<UserProfilePage> {
           height: double.infinity,
           child: CupertinoActivityIndicator());
     } else {
+      Widget userInfoCard = Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.only(bottom: 100, top: 80),
+          child: Stack(
+            fit: StackFit.loose,
+            alignment: Alignment.topCenter,
+            children: <Widget>[
+              Container(padding: EdgeInsets.only(top: 50), child: userCard()),
+              Positioned(
+                top: 0,
+                // left: 0,
+                // top: topPartHeight * 1.5 - 40,
+                child: avatar(),
+              )
+            ],
+          ));
+
+      child = CustomScrollView(
+        controller: _scrollController,
+        slivers: <Widget>[
+          SliverPersistentHeader(
+              floating: true,
+              pinned: true,
+              delegate: AppbarDelegate(
+                  child: UserAppBar(
+                title: Padding(
+                  padding: EdgeInsets.only(top: 18.0),
+                  child: Text(user.nickname,
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black.withOpacity(appBarOpacity))),
+                ),
+                color: Colors.white.withOpacity(appBarOpacity),
+              ))),
+          SliverToBoxAdapter(
+            child: userInfoCard,
+          ),
+          SliverPersistentHeader(
+              pinned: true,
+              // floating: true,
+              delegate: StickyTabBarDelegate(
+                  child: PreferredSize(
+                preferredSize: Size.fromHeight(ScreenUtil.screenHeightDp),
+                child: Stack(
+                  children: <Widget>[
+                    TabView(userId: user.id),
+                    Listener(
+                      onPointerDown: (detail) {
+                        setState(() {});
+                      },
+                      onPointerMove: (detail) {},
+                      onPointerUp: (detail) {},
+                      behavior: HitTestBehavior.translucent,
+                      child: Container(
+                        height: ScreenUtil.screenHeightDp,
+                        width: ScreenUtil.screenWidthDp,
+                      ),
+                    )
+                  ],
+                ),
+              )))
+        ],
+      );
+
       child = Stack(
         alignment: Alignment.topCenter,
         fit: StackFit.expand,
-        children: <Widget>[
-          buildBackground(),
-          Positioned(
-              left: 0,
-              right: 0,
-              top: topPartHeight * 1.2,
-              child: userCard(user, userProvider)),
-          Positioned(
-            // left: ScreenUtil().setWidth(0),
-            right: ScreenUtil.screenWidthDp / 2 - 45,
-            top: topPartHeight * 1.2 - 40,
-            child: avatar(),
-          ),
-          // Positioned(
-          //   left: ScreenUtil.screenWidthDp / 2 + 50,
-          //   top: topPartHeight * 0.5,
-          //   child: followButton(),
-          // )
-        ],
+        children: <Widget>[buildBackground(), child],
       );
     }
 
@@ -160,7 +216,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
       );
 
-  followButton(UserProvider userProvider) {
+  followButton() {
     Widget child = Text(user.isFollowed ? '已关注' : '关注',
         style:
             TextStyle(color: user.isFollowed ? Colors.black38 : Colors.white));
@@ -254,7 +310,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget userCard(UserModel user, UserProvider userProvider) {
+  Widget userCard() {
     return Card(
         margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(100)),
         color: Colors.white,
@@ -332,9 +388,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
+
+              ///私信 和关注 按钮
               (user.id == userItSelfId)
                   ? Container()
-                  : followButton(userProvider),
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                          followButton(),
+                          MaterialButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed(Routes.chat,
+                                  arguments:
+                                      UserProfile.fromJson(user.toJson()));
+                            },
+                            elevation: 1,
+                            shape: StadiumBorder(),
+                            color: Theme.of(context).primaryColor,
+                            child: Text("私信TA",
+                                style: TextStyle(color: Colors.black)),
+                          )
+                        ])
             ],
           ),
         ));
@@ -351,4 +425,73 @@ class _UserProfilePageState extends State<UserProfilePage> {
       this.user = userModel;
     });
   }
+}
+
+class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final PreferredSizeWidget child;
+  final Color color;
+  StickyTabBarDelegate({@required this.child, this.color});
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    var border = BorderSide(color: Colors.black12, width: 0.5);
+    return Container(
+      height: this.child.preferredSize.height,
+      // alignment: Alignment.center,
+      child: this.child,
+      // margin: EdgeInsets.only(top: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: border, bottom: border),
+      ),
+    );
+    // return child;
+  }
+
+  @override
+  double get maxExtent => this.child.preferredSize.height;
+  @override
+  double get minExtent => this.child.preferredSize.height;
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
+  }
+}
+
+class AppbarDelegate extends SliverPersistentHeaderDelegate {
+  final PreferredSizeWidget child;
+  AppbarDelegate({@required this.child});
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(color: Colors.transparent, child: this.child);
+  }
+
+  @override
+  double get maxExtent => this.child.preferredSize.height;
+  @override
+  double get minExtent => this.child.preferredSize.height;
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
+  }
+}
+
+class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final Widget title;
+  final Color color;
+  UserAppBar({this.title, this.color});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: color,
+      alignment: Alignment.center,
+      height: kToolbarHeight + ScreenUtil.statusBarHeight - 10,
+      child: title,
+    );
+  }
+
+  @override
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + ScreenUtil.statusBarHeight - 10);
 }

@@ -18,8 +18,7 @@ class Global {
   static String token = '';
   static UserModel userInfo = new UserModel(
       nickname: '未登录',
-      avatar:
-          'https://image.finder-nk.com/static/default.png');
+      avatar: 'https://image.finder-nk.com/static/default.png');
   static bool isLogin = false;
   static int totalMemory;
   // 是否为release版
@@ -30,9 +29,9 @@ class Global {
   //初始化全局信息，会在APP启动时执行
   //返回 isLogin
   Future<bool> init() async {
-    try{
+    try {
       totalMemory = SysInfo.getTotalPhysicalMemory() ~/ (1024 * 1024);
-    }catch(e){
+    } catch (e) {
       totalMemory = null;
     }
     print('...正在进行Global初始化...');
@@ -73,7 +72,7 @@ class Global {
       //     (await ApiClient.dio.get('get_association_types/')).data,
     };
     this.activityTypes = ActivityTypesModel.fromJson(formData['activityTypes'])
-      ..data.insert(0, ActivityTypesModelData(id: -1, name: "全部"));
+      ..data.insert(1, ActivityTypesModelData(id: -1, name: "全部"));
     this.recruitTypes = RecruitTypesModel.fromJson(formData['recruitTypes']);
   }
 

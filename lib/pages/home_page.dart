@@ -2,7 +2,6 @@ import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
 import 'package:finder/plugin/callback.dart';
-import 'package:finder/provider/user_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
@@ -14,7 +13,6 @@ import 'package:finder/models/topic_model.dart';
 import 'package:finder/models/activity_model.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -34,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context);
+    // final user = Provider.of<UserProvider>(context);
     return Scaffold(
         appBar: AppBar(
           leading: MaterialButton(
@@ -99,7 +97,7 @@ class _HomePageState extends State<HomePage> {
           return FadeTransition(
               child: child,
               opacity:
-              CurvedAnimation(curve: Curves.easeInOut, parent: animation));
+                  CurvedAnimation(curve: Curves.easeInOut, parent: animation));
         },
         child: child);
   }
@@ -116,9 +114,7 @@ class _HomePageState extends State<HomePage> {
     TopicModel topics = TopicModel.fromJson(topicsData);
     for (int i = 2; i <= pageCount; i++) {
       var topicsData2 = await apiClient.getTopics(page: i);
-      topics.data.addAll(TopicModel
-          .fromJson(topicsData2)
-          .data);
+      topics.data.addAll(TopicModel.fromJson(topicsData2).data);
     }
 
     return topics;
