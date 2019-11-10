@@ -7,6 +7,7 @@ import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class UserActivityPage extends StatefulWidget {
   final int userId;
@@ -29,6 +31,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
   EasyRefreshController _refreshController;
   int pageCount = 1;
   ScrollController controller;
+  bool isUserItSelf;
 
   @override
   void initState() {
@@ -46,6 +49,8 @@ class _UserActivityPageState extends State<UserActivityPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
+    this.isUserItSelf = (user.userInfo.id == widget.userId);
     return Container(
       // color: Theme.of(context).dividerColor,
       child: body,
@@ -72,13 +77,12 @@ class _UserActivityPageState extends State<UserActivityPage> {
           controller: controller,
           // primary: true,
           // physics: AlwaysScrollableScrollPhysics(),
-          // padding: EdgeInsets.only(top: kToolbarHeight * 2 + 20),
+          padding: EdgeInsets.only(top: 10, bottom: 40),
           itemCount: this.activities.length,
           itemBuilder: (context, index) {
             return buildContent(this.activities[index]);
           },
         ),
-
         // onRefresh: () async {
         //   this.topicComments = [];
         //   await getData(pageCount: 3);
@@ -105,121 +109,182 @@ class _UserActivityPageState extends State<UserActivityPage> {
   }
 
   buildContent(ActivityModelData item) {
-    // String time =
-    //     item.time.month.toString() + '月' + item.time.day.toString() + '日';
+    String heroTag = item.id.toString() + 'myActivity';
+    DateTime start = item.startTime;
+    DateTime end = item.endTime;
+    String startTime = start.year.toString() +
+        '-' +
+        start.month.toString() +
+        '-' +
+        start.day.toString();
+    String endTime = end.year.toString() +
+        '-' +
+        end.month.toString() +
+        '-' +
+        end.day.toString();
+
     Widget child;
-    child = GestureDetector(
-      onTap: () {
-        // Navigator.pushNamed(context, Routes.topicDetail,
-        //     arguments: {"item": item});
-      },
-      child: Container(
-        // width: 100,
-        padding: EdgeInsets.all(10),
+    child = Container(
+        padding: EdgeInsets.only(left: 20, right: 20, top: 50, bottom: 20),
         margin: EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.white.withOpacity(0.5)),
+            borderRadius: BorderRadius.circular(10), color: Colors.white),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Container(
-              width: ScreenUtil().setWidth(130),
-              // color: Colors.amber,
-              // child: Text(time),
+            ///活动海报
+            Hero(
+              tag: heroTag,
+              child: Container(
+                height: ScreenUtil().setHeight(320),
+                width: ScreenUtil().setWidth(250),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(-1.0, 2.0),
+                          blurRadius: 2.0,
+                          spreadRadius: 2.0),
+                    ],
+                    image: DecorationImage(
+                        image: CachedNetworkImageProvider(item.poster),
+                        fit: BoxFit.cover)),
+              ),
             ),
-            // Padding(
-            //   padding: EdgeInsets.only(top: 0, left: 10),
-            //   child: contentPart(item.content),
-            // )
+
+            ///活动信息
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.only(left: 10),
+                // color: Colors.amber,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ///活动标题
+                    Container(
+                      // color: Colors.cyan,
+                      padding: EdgeInsets.symmetric(vertical: 0),
+                      child: Text(
+                        '#' + item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: ScreenUtil().setSp(30),
+                            fontWeight: FontWeight.lerp(
+                                FontWeight.w400, FontWeight.w800, 0.8)),
+                      ),
+                    ),
+
+                    ///主办方
+                    Container(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Text(
+                        '主办方：' + item.sponsor,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+
+                    ///活动时间
+                    Container(
+                      // color: Colors.amber,
+                      padding: EdgeInsets.only(bottom: 10, top: 5),
+                      child: Text(
+                        '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+
+                    ///活动地点
+                    Container(
+                      // color: Colors.amber,
+                      padding: EdgeInsets.symmetric(vertical: 0),
+                      child: Text(
+                        '活动地点：' + item.place,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
           ],
-        ),
-      ),
+        ));
+
+    child = GestureDetector(
+      onTap: () {
+        var formData = {'item': item, 'heroTag': heroTag};
+        Navigator.pushNamed(context, Routes.activityDetail,
+            arguments: formData);
+      },
+      child: child,
     );
+    if (isUserItSelf) {
+      child = Stack(children: <Widget>[
+        child,
+        Positioned(
+          right: 0,
+          top: 5,
+          child: MaterialButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    title: Text("提示"),
+                    content: Text("确认要删除此活动吗? "),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("取消"),
+                        onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+                      ),
+                      FlatButton(
+                          child: Text("删除"),
+                          onPressed: () async {
+                            FinderDialog.showLoading();
+                            var data = await apiClient.deleteTopicComment(
+                                commentId: item.id);
+                            if (data['status']) {
+                              // this.topicComments.remove(item);
+                              setState(() {});
+                            }
+                            Navigator.pop(context);
+                          }),
+                    ],
+                  );
+                },
+              );
+            },
+            shape: CircleBorder(),
+            child: Icon(Icons.delete_outline),
+          ),
+        )
+      ]);
+    }
 
     return child;
-  }
-
-  Widget contentPart(String content) {
-    double picWidth = ScreenUtil().setWidth(160);
-    bool isSinglePic = false;
-    var json = jsonDecode(content);
-    List imagesJson = json['images'];
-    List<String> images = [];
-    String text = json['text'];
-    imagesJson.forEach((i) {
-      images.add(Avatar.getImageUrl(i));
-    });
-
-    return Container(
-      // color: Colors.amber,
-      // height: ScreenUtil().setHeight(400),
-      // width: ScreenUtil().setWidth(750),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            text,
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontFamily: 'normal',
-                fontSize: ScreenUtil().setSp(30)),
-          ),
-          SizedBox(
-            height: (text == "" || text == null) ? 0 : 10,
-          ),
-          Container(
-            width: ScreenUtil().setWidth(500),
-            // color: Colors.green,
-            child: Wrap(
-              spacing: ScreenUtil().setWidth(10),
-              runSpacing: 5,
-              children: images.asMap().keys.map((index) {
-                isSinglePic = (images.length == 1) ? true : false;
-                var _singlePic = Container(
-                  child: CachedNetworkImage(
-                    imageUrl: images[index],
-                    fit: BoxFit.cover,
-                    placeholder: (context, _) {
-                      return Center(
-                        child: CupertinoActivityIndicator(),
-                      );
-                    },
-                  ),
-                  constraints: BoxConstraints(maxHeight: 400, minWidth: 400),
-                );
-                return CachedNetworkImage(
-                  imageUrl: images[index],
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                  imageBuilder: (content, imageProvider) => InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          fullscreenDialog: false,
-                          builder: (_) {
-                            return PicSwiper(
-                              index: index,
-                              pics: images,
-                            );
-                          }));
-                    },
-                    child: Container(
-                      height: picWidth,
-                      width: picWidth,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: imageProvider, fit: BoxFit.cover)),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          )
-        ],
-      ),
-    );
   }
 
   Future getData({int pageCount}) async {
@@ -232,17 +297,18 @@ class _UserActivityPageState extends State<UserActivityPage> {
         ActivityModel activities = ActivityModel.fromJson(data);
         hasMore = activities.hasMore;
         temp.addAll(activities.data);
-        print(data);
+        // print('data====$data');
       }
 
       this.pageCount = pageCount;
     } else {
-      var data =
-          await apiClient.getUserTopics(page: pageCount, userId: widget.userId);
+      var data = await apiClient.getUserActivities(
+          page: pageCount, userId: widget.userId);
       ActivityModel activities = ActivityModel.fromJson(data);
       hasMore = activities.hasMore;
       temp.addAll(activities.data);
     }
+    if (!mounted) return;
 
     setState(() {
       this.isLoading = false;

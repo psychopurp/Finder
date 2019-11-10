@@ -1,7 +1,9 @@
+import 'package:finder/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/pages/mine_page/user_activity.dart';
 import 'package:finder/pages/mine_page/user_topic.dart';
 import 'package:finder/pages/mine_page/user_topic_comments.dart';
+import 'package:provider/provider.dart';
 
 class TabView extends StatefulWidget {
   final int userId;
@@ -17,9 +19,9 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
   @override
   void initState() {
     tabs = [
-      {'name': '我参与的话题', 'body': UserTopicCommentsPage(userId: widget.userId)},
-      {'name': '我发布的话题', 'body': UserTopicPage(userId: widget.userId)},
-      {'name': '我的活动', 'body': UserActivityPage(userId: widget.userId)},
+      {'name': '参与的话题', 'body': UserTopicCommentsPage(userId: widget.userId)},
+      {'name': '发布的话题', 'body': UserTopicPage(userId: widget.userId)},
+      {'name': '的活动', 'body': UserActivityPage(userId: widget.userId)},
       // {'name': '最近浏览', 'body': Container()},
     ];
     tabController = TabController(vsync: this, length: tabs.length);
@@ -29,9 +31,11 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
+    String it = (user.userInfo.id == widget.userId) ? "我" : "Ta";
     return Scaffold(
         appBar: TabBar(
-            isScrollable: true,
+            isScrollable: false,
             labelColor: Theme.of(context).primaryColor,
             indicatorColor: Theme.of(context).primaryColor,
             indicatorWeight: 1,
@@ -41,7 +45,7 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
             controller: this.tabController,
             tabs: this.tabs.map((tab) {
               return Tab(
-                text: tab['name'],
+                text: it + tab['name'],
               );
             }).toList()),
         body: TabBarView(

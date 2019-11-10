@@ -4,6 +4,7 @@ import 'package:finder/config/api_client.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class UserTopicPage extends StatefulWidget {
   final int userId;
@@ -27,6 +29,7 @@ class _UserTopicPageState extends State<UserTopicPage> {
   EasyRefreshController _refreshController;
   int pageCount = 1;
   ScrollController controller;
+  bool isUserItSelf;
 
   @override
   void initState() {
@@ -45,6 +48,8 @@ class _UserTopicPageState extends State<UserTopicPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
+    this.isUserItSelf = (user.userInfo.id == widget.userId);
     return Container(
       // color: Theme.of(context).dividerColor,
       child: body,
@@ -71,7 +76,7 @@ class _UserTopicPageState extends State<UserTopicPage> {
           controller: controller,
           // primary: true,
           // physics: AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.only(top: 10),
+          padding: EdgeInsets.only(top: 10, bottom: 40),
           itemCount: this.topics.length,
           itemBuilder: (context, index) {
             return buildContent(this.topics[index]);
@@ -153,47 +158,48 @@ class _UserTopicPageState extends State<UserTopicPage> {
       child: child,
     );
 
-    child = Stack(children: <Widget>[
-      child,
-      Positioned(
-        right: 0,
-        top: 10,
-        child: MaterialButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (_) {
-                return AlertDialog(
-                  title: Text("提示"),
-                  content: Text("确认要删除此条话题吗? "),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("取消"),
-                      onPressed: () => Navigator.of(context).pop(), // 关闭对话框
-                    ),
-                    FlatButton(
-                        child: Text("删除"),
-                        onPressed: () async {
-                          FinderDialog.showLoading();
-                          var data = await apiClient.deleteTopicComment(
-                              commentId: item.id);
-                          if (data['status']) {
-                            // this.topicComments.remove(item);
-                            setState(() {});
-                          }
-                          Navigator.pop(context);
-                        }),
-                  ],
-                );
-              },
-            );
-          },
-          shape: CircleBorder(),
-          child: Icon(Icons.delete_outline),
-        ),
-      )
-    ]);
-
+    if (isUserItSelf) {
+      child = Stack(children: <Widget>[
+        child,
+        Positioned(
+          right: 0,
+          top: 10,
+          child: MaterialButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    title: Text("提示"),
+                    content: Text("确认要删除此条话题吗? "),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("取消"),
+                        onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+                      ),
+                      FlatButton(
+                          child: Text("删除"),
+                          onPressed: () async {
+                            FinderDialog.showLoading();
+                            var data = await apiClient.deleteTopicComment(
+                                commentId: item.id);
+                            if (data['status']) {
+                              // this.topicComments.remove(item);
+                              setState(() {});
+                            }
+                            Navigator.pop(context);
+                          }),
+                    ],
+                  );
+                },
+              );
+            },
+            shape: CircleBorder(),
+            child: Icon(Icons.delete_outline),
+          ),
+        )
+      ]);
+    }
     return child;
   }
 
@@ -219,6 +225,7 @@ class _UserTopicPageState extends State<UserTopicPage> {
       temp.addAll(topics.data);
     }
 
+    if (!mounted) return;
     setState(() {
       this.isLoading = false;
       this.topics.addAll(temp);

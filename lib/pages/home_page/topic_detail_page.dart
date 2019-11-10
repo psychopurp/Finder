@@ -622,13 +622,8 @@ class _TopicCommentsState extends State<TopicComments> {
         handleDelete(user, item);
       },
       onTap: () {
-        var formData = {
-          'item': item,
-          'topicId': widget.topicId,
-          'topicTitle': widget.topicTitle
-        };
         Navigator.pushNamed(context, Routes.topicCommentDetail,
-            arguments: formData);
+            arguments: item);
       },
       child: Container(
         padding: EdgeInsets.only(
@@ -885,7 +880,7 @@ class _TopicCommentsState extends State<TopicComments> {
   Future getInitialData() async {
     var data =
         await apiClient.getTopicComments(topicId: widget.topicId, page: 1);
-    print(data);
+    // print(data);
     var topicComments = TopicCommentsModel.fromJson(data);
     // print(data);
 

@@ -53,10 +53,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
   @override
   Widget build(BuildContext context) {
     userProvider = Provider.of<UserProvider>(context);
-    var data = ModalRoute.of(context).settings.arguments;
-    topicComment = Map.from(data)['item'];
-    // topicId = Map.from(data)['topicId'];
-    // topicTitle = Map.from(data)['topicTitle'];
+    topicComment = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(

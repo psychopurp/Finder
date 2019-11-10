@@ -5,6 +5,7 @@ import 'package:finder/models/engage_topic_comment_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class UserTopicCommentsPage extends StatefulWidget {
   final int userId;
@@ -28,6 +30,7 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
   EasyRefreshController _refreshController;
   int pageCount = 1;
   ScrollController _scrollController;
+  bool isUserItSelf;
 
   @override
   void initState() {
@@ -46,6 +49,8 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
+    this.isUserItSelf = (user.userInfo.id == widget.userId);
     return Container(
       // color: Theme.of(context).dividerColor,
       child: body,
@@ -72,7 +77,7 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
           controller: _scrollController,
           // primary: true,
           // physics: AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+          padding: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 40),
           itemCount: this.topicComments.length,
           itemBuilder: (context, index) {
             return buildContent(this.topicComments[index]);
@@ -110,13 +115,8 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
     Widget child;
     child = GestureDetector(
       onTap: () {
-        var formData = {
-          'item': item,
-          'topicId': item.topicId,
-          'topicTitle': item.topicTitle
-        };
         Navigator.pushNamed(context, Routes.topicCommentDetail,
-            arguments: formData);
+            arguments: item);
       },
       child: Container(
         // width: 100,
@@ -158,47 +158,48 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
         ),
       ),
     );
-
-    child = Stack(children: <Widget>[
-      child,
-      Positioned(
-        right: 0,
-        top: 10,
-        child: MaterialButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (_) {
-                return AlertDialog(
-                  title: Text("提示"),
-                  content: Text("确认要删除此条话题评论吗? "),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("取消"),
-                      onPressed: () => Navigator.of(context).pop(), // 关闭对话框
-                    ),
-                    FlatButton(
-                        child: Text("删除"),
-                        onPressed: () async {
-                          FinderDialog.showLoading();
-                          var data = await apiClient.deleteTopicComment(
-                              commentId: item.id);
-                          if (data['status']) {
-                            this.topicComments.remove(item);
-                            setState(() {});
-                          }
-                          Navigator.pop(context);
-                        }),
-                  ],
-                );
-              },
-            );
-          },
-          shape: CircleBorder(),
-          child: Icon(Icons.delete_outline),
-        ),
-      )
-    ]);
+    if (isUserItSelf) {
+      child = Stack(children: <Widget>[
+        child,
+        Positioned(
+          right: 0,
+          top: 10,
+          child: MaterialButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    title: Text("提示"),
+                    content: Text("确认要删除此条话题评论吗? "),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("取消"),
+                        onPressed: () => Navigator.of(context).pop(), // 关闭对话框
+                      ),
+                      FlatButton(
+                          child: Text("删除"),
+                          onPressed: () async {
+                            FinderDialog.showLoading();
+                            var data = await apiClient.deleteTopicComment(
+                                commentId: item.id);
+                            if (data['status']) {
+                              this.topicComments.remove(item);
+                              setState(() {});
+                            }
+                            Navigator.pop(context);
+                          }),
+                    ],
+                  );
+                },
+              );
+            },
+            shape: CircleBorder(),
+            child: Icon(Icons.delete_outline),
+          ),
+        )
+      ]);
+    }
 
     return child;
   }
@@ -293,6 +294,8 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
       for (int i = 1; i <= pageCount; i++) {
         var data = await apiClient.getUserTopicComments(
             page: i, userId: widget.userId);
+
+        print('=====${widget.userId}');
         TopicCommentsModel topicComments = TopicCommentsModel.fromJson(data);
         hasMore = topicComments.hasMore;
         temp.addAll(topicComments.topicComments);
