@@ -11,13 +11,23 @@ class Eamis {
   SharedPreferences prefs;
 
   factory Eamis() {
-    if (instance == null) instance = Eamis._init();
+    if (instance == null) {
+      instance = Eamis._init();
+    }
     return instance;
+  }
+
+  clear() {
+    cookieJar.deleteAll();
+    instance = null;
+    prefs.remove("course_table");
   }
 
   Eamis._init() {
     dio.interceptors.add(CookieManager(cookieJar));
     dio.options.headers = headers;
+//    dio.options.receiveTimeout = 10000;
+//    dio.options.connectTimeout = 10000;
     SharedPreferences.getInstance().then((value) {
       prefs = value;
     });
@@ -26,10 +36,19 @@ class Eamis {
   bool ok = false;
 
   Future<void> run() async {
-    if (!ok) {
-      await init();
-      ok = true;
-      save();
+    try {
+      if (!ok) {
+        await init();
+        ok = true;
+        save();
+      }
+    } on Error catch (e) {
+      print(e);
+      e.stackTrace;
+      ok = false;
+    } on Exception catch (e) {
+      print(e);
+      ok = false;
     }
   }
 
@@ -63,8 +82,8 @@ class Eamis {
       "http://eamis.nankai.edu.cn/eams/courseTableForStd!courseTable.action";
   Uri uri = Uri.parse("http://eamis.nankai.edu.cn/eams");
   DefaultCookieJar cookieJar = CookieJar();
-  String username = "1713005";
-  String password = "YRT9921.";
+  String username;
+  String password;
   String nowSemesterId = "4083";
   int unitCount;
   static RegExp idsExp =
@@ -74,7 +93,8 @@ class Eamis {
   Future<void> init() async {
     prefs = await SharedPreferences.getInstance();
     load();
-    if(ok) return;
+    if (password == null || username == null) return;
+    if (ok) return;
     await login();
     await getTermSelector();
     String data = await getSchedule();
@@ -85,8 +105,8 @@ class Eamis {
   void save() {
     Map<String, dynamic> courseJson = {};
     course.forEach((key, value) {
-      courseJson[key.toString()] =
-          List<Map<String, dynamic>>.generate(value.length, (i) => value[i]?.toJson());
+      courseJson[key.toString()] = List<Map<String, dynamic>>.generate(
+          value.length, (i) => value[i]?.toJson());
     });
     prefs.setString(
         "course_table",
@@ -103,14 +123,14 @@ class Eamis {
   void load() {
     if (prefs == null) return;
     var data = prefs.getString("course_table");
-    if(data == null) return;
+    if (data == null) return;
     var loadData = json.decode(data);
     username = loadData["username"];
     password = loadData["password"];
     course = {};
     loadData["course"].forEach((key, value) {
-      course[int.parse(key)] =
-      List<Lesson>.generate(value.length, (i) => value[i] == null ? null : Lesson.fromJson(value[i]));
+      course[int.parse(key)] = List<Lesson>.generate(value.length,
+          (i) => value[i] == null ? null : Lesson.fromJson(value[i]));
     });
     unitCount = loadData["unitCount"];
     ids = loadData["ids"];
@@ -143,10 +163,14 @@ class Eamis {
 
   Future<void> getTermSelector() async {
     RegExp exp = new RegExp(r"(?<=toolbar)\d+");
+    RegExp exp2 = new RegExp(r"(?<=#semesterBar)\d+");
     String firstUrl =
         "http://eamis.nankai.edu.cn/eams/courseTableForStd.action?_=${DateTime.now().millisecondsSinceEpoch}";
     Response res = await dio.get(firstUrl);
-    var id = exp.firstMatch(res.data).group(0);
+    var id = exp.firstMatch(res.data)?.group(0);
+    if (id == null) {
+      id = exp2.firstMatch(res.data)?.group(0);
+    }
     ids = idsExp.firstMatch(res.data).group(1);
     String query = 'http://eamis.nankai.edu.cn/eams/dataQuery.action';
 
@@ -228,7 +252,8 @@ class Course {
         teacher: json['teacher'],
         courseId: json['courseId'],
         position: json['postion'],
-        validWeeks: List<bool>.generate(json['validWeeks'].length, (i)=>json['validWeeks'][i]));
+        validWeeks: List<bool>.generate(
+            json['validWeeks'].length, (i) => json['validWeeks'][i]));
   }
 
   Map<String, dynamic> toJson() {

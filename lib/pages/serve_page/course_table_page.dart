@@ -1,7 +1,9 @@
 import 'package:finder/plugin/course_table.dart';
-import 'package:finder/provider/store.dart';
+import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CourseTablePage extends StatefulWidget {
   @override
@@ -108,7 +110,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
   }
 
   getData() async {
-    await eamis.run();
+    eamis.load();
     setState(() {});
   }
 
@@ -154,12 +156,16 @@ class _CourseTablePageState extends State<CourseTablePage> {
           )
         ],
       ),
-      body: body,
+      body: eamis.username == null || eamis.password == null
+          ? CourseTableRegister(() {
+              setState(() {});
+            })
+          : body,
     );
   }
 
   Widget get body {
-    if(!eamis.ok){
+    if (!eamis.ok) {
       return Container(
         width: ScreenUtil.screenWidthDp,
         height: ScreenUtil.screenHeightDp,
@@ -318,6 +324,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
         color = Color(0xffeeeeee);
       } else {
         color = colors[colorIndex++];
+        colorIndex %= colors.length;
       }
     }
     double height = blockHeight * reduce / reduceScale +
@@ -452,6 +459,125 @@ class SlideTransitionX extends AnimatedWidget {
       translation: offset,
       transformHitTests: transformHitTests,
       child: child,
+    );
+  }
+}
+
+class CourseTableRegister extends StatefulWidget {
+  CourseTableRegister(this.onLogin);
+
+  VoidCallback onLogin;
+
+  @override
+  _CourseTableRegisterState createState() => _CourseTableRegisterState();
+}
+
+class _CourseTableRegisterState extends State<CourseTableRegister> {
+  TextEditingController _password;
+
+  @override
+  void initState() {
+    super.initState();
+    _password = TextEditingController();
+    Future.delayed(Duration(milliseconds: 200), () {
+      showErrorHint(context, "本系统使用教务系统账号密码登录.\n\nFinders使用您的账号在本地登录教务系统获取课表.\n\nFinders承诺, 您的密码将不会上传到服务器, 我们也不会以任何形式记录您的密码.\n\n使用本系统, 将默认您同意此行为, 如果不能接受, 请返回首页.\n");
+    });
+  }
+
+  @override
+  void dispose() {
+    _password.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: ScreenUtil.screenWidthDp,
+      height: ScreenUtil.screenHeightDp,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(ScreenUtil.screenHeightDp / 10),
+            ),
+            MaterialButton(
+              minWidth: ScreenUtil.screenWidthDp / 1.5,
+              height: 50,
+              child: Text(
+                "学号: ${Provider.of<UserProvider>(context).userInfo.studentId.toString()}",
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pushNamed(Routes.modifyInfoPage);
+              },
+              color: Color.fromARGB(255, 245, 241, 241),
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+            ),
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            Container(
+              width: ScreenUtil.screenWidthDp / 1.5,
+              child: TextField(
+                expands: false,
+                obscureText: true,
+                keyboardType: TextInputType.text,
+                cursorColor: Theme.of(context).primaryColor,
+                controller: _password,
+                decoration: InputDecoration(
+                  labelText: "密码",
+                  filled: true,
+                  hintText: "请输入您教务系统的密码",
+                  fillColor: Color.fromARGB(255, 245, 241, 241),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(30),
+            ),
+            MaterialButton(
+              minWidth: ScreenUtil.screenWidthDp / 1.5,
+              height: 50,
+              child: Text(
+                "确认",
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                var eamis = Eamis();
+                eamis.password = _password.text;
+                eamis.username = Provider.of<UserProvider>(context)
+                    .userInfo
+                    .studentId
+                    .toString();
+                await eamis.run();
+                if (!eamis.ok) {
+                  showErrorHint(context, "密码错误");
+                  eamis.password = null;
+                  eamis.username = null;
+                  eamis.clear();
+                  eamis = Eamis();
+                } else {
+                  widget.onLogin();
+                }
+              },
+              color: Theme.of(context).primaryColor,
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
