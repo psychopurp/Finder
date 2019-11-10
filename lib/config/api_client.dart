@@ -5,10 +5,10 @@ import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 
 class ApiClient {
-  // static const host = "http://47.94.247.8";
-  // static const baseURL = "http://47.94.247.8/api/";
-  static const host = "https://www.finder-nk.com";
-  static const baseURL = "https://www.finder-nk.com/api/";
+  static const host = "http://47.94.247.8";
+  static const baseURL = "http://47.94.247.8/api/";
+  // static const host = "https://www.finder-nk.com";
+  // static const baseURL = "https://www.finder-nk.com/api/";
 
   static Dio dio = new Dio(BaseOptions(baseUrl: baseURL));
 
@@ -276,7 +276,7 @@ class ApiClient {
     try {
       Response response =
           await dio.post('like_topic_comment/', data: jsonEncode(formData));
-      // print('点赞话题评论成功....${response.data}');
+      print('点赞话题评论成功....${response.data}');
       return response.data;
     } catch (e) {
       print('点赞话题评论错误==========>$e');
