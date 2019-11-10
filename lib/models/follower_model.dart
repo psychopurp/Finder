@@ -58,25 +58,34 @@ class FollowerModelData {
     id = json['id'];
     nickname = json['nickname'];
     avatar = Avatar.getImageUrl(json['avatar']);
-    introduction = json['introduction'] ?? "";
-    isBothFollowed = json['is_both_followed'] ?? true;
-    isFollowed = json['isFollowed'] ?? true;
+    introduction = (json['introduction'] != null) ? json['introduction'] : "";
+    isBothFollowed = json['is_both_followed'];
+    // print(json['isFollowed']);
+    isFollowed = json['is_followed'];
 
-    if (isFan) {
-      ///粉丝页
-      if (isBothFollowed) {
-        status = BOTHFOLLOW;
-      } else {
-        status = FOLLOW;
-      }
+    // print(isFollowed);
+    if (isBothFollowed) {
+      status = BOTHFOLLOW;
+    } else if (isFollowed) {
+      status = FOLLOWED;
     } else {
-      ///关注页
-      if (isBothFollowed) {
-        this.status = BOTHFOLLOW;
-      } else {
-        this.status = FOLLOWED;
-      }
+      status = FOLLOW;
     }
+    // if (isFan) {
+    //   ///粉丝页
+    //   if (isBothFollowed) {
+    //     status = BOTHFOLLOW;
+    //   } else {
+    //     status = FOLLOW;
+    //   }
+    // } else {
+    //   ///关注页
+    //   if (isBothFollowed) {
+    //     this.status = BOTHFOLLOW;
+    //   } else {
+    //     this.status = FOLLOWED;
+    //   }
+    // }
   }
 
   Map<String, dynamic> toJson() {

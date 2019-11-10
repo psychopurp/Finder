@@ -27,7 +27,7 @@ class HomePageBanner extends StatelessWidget {
           String url = banner.data[index].location;
           url = Uri.encodeComponent(url);
           Application.router
-              .navigateTo(context, "${Routes.webViewPage}?url=${url}");
+              .navigateTo(context, "${Routes.webViewPage}?url=$url");
           if (await canLaunch(url)) {
             await launch(url);
           }

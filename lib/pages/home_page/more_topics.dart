@@ -1,7 +1,7 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/pages/home_page/topic/topic_search_page.dart';
 import 'package:finder/plugin/callback.dart';
-import 'package:finder/provider/store.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:convert' as prefix0;
 
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/follower_model.dart';
@@ -12,7 +11,6 @@ import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -28,8 +26,8 @@ class TopicCommentDetailPage extends StatefulWidget {
 class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
     with TickerProviderStateMixin {
   TopicCommentsModelData topicComment;
-  int topicId;
-  String topicTitle;
+  // int topicId;
+  // String topicTitle;
   UserProvider userProvider;
   TabController tabController;
   List<FollowerModelData> liker = [];
@@ -55,19 +53,11 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
   @override
   Widget build(BuildContext context) {
     userProvider = Provider.of<UserProvider>(context);
-    var data = ModalRoute.of(context).settings.arguments;
-    topicComment = Map.from(data)['item'];
-    topicId = Map.from(data)['topicId'];
-    topicTitle = Map.from(data)['topicTitle'];
-    // buildLikeUserList();
-    // Object object = {'item': "elyar"};
-    // print(Map.from(object)['item']);
-    // print(data);
-    // topicComment = formData['item'];
+    topicComment = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(topicTitle),
+        title: Text(topicComment.topicTitle),
         elevation: 1,
         textTheme: TextTheme(
             title: Theme.of(context)
@@ -157,7 +147,21 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
               controller: this.tabController,
               children: <Widget>[
                 CommentPage(
-                    topicId: this.topicId, topicCommentId: topicComment.id),
+                    topicId: this.topicComment.topicId,
+                    topicCommentId: this.topicComment.id,
+                    onDelete: (isDelete) {
+                      if (isDelete) {
+                        topicComment.replyCount--;
+                        setState(() {});
+                      }
+                    },
+                    onComment: (isComment) {
+                      if (isComment) {
+                        setState(() {
+                          topicComment.replyCount++;
+                        });
+                      }
+                    }),
                 Padding(
                   padding: EdgeInsets.only(top: 20.0),
                   child: UserLikeWidget(topicCommentId: this.topicComment.id),

@@ -1,13 +1,11 @@
 import 'dart:io';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:finder/public.dart';
 import 'package:provider/provider.dart';
-import 'package:photo_view/photo_view.dart';
 
 class PublishTopicCommentPage extends StatefulWidget {
   final int topicId;

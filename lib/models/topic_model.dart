@@ -1,4 +1,3 @@
-import 'package:finder/config/api_client.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/public.dart';
 

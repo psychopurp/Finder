@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:finder/models/user_model.dart';
 import 'package:finder/pages/check_code_login_page.dart';
 import 'package:finder/pages/fans_follow_page.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
@@ -122,7 +119,7 @@ var commentPageHandler = Handler(
   String topicId = params['topicId']?.first;
 
   return CommentPage(
-    topicCommentId: int.parse(topicCommentId),
+    // topicCommentId: int.parse(topicCommentId),
     topicId: int.parse(topicId),
   );
 });

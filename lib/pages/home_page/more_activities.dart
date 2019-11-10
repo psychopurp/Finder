@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:finder/config/global.dart';
 import 'package:finder/pages/home_page/activity/activity_search_page.dart';
 import 'package:finder/plugin/callback.dart';
-import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -36,7 +33,7 @@ class _MoreActivitiesState extends State<MoreActivities>
         this
             .activityTypes
             .data
-            .insert(0, ActivityTypesModelData(id: -1, name: "全部"));
+            .insert(1, ActivityTypesModelData(id: -1, name: "全部"));
         _tabController = new TabController(
             vsync: this, length: this.activityTypes.data.length);
       });
@@ -129,7 +126,7 @@ class _ChildActivitiesState extends State<ChildActivities>
   int pageCount = 2;
   int itemCount = 0;
   bool atHear = true;
-  EasyRefreshController _refreshController = EasyRefreshController();
+  EasyRefreshController _refreshController;
 
   @override
   bool get wantKeepAlive => true;
@@ -144,6 +141,7 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   @override
   void initState() {
+    _refreshController = EasyRefreshController();
     _getInitialActivitiesData(1);
     super.initState();
   }
@@ -188,7 +186,7 @@ class _ChildActivitiesState extends State<ChildActivities>
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                return _singleItem(context, this.activities.data[index], index);
+                return _singleItem(this.activities.data[index]);
               },
               childCount: this.itemCount,
             ),
@@ -220,6 +218,7 @@ class _ChildActivitiesState extends State<ChildActivities>
     if (this.activityType.name != "全部") {
       print(this.activityType.name);
       activities.data.removeWhere((item) {
+        // print('isContain');
         print(item.types.contains(this.activityType));
         bool isContain = false;
         item.types.forEach((val) {
@@ -231,7 +230,7 @@ class _ChildActivitiesState extends State<ChildActivities>
       });
     }
     if (!mounted) return;
-    // print('activities=======>${activities.data}');
+
     setState(() {
       this.pageCount = pageCount + 1;
       this.activities = activities;
@@ -264,95 +263,88 @@ class _ChildActivitiesState extends State<ChildActivities>
     return activities.data;
   }
 
-  _singleItem(BuildContext context, ActivityModelData item, int index) {
-    return CachedNetworkImage(
-      imageUrl: item.poster,
-      imageBuilder: (context, imageProvider) => InkWell(
-        onTap: () {
-          push(() async {
-            Navigator.pushNamed(context, Routes.activityDetail,
-                arguments: item);
-          });
-        },
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            // margin: EdgeInsets.only(
-            //   left: ScreenUtil().setWidth(40),
-            //   right: ScreenUtil().setWidth(40),
-            // ),
-            height: ScreenUtil().setHeight(400),
-            width: ScreenUtil().setWidth(670),
-            decoration: BoxDecoration(
-                // color: Colors.blue,
-                border: Border(bottom: BorderSide(color: Colors.black12))),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                    height: ScreenUtil().setHeight(320),
-                    width: ScreenUtil().setWidth(250),
-                    decoration: BoxDecoration(
-                      // color: Colors.green,
-                      borderRadius: BorderRadius.all(Radius.circular(3)),
-                      // border: Border.all(color: Colors.black, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black38,
-                            offset: Offset(-1.0, 2.0),
-                            blurRadius: 2.0,
-                            spreadRadius: 1.0),
-                      ],
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
-                      ),
-                    )),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+  _singleItem(ActivityModelData item) {
+    String heroTag =
+        this.activityType.name + item.id.toString() + 'moreActivities';
+    DateTime start = item.startTime;
+    DateTime end = item.endTime;
+    String startTime = start.year.toString() +
+        '-' +
+        start.month.toString() +
+        '-' +
+        start.day.toString();
+    String endTime = end.year.toString() +
+        '-' +
+        end.month.toString() +
+        '-' +
+        end.day.toString();
+
+    Widget child;
+    child = Container(
+        margin: EdgeInsets.only(bottom: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: Colors.black12, width: 1),
+              // top: BorderSide(color: Colors.black12, width: 1)),
+            ),
+            // borderRadius: BorderRadius.circular(10),
+            color: Colors.white),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            ///活动海报
+            Hero(
+              tag: heroTag,
+              child: Container(
+                height: ScreenUtil().setHeight(320),
+                width: ScreenUtil().setWidth(250),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(-1.0, 2.0),
+                          blurRadius: 2.0,
+                          spreadRadius: 2.0),
+                    ],
+                    image: DecorationImage(
+                        image: CachedNetworkImageProvider(item.poster),
+                        fit: BoxFit.cover)),
+              ),
+            ),
+
+            ///活动信息
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.only(left: 10),
+                // color: Colors.amber,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
+                    ///活动标题
                     Container(
                       // color: Colors.cyan,
-                      width: ScreenUtil().setWidth(420),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: EdgeInsets.symmetric(vertical: 0),
                       child: Text(
-                        item.title,
+                        '#' + item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.left,
                         style: TextStyle(
-                            color: Colors.black,
+                            color: Theme.of(context).primaryColor,
                             fontSize: ScreenUtil().setSp(30),
                             fontWeight: FontWeight.lerp(
                                 FontWeight.w400, FontWeight.w800, 0.8)),
                       ),
                     ),
+
                     Container(
-                      // color: Colors.amber,
-                      width: ScreenUtil().setWidth(420),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: EdgeInsets.only(top: 10),
                       child: Text(
-                        item.startTime.split(" ")[0].replaceAll('-', '.') +
-                            "-" +
-                            item.endTime.split(' ')[0].replaceAll('-', '.'),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: ScreenUtil().setSp(30),
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    Container(
-                      // color: Colors.amber,
-                      // margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
-                      width: ScreenUtil().setWidth(420),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        item.place,
+                        '主办方：' + item.sponsor,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.left,
@@ -362,31 +354,56 @@ class _ChildActivitiesState extends State<ChildActivities>
                             fontWeight: FontWeight.w500),
                       ),
                     ),
+
+                    ///活动时间
                     Container(
-                      margin: EdgeInsets.only(
-                        right: ScreenUtil().setWidth(40),
-                        // top: ScreenUtil().setHeight(20)),
-                      ),
-                      padding: EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                          // color: Colors.amber,
-                          border: Border.all(color: Color(0xFFF0AA89)),
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      // color: Colors.amber,
+                      padding: EdgeInsets.only(bottom: 10, top: 5),
                       child: Text(
-                        "  详情  ",
+                        '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
                         style: TextStyle(
-                            fontSize: ScreenUtil().setSp(22),
-                            color: Color(0xFFF0AA89)),
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
                       ),
-                    )
+                    ),
+
+                    ///活动地点
+                    Container(
+                      // color: Colors.amber,
+                      padding: EdgeInsets.symmetric(vertical: 0),
+                      child: Text(
+                        '活动地点：' + item.place,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(25),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
                   ],
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-      errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              ),
+            )
+          ],
+        ));
+
+    child = GestureDetector(
+      onTap: () {
+        push(() async {
+          var formData = {'item': item, 'heroTag': heroTag};
+          Navigator.pushNamed(context, Routes.activityDetail,
+              arguments: formData);
+        });
+      },
+      child: child,
     );
+
+    return child;
   }
 }

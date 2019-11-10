@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:finder/config/api_client.dart';
+import 'package:finder/models/topic_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/drop_down_text.dart';
 import 'package:finder/plugin/pics_swiper.dart';
@@ -29,9 +30,17 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   ScrollController _controller;
   double titleOpacity = 0;
   double bottomTitleOpacity = 0;
+  String topicImage;
+  String topicTitle;
 
   @override
   void initState() {
+    if (widget.topicImage == null) {
+      getTopic();
+    } else {
+      topicImage = widget.topicImage;
+      topicTitle = widget.topicTitle;
+    }
     _controller = ScrollController()
       ..addListener(() {
 //        print(_controller.offset);
@@ -66,39 +75,25 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    var joinTopicButton = Padding(
-        padding: EdgeInsets.symmetric(horizontal: 120),
-        child: MaterialButton(
-          onPressed: () {
-            Application.router.navigateTo(context,
-                '/publishTopicComment?topicId=${widget.topicId.toString()}&&topicTitle=${Uri.encodeComponent(widget.topicTitle)}');
-          },
-          child: Text(
-            "+ 参与话题",
-            style: TextStyle(color: Colors.white),
-          ),
-          highlightElevation: 5,
-          color: Theme.of(context).primaryColor,
-          shape: StadiumBorder(side: BorderSide(color: Colors.white)),
-          // minWidth: ScreenUtil().setWidth(100),
-          height: ScreenUtil().setHeight(70),
-        ));
-
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          NestedScrollView(
-            controller: _controller,
-            physics: ScrollPhysics(),
-            headerSliverBuilder: _sliverBuilder,
-            body: TopicComments(
-              topicId: widget.topicId,
-              controller: _controller,
-              topicTitle: widget.topicTitle,
-            ),
-          ),
+          (this.topicImage != null)
+              ? NestedScrollView(
+                  controller: _controller,
+                  physics: ScrollPhysics(),
+                  headerSliverBuilder: _sliverBuilder,
+                  body: TopicComments(
+                    topicId: widget.topicId,
+                    controller: _controller,
+                    topicTitle: widget.topicTitle,
+                  ))
+              : Container(
+                  alignment: Alignment.center,
+                  height: double.infinity,
+                  child: CupertinoActivityIndicator()),
           Positioned(
-            child: joinTopicButton,
+            child: joinTopicButton(),
             bottom: 20,
             left: 0,
             right: 0,
@@ -166,7 +161,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               fit: StackFit.expand,
               children: <Widget>[
                 CachedNetworkImage(
-                  imageUrl: widget.topicImage,
+                  imageUrl: this.topicImage,
                   fit: BoxFit.cover,
                 ),
                 Opacity(
@@ -183,7 +178,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   Widget topImage() {
     return CachedNetworkImage(
-      imageUrl: this.widget.topicImage,
+      imageUrl: this.topicImage,
       imageBuilder: (context, imageProvider) => Align(
         alignment: Alignment.topCenter,
         child: Container(
@@ -230,6 +225,32 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       ),
       errorWidget: (context, url, error) => Icon(Icons.error),
     );
+  }
+
+  joinTopicButton() => Padding(
+      padding: EdgeInsets.symmetric(horizontal: 120),
+      child: MaterialButton(
+        onPressed: () {
+          Application.router.navigateTo(context,
+              '/publishTopicComment?topicId=${this.widget.topicId.toString()}&&topicTitle=${Uri.encodeComponent(this.topicTitle)}');
+        },
+        child: Text(
+          "+ 参与话题",
+          style: TextStyle(color: Colors.white),
+        ),
+        highlightElevation: 5,
+        color: Theme.of(context).primaryColor,
+        shape: StadiumBorder(side: BorderSide(color: Colors.white)),
+        // minWidth: ScreenUtil().setWidth(100),
+        height: ScreenUtil().setHeight(70),
+      ));
+
+  Future getTopic() async {
+    var data = await apiClient.getTopics(topicId: widget.topicId);
+    TopicModel topic = TopicModel.fromJson(data);
+    setState(() {
+      this.topicImage = topic.data.first.image;
+    });
   }
 }
 
@@ -335,8 +356,8 @@ class _TopicCommentsState extends State<TopicComments> {
           child: CupertinoActivityIndicator());
     } else {
       List<Widget> widgets =
-          List.generate(this.topicComments.data.length, (index) {
-        return _singleItem(this.topicComments.data[index], user);
+          List.generate(this.topicComments.topicComments.length, (index) {
+        return _singleItem(this.topicComments.topicComments[index], user);
       });
 
       child = EasyRefresh(
@@ -601,13 +622,8 @@ class _TopicCommentsState extends State<TopicComments> {
         handleDelete(user, item);
       },
       onTap: () {
-        var formData = {
-          'item': item,
-          'topicId': widget.topicId,
-          'topicTitle': widget.topicTitle
-        };
         Navigator.pushNamed(context, Routes.topicCommentDetail,
-            arguments: formData);
+            arguments: item);
       },
       child: Container(
         padding: EdgeInsets.only(
@@ -866,6 +882,7 @@ class _TopicCommentsState extends State<TopicComments> {
         await apiClient.getTopicComments(topicId: widget.topicId, page: 1);
     // print(data);
     var topicComments = TopicCommentsModel.fromJson(data);
+    // print(data);
 
     if (!mounted) return;
     setState(() {
@@ -881,7 +898,7 @@ class _TopicCommentsState extends State<TopicComments> {
     TopicCommentsModel comments = TopicCommentsModel.fromJson(data);
 
     setState(() {
-      this.topicComments.data.addAll(comments.data);
+      this.topicComments.topicComments.addAll(comments.topicComments);
       this.pageCount++;
     });
     return comments.data;
