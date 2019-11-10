@@ -218,6 +218,7 @@ class _ChildActivitiesState extends State<ChildActivities>
     if (this.activityType.name != "全部") {
       print(this.activityType.name);
       activities.data.removeWhere((item) {
+        // print('isContain');
         print(item.types.contains(this.activityType));
         bool isContain = false;
         item.types.forEach((val) {
@@ -229,7 +230,7 @@ class _ChildActivitiesState extends State<ChildActivities>
       });
     }
     if (!mounted) return;
-    // print('activities=======>${activities.data}');
+
     setState(() {
       this.pageCount = pageCount + 1;
       this.activities = activities;
