@@ -122,9 +122,10 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   _ChildActivitiesState({this.activityType});
 
-  ActivityModel activities;
-  int pageCount = 2;
-  int itemCount = 0;
+  List<ActivityModelData> activities = [];
+  bool hasMore = true;
+  bool isLoading = true;
+  int pageCount = 1;
   bool atHear = true;
   EasyRefreshController _refreshController;
 
@@ -142,7 +143,7 @@ class _ChildActivitiesState extends State<ChildActivities>
   @override
   void initState() {
     _refreshController = EasyRefreshController();
-    _getInitialActivitiesData(1);
+    getData(pageCount: 1);
     super.initState();
   }
 
@@ -161,7 +162,7 @@ class _ChildActivitiesState extends State<ChildActivities>
 
   Widget get body {
     Widget child;
-    if (this.activities == null) {
+    if (this.isLoading) {
       child = Container(
           alignment: Alignment.center,
           height: double.infinity,
@@ -173,22 +174,24 @@ class _ChildActivitiesState extends State<ChildActivities>
         footer: MaterialFooter(),
         controller: _refreshController,
         onRefresh: () async {
-          await _getInitialActivitiesData(1);
-
+          this.isLoading = true;
+          this.activities = [];
+          await getData(pageCount: 1);
           _refreshController.resetLoadState();
         },
         onLoad: () async {
-          var data = await _getMore(this.pageCount, context);
-          _refreshController.finishLoad(
-              success: true, noMore: (data.length == 0));
+          await Future.delayed(Duration(milliseconds: 500), () {
+            getData(pageCount: this.pageCount);
+          });
+          _refreshController.finishLoad(success: true, noMore: (!this.hasMore));
         },
         slivers: <Widget>[
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                return _singleItem(this.activities.data[index]);
+                return _singleItem(this.activities[index]);
               },
-              childCount: this.itemCount,
+              childCount: this.activities.length,
             ),
           ),
         ],
@@ -206,63 +209,35 @@ class _ChildActivitiesState extends State<ChildActivities>
         child: child);
   }
 
-  Future _getInitialActivitiesData(int pageCount) async {
-    var activityData =
-        await apiClient.getActivities(page: 1, typeId: activityType.id);
-    print(activityData);
-    ActivityModel activities = ActivityModel.fromJson(activityData);
-    for (int i = 2; i <= pageCount; i++) {
-      var activitiesDataTemp = await apiClient.getActivities(page: i);
-      ActivityModel activityTemp = ActivityModel.fromJson(activitiesDataTemp);
-      activities.data.addAll(activityTemp.data);
+  Future getData({int pageCount}) async {
+    List<ActivityModelData> temp = [];
+    bool hasMore;
+    if (this.activities.length == 0) {
+      for (int i = 1; i <= pageCount; i++) {
+        var data =
+            await apiClient.getActivities(page: i, typeId: activityType.id);
+        print(data['total_page']);
+        ActivityModel activities = ActivityModel.fromJson(data);
+        hasMore = activities.hasMore;
+        temp.addAll(activities.data);
+      }
+      this.pageCount = pageCount;
+    } else {
+      var data = await apiClient.getActivities(
+          page: this.pageCount, typeId: activityType.id);
+      ActivityModel activities = ActivityModel.fromJson(data);
+      print(data['total_page']);
+      hasMore = activities.hasMore;
+      temp.addAll(activities.data);
     }
 
-    if (this.activityType.name != "全部") {
-      print(this.activityType.name);
-      activities.data.removeWhere((item) {
-        // print('isContain');
-        print(item.types.contains(this.activityType));
-        bool isContain = false;
-        item.types.forEach((val) {
-          if (val.id == this.activityType.id) {
-            isContain = true;
-          }
-        });
-        return !isContain;
-      });
-    }
     if (!mounted) return;
-
     setState(() {
-      this.pageCount = pageCount + 1;
-      this.activities = activities;
-      this.itemCount = activities.data.length;
-    });
-  }
-
-  Future _getMore(int pageCount, BuildContext context) async {
-    var activityData = await apiClient.getActivities(page: pageCount);
-    ActivityModel activities = ActivityModel.fromJson(activityData);
-
-    if (this.activityType.name != "全部") {
-      print(this.activityType.name);
-      activities.data.removeWhere((item) {
-        bool isContain = false;
-        item.types.forEach((val) {
-          if (val.id == this.activityType.id) {
-            isContain = true;
-          }
-        });
-        return !isContain;
-      });
-    }
-
-    setState(() {
-      this.activities.data.addAll(activities.data);
-      this.itemCount = this.itemCount + activities.data.length;
+      this.isLoading = false;
+      this.activities.addAll(temp);
+      this.hasMore = hasMore;
       this.pageCount++;
     });
-    return activities.data;
   }
 
   _singleItem(ActivityModelData item) {

@@ -188,9 +188,9 @@ class ApiClient {
   Future getActivities(
       {String query = "", int page = 1, int activityId, int typeId}) async {
     var formData = {'query': query, 'page': page};
-    if (typeId != null) formData.addAll({'type_id': typeId});
+    if (typeId != null && typeId != -1) formData.addAll({'type_id': typeId});
     if (activityId != null) formData = {'activity_id': activityId};
-    // print(formData);
+    print(formData);
     try {
       Response response = await dio.get(
         'get_activities/',
