@@ -567,10 +567,12 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () async {
+                BuildContext inner;
                 showDialog(
                   context: context,
                   barrierDismissible: false, //点击遮罩不关闭对话框
                   builder: (context) {
+                    inner = context;
                     return UnconstrainedBox(
                       constrainedAxis: Axis.vertical,
                       child: SizedBox(
@@ -598,7 +600,16 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                     .studentId
                     .toString();
                 await eamis.run();
-                Navigator.of(context).pop();
+                try{
+                  Navigator.of(context).pop();
+                }on NoSuchMethodError catch(e){
+                  print(e);
+                  try{
+                    Navigator.of(inner).pop();
+                  }on NoSuchMethodError catch(e){
+                    print(e);
+                  }
+                }
                 if (!eamis.ok) {
                   showErrorHint(context, "密码错误");
                   eamis.password = null;
