@@ -721,13 +721,13 @@ class _TopicCommentsState extends State<TopicComments> {
                 ///评论
                 MaterialButton(
                   onPressed: () {
-                    var formData = {
-                      'item': item,
-                      'topicId': widget.topicId,
-                      'topicTitle': widget.topicTitle
-                    };
+//                    var formData = {
+//                      'item': item,
+//                      'topicId': widget.topicId,
+//                      'topicTitle': widget.topicTitle
+//                    };
                     Navigator.pushNamed(context, Routes.topicCommentDetail,
-                        arguments: formData);
+                        arguments: item);
                     // Application.router.navigateTo(context,
                     //     "${Routes.commentPage}?topicCommentId=${item.id}&topicId=$topicId");
                   },

@@ -157,8 +157,10 @@ class _CourseTablePageState extends State<CourseTablePage> {
       ),
       body: eamis.username == null || eamis.password == null
           ? CourseTableRegister(() {
-              setState(() {});
-              Future.delayed(Duration(seconds: 2), (){
+              setState(() {
+                eamis = Eamis();
+              });
+              Future.delayed(Duration(seconds: 1), () {
                 showErrorHint(context,
                     "课表包含三个模式：\n  1.最近三天的课程.\n  2.我有课程的日子的课程. \n  3.一个星期的完整课程表.\n大家可以通过左右滑动切换模式.\n欢迎大家酌情使用!");
               });
@@ -484,6 +486,7 @@ class CourseTableRegister extends StatefulWidget {
 
 class _CourseTableRegisterState extends State<CourseTableRegister> {
   TextEditingController _password;
+  bool loading = false;
 
   @override
   void initState() {
@@ -564,6 +567,30 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () async {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, //点击遮罩不关闭对话框
+                  builder: (context) {
+                    return UnconstrainedBox(
+                      constrainedAxis: Axis.vertical,
+                      child: SizedBox(
+                        width: 280,
+                        child: AlertDialog(
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              CircularProgressIndicator(value: .8),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 26.0),
+                                child: Text("正在加载，请稍后..."),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
                 var eamis = Eamis();
                 eamis.password = _password.text;
                 eamis.username = Provider.of<UserProvider>(context)
@@ -571,6 +598,7 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                     .studentId
                     .toString();
                 await eamis.run();
+                Navigator.of(context).pop();
                 if (!eamis.ok) {
                   showErrorHint(context, "密码错误");
                   eamis.password = null;
@@ -578,6 +606,8 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                   eamis.clear();
                   eamis = Eamis();
                 } else {
+                  print(eamis.password);
+                  print(eamis.username);
                   widget.onLogin();
                 }
               },

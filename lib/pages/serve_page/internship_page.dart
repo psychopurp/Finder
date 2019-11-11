@@ -294,7 +294,6 @@ class _InternshipPageState extends State<InternshipPage> {
                     Padding(
                         padding: EdgeInsets.only(left: 20),
                         child: Container(
-                          width: ScreenUtil.screenWidthDp - 180,
                           child: Text(
                             company.name,
                             maxLines: 1,
@@ -308,6 +307,10 @@ class _InternshipPageState extends State<InternshipPage> {
                   ],
                 ),
               ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
               Expanded(
                 flex: 1,
                 child: Container(),
