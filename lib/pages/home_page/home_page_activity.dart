@@ -118,6 +118,7 @@ class HomePageActivities extends StatelessWidget {
   _singleItem(BuildContext context, ActivityModelData item, int index) {
     // bool isLastItem = (index == this.activities.data.length - 1);
     double picWidth = ScreenUtil().setWidth(230);
+    String heroTag = item.id.toString() + 'home' + item.title;
 
     ///宽高比 1/1.4
     double picHeight = picWidth * 1.4;
@@ -127,7 +128,7 @@ class HomePageActivities extends StatelessWidget {
       imageBuilder: (context, imageProvider) => GestureDetector(
         onTap: () {
           push(() async {
-            var formData = {'item': item, 'heroTag': item.id.toString()};
+            var formData = {'item': item, 'heroTag': heroTag};
             Navigator.pushNamed(context, Routes.activityDetail,
                 arguments: formData);
           });
@@ -144,7 +145,7 @@ class HomePageActivities extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Hero(
-                  tag: item.id.toString() + "activityDetail",
+                  tag: heroTag,
                   child: Container(
                     height: picHeight,
                     width: picWidth,

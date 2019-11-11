@@ -4,6 +4,7 @@ import 'package:finder/config/api_client.dart';
 import 'package:finder/models/follower_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
+import 'package:finder/pages/serve_page/he_says_page.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
@@ -105,6 +106,12 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
   }
 
   Widget get body {
+    String comment = (this.topicComment.replyCount == 0)
+        ? "评论"
+        : '评论 ' + this.topicComment.replyCount.toString();
+    String like = (this.topicComment.likes == 0)
+        ? ""
+        : this.topicComment.likes.toString();
     Widget child;
     child = CustomScrollView(
       slivers: <Widget>[
@@ -125,14 +132,24 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                 Container(
                     width: ScreenUtil().setWidth(375),
                     // margin: EdgeInsets.only(left: 50, right: 50),
-                    child: Tab(
-                        text: '评论 ' + this.topicComment.replyCount.toString())),
+                    child: Tab(text: comment)),
                 Container(
                     width: ScreenUtil().setWidth(375),
                     // alignment: Alignment.centerRight,
                     // margin: EdgeInsets.only(left: 50, right: 50),
-                    child:
-                        Tab(text: '点赞 ' + this.topicComment.likes.toString())),
+                    child: (topicComment.isLike)
+                        ? Tab(
+                            // text: ' ' + this.topicComment.likes.toString(),
+                            icon: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(Icons.favorite,
+                                    color: Theme.of(context).primaryColor),
+                                Text("    " + like)
+                              ],
+                            ),
+                          )
+                        : Tab(text: '点赞 ' + like)),
               ],
             ),
           ),
@@ -164,7 +181,23 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                     }),
                 Padding(
                   padding: EdgeInsets.only(top: 20.0),
-                  child: UserLikeWidget(topicCommentId: this.topicComment.id),
+                  child: UserLikeWidget(
+                    topicCommentId: this.topicComment.id,
+                    isLike: () async {
+                      var data = await apiClient.likeTopicComment(
+                          topicCommentId: topicComment.id);
+                      if (data['status']) {
+                        if (topicComment.isLike) {
+                          topicComment.isLike = false;
+                          topicComment.likes--;
+                        } else {
+                          topicComment.isLike = true;
+                          topicComment.likes++;
+                        }
+                        setState(() {});
+                      }
+                    },
+                  ),
                 )
               ],
             ),
@@ -340,10 +373,6 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
     }
   }
 
-  buildCommentPart() {
-    Widget child;
-  }
-
   buildLikeUserList() {
     Future getData() async {
       var data = await apiClient.getTopicCommentLikeUsers(
@@ -499,7 +528,8 @@ class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
 
 class UserLikeWidget extends StatefulWidget {
   final int topicCommentId;
-  UserLikeWidget({this.topicCommentId});
+  final VoidCallback isLike;
+  UserLikeWidget({this.topicCommentId, this.isLike});
   @override
   _UserLikeWidgetState createState() => _UserLikeWidgetState();
 }
@@ -566,14 +596,33 @@ class _UserLikeWidgetState extends State<UserLikeWidget> {
       );
       child = Stack(children: <Widget>[
         child,
-        // Positioned(
-        //   bottom: 0,
-        //   right: 0,
-        //   child: MaterialButton(
-        //       onPressed: () {},
-        //       shape: CircleBorder(),
-        //       child: Icon(Icons.favorite_border)),
-        // )
+        Positioned(
+          bottom: 30,
+          right: 20,
+          child: MaterialButton(
+              onPressed: () async {
+                BotToast.showWidget(toastBuilder: (canl) {
+                  Future.delayed(Duration(milliseconds: 700), () {
+                    canl();
+                  });
+                  return Center(
+                    child: Container(
+                      child: Icon(
+                        Icons.favorite,
+                        size: 100,
+                      ),
+                    ),
+                  );
+                });
+                this.widget.isLike();
+              },
+              shape: CircleBorder(),
+              child: Icon(
+                Icons.favorite,
+                size: 40,
+                color: Theme.of(context).primaryColor,
+              )),
+        )
       ]);
     }
 

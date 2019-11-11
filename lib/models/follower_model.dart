@@ -64,12 +64,14 @@ class FollowerModelData {
     isFollowed = json['is_followed'] ?? false;
 
     // print(isFollowed);
-    if (isBothFollowed) {
-      status = BOTHFOLLOW;
-    } else if (isFollowed) {
-      status = FOLLOWED;
-    } else {
-      status = FOLLOW;
+    if (isBothFollowed != null) {
+      if (isBothFollowed) {
+        status = BOTHFOLLOW;
+      } else if (isFollowed) {
+        status = FOLLOWED;
+      } else {
+        status = FOLLOW;
+      }
     }
     // if (isFan) {
     //   ///粉丝页

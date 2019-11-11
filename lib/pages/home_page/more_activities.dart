@@ -207,7 +207,9 @@ class _ChildActivitiesState extends State<ChildActivities>
   }
 
   Future _getInitialActivitiesData(int pageCount) async {
-    var activityData = await apiClient.getActivities(page: 1);
+    var activityData =
+        await apiClient.getActivities(page: 1, typeId: activityType.id);
+    print(activityData);
     ActivityModel activities = ActivityModel.fromJson(activityData);
     for (int i = 2; i <= pageCount; i++) {
       var activitiesDataTemp = await apiClient.getActivities(page: i);

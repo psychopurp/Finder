@@ -186,9 +186,11 @@ class ApiClient {
 
   //获取活动
   Future getActivities(
-      {String query = "", int page = 1, int activityId}) async {
+      {String query = "", int page = 1, int activityId, int typeId}) async {
     var formData = {'query': query, 'page': page};
+    if (typeId != null) formData.addAll({'type_id': typeId});
     if (activityId != null) formData = {'activity_id': activityId};
+    // print(formData);
     try {
       Response response = await dio.get(
         'get_activities/',
@@ -276,10 +278,11 @@ class ApiClient {
     try {
       Response response =
           await dio.post('like_topic_comment/', data: jsonEncode(formData));
-      // print('点赞话题评论成功....${response.data}');
+      print('点赞话题评论成功....${response.data}');
       return response.data;
     } catch (e) {
       print('点赞话题评论错误==========>$e');
+      return {'status': false, 'data': e};
     }
   }
 
