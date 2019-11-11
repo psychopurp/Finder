@@ -158,7 +158,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
       body: eamis.username == null || eamis.password == null
           ? CourseTableRegister(() {
               setState(() {});
-              Future.delayed(Duration(seconds: 1), (){
+              Future.delayed(Duration(seconds: 2), (){
                 showErrorHint(context,
                     "课表包含三个模式：\n  1.最近三天的课程.\n  2.我有课程的日子的课程. \n  3.一个星期的完整课程表.\n大家可以通过左右滑动切换模式.\n欢迎大家酌情使用!");
               });

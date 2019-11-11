@@ -98,6 +98,13 @@ class ActivityModelData {
         tags.add(new TagModel.fromJson(v));
       });
     }
+
+
+  }
+
+  @override
+  String toString() {
+    return "$title ===== $types";
   }
 
   Map<String, dynamic> toJson() {
@@ -175,4 +182,11 @@ class ActivityTypesModelData {
     data['name'] = this.name;
     return data;
   }
+
+  @override
+  String toString() {
+    return "$name";
+  }
+
+
 }
