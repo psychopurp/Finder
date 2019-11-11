@@ -94,7 +94,7 @@ class TopicCommentsModelData {
     //     : null;
     replyCount = json['reply_count'];
     likes = json['likes'];
-    isLike = json['is_like'];
+    isLike = json['is_like'] ?? false;
     isCollected = json['is_collected'];
 
     hasReply = json['has_reply'];

@@ -28,12 +28,21 @@ class _HomePageState extends State<HomePage> {
   bool down;
   bool hold;
   DateTime holdTime;
+  ScrollController _controller;
 
   @override
   void initState() {
     print('homepage setstate');
     _getHomePageData();
+    _controller = ScrollController();
     super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,7 +79,9 @@ class _HomePageState extends State<HomePage> {
           Listener(
             behavior: HitTestBehavior.translucent,
             onPointerDown: (detail) {
-              first = detail.position;
+              if(_controller.offset < 10){
+                first = detail.position;
+              }
             },
             onPointerMove: (detail) {
               if (down == null && first != null) {
@@ -129,6 +140,7 @@ class _HomePageState extends State<HomePage> {
       child = EasyRefresh(
         header: MaterialHeader(),
         child: ListView(
+          controller: _controller,
           children: <Widget>[
             HomePageBanner(formData['banner']),
             Padding(
