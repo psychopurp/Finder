@@ -579,7 +579,7 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              CircularProgressIndicator(value: .8),
+                              CircularProgressIndicator(),
                               Padding(
                                 padding: const EdgeInsets.only(top: 26.0),
                                 child: Text("正在加载，请稍后..."),
@@ -606,8 +606,6 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                   eamis.clear();
                   eamis = Eamis();
                 } else {
-                  print(eamis.password);
-                  print(eamis.username);
                   widget.onLogin();
                 }
               },
