@@ -264,13 +264,24 @@ class _UserProfilePageState extends State<UserProfilePage> {
         );
 
     List<Widget> content = [];
+    List<Color> backGroundColor = this.user.backGround != null
+        ? this.user.backGround
+        : [Theme.of(context).primaryColor];
 
     Widget backGround = Container(
+      key: ValueKey((this.user.backGround == null)),
       height: ScreenUtil.screenHeightDp,
       decoration: BoxDecoration(
-          gradient: GradientGenerator.linear(user.backGround.first,
+          gradient: GradientGenerator.linear(backGroundColor.first,
               begin: Alignment.bottomLeft, end: Alignment.topRight)),
     );
+    backGround = AnimatedSwitcher(
+      switchInCurve: Curves.easeIn,
+      switchOutCurve: Curves.easeOut,
+      duration: Duration(milliseconds: 3000),
+      child: backGround,
+    );
+
     backGround = Opacity(
       child: backGround,
       opacity: 1,
@@ -418,12 +429,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     var data = await apiClient.getOtherProfile(userId: widget.senderId);
     // print(data);
     UserModel userModel = UserModel.fromJson(data['data']);
-
-    userModel.backGround = await imageToColors(userModel.avatar);
     if (!mounted) return;
-    setState(() {
-      this.user = userModel;
+
+    this.user = userModel;
+
+    imageToColors(userModel.avatar).then((val) {
+      setState(() {
+        this.user.backGround = val;
+      });
     });
+
+    setState(() {});
   }
 }
 

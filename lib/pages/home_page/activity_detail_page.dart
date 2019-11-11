@@ -42,7 +42,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     var formData = ModalRoute.of(context).settings.arguments;
     this.activity = Map.from(formData)['item'];
     this.heroTag = Map.from(formData)['heroTag'];
-    // print(heroTag);
+    // print(activity.);
 
     return Scaffold(
         appBar: AppBar(),
@@ -392,29 +392,33 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     );
   }
 
-  description() => Align(
-        child: Container(
-          alignment: Alignment.topLeft,
-          // color: Colors.amber,
-          padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(50)),
-          child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.body1,
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                      text: "活动介绍: \n\n",
-                      style: TextStyle(
-                          color: Theme.of(context).primaryColor, fontSize: 18)),
-                  TextSpan(text: activity.description)
-                ],
-              ),
-              // '活动介绍:\n' + activity.description,
-              textAlign: TextAlign.left,
+  description() {
+    Widget child = Align(
+      child: Container(
+        alignment: Alignment.topLeft,
+        // color: Colors.amber,
+        padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(50)),
+        child: DefaultTextStyle(
+          style: Theme.of(context).textTheme.body1,
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                    text: "活动介绍: \n\n",
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor, fontSize: 18)),
+                TextSpan(text: activity.description)
+              ],
             ),
+            // '活动介绍:\n' + activity.description,
+            textAlign: TextAlign.left,
           ),
         ),
-      );
+      ),
+    );
+
+    return child;
+  }
 
   collectHandle(UserProvider user, ActivityModelData item) async {
     String showText = "";

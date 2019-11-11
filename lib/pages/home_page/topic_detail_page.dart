@@ -407,26 +407,27 @@ class _TopicCommentsState extends State<TopicComments> {
 
   likeHandle(UserProvider user, TopicCommentsModelData item) async {
     if (user.isLogIn) {
-      var data;
-      if (item.isLike == true) {
-        data = await apiClient.likeTopicComment(topicCommentId: item.id);
-        item.isLike = false;
-        item.likes--;
+      var data = await apiClient.likeTopicComment(topicCommentId: item.id);
+      if (data['status']) {
+        if (item.isLike == true) {
+          item.isLike = false;
+          item.likes--;
+        } else {
+          item.likes++;
+          item.isLike = true;
+        }
       } else {
-        data = await apiClient.likeTopicComment(topicCommentId: item.id);
-        item.likes++;
-        item.isLike = true;
+        Future.delayed(Duration(milliseconds: 500), () {
+          Scaffold.of(context).showSnackBar(new SnackBar(
+            duration: Duration(milliseconds: 200),
+            content: new Text("错误"),
+            action: new SnackBarAction(
+              label: "取消",
+              onPressed: () {},
+            ),
+          ));
+        });
       }
-      // Future.delayed(Duration(milliseconds: 500), () {
-      //   Scaffold.of(context).showSnackBar(new SnackBar(
-      //     duration: Duration(milliseconds: 200),
-      //     content: new Text("${data}"),
-      //     action: new SnackBarAction(
-      //       label: "取消",
-      //       onPressed: () {},
-      //     ),
-      //   ));
-      // });
 
       setState(() {});
     } else {
@@ -721,13 +722,8 @@ class _TopicCommentsState extends State<TopicComments> {
                 ///评论
                 MaterialButton(
                   onPressed: () {
-                    var formData = {
-                      'item': item,
-                      'topicId': widget.topicId,
-                      'topicTitle': widget.topicTitle
-                    };
                     Navigator.pushNamed(context, Routes.topicCommentDetail,
-                        arguments: formData);
+                        arguments: item);
                     // Application.router.navigateTo(context,
                     //     "${Routes.commentPage}?topicCommentId=${item.id}&topicId=$topicId");
                   },

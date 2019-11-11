@@ -5,10 +5,10 @@ import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 
 class ApiClient {
-  static const host = "http://47.94.247.8";
-  static const baseURL = "http://47.94.247.8/api/";
-  // static const host = "https://www.finder-nk.com";
-  // static const baseURL = "https://www.finder-nk.com/api/";
+  // static const host = "http://47.94.247.8";
+  // static const baseURL = "http://47.94.247.8/api/";
+  static const host = "https://www.finder-nk.com";
+  static const baseURL = "https://www.finder-nk.com/api/";
 
   static Dio dio = new Dio(BaseOptions(baseUrl: baseURL));
 
@@ -186,9 +186,11 @@ class ApiClient {
 
   //获取活动
   Future getActivities(
-      {String query = "", int page = 1, int activityId}) async {
+      {String query = "", int page = 1, int activityId, int typeId}) async {
     var formData = {'query': query, 'page': page};
+    if (typeId != null) formData.addAll({'type_id': typeId});
     if (activityId != null) formData = {'activity_id': activityId};
+    // print(formData);
     try {
       Response response = await dio.get(
         'get_activities/',
@@ -280,6 +282,7 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('点赞话题评论错误==========>$e');
+      return {'status': false, 'data': e};
     }
   }
 
