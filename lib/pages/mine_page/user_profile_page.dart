@@ -53,6 +53,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
         }
         // print(scrollController.offset);
       });
+    Future.delayed(Duration(milliseconds: 50), () {
+      userProvider = Provider.of<UserProvider>(context);
+      setState(() {
+        userItSelfId = userProvider.userInfo.id;
+      });
+    });
     super.initState();
   }
 
@@ -64,10 +70,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    setState(() {
-      userItSelfId = userProvider.userInfo.id;
-    });
 //    print(widget.heroTag);
     return Scaffold(
       body: SafeArea(
@@ -446,7 +448,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   final PreferredSizeWidget child;
   final Color color;
+
   StickyTabBarDelegate({@required this.child, this.color});
+
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -466,8 +470,10 @@ class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   double get maxExtent => this.child.preferredSize.height;
+
   @override
   double get minExtent => this.child.preferredSize.height;
+
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
     return true;
@@ -476,7 +482,9 @@ class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
 
 class AppbarDelegate extends SliverPersistentHeaderDelegate {
   final PreferredSizeWidget child;
+
   AppbarDelegate({@required this.child});
+
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -485,8 +493,10 @@ class AppbarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   double get maxExtent => this.child.preferredSize.height;
+
   @override
   double get minExtent => this.child.preferredSize.height;
+
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
     return true;
@@ -496,7 +506,9 @@ class AppbarDelegate extends SliverPersistentHeaderDelegate {
 class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget title;
   final Color color;
+
   UserAppBar({this.title, this.color});
+
   @override
   Widget build(BuildContext context) {
     return Container(

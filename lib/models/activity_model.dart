@@ -86,12 +86,14 @@ class ActivityModelData {
     description = json['description'];
     signUpLocation = json['sign_up_location'];
     position = json['position'];
+    print("$title ======================= ${json['types']}");
     if (json['types'] != null) {
       types = new List<ActivityTypesModelData>();
       json['types'].forEach((v) {
         types.add(new ActivityTypesModelData.fromJson(v));
       });
-    }
+    }else
+      types = [];
     if (json['tags'] != null) {
       tags = new List<TagModel>();
       json['tags'].forEach((v) {
