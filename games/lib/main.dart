@@ -67,6 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     context, MaterialPageRoute(builder: (context) => Gomoku()));
               },
             ),
+            Padding(
+              padding: EdgeInsets.all(20),
+            ),
             RaisedButton(
               child: Text("数独"),
               onPressed: () {
