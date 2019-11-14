@@ -1218,7 +1218,7 @@ class _GomokuState extends State<Gomoku> {
     List<int> pair = maxs[random.nextInt(maxs.length)];
     i = pair[0];
     j = pair[1];
-    Future.delayed(Duration(milliseconds: 100), () async {
+    Future.delayed(Duration(milliseconds: 50), () async {
       setState(() {
         goStep(i, j, myColor);
       });
