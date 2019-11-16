@@ -159,8 +159,8 @@ class _TabBodyState extends State<TabBody> {
           }, childCount: this.followers.length)),
         ],
         onRefresh: () async {
-          this.followers = [];
-          await getData(pageCount: 1);
+          // this.followers = [];
+          // await getData(pageCount: 1);
           _refreshController.resetLoadState();
         },
         onLoad: () async {
