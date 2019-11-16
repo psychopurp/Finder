@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:finder/config/api_client.dart';
-import 'package:finder/models/engage_topic_comment_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';

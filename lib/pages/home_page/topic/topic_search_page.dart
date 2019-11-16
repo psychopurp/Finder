@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:finder/pages/home_page/more_topics.dart' show ImageItem;
 
 class TopicSearchPage extends StatefulWidget {

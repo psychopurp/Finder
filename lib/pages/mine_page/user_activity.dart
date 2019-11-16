@@ -1,12 +1,5 @@
-import 'dart:convert';
-
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/activity_model.dart';
-import 'package:finder/models/engage_topic_comment_model.dart';
-import 'package:finder/models/topic_comments_model.dart';
-import 'package:finder/models/topic_model.dart';
-import 'package:finder/plugin/avatar.dart';
-import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/cupertino.dart';

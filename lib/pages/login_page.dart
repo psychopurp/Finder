@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:finder/pages/register_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +44,6 @@ class _LoginPageState extends State<LoginPage>
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     Future<void>.delayed(Duration(milliseconds: 200), () {
@@ -67,7 +64,9 @@ class _LoginPageState extends State<LoginPage>
                     EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(30)),
                 children: <Widget>[
                   // title(),
-                  Padding(padding: EdgeInsets.all(10),),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
                   topTitle(context),
                   phoneTextField(context),
                   Container(height: ScreenUtil().setHeight(60)),
@@ -95,18 +94,20 @@ class _LoginPageState extends State<LoginPage>
                     onPress: () async {
                       Map result = await login(user);
                       if (result["status"]) {
-                        String nickName = Provider.of<UserProvider>(context).userInfo.nickname;
+                        String nickName = Provider.of<UserProvider>(context)
+                            .userInfo
+                            .nickname;
                         bool notRegister = nickName == "" || nickName == null;
-                        if(!notRegister){
+                        if (!notRegister) {
                           Navigator.of(context).pushAndRemoveUntil(
                               new MaterialPageRoute(
                                   builder: (context) => new IndexPage()),
-                                  (route) => route == null);
-                        }else{
+                              (route) => route == null);
+                        } else {
                           Navigator.of(context).pushAndRemoveUntil(
                               new MaterialPageRoute(
                                   builder: (context) => new RegisterPage()),
-                                  (route) => route == null);
+                              (route) => route == null);
                         }
                       } else {
                         showErrorHint(context, result["error"]);

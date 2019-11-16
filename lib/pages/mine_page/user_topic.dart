@@ -1,9 +1,5 @@
-import 'dart:convert';
-
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/topic_model.dart';
-import 'package:finder/plugin/avatar.dart';
-import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -12,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class UserTopicPage extends StatefulWidget {
