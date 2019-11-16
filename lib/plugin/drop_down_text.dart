@@ -1,5 +1,6 @@
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class DropDownTextWidget extends StatefulWidget {
   DropDownTextWidget({@required this.content});
@@ -80,7 +81,7 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
             }
           });
         }
-        return Text(
+        return BetterText(
           widget.content,
           textAlign: TextAlign.left,
           overflow: TextOverflow.ellipsis,
@@ -100,11 +101,11 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
             child: isShowMore
-                ? Text(
+                ? BetterText(
               "收起",
               style: style,
             )
-                : Text(
+                : BetterText(
               "查看全文",
               style: style,
             ),

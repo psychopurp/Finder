@@ -1,4 +1,5 @@
 import 'package:finder/pages/home_page/home_page_banner.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
 import 'package:finder/plugin/callback.dart';
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
           ),
           onPressed: () => Scaffold.of(context).openDrawer(),
         ),
-        title: Text(
+        title: BetterText(
           'Finders',
           style: TextStyle(
             color: Colors.white,

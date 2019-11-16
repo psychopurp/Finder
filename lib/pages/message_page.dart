@@ -1,3 +1,4 @@
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/routers/routes.dart';
@@ -35,7 +36,7 @@ class _MessagePageState extends State<MessagePage> {
     try {
       return Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: BetterText(
             "消息",
             style: TextStyle(
               color: Colors.white,
@@ -79,7 +80,7 @@ class _MessagePageState extends State<MessagePage> {
           child: Column(
             children: <Widget>[
               CircularProgressIndicator(),
-              Text("加载中"),
+              BetterText("加载中"),
             ],
           ),
         ),
@@ -130,7 +131,7 @@ class _MessagePageState extends State<MessagePage> {
       String data,
       VoidCallback onPress,
       String url}) {
-    Widget titleWidget = Text(
+    Widget titleWidget = BetterText(
       title,
       style: TextStyle(
         fontSize: 16,
@@ -168,7 +169,7 @@ class _MessagePageState extends State<MessagePage> {
                       Padding(
                         padding: EdgeInsets.all(3),
                       ),
-                      Text(
+                      BetterText(
                         data,
                         textAlign: TextAlign.left,
                         style: TextStyle(
@@ -278,11 +279,11 @@ class _MessagePageState extends State<MessagePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(other.nickname),
+                BetterText(other.nickname),
                 Padding(
                   padding: EdgeInsets.all(3),
                 ),
-                Text(
+                BetterText(
                   item.content,
                   textAlign: TextAlign.left,
                   style: TextStyle(
@@ -298,7 +299,7 @@ class _MessagePageState extends State<MessagePage> {
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.only(right: 10, top: 13, bottom: 5),
-                child: Text(
+                child: BetterText(
                   getTimeString(item.time),
                   style: TextStyle(fontSize: 12),
                 ),

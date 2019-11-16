@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/message_model.dart';
 import 'package:finder/plugin/course_table.dart';
@@ -41,7 +42,7 @@ class ProfileDrawer extends StatelessWidget {
 
   Widget generateListTile(List list, int index) {
     return ListTile(
-      title: Text(
+      title: BetterText(
         "${list[index][0]}:         ${list[index][1]}",
         style: TextStyle(fontSize: 14),
       ),
@@ -80,7 +81,7 @@ class ProfileDrawer extends StatelessWidget {
           children.add(
             ListTile(
               leading: listOption['modify']['icon'],
-              title: Text('编辑信息'),
+              title: BetterText('编辑信息'),
               onTap: () async {
                 Navigator.of(context).pushNamed(Routes.modifyInfoPage);
               },
@@ -89,7 +90,7 @@ class ProfileDrawer extends StatelessWidget {
           children.add(
             ListTile(
               leading: listOption['exit']['icon'],
-              title: Text('退出登录'),
+              title: BetterText('退出登录'),
               onTap: () async {
                 Global.isLogin = false;
                 Global.token = "";

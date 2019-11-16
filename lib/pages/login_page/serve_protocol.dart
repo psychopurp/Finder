@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class ServeProtocolRoute extends StatelessWidget {
   final TextStyle titleOneStyle = TextStyle(
@@ -33,7 +34,7 @@ class ServeProtocolRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("服务条款"),
+        title: BetterText("服务条款"),
       ),
       body: SingleChildScrollView(
         child: Padding(

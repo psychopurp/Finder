@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'dart:math';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
@@ -243,14 +244,14 @@ class MySwiperPlugin extends StatelessWidget {
                 Container(
                   width: 10.0,
                 ),
-                Text(
+                BetterText(
                   "${data.data + 1}",
                 ),
-                Text(
+                BetterText(
                   " / ${pics.length}",
                 ),
                 Expanded(
-                    child: Text(
+                    child: BetterText(
                   "",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -262,7 +263,7 @@ class MySwiperPlugin extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.only(right: 10.0),
                     alignment: Alignment.center,
-                    child: Text(
+                    child: BetterText(
                       "保存图片",
                     ),
                   ),

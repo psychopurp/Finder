@@ -11,6 +11,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:finder/plugin/better_text.dart';
 
 const double MessageHeight = 70;
 const double AvatarHeight = 54;
@@ -35,7 +36,7 @@ class ChatRouter extends StatelessWidget {
     String sessionId = "$id1-$id2";
     return Scaffold(
       appBar: AppBar(
-        title: Text(other.nickname),
+        title: BetterText(other.nickname),
       ),
       backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       body: ChatPage(sessionId, other),
@@ -354,7 +355,7 @@ class _ChatPageState extends State<ChatPage> {
     if (reverse) {
       index = messages.length - 1 - index;
     }
-    Widget text = Text(
+    Widget text = BetterText(
       getTimeString(messages[index].time),
       style: TextStyle(
         color: Color(0xFF999999),
@@ -581,7 +582,7 @@ class Bubble extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           constraints: BoxConstraints(maxWidth: bubbleWidth),
-          child: Text(
+          child: BetterText(
             text,
             style: style,
           ),

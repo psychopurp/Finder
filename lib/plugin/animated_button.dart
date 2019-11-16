@@ -1,5 +1,6 @@
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 ///登录页动画按钮
 
@@ -80,7 +81,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
                 alignment: Alignment.center,
                 index: index,
                 children: <Widget>[
-                  Text("登陆",
+                  BetterText("登陆",
                       style: Theme.of(context).textTheme.title.copyWith(
                           color: Colors.white,
                           fontSize: ScreenUtil().setSp(35))),

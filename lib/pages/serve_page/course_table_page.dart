@@ -3,6 +3,7 @@ import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class CourseTablePage extends StatefulWidget {
   @override
@@ -130,7 +131,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
             Navigator.pop(context);
           },
         ),
-        title: Text(
+        title: BetterText(
           "课表",
           style: TextStyle(
             color: appBarColor,
@@ -187,7 +188,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
             Padding(
               padding: EdgeInsets.all(30),
             ),
-            Text("加载中"),
+            BetterText("加载中"),
           ],
         ),
       );
@@ -251,7 +252,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
       children: List<Widget>.generate(days.length, (index) {
         List<Widget> children = [
           Container(
-            child: Text(
+            child: BetterText(
               weekdays[days[index]],
               style: TextStyle(fontSize: days.length > 5 ? 12 : 14),
             ),
@@ -265,7 +266,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
               height: (reduce.contains(i)
                   ? blockHeight / reduceScale
                   : blockHeight),
-              child: Text(eamis.course[index][i].course.name),
+              child: BetterText(eamis.course[index][i].course.name),
             );
           }));
         } else {
@@ -317,8 +318,8 @@ class _CourseTablePageState extends State<CourseTablePage> {
 //        return Column(
 //            children: List<Widget>.generate(eamis.course[days[index]].length,
 //                    (i) =>
-//                    Text(eamis.course[days[index]][i]?.course?.name ?? ""))
-//              ..insert(0, Text(weekdays[index])));
+//                    BetterText(eamis.course[days[index]][i]?.course?.name ?? ""))
+//              ..insert(0, BetterText(weekdays[index])));
       }),
     );
     colorIndex = 0;
@@ -348,7 +349,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
         : <Widget>[
             Container(
               width: double.infinity,
-              child: Text(
+              child: BetterText(
                 course.name,
                 style: TextStyle(
                     fontSize: days.length > 5 ? 12 : 14,
@@ -361,7 +362,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
             ),
             Container(
               width: double.infinity,
-              child: Text(
+              child: BetterText(
                 course.position,
                 style: TextStyle(
                     fontSize: days.length > 5 ? 12 : 14,
@@ -380,7 +381,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
         ..add(
           Container(
             width: double.infinity,
-            child: Text(
+            child: BetterText(
               "(非本周)",
               style: TextStyle(fontSize: days.length > 5 ? 12 : 14),
             ),
@@ -521,7 +522,7 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
             MaterialButton(
               minWidth: ScreenUtil.screenWidthDp / 1.5,
               height: 50,
-              child: Text(
+              child: BetterText(
                 "学号: ${Provider.of<UserProvider>(context).userInfo.studentId.toString()}",
                 style: TextStyle(color: Colors.black),
               ),
@@ -562,7 +563,7 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
             MaterialButton(
               minWidth: ScreenUtil.screenWidthDp / 1.5,
               height: 50,
-              child: Text(
+              child: BetterText(
                 "确认",
                 style: TextStyle(color: Colors.white),
               ),
@@ -584,7 +585,7 @@ class _CourseTableRegisterState extends State<CourseTableRegister> {
                               CircularProgressIndicator(),
                               Padding(
                                 padding: const EdgeInsets.only(top: 26.0),
-                                child: Text("正在加载，请稍后..."),
+                                child: BetterText("正在加载，请稍后..."),
                               )
                             ],
                           ),

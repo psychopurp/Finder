@@ -1,5 +1,6 @@
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:finder/routers/application.dart';
 
@@ -72,7 +73,7 @@ class _ServePageState extends State<ServePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: BetterText(
           '服务',
           style: TextStyle(
             color: Colors.white,
@@ -105,7 +106,7 @@ class _ServePageState extends State<ServePage> {
             Application.router
                 .navigateTo(context, serviceItemList[index]['url']);
           },
-          title: Text(serviceItemList[index]['name']),
+          title: BetterText(serviceItemList[index]['name']),
           leading: Icon(
             serviceItemList[index]['preIcon'],
             color: serviceItemList[index]['color'],

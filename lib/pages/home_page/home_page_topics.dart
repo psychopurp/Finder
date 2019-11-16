@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
@@ -59,7 +60,7 @@ class HomePageTopics extends StatelessWidget {
                   width: ScreenUtil().setWidth(150),
                   height: titleHeight / 5,
                 ),
-                Text('  与·话题',
+                BetterText('  与·话题',
                     style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: ScreenUtil().setSp(35),
@@ -81,7 +82,7 @@ class HomePageTopics extends StatelessWidget {
               backgroundColor: Colors.white,
               label: Row(
                 children: <Widget>[
-                  Text(
+                  BetterText(
                     '更多 ',
                     style: TextStyle(fontSize: ScreenUtil().setSp(26)),
                   ),
@@ -238,7 +239,7 @@ class ImageItem extends StatelessWidget {
                             topRight: Radius.circular(20),
                             // bottomLeft: Radius.circular(10),
                             bottomRight: Radius.circular(20))),
-                    child: Text(
+                    child: BetterText(
                       inSchool ? '校内' : '校际',
                       style: TextStyle(
                           color: Colors.white,
@@ -249,7 +250,7 @@ class ImageItem extends StatelessWidget {
                 alignment: Alignment.center,
                 // color: Colors.blue,
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text(
+                child: BetterText(
                   item.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

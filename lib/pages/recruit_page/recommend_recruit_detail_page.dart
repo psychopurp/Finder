@@ -5,6 +5,7 @@ import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:finder/plugin/better_text.dart';
 
 const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
@@ -50,7 +51,7 @@ class _RecommendRecruitDetailPageState
     RecruitModelData item = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        child: Text("参与"),
+        child: BetterText("参与"),
         elevation: 1,
         onPressed: () {
           Navigator.of(context)
@@ -71,7 +72,7 @@ class _RecommendRecruitDetailPageState
         centerTitle: true,
         brightness: Brightness.light,
         backgroundColor: Colors.white,
-        title: Text(
+        title: BetterText(
           item.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -94,7 +95,7 @@ class _RecommendRecruitDetailPageState
                         Icon(menuItem[key]["icon"]),
                         Expanded(
                           flex: 1,
-                          child: Text(
+                          child: BetterText(
                             key,
                             textAlign: TextAlign.right,
                           ),
@@ -149,7 +150,7 @@ class _RecommendRecruitDetailPageState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
+                      BetterText(
                         item.title,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
@@ -161,7 +162,7 @@ class _RecommendRecruitDetailPageState
                       Padding(
                         padding: EdgeInsets.all(3),
                       ),
-                      Text(
+                      BetterText(
                         getTimeString(item.time),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -229,7 +230,7 @@ class _RecommendRecruitDetailPageState
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 15),
-                    child: Text(
+                    child: BetterText(
                       item.sender.nickname,
                       style: TextStyle(
                         fontSize: 17,
@@ -248,7 +249,7 @@ class _RecommendRecruitDetailPageState
           Container(
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             width: ScreenUtil.screenWidthDp,
-            child: Text(
+            child: BetterText(
               "招募详情",
               textAlign: TextAlign.left,
               style: TextStyle(
@@ -259,7 +260,7 @@ class _RecommendRecruitDetailPageState
           ),
           Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-            child: Text(
+            child: BetterText(
               item.introduction ?? "暂时没有详情",
               style: TextStyle(fontSize: 16),
             ),
@@ -282,7 +283,7 @@ class _RecommendRecruitDetailPageState
               Navigator.of(context)
                   .pushNamed(Routes.candidates, arguments: item);
             },
-            child: Text(
+            child: BetterText(
               MessageModel().self.id == item.sender.id ? "管理应聘者" : "查看应聘者",
               style: TextStyle(color: Theme.of(context).primaryColor),
               textAlign: TextAlign.left,
@@ -302,7 +303,7 @@ class _RecommendRecruitDetailPageState
           decoration: BoxDecoration(
               color: Color.fromARGB(255, 244, 167, 131),
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(color: Colors.white),
           ),

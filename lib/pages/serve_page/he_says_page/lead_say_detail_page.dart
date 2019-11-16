@@ -7,6 +7,7 @@ import 'package:finder/models/he_says_item.dart';
 import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
@@ -58,15 +59,15 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("提示"),
-              content: Text("请先登录再点赞!"),
+              title: BetterText("提示"),
+              content: BetterText("请先登录再点赞!"),
               actions: <Widget>[
                 FlatButton(
-                  child: Text("取消"),
+                  child: BetterText("取消"),
                   onPressed: () => Navigator.pop(context),
                 ),
                 FlatButton(
-                  child: Text("确认"),
+                  child: BetterText("确认"),
                   onPressed: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, '/login');
@@ -114,7 +115,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
         centerTitle: true,
         brightness: Brightness.light,
         backgroundColor: Colors.white,
-        title: Text(
+        title: BetterText(
           item.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -137,7 +138,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                         Icon(menuItem[key]["icon"]),
                         Expanded(
                           flex: 1,
-                          child: Text(
+                          child: BetterText(
                             key,
                             textAlign: TextAlign.right,
                           ),
@@ -192,7 +193,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
+                      BetterText(
                         item.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -204,7 +205,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                       Padding(
                         padding: EdgeInsets.all(3),
                       ),
-                      Text(
+                      BetterText(
                         getTimeString(item.time),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -242,7 +243,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                       Padding(
                         padding: EdgeInsets.all(3),
                       ),
-                      Text(
+                      BetterText(
                         item.likeCount < 999 ? "${item.likeCount}" : "999+",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -310,7 +311,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 15),
-                    child: Text(
+                    child: BetterText(
                       item.authorName,
                       style: TextStyle(
                         fontSize: 17,
@@ -325,7 +326,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
           split,
           Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-            child: Text(
+            child: BetterText(
               item.content,
               style: TextStyle(fontSize: 16),
             ),

@@ -18,6 +18,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:system_info/system_info.dart';
+import 'package:finder/plugin/better_text.dart';
 
 /// 此页面定义了三个statefull 页面
 
@@ -84,7 +85,7 @@ class _MoreTopicsState extends State<MoreTopics>
               Navigator.pop(context);
             },
           ),
-          title: Text(
+          title: BetterText(
             "话题",
             style: TextStyle(
               color: appBarColor,
@@ -116,7 +117,7 @@ class _MoreTopicsState extends State<MoreTopics>
             indicatorWeight: 3,
             tabs: <Widget>[
               new Tab(
-                child: Text(
+                child: BetterText(
                   '校内',
                   // style: TextStyle(
                   //     fontSize: ScreenUtil().setSp(30),
@@ -124,7 +125,7 @@ class _MoreTopicsState extends State<MoreTopics>
                 ),
               ),
               new Tab(
-                child: Text(
+                child: BetterText(
                   '校际',
                   // style: TextStyle(
                   //     fontSize: ScreenUtil().setSp(30),
@@ -170,7 +171,7 @@ class _MoreTopicsState extends State<MoreTopics>
                     Icons.add,
                     color: Colors.white,
                   ),
-                  label: Text(
+                  label: BetterText(
                     '添加话题',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -497,7 +498,7 @@ class ImageItem extends StatelessWidget {
                 decoration: BoxDecoration(
                     // color: Colors.white,
                     border: Border.all(color: Colors.white.withOpacity(0.3))),
-                child: Text(
+                child: BetterText(
                   item.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -517,7 +518,7 @@ class ImageItem extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.5),
                     ),
-                    child: Text(
+                    child: BetterText(
                       '点击查看详情',
                       style: TextStyle(
                           color: Colors.white,

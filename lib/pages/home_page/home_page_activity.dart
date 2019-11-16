@@ -3,6 +3,8 @@ import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/models/activity_model.dart';
+import 'package:finder/plugin/better_text.dart';
+
 
 class HomePageActivities extends StatelessWidget {
   final ActivityModel activities;
@@ -55,7 +57,7 @@ class HomePageActivities extends StatelessWidget {
 //                    ]),
 //                  ),
                 ),
-                Text('  知·活动',
+                BetterText('  知·活动',
                     style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: ScreenUtil().setSp(35),
@@ -79,7 +81,7 @@ class HomePageActivities extends StatelessWidget {
               backgroundColor: Colors.white,
               label: Row(
                 children: <Widget>[
-                  Text(
+                  BetterText(
                     '更多 ',
                     style: TextStyle(fontSize: ScreenUtil().setSp(26)),
                   ),
@@ -167,7 +169,7 @@ class HomePageActivities extends StatelessWidget {
                   width: picWidth,
                   padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
                   // color: Colors.yellow,
-                  child: Text(item.title,
+                  child: BetterText(item.title,
                       maxLines: 2,
                       textAlign: TextAlign.start,
                       overflow: TextOverflow.ellipsis,

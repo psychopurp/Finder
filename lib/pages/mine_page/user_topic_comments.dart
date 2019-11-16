@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/config/api_client.dart';
-import 'package:finder/models/engage_topic_comment_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/pics_swiper.dart';
@@ -18,7 +18,9 @@ import 'package:provider/provider.dart';
 
 class UserTopicCommentsPage extends StatefulWidget {
   final int userId;
+
   UserTopicCommentsPage({this.userId});
+
   @override
   _UserTopicCommentsPageState createState() => _UserTopicCommentsPageState();
 }
@@ -131,7 +133,7 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
-              child: Text(
+              child: BetterText(
                 time,
                 style: TextStyle(fontSize: 16),
               ),
@@ -144,7 +146,7 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
                     Application.router.navigateTo(context,
                         "${Routes.topicDetail}?id=${item.topicId}&title=${Uri.encodeComponent(item.topicTitle)}");
                   },
-                  child: Text(
+                  child: BetterText(
                     '#' + item.topicTitle,
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 17),
@@ -170,15 +172,15 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
                 context: context,
                 builder: (_) {
                   return AlertDialog(
-                    title: Text("提示"),
-                    content: Text("确认要删除此条话题评论吗? "),
+                    title: BetterText("提示"),
+                    content: BetterText("确认要删除此条话题评论吗? "),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text("取消"),
+                        child: BetterText("取消"),
                         onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                       ),
                       FlatButton(
-                          child: Text("删除"),
+                          child: BetterText("删除"),
                           onPressed: () async {
                             FinderDialog.showLoading();
                             var data = await apiClient.deleteTopicComment(
@@ -229,7 +231,7 @@ class _UserTopicCommentsPageState extends State<UserTopicCommentsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
+          BetterText(
             text,
             maxLines: 5,
             overflow: TextOverflow.ellipsis,

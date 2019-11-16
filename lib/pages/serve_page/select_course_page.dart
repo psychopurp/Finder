@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class SelectCoursePage extends StatefulWidget {
   @override
@@ -55,7 +56,7 @@ class _SelectCoursePageState extends State<SelectCoursePage> {
         ),
         backgroundColor: Theme.of(context).primaryColor.withOpacity(0.95),
         body: Center(
-          child: Text('home page'),
+          child: BetterText('home page'),
         ));
   }
 }

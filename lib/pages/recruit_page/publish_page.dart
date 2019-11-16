@@ -6,6 +6,7 @@ import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/recruit_model.dart';
+import 'package:finder/plugin/better_text.dart';
 
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 const Color ActionColor = Color(0xFFDB6B5C);
@@ -113,7 +114,7 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
+                        BetterText(
                           "发布成功！",
                           style: TextStyle(color: ActionColor, fontSize: 30),
                         ),
@@ -127,7 +128,7 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
                     Padding(
                       padding: EdgeInsets.all(25),
                     ),
-                    Text(
+                    BetterText(
                       "点击屏幕返回",
                       style: TextStyle(
                         color: Color.fromARGB(255, 235, 173, 146),
@@ -149,11 +150,11 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("提示"),
-            content: Text(errorHint),
+            title: BetterText("提示"),
+            content: BetterText(errorHint),
             actions: <Widget>[
               FlatButton(
-                child: Text("确认"),
+                child: BetterText("确认"),
                 onPressed: () => Navigator.of(context).pop(), //关闭对话框
               ),
             ],
@@ -188,7 +189,7 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
                             CircularProgressIndicator(),
                             Padding(
                               padding: const EdgeInsets.only(top: 26.0),
-                              child: Text("正在发布，请稍后..."),
+                              child: BetterText("正在发布，请稍后..."),
                             )
                           ],
                         ),
@@ -203,7 +204,7 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
                     handleSuccess();
                   }
                 },
-                child: Text(
+                child: BetterText(
                   '发布',
                   style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
@@ -220,10 +221,10 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
               Navigator.pop(context);
             },
           ),
-          // title: Text('Finders'),
+          // title: BetterText('Finders'),
           brightness: Brightness.light,
           elevation: 0,
-          title: Text(
+          title: BetterText(
             "招募",
             style: TextStyle(
               color: appBarColor,
@@ -254,7 +255,7 @@ class _RecruitPublishPageState extends State<RecruitPublishPage>
                     ? Color.fromARGB(255, 204, 204, 204)
                     : Theme.of(context).accentColor,
                 borderRadius: BorderRadius.circular(15)),
-            child: Text(
+            child: BetterText(
               tag,
               style: TextStyle(
                 color: Colors.white,
@@ -438,7 +439,7 @@ class _TypeSelectorState extends State<TypeSelector>
         children: <Widget>[
           Row(children: <Widget>[
             _nowTypes.length == 0
-                ? Text("请选择招募类型")
+                ? BetterText("请选择招募类型")
                 : _nowTypes.length <= 2
                     ? Row(
                         children: _nowTypes.map((e) => getTag(e.name)).toList(),
@@ -465,7 +466,7 @@ class _TypeSelectorState extends State<TypeSelector>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Text(
+                  BetterText(
                     "修改分类",
                     style: TextStyle(
                       fontSize: 13,
@@ -543,7 +544,7 @@ class _TypeSelectorState extends State<TypeSelector>
                   ? Color.fromARGB(255, 204, 204, 204)
                   : Theme.of(context).accentColor,
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(
               color: Colors.white,

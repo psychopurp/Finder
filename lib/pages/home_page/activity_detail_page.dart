@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/models/activity_model.dart';
 import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
@@ -8,7 +9,9 @@ import 'package:provider/provider.dart';
 
 class ActivityDetailPage extends StatefulWidget {
   final int activityId;
+
   ActivityDetailPage({this.activityId});
+
   @override
   _ActivityDetailPageState createState() => _ActivityDetailPageState();
 }
@@ -156,7 +159,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     Container(
                       // color: Colors.cyan,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '#' + activity.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -171,7 +174,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
                     Container(
                       padding: EdgeInsets.only(top: 10),
-                      child: Text(
+                      child: BetterText(
                         '主办方：' + activity.sponsor,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -187,7 +190,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.only(bottom: 10, top: 5),
-                      child: Text(
+                      child: BetterText(
                         '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -203,7 +206,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '活动地点：' + activity.place,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -275,7 +278,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     // color: Colors.cyan,
                     width: ScreenUtil().setWidth(480),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    child: Text(
+                    child: BetterText(
                       activity.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -305,7 +308,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                             // color: Colors.blue,
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             width: ScreenUtil().setWidth(380),
-                            child: Text(
+                            child: BetterText(
                               activity.sponsor,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -336,7 +339,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           // color: Colors.blue,
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           width: ScreenUtil().setWidth(380),
-                          child: Text(
+                          child: BetterText(
                             '开始日期：' + startTime + '\n' + '截止日期：' + endTime,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -368,7 +371,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             width: ScreenUtil().setWidth(380),
-                            child: Text(
+                            child: BetterText(
                               activity.place,
                               maxLines: 4,
                               overflow: TextOverflow.ellipsis,
@@ -399,21 +402,21 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
         // color: Colors.amber,
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(50)),
         child: DefaultTextStyle(
-          style: Theme.of(context).textTheme.body1,
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                    text: "活动介绍: \n\n",
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColor, fontSize: 18)),
-                TextSpan(text: activity.description)
+            style: Theme.of(context).textTheme.body1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                BetterText(
+                  "活动介绍:",
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 18),
+                  textAlign: TextAlign.left,
+                ),
+                Padding(padding: EdgeInsets.all(20),),
+                BetterText(activity.description)
               ],
+            )
             ),
-            // '活动介绍:\n' + activity.description,
-            textAlign: TextAlign.left,
-          ),
-        ),
       ),
     );
 
@@ -476,7 +479,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                   key: ValueKey(activity.isCollected),
                   color: Theme.of(context).primaryColor),
             ),
-            Text(
+            BetterText(
               "关注活动",
               style: TextStyle(
                   color: Theme.of(context).primaryColor,

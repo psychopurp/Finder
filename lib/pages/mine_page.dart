@@ -1,11 +1,10 @@
 import 'dart:io';
 
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/engage_topic_comment_model.dart';
 import 'package:finder/models/user_model.dart';
-import 'package:finder/pages/mine_page/user_activity.dart';
 import 'package:finder/pages/mine_page/user_content_tabview.dart';
-import 'package:finder/pages/mine_page/user_topic.dart';
 import 'package:finder/pages/mine_page/user_topic_comments.dart';
 import 'package:finder/plugin/gradient_generator.dart';
 import 'package:finder/public.dart';
@@ -162,7 +161,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
                   child: UserAppBar(
                 title: Padding(
                   padding: EdgeInsets.only(top: 18.0),
-                  child: Text(userInfo.nickname,
+                  child: BetterText(userInfo.nickname,
                       style: TextStyle(
                           fontSize: 20,
                           color: Colors.black.withOpacity(appBarOpacity))),
@@ -277,7 +276,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
                                 },
                                 shape: StadiumBorder(
                                     side: BorderSide(color: Colors.white)),
-                                child: Text(
+                                child: BetterText(
                                   "修改图片",
                                   style: TextStyle(color: Colors.white),
                                 ),
@@ -416,7 +415,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
             alignment: Alignment.center,
             height: cardWidth,
             width: cardWidth * 2,
-            child: Text(item['name']),
+            child: BetterText(item['name']),
           ),
         );
 
@@ -515,7 +514,7 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
               SizedBox(height: 50),
 
               ///昵称
-              Text(
+              BetterText(
                 user.nickname,
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -524,20 +523,20 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(user?.school?.name ?? "家里蹲大学"),
+                  BetterText(user?.school?.name ?? "家里蹲大学"),
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 5),
                     height: 14,
                     width: 1,
                     color: Theme.of(context).primaryColor,
                   ),
-                  Text((user.major != null) ? user.major : ""),
+                  BetterText((user.major != null) ? user.major : ""),
                 ],
               ),
 
               Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text((user.introduction != null)
+                  child: BetterText((user.introduction != null)
                       ? "简介：" + user.introduction
                       : "简介：")),
 
@@ -555,8 +554,8 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
                       shape: RoundedRectangleBorder(),
                       child: Column(
                         children: <Widget>[
-                          Text(user.followCount.toString()),
-                          Text('关注')
+                          BetterText(user.followCount.toString()),
+                          BetterText('关注')
                         ],
                       ),
                     ),
@@ -568,8 +567,8 @@ class _MinePageState extends State<MinePage> with TickerProviderStateMixin {
                       shape: RoundedRectangleBorder(),
                       child: Column(
                         children: <Widget>[
-                          Text(user.fanCount.toString()),
-                          Text('粉丝')
+                          BetterText(user.fanCount.toString()),
+                          BetterText('粉丝')
                         ],
                       ),
                     )

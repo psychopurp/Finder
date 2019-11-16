@@ -1,6 +1,7 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/pages/serve_page/he_says_page.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -77,7 +78,7 @@ class _CommentPageState extends State<CommentPage> {
 
     return Scaffold(
       // appBar: AppBar(
-      //   title: Text("评论"),
+      //   title: BetterText("评论"),
       //   textTheme: TextTheme(
       //       title: Theme.of(context)
       //           .appBarTheme
@@ -198,7 +199,7 @@ class _CommentPageState extends State<CommentPage> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(left: 10.0),
-                        child: Text(
+                        child: BetterText(
                           item.sender.nickname,
                           style: Theme.of(context)
                               .textTheme
@@ -220,7 +221,7 @@ class _CommentPageState extends State<CommentPage> {
                                                 .primaryColor)),
                                 TextSpan(text: " : " + item.content)
                               ]))
-                            : Text(
+                            : BetterText(
                                 item.content,
                                 style: Theme.of(context).textTheme.body2,
                               ),
@@ -230,7 +231,7 @@ class _CommentPageState extends State<CommentPage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(right: 15.0),
-                  child: Text(getTimeString(item.time),
+                  child: BetterText(getTimeString(item.time),
                       style: Theme.of(context).textTheme.body1),
                 )
               ],
@@ -290,7 +291,7 @@ class _CommentPageState extends State<CommentPage> {
             minWidth: ScreenUtil().setWidth(100),
             height: ScreenUtil().setHeight(70),
             shape: StadiumBorder(),
-            child: Text(
+            child: BetterText(
               "发送",
               style: TextStyle(color: Colors.white),
             ),
@@ -307,15 +308,15 @@ class _CommentPageState extends State<CommentPage> {
           context: context,
           builder: (_) {
             return AlertDialog(
-              title: Text("提示"),
-              content: Text("确认要删除此条回复吗? "),
+              title: BetterText("提示"),
+              content: BetterText("确认要删除此条回复吗? "),
               actions: <Widget>[
                 FlatButton(
-                  child: Text("取消"),
+                  child: BetterText("取消"),
                   onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                 ),
                 FlatButton(
-                    child: Text("删除"),
+                    child: BetterText("删除"),
                     onPressed: () async {
                       FinderDialog.showLoading();
                       var data = await apiClient.deleteTopicComment(

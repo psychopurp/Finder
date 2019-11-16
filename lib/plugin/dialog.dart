@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 ///一些自己实现的dialog
 
@@ -25,11 +26,11 @@ void showErrorHint(BuildContext context, String text) {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("提示"),
-          content: Text(text),
+          title: BetterText("提示"),
+          content: BetterText(text),
           actions: <Widget>[
             FlatButton(
-              child: Text("确认"),
+              child: BetterText("确认"),
               onPressed: () => Navigator.of(context).pop(), //关闭对话框
             ),
           ],

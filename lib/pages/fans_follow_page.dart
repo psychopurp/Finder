@@ -1,4 +1,5 @@
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/models/follower_model.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
@@ -41,7 +42,7 @@ class _FansFollowPageState extends State<FansFollowPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("圈子"),
+        title: BetterText("圈子"),
         textTheme: TextTheme(
             title: Theme.of(context)
                 .appBarTheme
@@ -214,7 +215,7 @@ class _TabBodyState extends State<TabBody> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(left: 10.0),
-                  child: Text(
+                  child: BetterText(
                     item.nickname,
                     style: Theme.of(context)
                         .textTheme
@@ -224,7 +225,7 @@ class _TabBodyState extends State<TabBody> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 10.0, top: 5.0),
-                  child: Text(
+                  child: BetterText(
                     item.introduction != null ? item.introduction : "",
                     style: Theme.of(context).textTheme.body2,
                   ),
@@ -310,7 +311,7 @@ class _TabBodyState extends State<TabBody> {
                       : Colors.black12),
               borderRadius: BorderRadius.circular(30)),
           height: 30,
-          child: Text(
+          child: BetterText(
             buttonText,
             style: TextStyle(
                 color: (userInfo.status == FOLLOW)

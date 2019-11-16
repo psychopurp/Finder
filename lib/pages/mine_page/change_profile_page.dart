@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class ChangeProfilePage extends StatefulWidget {
   final UserModel user;
@@ -84,7 +85,7 @@ class _ChangeProfilePageState extends State<ChangeProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('个人信息'),
+        title: BetterText('个人信息'),
       ),
       body: body(userProvider),
     );
@@ -106,7 +107,7 @@ class _ChangeProfilePageState extends State<ChangeProfilePage> {
     Widget child;
 
     if (item['data'] == null) {
-      child = Text('');
+      child = BetterText('');
     } else if (item['data'].toString().startsWith('http')) {
       child = Card(
         // color: Colors.yellow,
@@ -119,13 +120,13 @@ class _ChangeProfilePageState extends State<ChangeProfilePage> {
         ),
       );
     } else if (item['data'] is DateTime) {
-      child = Text(item['data'].toString().split(' ').first);
+      child = BetterText(item['data'].toString().split(' ').first);
     } else {
-      child = Text(item['data'].toString());
+      child = BetterText(item['data'].toString());
     }
 
     return ListTile(
-      title: Text(item['name']),
+      title: BetterText(item['name']),
       trailing: child,
       onTap: () {
         _controller.text = item['data'].toString();
@@ -169,7 +170,7 @@ class _ChangeProfilePageState extends State<ChangeProfilePage> {
             builder: (_) {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(title),
+                  title: BetterText(title),
                   actions: <Widget>[
                     Center(
                       child: Padding(
@@ -200,7 +201,7 @@ class _ChangeProfilePageState extends State<ChangeProfilePage> {
                           },
                           shape: StadiumBorder(),
                           color: Colors.white,
-                          child: Text('保存'),
+                          child: BetterText('保存'),
                           minWidth: 30,
                         ),
                       ),

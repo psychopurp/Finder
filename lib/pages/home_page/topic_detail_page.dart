@@ -14,6 +14,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
+
 
 class TopicDetailPage extends StatefulWidget {
   final int topicId;
@@ -121,7 +123,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         //       shape: CircleBorder(),
         //       child: Icon(Icons.star_border))
         // ],
-        title: Text(
+        title: BetterText(
           this.widget.topicTitle,
           style: TextStyle(
               fontSize: ScreenUtil().setSp(30),
@@ -145,7 +147,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               padding: EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 50),
               // alignment: Alignment.center,
               // color: Colors.amber,
-              child: Text(
+              child: BetterText(
                 this.widget.topicTitle,
                 softWrap: true,
                 maxLines: 2,
@@ -206,7 +208,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                 alignment: Alignment.center,
                 // color: Colors.blue,
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text(
+                child: BetterText(
                   this.widget.topicTitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -234,7 +236,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
           Application.router.navigateTo(context,
               '/publishTopicComment?topicId=${this.widget.topicId.toString()}&&topicTitle=${Uri.encodeComponent(this.topicTitle)}');
         },
-        child: Text(
+        child: BetterText(
           "+ 参与话题",
           style: TextStyle(color: Colors.white),
         ),
@@ -420,7 +422,7 @@ class _TopicCommentsState extends State<TopicComments> {
         Future.delayed(Duration(milliseconds: 500), () {
           Scaffold.of(context).showSnackBar(new SnackBar(
             duration: Duration(milliseconds: 200),
-            content: new Text("错误"),
+            content: new BetterText("错误"),
             action: new SnackBarAction(
               label: "取消",
               onPressed: () {},
@@ -460,7 +462,7 @@ class _TopicCommentsState extends State<TopicComments> {
       Future.delayed(Duration(milliseconds: 500), () {
         Scaffold.of(context).showSnackBar(new SnackBar(
           duration: Duration(milliseconds: 200),
-          content: new Text("$showText"),
+          content: new BetterText("$showText"),
           action: new SnackBarAction(
             label: "取消",
             onPressed: () {},
@@ -531,7 +533,7 @@ class _TopicCommentsState extends State<TopicComments> {
                         minWidth: ScreenUtil().setWidth(100),
                         height: ScreenUtil().setHeight(70),
                         shape: StadiumBorder(),
-                        child: Text(
+                        child: BetterText(
                           "发送",
                           style: TextStyle(color: Colors.white),
                         ),
@@ -552,15 +554,15 @@ class _TopicCommentsState extends State<TopicComments> {
           context: context,
           builder: (_) {
             return AlertDialog(
-              title: Text("提示"),
-              content: Text("确认要删除此条话题评论吗? "),
+              title: BetterText("提示"),
+              content: BetterText("确认要删除此条话题评论吗? "),
               actions: <Widget>[
                 FlatButton(
-                  child: Text("取消"),
+                  child: BetterText("取消"),
                   onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                 ),
                 FlatButton(
-                    child: Text("删除"),
+                    child: BetterText("删除"),
                     onPressed: () async {
                       FinderDialog.showLoading();
                       var data = await apiClient.deleteTopicComment(
@@ -665,7 +667,7 @@ class _TopicCommentsState extends State<TopicComments> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
+                          BetterText(
                             item.sender.nickname,
                             style: TextStyle(
                                 fontFamily: 'normal',
@@ -673,7 +675,7 @@ class _TopicCommentsState extends State<TopicComments> {
                                 fontSize: ScreenUtil().setSp(30)),
                           ),
                           SizedBox(height: 4),
-                          Text(
+                          BetterText(
                             getTimeString(item.time),
                             style: TextStyle(
                                 color: Colors.grey,
@@ -739,7 +741,7 @@ class _TopicCommentsState extends State<TopicComments> {
                       buttonItem['comment']['icon'],
                       Padding(
                         padding: EdgeInsets.only(left: 5),
-                        child: Text(replyCount),
+                        child: BetterText(replyCount),
                       )
                     ],
                   ),
@@ -765,7 +767,7 @@ class _TopicCommentsState extends State<TopicComments> {
                         buttonItem['like'][item.isLike],
                         Padding(
                           padding: EdgeInsets.only(left: 5),
-                          child: Text(likeCount),
+                          child: BetterText(likeCount),
                         )
                       ],
                     ),
@@ -810,7 +812,7 @@ class _TopicCommentsState extends State<TopicComments> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-//          Text(
+//          BetterText(
 //            text,
 //            maxLines: 5,
 //            overflow: TextOverflow.ellipsis,

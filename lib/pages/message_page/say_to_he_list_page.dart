@@ -1,7 +1,7 @@
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
-
+import 'package:finder/plugin/better_text.dart';
 import '../../models/message_model.dart';
 
 const double MessageHeight = 70;
@@ -35,7 +35,7 @@ class _SayToHePageState extends State<SayToHePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("对Ta说"),
+        title: BetterText("对Ta说"),
         elevation: 0,
         centerTitle: true,
         actions: <Widget>[
@@ -136,11 +136,11 @@ class _SayToHePageState extends State<SayToHePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(other.nickname),
+                BetterText(other.nickname),
                 Padding(
                   padding: EdgeInsets.all(3),
                 ),
-                Text(
+                BetterText(
                   item.content,
                   textAlign: TextAlign.left,
                   style: TextStyle(
@@ -156,7 +156,7 @@ class _SayToHePageState extends State<SayToHePage> {
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.only(right: 10, top: 13, bottom: 5),
-                child: Text(
+                child: BetterText(
                   getTimeString(item.time),
                   style: TextStyle(fontSize: 12),
                 ),

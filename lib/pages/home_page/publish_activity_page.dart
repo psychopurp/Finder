@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class PublishActivityPage extends StatefulWidget {
   @override
@@ -102,7 +103,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,
-        title: Text(
+        title: BetterText(
           '创建活动',
           style: TextStyle(
             color: Colors.black,
@@ -123,7 +124,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                         CircularProgressIndicator(),
                         Padding(
                           padding: const EdgeInsets.only(top: 26.0),
-                          child: Text("正在发布，请稍后..."),
+                          child: BetterText("正在发布，请稍后..."),
                         )
                       ],
                     ),
@@ -141,7 +142,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                 handleSuccess();
               }
             },
-            child: Text(
+            child: BetterText(
               '发布',
               style: TextStyle(
                   color: Theme.of(context).primaryColor,
@@ -149,7 +150,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
             ),
           ),
         ],
-        // title: Text('Finders'),
+        // title: BetterText('Finders'),
         elevation: 0,
       ),
       body: ListView(
@@ -241,16 +242,16 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                           color: Color.fromARGB(255, 245, 241, 241),
                           borderRadius: BorderRadius.circular(20)),
                       child: DropdownButton(
-                        hint: Text('请选择活动类型'),
+                        hint: BetterText('请选择活动类型'),
                         items: activityTypes.map((item) {
                           return DropdownMenuItem(
                             value: item.id,
-                            child: Text(item.name),
+                            child: BetterText(item.name),
                           );
                         }).toList(),
                         value: this.selectedActivityTypeValue,
                         isExpanded: true,
-                        underline: Text(''),
+                        underline: BetterText(''),
                         onChanged: (t) {
                           setState(() {
                             this.selectedActivityTypeValue = t;
@@ -275,7 +276,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
+                BetterText(
                   "活动时间",
                   style: TextStyle(fontSize: ScreenUtil().setSp(30)),
                 ),
@@ -311,7 +312,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                           },
                           child: Container(
                             padding: EdgeInsets.all(5),
-                            child: Text(startTime),
+                            child: BetterText(startTime),
                           ),
                         ),
                         InkWell(
@@ -338,7 +339,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                           },
                           child: Container(
                             padding: EdgeInsets.all(5),
-                            child: Text(endTime),
+                            child: BetterText(endTime),
                           ),
                         ),
                       ],
@@ -519,7 +520,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                   backgroundColor:
                       Theme.of(context).primaryColor.withOpacity(0.5),
                   labelStyle: TextStyle(color: Colors.white),
-                  label: Text(val),
+                  label: BetterText(val),
                 );
               }).toList(),
             ),
@@ -594,7 +595,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                         color: Color(0xFFF0AA89),
                         size: ScreenUtil().setSp(100),
                       ),
-                      Text(
+                      BetterText(
                         '上传背景图',
                         style: TextStyle(
                             fontFamily: 'Poppins',
@@ -628,11 +629,11 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("提示"),
-            content: Text(errorHint),
+            title: BetterText("提示"),
+            content: BetterText(errorHint),
             actions: <Widget>[
               FlatButton(
-                child: Text("确认"),
+                child: BetterText("确认"),
                 onPressed: () => Navigator.of(context).pop(), //关闭对话框
               ),
             ],

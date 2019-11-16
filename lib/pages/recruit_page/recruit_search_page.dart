@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class RecruitSearchDelegate extends SearchDelegate<String> {
   @override
@@ -42,7 +43,7 @@ class RecruitSearchDelegate extends SearchDelegate<String> {
     return Column(
       children: <Widget>[
         Chip(
-          label: Text('asfasf'),
+          label: BetterText('asfasf'),
         )
       ],
     );

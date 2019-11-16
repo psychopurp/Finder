@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:finder/public.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
+
 
 class PublishTopicCommentPage extends StatefulWidget {
   final int topicId;
@@ -48,7 +50,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(widget.topicTitle),
+        title: BetterText(widget.topicTitle),
         elevation: 0,
         actions: <Widget>[
           Builder(builder: (context) {
@@ -67,7 +69,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
                           CircularProgressIndicator(),
                           Padding(
                             padding: const EdgeInsets.only(top: 26.0),
-                            child: Text("正在发布，请稍后..."),
+                            child: BetterText("正在发布，请稍后..."),
                           )
                         ],
                       ),
@@ -84,7 +86,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
                   handleSuccess();
                 }
               },
-              child: Text(
+              child: BetterText(
                 '发布',
                 style: TextStyle(
                     color: Colors.white,
@@ -212,7 +214,7 @@ class _PublishTopicCommentPageState extends State<PublishTopicCommentPage> {
             //     height: ScreenUtil().setHeight(100),
             //     width: ScreenUtil().setWidth(750),
             //     color: Colors.amber,
-            //     child: Text('toolbar'),
+            //     child: BetterText('toolbar'),
             //   )
           ],
         ),
