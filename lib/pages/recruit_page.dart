@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:finder/plugin/better_text.dart';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
@@ -92,13 +93,13 @@ class _RecruitPageState extends State<RecruitPage> {
             Padding(
               padding: EdgeInsets.all(10),
             ),
-            Text("加载中...")
+            BetterText("加载中...")
           ],
         ),
       );
     } else if (_bannerData.length == 0 && _data.length == 0) {
       child = Center(
-        child: Text("暂时没有数据"),
+        child: BetterText("暂时没有数据"),
       );
     } else {
       if (_bannerData.length != 0) {
@@ -112,7 +113,7 @@ class _RecruitPageState extends State<RecruitPage> {
             color: Colors.white,
             width: double.infinity,
             alignment: Alignment.center,
-            child: Text(
+            child: BetterText(
               "暂时没有找到相关的招募哟~\n重新找找看吧！",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -275,7 +276,7 @@ class _RecruitPageState extends State<RecruitPage> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 20),
-                      child: Text(
+                      child: BetterText(
                         sender.nickname,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -294,7 +295,7 @@ class _RecruitPageState extends State<RecruitPage> {
               ),
               Padding(
                 padding: EdgeInsets.only(right: 10),
-                child: Text(
+                child: BetterText(
                   getTimeString(item.time),
                   textAlign: TextAlign.right,
                   style: TextStyle(
@@ -321,7 +322,7 @@ class _RecruitPageState extends State<RecruitPage> {
                 Container(
                   padding: EdgeInsets.only(left: 13, bottom: 8),
                   width: ScreenUtil.screenWidthDp,
-                  child: Text(
+                  child: BetterText(
                     item.title,
                     style: TextStyle(
                         color: Color(0xff555555),
@@ -363,7 +364,7 @@ class _RecruitPageState extends State<RecruitPage> {
           decoration: BoxDecoration(
               color: Color.fromARGB(255, 244, 167, 131),
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(color: Colors.white),
           ),
@@ -510,7 +511,7 @@ class _RecruitPageHeaderState extends State<RecruitPageHeader>
           Positioned(
             child: Opacity(
               opacity: _opacityAnimation.value,
-              child: Text(
+              child: BetterText(
                 "招募 · 寻你",
                 style: TextStyle(
                   color: Colors.white,
@@ -702,7 +703,7 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                 padding: EdgeInsets.symmetric(horizontal: 13),
                 child: Row(
                   children: <Widget>[
-                    Text(
+                    BetterText(
                       "修改分类",
                       style: TextStyle(
                         fontSize: 13,
@@ -751,7 +752,7 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                         onPressed: () {
                           close();
                         },
-                        child: Text(
+                        child: BetterText(
                           "取消",
                           style: TextStyle(color: Color(0xff999999)),
                         ),
@@ -763,7 +764,7 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                           (widget.onChange ?? (b) {})(_tempType);
                           close();
                         },
-                        child: Text(
+                        child: BetterText(
                           "确定",
                         ),
                         minWidth: 10,
@@ -806,7 +807,7 @@ class _FilterState extends State<Filter> with TickerProviderStateMixin {
                   ? Color.fromARGB(255, 204, 204, 204)
                   : Theme.of(context).accentColor,
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(
               color: Colors.white,

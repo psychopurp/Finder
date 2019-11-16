@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/pages/register_page.dart';
 import 'package:flutter/foundation.dart';
@@ -185,7 +186,7 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
                     beginWidth: 600,
                     endWidth: 150,
                     onPress: checkCheckCode,
-                    child: Text(
+                    child: BetterText(
                       '登录 | 注册',
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
@@ -212,7 +213,7 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
+              BetterText(
                 'Finders · 登录 | 注册',
               ),
               Container(
@@ -260,7 +261,7 @@ class _CheckCodeLoginPageState extends State<CheckCodeLoginPage>
             minWidth: ScreenUtil.screenWidthDp / 3,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Text(
+            child: BetterText(
                 leftTime == 0 ? loading ? "加载中..." : "获取验证码" : "$leftTime"),
             onPressed: leftTime == 0
                 ? () {

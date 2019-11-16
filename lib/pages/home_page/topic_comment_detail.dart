@@ -18,6 +18,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class TopicCommentDetailPage extends StatefulWidget {
   @override
@@ -58,7 +59,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(topicComment.topicTitle),
+        title: BetterText(topicComment.topicTitle),
         elevation: 1,
         textTheme: TextTheme(
             title: Theme.of(context)
@@ -77,7 +78,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
 
                   bottomBar.forEach((item, object) {
                     button.add(ListTile(
-                        title: Text(object['name']), onTap: object['handler']));
+                        title: BetterText(object['name']), onTap: object['handler']));
                   });
 
                   ///如果是自己的话题 有删除栏
@@ -145,7 +146,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                               children: <Widget>[
                                 Icon(Icons.favorite,
                                     color: Theme.of(context).primaryColor),
-                                Text("    " + like)
+                                BetterText("    " + like)
                               ],
                             ),
                           )
@@ -275,7 +276,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text(
+                              BetterText(
                                 topicComment.sender.nickname,
                                 style: TextStyle(
                                     fontFamily: 'normal',
@@ -283,7 +284,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                                     fontSize: ScreenUtil().setSp(30)),
                               ),
                               SizedBox(height: 4),
-                              Text(
+                              BetterText(
                                 getTimeString(topicComment.time),
                                 style: TextStyle(
                                     color: Colors.grey,
@@ -341,15 +342,15 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
         context: context,
         builder: (_) {
           return AlertDialog(
-            title: Text("提示"),
-            content: Text("确认要删除此此话题评论吗? "),
+            title: BetterText("提示"),
+            content: BetterText("确认要删除此此话题评论吗? "),
             actions: <Widget>[
               FlatButton(
-                child: Text("取消"),
+                child: BetterText("取消"),
                 onPressed: () => Navigator.of(context).pop(), // 关闭对话框
               ),
               FlatButton(
-                  child: Text("删除"),
+                  child: BetterText("删除"),
                   onPressed: () async {
                     // FinderDialog.showLoading();
                     var data = await apiClient.deleteTopicComment(
@@ -438,7 +439,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
+          BetterText(
             text,
             // maxLines: 5,
             // overflow: TextOverflow.ellipsis,
@@ -667,7 +668,7 @@ class _UserLikeWidgetState extends State<UserLikeWidget> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(left: 10.0),
-                  child: Text(
+                  child: BetterText(
                     item.nickname,
                     style: Theme.of(context)
                         .textTheme
@@ -677,7 +678,7 @@ class _UserLikeWidgetState extends State<UserLikeWidget> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 10.0, top: 5.0),
-                  child: Text(
+                  child: BetterText(
                     item.introduction != null ? item.introduction : "",
                     style: Theme.of(context).textTheme.body2,
                   ),

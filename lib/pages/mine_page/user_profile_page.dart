@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/plugin/my_appbar.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
 
 ///用户信息详情页
 class UserProfilePage extends StatefulWidget {
@@ -122,7 +123,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   child: UserAppBar(
                 title: Padding(
                   padding: EdgeInsets.only(top: 18.0),
-                  child: Text(user.nickname,
+                  child: BetterText(user.nickname,
                       style: TextStyle(
                           fontSize: 20,
                           color: Colors.black.withOpacity(appBarOpacity))),
@@ -219,7 +220,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       );
 
   followButton() {
-    Widget child = Text(user.isFollowed ? '已关注' : '关注',
+    Widget child = BetterText(user.isFollowed ? '已关注' : '关注',
         style:
             TextStyle(color: user.isFollowed ? Colors.black38 : Colors.white));
 
@@ -261,7 +262,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             alignment: Alignment.center,
             height: cardWidth,
             width: cardWidth * 2,
-            child: Text(item['name']),
+            child: BetterText(item['name']),
           ),
         );
 
@@ -340,7 +341,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               ///昵称
-              Text(
+              BetterText(
                 user.nickname,
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -349,20 +350,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text((user.school != null) ? user.school.name : "家里蹲大学"),
+                  BetterText((user.school != null) ? user.school.name : "家里蹲大学"),
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 5),
                     height: 14,
                     width: 1,
                     color: Theme.of(context).primaryColor,
                   ),
-                  Text((user.major != null) ? user.major : ""),
+                  BetterText((user.major != null) ? user.major : ""),
                 ],
               ),
 
               Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text((user.introduction != null)
+                  child: BetterText((user.introduction != null)
                       ? "简介：" + user.introduction
                       : "简介：")),
 
@@ -380,8 +381,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       shape: RoundedRectangleBorder(),
                       child: Column(
                         children: <Widget>[
-                          Text(user.followCount.toString()),
-                          Text('关注')
+                          BetterText(user.followCount.toString()),
+                          BetterText('关注')
                         ],
                       ),
                     ),
@@ -393,8 +394,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       shape: RoundedRectangleBorder(),
                       child: Column(
                         children: <Widget>[
-                          Text(user.fanCount.toString()),
-                          Text('粉丝')
+                          BetterText(user.fanCount.toString()),
+                          BetterText('粉丝')
                         ],
                       ),
                     )
@@ -418,7 +419,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             elevation: 1,
                             shape: StadiumBorder(),
                             color: Theme.of(context).primaryColor,
-                            child: Text("私信TA",
+                            child: BetterText("私信TA",
                                 style: TextStyle(color: Colors.black)),
                           )
                         ])

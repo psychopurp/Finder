@@ -3,6 +3,7 @@ import 'package:finder/models/internship_item.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:finder/plugin/better_text.dart';
 
 const Color ActionColor = Color(0xFFDB6B5C);
 const Color ActionColorActive = Color(0xFFEC7C6D);
@@ -58,7 +59,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
         centerTitle: true,
         brightness: Brightness.light,
         backgroundColor: Colors.white,
-        title: Text(
+        title: BetterText(
           item.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -81,7 +82,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
                         Icon(menuItem[key]["icon"]),
                         Expanded(
                           flex: 1,
-                          child: Text(
+                          child: BetterText(
                             key,
                             textAlign: TextAlign.right,
                           ),
@@ -120,7 +121,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
+                      BetterText(
                         item.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -132,7 +133,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
                       Padding(
                         padding: EdgeInsets.all(3),
                       ),
-                      Text(
+                      BetterText(
                         getTimeString(item.time),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -200,7 +201,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 15),
-                    child: Text(
+                    child: BetterText(
                       item.company.name,
                       style: TextStyle(
                         fontSize: 17,
@@ -219,7 +220,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             width: ScreenUtil.screenWidthDp,
-            child: Text(
+            child: BetterText(
               "薪资水平",
               textAlign: TextAlign.left,
               style: TextStyle(
@@ -231,7 +232,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             width: ScreenUtil.screenWidthDp,
-            child: Text(
+            child: BetterText(
               item.salaryRange,
               style: TextStyle(
                 color: Color(0xff777777),
@@ -246,7 +247,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             width: ScreenUtil.screenWidthDp,
-            child: Text(
+            child: BetterText(
               "职位介绍",
               textAlign: TextAlign.left,
               style: TextStyle(
@@ -257,7 +258,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
           ),
           Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-            child: Text(
+            child: BetterText(
               item.introduction,
               style: TextStyle(fontSize: 16),
             ),
@@ -285,7 +286,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
           decoration: BoxDecoration(
               color: Color.fromARGB(255, 244, 167, 131),
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(color: Colors.white),
           ),

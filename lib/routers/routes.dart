@@ -2,6 +2,7 @@ import 'package:finder/pages/settings_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'router_handler.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class Routes {
   static String root = "/"; //首页
@@ -71,7 +72,7 @@ class Routes {
         handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       print("ROUTE WAS NOT FOUND !!!");
       return Center(
-        child: Text("ROUTE WAS NOT FOUND !!!"),
+        child: BetterText("ROUTE WAS NOT FOUND !!!"),
       );
     });
     router.define(root, handler: rootHandler);

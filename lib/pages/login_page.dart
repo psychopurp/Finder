@@ -1,4 +1,5 @@
 import 'package:finder/pages/register_page.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
@@ -77,7 +78,7 @@ class _LoginPageState extends State<LoginPage>
 //                    alignment: Alignment.centerRight,
 //                    padding: EdgeInsets.only(top: ScreenUtil().setHeight(8)),
 //                    child: FlatButton(
-//                      child: Text(
+//                      child: BetterText(
 //                        '忘记密码？',
 //                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
 //                      ),
@@ -113,7 +114,7 @@ class _LoginPageState extends State<LoginPage>
                         showErrorHint(context, result["error"]);
                       }
                     },
-                    child: Text(
+                    child: BetterText(
                       '登录',
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
@@ -150,7 +151,7 @@ class _LoginPageState extends State<LoginPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
+              BetterText(
                 'Finders · 登录',
               ),
               Container(
@@ -232,13 +233,13 @@ class _LoginPageState extends State<LoginPage>
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text('没有账号？ 不记得密码？'),
+            BetterText('没有账号？ 不记得密码？'),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text("试试  "),
+                BetterText("试试  "),
                 InkWell(
-                  child: Text(
+                  child: BetterText(
                     '验证码登录 | 注册',
                     style: TextStyle(color: Theme.of(context).primaryColor),
                   ),
@@ -266,7 +267,7 @@ class _LoginPageState extends State<LoginPage>
 //                      onPressed: () {
 //                        //TODO : 第三方登录方法
 //                        Scaffold.of(context).showSnackBar(new SnackBar(
-//                          content: new Text("${item['title']}登录"),
+//                          content: new BetterText("${item['title']}登录"),
 //                          action: new SnackBarAction(
 //                            label: "取消",
 //                            onPressed: () {},
@@ -285,7 +286,7 @@ class _LoginPageState extends State<LoginPage>
 //        alignment: Alignment.center,
 //        child: Container(
 //          // color: Colors.green,
-//          child: Text(
+//          child: BetterText(
 //            '其他账号登录',
 //            style: TextStyle(color: Colors.grey, fontSize: 14.0),
 //          ),
@@ -303,7 +304,7 @@ class _LoginPageState extends State<LoginPage>
         width: ScreenUtil().setWidth(600),
         height: ScreenUtil().setHeight(100),
         child: RaisedButton(
-          child: Text(
+          child: BetterText(
             '登录',
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
@@ -340,7 +341,7 @@ class _LoginPageState extends State<LoginPage>
             //                   horizontal: ScreenUtil().setWidth(100)),
             //               child: Container(
             //                 color: Colors.white,
-            //                 child: Text('登录失败'),
+            //                 child: BetterText('登录失败'),
             //               ),
             //             ));
             //   }

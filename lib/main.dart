@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:finder/pages/index_page.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/pages/login_page.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
@@ -36,12 +37,12 @@ void main() {
             color: ActionColor,
             size: 40,
           ),
-          Text(
+          BetterText(
             "出错了",
             style: TextStyle(color: ActionColor, fontSize: 18),
             textDirection: TextDirection.ltr,
           ),
-          Text(
+          BetterText(
             "请尝试刷新或重启App, 如未能解决, 请反馈问题!",
             style: TextStyle(color: Colors.grey, fontSize: 12),
             textDirection: TextDirection.ltr,
@@ -113,7 +114,7 @@ class _MyAppState extends State<MyApp> {
                 onTap: globalInit,
               ),
               InkWell(
-                child: Text(
+                child: BetterText(
                   "网络连接失败, 点击重试",
                   textDirection: TextDirection.ltr,
                 ),
@@ -135,7 +136,7 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset("assets/logo.png"),
-              Text(
+              BetterText(
                 "Finders",
                 style: TextStyle(
                   color: ActionColor,

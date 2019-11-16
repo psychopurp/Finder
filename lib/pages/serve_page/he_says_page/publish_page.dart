@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:finder/plugin/better_text.dart';
 
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 const Color ActionColor = Color(0xFFDB6B5C);
@@ -195,7 +196,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
+                        BetterText(
                           "发布成功！",
                           style: TextStyle(color: ActionColor, fontSize: 30),
                         ),
@@ -209,7 +210,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
                     Padding(
                       padding: EdgeInsets.all(25),
                     ),
-                    Text(
+                    BetterText(
                       "点击屏幕返回",
                       style: TextStyle(
                         color: Color.fromARGB(255, 235, 173, 146),
@@ -231,11 +232,11 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("提示"),
-            content: Text(errorHint),
+            title: BetterText("提示"),
+            content: BetterText(errorHint),
             actions: <Widget>[
               FlatButton(
-                child: Text("确认"),
+                child: BetterText("确认"),
                 onPressed: () => Navigator.of(context).pop(), //关闭对话框
               ),
             ],
@@ -270,7 +271,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
                           CircularProgressIndicator(),
                           Padding(
                             padding: const EdgeInsets.only(top: 26.0),
-                            child: Text("正在发布，请稍后..."),
+                            child: BetterText("正在发布，请稍后..."),
                           )
                         ],
                       ),
@@ -285,7 +286,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
                   handleSuccess();
                 }
               },
-              child: Text(
+              child: BetterText(
                 '发布',
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
@@ -302,10 +303,10 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
             Navigator.pop(context);
           },
         ),
-        // title: Text('Finders'),
+        // title: BetterText('Finders'),
         brightness: Brightness.light,
         elevation: 0,
-        title: Text(
+        title: BetterText(
           "他 · 她说",
           style: TextStyle(
             color: appBarColor,
@@ -328,7 +329,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
               return Tab(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(tabBarItem[index]["name"]),
+                  child: BetterText(tabBarItem[index]["name"]),
                 ),
               );
             }),
@@ -375,7 +376,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
                 top: BorderSide(color: Colors.black12),
               )),
           child: ListTile(
-            leading: Text('启用匿名'),
+            leading: BetterText('启用匿名'),
             trailing: Switch(
               value: nameLess,
               onChanged: (val) {
@@ -425,7 +426,7 @@ class _HeSaysPublishPageState extends State<HeSaysPublishPage>
                   color: uploadColor,
                   size: 50,
                 ),
-                Text(
+                BetterText(
                   "上传封面图",
                   style: TextStyle(
                     color: uploadColor,

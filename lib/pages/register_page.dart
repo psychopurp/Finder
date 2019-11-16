@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
@@ -279,7 +280,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("完善个人信息"),
+        title: BetterText("完善个人信息"),
         centerTitle: true,
         leading: Container(),
         actions: <Widget>[
@@ -289,12 +290,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: Text("提示"),
+                    title: BetterText("提示"),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
+                        BetterText(
                           "请详细阅读《意旸Finders智慧校园软件许可及服务协议》与《隐私政策》。",
                           style: TextStyle(fontSize: 16),
                         ),
@@ -302,7 +303,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           padding: EdgeInsets.all(10),
                         ),
                         MaterialButton(
-                          child: Text(
+                          child: BetterText(
                             "《意旸Finders智慧校园软件许可及服务协议》",
                             style: TextStyle(
                               color: Colors.indigo,
@@ -314,7 +315,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                         ),
                         MaterialButton(
-                          child: Text(
+                          child: BetterText(
                             "《隐私政策》",
                             style: TextStyle(
                               color: Colors.indigo,
@@ -327,16 +328,16 @@ class _RegisterPageState extends State<RegisterPage> {
                         Padding(
                           padding: EdgeInsets.all(10),
                         ),
-                        Text("点击确认既代表您同意本条款。"),
+                        BetterText("点击确认既代表您同意本条款。"),
                       ],
                     ),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text("取消"),
+                        child: BetterText("取消"),
                         onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                       ),
                       FlatButton(
-                        child: Text("确认"),
+                        child: BetterText("确认"),
                         onPressed: () {
                           postData();
                         },
@@ -566,7 +567,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                 padding: EdgeInsets.symmetric(horizontal: 13),
                 child: Row(
                   children: <Widget>[
-                    Text(
+                    BetterText(
                       widget.verbose,
                       style: TextStyle(
                         fontSize: 13,
@@ -646,7 +647,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                         onPressed: () {
                           close();
                         },
-                        child: Text(
+                        child: BetterText(
                           "取消",
                           style: TextStyle(color: Color(0xff999999)),
                         ),
@@ -658,7 +659,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                           (widget.onChange ?? (b) {})(_tempSelected);
                           close();
                         },
-                        child: Text(
+                        child: BetterText(
                           "确定",
                         ),
                         minWidth: 10,
@@ -701,7 +702,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                   ? Color.fromARGB(255, 204, 204, 204)
                   : Theme.of(context).accentColor,
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(
               color: Colors.white,

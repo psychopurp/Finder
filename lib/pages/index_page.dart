@@ -1,3 +1,4 @@
+import 'package:finder/plugin/better_text.dart';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/message_model.dart';
@@ -51,16 +52,16 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("提示"),
+              title: BetterText("提示"),
               content:
-                  Text("检测到新版本? \n是否前往更新? \n(当前处于公测版本, 每个版本都将有大量变动, 建议立即更新!)"),
+                  BetterText("检测到新版本? \n是否前往更新? \n(当前处于公测版本, 每个版本都将有大量变动, 建议立即更新!)"),
               actions: <Widget>[
                 FlatButton(
-                  child: Text("取消"),
+                  child: BetterText("取消"),
                   onPressed: () => Navigator.of(context).pop(), //关闭对话框
                 ),
                 FlatButton(
-                  child: Text("确认"),
+                  child: BetterText("确认"),
                   onPressed: () async {
                     String url = "https://apk.finder-nk.com/finders.apk";
                     if (await canLaunch(url)) {
@@ -184,7 +185,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                                         transition: TransitionType.cupertino);
                                   },
                                   shape: CircleBorder(),
-                                  child: Text("话题"),
+                                  child: BetterText("话题"),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(bottom: 28.0),
@@ -199,7 +200,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                                       );
                                     },
                                     shape: CircleBorder(),
-                                    child: Text("招募"),
+                                    child: BetterText("招募"),
                                   ),
                                 ),
                                 MaterialButton(
@@ -212,7 +213,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
                                         transition: TransitionType.cupertino);
                                   },
                                   shape: CircleBorder(),
-                                  child: Text("活动"),
+                                  child: BetterText("活动"),
                                 ),
                               ],
                             ),
@@ -250,7 +251,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
             color: selectedColor,
             size: 28,
           ),
-          Text(
+          BetterText(
             title,
             style: TextStyle(
               fontSize: 12,
@@ -268,7 +269,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
             color: unSelectedColor,
             size: 28,
           ),
-          Text(
+          BetterText(
             title,
             style: TextStyle(
               fontSize: 12,

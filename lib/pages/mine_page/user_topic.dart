@@ -9,6 +9,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class UserTopicPage extends StatefulWidget {
   final int userId;
@@ -117,7 +118,7 @@ class _UserTopicPageState extends State<UserTopicPage> {
       child: Column(
         children: <Widget>[
           Container(
-            child: Text(
+            child: BetterText(
               time,
               style: TextStyle(fontSize: 16),
             ),
@@ -126,7 +127,7 @@ class _UserTopicPageState extends State<UserTopicPage> {
             width: double.infinity,
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.only(bottom: 5),
-            child: Text(
+            child: BetterText(
               '#' + item.title,
               style: TextStyle(
                   color: Theme.of(context).primaryColor, fontSize: 17),
@@ -165,15 +166,15 @@ class _UserTopicPageState extends State<UserTopicPage> {
                 context: context,
                 builder: (_) {
                   return AlertDialog(
-                    title: Text("提示"),
-                    content: Text("确认要删除此条话题吗? "),
+                    title: BetterText("提示"),
+                    content: BetterText("确认要删除此条话题吗? "),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text("取消"),
+                        child: BetterText("取消"),
                         onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                       ),
                       FlatButton(
-                          child: Text("删除"),
+                          child: BetterText("删除"),
                           onPressed: () async {
                             FinderDialog.showLoading();
                             var data =

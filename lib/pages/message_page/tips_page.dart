@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
-import 'package:finder/models/collections_model.dart';
 import 'package:finder/models/he_says_item.dart';
 import 'package:finder/models/recruit_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
@@ -9,6 +8,7 @@ import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
 import '../../models/message_model.dart';
+import 'package:finder/plugin/better_text.dart';
 
 const double MessageHeight = 70;
 const double AvatarHeight = 54;
@@ -41,7 +41,7 @@ class _TipsPageState extends State<TipsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("提醒"),
+        title: BetterText("提醒"),
         elevation: 0,
         centerTitle: true,
         actions: <Widget>[
@@ -130,7 +130,7 @@ class _TipsPageState extends State<TipsPage> {
                 Padding(
                   padding: EdgeInsets.all(3),
                 ),
-                Text(
+                BetterText(
                   item.content,
                   textAlign: TextAlign.left,
                   style: TextStyle(
@@ -145,7 +145,7 @@ class _TipsPageState extends State<TipsPage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(
+              BetterText(
                 getTimeString(item.time),
               ),
               Padding(

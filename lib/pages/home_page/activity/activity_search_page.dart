@@ -1,5 +1,6 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/activity_model.dart';
+import 'package:finder/plugin/better_text.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/cupertino.dart';
@@ -51,7 +52,7 @@ class ActivitySearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return Container(child: Text(query));
+    return Container(child: BetterText(query));
   }
 
   @override
@@ -130,7 +131,7 @@ class ActivitySearchDelegate extends SearchDelegate<String> {
                       // color: Colors.cyan,
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
+                      child: BetterText(
                         item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -146,7 +147,7 @@ class ActivitySearchDelegate extends SearchDelegate<String> {
                       // color: Colors.amber,
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
+                      child: BetterText(
                         // item.startTime.split(" ")[0].replaceAll('-', '.') +
                         //     "-" +
                         //     item.endTime.split(' ')[0].replaceAll('-', '.'),
@@ -165,7 +166,7 @@ class ActivitySearchDelegate extends SearchDelegate<String> {
                       // margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
                       width: ScreenUtil().setWidth(420),
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
+                      child: BetterText(
                         item.place,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -186,7 +187,7 @@ class ActivitySearchDelegate extends SearchDelegate<String> {
                           // color: Colors.amber,
                           border: Border.all(color: Color(0xFFF0AA89)),
                           borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: Text(
+                      child: BetterText(
                         "  详情  ",
                         style: TextStyle(
                             fontSize: ScreenUtil().setSp(22),
@@ -390,7 +391,7 @@ class _ActivitySearchPageState extends State<ActivitySearchPage> {
                     Container(
                       // color: Colors.cyan,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '#' + item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -405,7 +406,7 @@ class _ActivitySearchPageState extends State<ActivitySearchPage> {
 
                     Container(
                       padding: EdgeInsets.only(top: 10),
-                      child: Text(
+                      child: BetterText(
                         '主办方：' + item.sponsor,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -421,7 +422,7 @@ class _ActivitySearchPageState extends State<ActivitySearchPage> {
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.only(bottom: 10, top: 5),
-                      child: Text(
+                      child: BetterText(
                         '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -437,7 +438,7 @@ class _ActivitySearchPageState extends State<ActivitySearchPage> {
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '活动地点：' + item.place,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

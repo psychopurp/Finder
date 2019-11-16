@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class LostFoundPage extends StatefulWidget {
   @override
@@ -71,10 +72,10 @@ class _LostFoundPageState extends State<LostFoundPage>
           labelColor: Color(0xff333333),
           tabs: <Widget>[
             new Tab(
-              child: Text('     寻物      '),
+              child: BetterText('     寻物      '),
             ),
             new Tab(
-              child: Text('     招领      '),
+              child: BetterText('     招领      '),
             ),
           ],
           controller: _tabController,
@@ -84,9 +85,9 @@ class _LostFoundPageState extends State<LostFoundPage>
       body: new TabBarView(
         controller: _tabController,
         children: <Widget>[
-          new Center(child: new Text('自行车')),
-          new Center(child: new Text('船')),
-          // new Center(child: new Text('巴士')),
+          new Center(child: new BetterText('自行车')),
+          new Center(child: new BetterText('船')),
+          // new Center(child: new BetterText('巴士')),
         ],
       ),
     );

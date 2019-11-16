@@ -7,6 +7,7 @@ import 'package:finder/models/internship_item.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 const double AppBarHeight = 330;
 
@@ -251,7 +252,7 @@ class _CompanyPageState extends State<CompanyPage>
                     Container(
                       width: ScreenUtil.screenWidthDp - 140,
                       padding: EdgeInsets.only(left: 13, bottom: 8),
-                      child: Text(
+                      child: BetterText(
                         item.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -267,7 +268,7 @@ class _CompanyPageState extends State<CompanyPage>
                     ),
                     Padding(
                       padding: EdgeInsets.only(right: 10),
-                      child: Text(
+                      child: BetterText(
                         getTimeString(item.time),
                         textAlign: TextAlign.right,
                         style: TextStyle(
@@ -281,7 +282,7 @@ class _CompanyPageState extends State<CompanyPage>
                 Container(
                   padding: EdgeInsets.only(left: 13),
                   width: ScreenUtil.screenWidthDp,
-                  child: Text(
+                  child: BetterText(
                     item.salaryRange,
                     style: TextStyle(
                       color: Color(0xff777777),
@@ -322,7 +323,7 @@ class _CompanyPageState extends State<CompanyPage>
           decoration: BoxDecoration(
               color: Color.fromARGB(255, 244, 167, 131),
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(color: Colors.white),
           ),
@@ -421,7 +422,7 @@ class _CompanyPageState extends State<CompanyPage>
                             Padding(
                               padding: EdgeInsets.all(10),
                             ),
-                            Text("加载中..."),
+                            BetterText("加载中..."),
                           ],
                         ),
                       ),
@@ -475,7 +476,7 @@ class _CompanyPageState extends State<CompanyPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
+            BetterText(
               text,
               textAlign: TextAlign.left,
               style: TextStyle(
@@ -486,7 +487,7 @@ class _CompanyPageState extends State<CompanyPage>
             Padding(
               padding: EdgeInsets.all(8),
             ),
-            Text(
+            BetterText(
               info,
               style: TextStyle(color: Color(0xff444444)),
             ),
@@ -604,7 +605,7 @@ class CompanyPageHeader extends StatelessWidget {
               },
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              child: Text(
+              child: BetterText(
                 tabs[index],
                 style: index == selected ? selectedStyle : unSelectedStyle,
               ),
@@ -696,7 +697,7 @@ class CompanyPageHeader extends StatelessWidget {
             children: <Widget>[
               Container(
                 width: nameWidth,
-                child: Text(
+                child: BetterText(
                   companyMainInfo.name,
                   style: TextStyle(
                     fontSize: 18,
@@ -704,7 +705,7 @@ class CompanyPageHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
+              BetterText(
                 company == null ? "" : "${company.type} / ${company.size}人",
                 style: TextStyle(
                     color: Color(0xffeeeeee).withOpacity(avatarOpacity),

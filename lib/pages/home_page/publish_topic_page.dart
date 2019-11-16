@@ -8,6 +8,7 @@ import 'package:finder/provider/user_provider.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class PublishTopicPage extends StatefulWidget {
   @override
@@ -49,7 +50,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
     var onlySchool = Container(
       // margin: EdgeInsets.only(top: 20),
       child: ListTile(
-        title: Text("仅本校可见"),
+        title: BetterText("仅本校可见"),
         trailing: Switch(
           activeTrackColor: Theme.of(context).primaryColor,
           activeColor: Colors.white,
@@ -67,7 +68,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Colors.white,
-        title: Text(
+        title: BetterText(
           '创建话题',
           style: TextStyle(
             color: Colors.black,
@@ -89,7 +90,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                         CircularProgressIndicator(),
                         Padding(
                           padding: const EdgeInsets.only(top: 26.0),
-                          child: Text("正在发布，请稍后..."),
+                          child: BetterText("正在发布，请稍后..."),
                         )
                       ],
                     ),
@@ -107,7 +108,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                 handleSuccess();
               }
             },
-            child: Text(
+            child: BetterText(
               '发布',
               style: TextStyle(
                   color: Theme.of(context).primaryColor,
@@ -116,7 +117,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
             ),
           )
         ],
-        // title: Text('Finders'),
+        // title: BetterText('Finders'),
         elevation: 0,
       ),
       body: ListView(
@@ -202,7 +203,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                   backgroundColor:
                       Theme.of(context).primaryColor.withOpacity(0.5),
                   labelStyle: TextStyle(color: Colors.white),
-                  label: Text(val),
+                  label: BetterText(val),
                 );
               }).toList(),
             ),
@@ -301,7 +302,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                         color: Color(0xFFF0AA89),
                         size: ScreenUtil().setSp(100),
                       ),
-                      Text(
+                      BetterText(
                         '上传背景图',
                         style: TextStyle(
                             fontFamily: 'Poppins',
@@ -360,11 +361,11 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("提示"),
-            content: Text(errorHint),
+            title: BetterText("提示"),
+            content: BetterText(errorHint),
             actions: <Widget>[
               FlatButton(
-                child: Text("确认"),
+                child: BetterText("确认"),
                 onPressed: () => Navigator.of(context).pop(), //关闭对话框
               ),
             ],

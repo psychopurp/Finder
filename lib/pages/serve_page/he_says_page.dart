@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:finder/plugin/better_text.dart';
 
 import '../../public.dart';
 
@@ -133,7 +134,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text(
+        title: BetterText(
           "他 · 她说",
           style: TextStyle(
             color: appBarColor,
@@ -223,7 +224,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
             Padding(
               padding: EdgeInsets.all(10),
             ),
-            Text(error)
+            BetterText(error)
           ],
         ),
       );
@@ -242,7 +243,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
             Padding(
               padding: EdgeInsets.all(10),
             ),
-            Text("加载中...")
+            BetterText("加载中...")
           ],
         ),
       );
@@ -263,7 +264,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                     Padding(
                       padding: EdgeInsets.all(10),
                     ),
-                    Text("加载中"),
+                    BetterText("加载中"),
                   ],
                 )
               : GestureDetector(
@@ -284,7 +285,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                     color: Colors.white,
                     padding: EdgeInsets.only(top: 10, bottom: 10),
                     alignment: Alignment.center,
-                    child: Text("没有更多了"),
+                    child: BetterText("没有更多了"),
                   ),
                 ),
         ),
@@ -408,7 +409,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 15),
-                            child: Text(
+                            child: BetterText(
                               item.authorName,
                               style: TextStyle(
                                 fontSize: 17,
@@ -499,7 +500,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                   ),
                   Container(
                     constraints: BoxConstraints(maxWidth: 300),
-                    child: Text(
+                    child: BetterText(
                       item.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -592,7 +593,7 @@ class TimeSelector extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 15, right: 15),
-                    child: Text(
+                    child: BetterText(
                       time.year.toString() +
                           '-' +
                           time.month.toString() +
@@ -601,7 +602,7 @@ class TimeSelector extends StatelessWidget implements PreferredSizeWidget {
                       style: TextStyle(fontFamily: 'arail'),
                     ),
                   ),
-                  Text(
+                  BetterText(
                     '▼',
                     style: TextStyle(
                       fontSize: 9,
@@ -668,7 +669,7 @@ class LikeButton extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 5),
               ),
-              Text(
+              BetterText(
                 likeCount < 999 ? "$likeCount" : "999+",
                 style: TextStyle(
                     color: isLike ? ActionColor : notLikeColor ?? Colors.grey),

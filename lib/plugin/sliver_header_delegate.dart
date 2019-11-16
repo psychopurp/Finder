@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class SliverCustomHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double collapsedHeight;
@@ -73,7 +74,7 @@ class SliverCustomHeaderDelegate extends SliverPersistentHeaderDelegate {
                         ),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      Text(
+                      BetterText(
                         this.title,
                         style: TextStyle(
                           fontSize: 20,

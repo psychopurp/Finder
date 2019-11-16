@@ -9,6 +9,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class MoreActivities extends StatefulWidget {
   @override
@@ -59,7 +60,7 @@ class _MoreActivitiesState extends State<MoreActivities>
                   color: Colors.black,
                   fontFamily: 'Poppins',
                   fontSize: ScreenUtil().setSp(45))),
-          title: Text('知 · 活动'),
+          title: BetterText('知 · 活动'),
           actions: <Widget>[
             MaterialButton(
               child: Icon(Icons.search),
@@ -83,7 +84,7 @@ class _MoreActivitiesState extends State<MoreActivities>
             indicatorWeight: 3,
             tabs: this.activityTypes.data.map((item) {
               return Tab(
-                child: Text(
+                child: BetterText(
                   item.name,
                   style: TextStyle(
                       fontSize: ScreenUtil().setSp(30),
@@ -305,7 +306,7 @@ class _ChildActivitiesState extends State<ChildActivities>
                     Container(
                       // color: Colors.cyan,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '#' + item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -320,7 +321,7 @@ class _ChildActivitiesState extends State<ChildActivities>
 
                     Container(
                       padding: EdgeInsets.only(top: 10),
-                      child: Text(
+                      child: BetterText(
                         '主办方：' + item.sponsor,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -336,7 +337,7 @@ class _ChildActivitiesState extends State<ChildActivities>
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.only(bottom: 10, top: 5),
-                      child: Text(
+                      child: BetterText(
                         '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -352,7 +353,7 @@ class _ChildActivitiesState extends State<ChildActivities>
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '活动地点：' + item.place,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

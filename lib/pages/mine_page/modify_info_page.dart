@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class ModifyInfoPage extends StatefulWidget {
   @override
@@ -270,7 +271,7 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("修改个人信息"),
+        title: BetterText("修改个人信息"),
         centerTitle: true,
         leading: Container(),
         actions: <Widget>[
@@ -483,7 +484,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                 padding: EdgeInsets.symmetric(horizontal: 13),
                 child: Row(
                   children: <Widget>[
-                    Text(
+                    BetterText(
                       widget.verbose,
                       style: TextStyle(
                         fontSize: 13,
@@ -563,7 +564,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                         onPressed: () {
                           close();
                         },
-                        child: Text(
+                        child: BetterText(
                           "取消",
                           style: TextStyle(color: Color(0xff999999)),
                         ),
@@ -575,7 +576,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                           (widget.onChange ?? (b) {})(_tempSelected);
                           close();
                         },
-                        child: Text(
+                        child: BetterText(
                           "确定",
                         ),
                         minWidth: 10,
@@ -618,7 +619,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
                   ? Color.fromARGB(255, 204, 204, 204)
                   : Theme.of(context).accentColor,
               borderRadius: BorderRadius.circular(15)),
-          child: Text(
+          child: BetterText(
             tag,
             style: TextStyle(
               color: Colors.white,

@@ -9,6 +9,7 @@ import 'package:flutter_easyrefresh/material_footer.dart';
 import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:finder/plugin/better_text.dart';
 
 class UserActivityPage extends StatefulWidget {
   final int userId;
@@ -160,7 +161,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                     Container(
                       // color: Colors.cyan,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '#' + item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -176,7 +177,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                     ///主办方
                     Container(
                       padding: EdgeInsets.only(top: 10),
-                      child: Text(
+                      child: BetterText(
                         '主办方：' + item.sponsor,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -192,7 +193,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.only(bottom: 10, top: 5),
-                      child: Text(
+                      child: BetterText(
                         '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -208,7 +209,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                     Container(
                       // color: Colors.amber,
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      child: Text(
+                      child: BetterText(
                         '活动地点：' + item.place,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -246,15 +247,15 @@ class _UserActivityPageState extends State<UserActivityPage> {
                 context: context,
                 builder: (_) {
                   return AlertDialog(
-                    title: Text("提示"),
-                    content: Text("确认要删除此活动吗? "),
+                    title: BetterText("提示"),
+                    content: BetterText("确认要删除此活动吗? "),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text("取消"),
+                        child: BetterText("取消"),
                         onPressed: () => Navigator.of(context).pop(), // 关闭对话框
                       ),
                       FlatButton(
-                          child: Text("删除"),
+                          child: BetterText("删除"),
                           onPressed: () async {
                             FinderDialog.showLoading();
                             var data = await apiClient.deleteActivity(

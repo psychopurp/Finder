@@ -7,6 +7,7 @@ import 'package:finder/models/recruit_model.dart';
 import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:finder/plugin/better_text.dart';
 
 import '../../public.dart';
 
@@ -94,7 +95,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
         centerTitle: true,
         brightness: Brightness.light,
         backgroundColor: Colors.white,
-        title: Text(
+        title: BetterText(
           "应聘者",
           style: TextStyle(color: appBarColor, fontSize: 20),
         ),
@@ -106,7 +107,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
           if (item.status != CandidateItem.waiting) {
             status = Container(
               padding: EdgeInsets.only(left: 20),
-              child: Text(
+              child: BetterText(
                 "状态: ${item.status == CandidateItem.accept ? "接受" : "拒绝"}",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -117,7 +118,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   MaterialButton(
-                    child: Text(
+                    child: BetterText(
                       "接受",
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
@@ -129,7 +130,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
                     padding: EdgeInsets.all(10),
                   ),
                   MaterialButton(
-                    child: Text("拒绝"),
+                    child: BetterText("拒绝"),
                     onPressed: () {
                       postData(item, false);
                     },
@@ -139,7 +140,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
             } else {
               status = Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text(
+                child: BetterText(
                   "状态: 等待",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
@@ -205,7 +206,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 20),
-                            child: Text(
+                            child: BetterText(
                               item.user.nickname,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -224,7 +225,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(right: 10),
-                      child: Text(
+                      child: BetterText(
                         getTimeString(item.time),
                         textAlign: TextAlign.right,
                         style: TextStyle(
@@ -243,7 +244,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                  child: Text(item.information),
+                  child: BetterText(item.information),
                 ),
                 status,
                 Container(
