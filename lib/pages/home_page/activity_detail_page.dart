@@ -174,7 +174,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
                     Container(
                       padding: EdgeInsets.only(top: 10),
-                      child: BetterText(
+                      child: Text(
                         '主办方：' + activity.sponsor,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -412,11 +412,12 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       color: Theme.of(context).primaryColor, fontSize: 18),
                   textAlign: TextAlign.left,
                 ),
-                Padding(padding: EdgeInsets.all(20),),
+                Padding(
+                  padding: EdgeInsets.all(20),
+                ),
                 BetterText(activity.description)
               ],
-            )
-            ),
+            )),
       ),
     );
 
