@@ -190,7 +190,7 @@ class ApiClient {
     var formData = {'query': query, 'page': page};
     if (typeId != null && typeId != -1) formData.addAll({'type_id': typeId});
     if (activityId != null) formData = {'activity_id': activityId};
-    print(formData);
+    print('正在获取话题=======$formData');
     try {
       Response response = await dio.get(
         'get_activities/',

@@ -86,13 +86,13 @@ class ActivityModelData {
     description = json['description'];
     signUpLocation = json['sign_up_location'];
     position = json['position'];
-    print("$title ======================= ${json['types']}");
+    // print("$title ======================= ${json['types']}");
     if (json['types'] != null) {
       types = new List<ActivityTypesModelData>();
       json['types'].forEach((v) {
         types.add(new ActivityTypesModelData.fromJson(v));
       });
-    }else
+    } else
       types = [];
     if (json['tags'] != null) {
       tags = new List<TagModel>();
@@ -100,8 +100,6 @@ class ActivityModelData {
         tags.add(new TagModel.fromJson(v));
       });
     }
-
-
   }
 
   @override
@@ -189,6 +187,4 @@ class ActivityTypesModelData {
   String toString() {
     return "$name";
   }
-
-
 }

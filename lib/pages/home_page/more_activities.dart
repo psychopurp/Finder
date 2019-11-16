@@ -212,24 +212,24 @@ class _ChildActivitiesState extends State<ChildActivities>
   Future getData({int pageCount}) async {
     List<ActivityModelData> temp = [];
     bool hasMore;
-    if (this.activities.length == 0) {
-      for (int i = 1; i <= pageCount; i++) {
-        var data =
-            await apiClient.getActivities(page: i, typeId: activityType.id);
-        print(data['total_page']);
-        ActivityModel activities = ActivityModel.fromJson(data);
-        hasMore = activities.hasMore;
-        temp.addAll(activities.data);
-      }
-      this.pageCount = pageCount;
-    } else {
-      var data = await apiClient.getActivities(
-          page: this.pageCount, typeId: activityType.id);
-      ActivityModel activities = ActivityModel.fromJson(data);
-      print(data['total_page']);
-      hasMore = activities.hasMore;
-      temp.addAll(activities.data);
-    }
+    // if (this.activities.length == 0) {
+    //   for (int i = 1; i <= pageCount; i++) {
+    //     var initData =
+    //         await apiClient.getActivities(page: i, typeId: activityType.id);
+    //     print(initData['total_page']);
+    //     ActivityModel initActivities = ActivityModel.fromJson(initData);
+    //     hasMore = initActivities.hasMore;
+    //     temp.addAll(initActivities.data);
+    //   }
+    //   this.pageCount = pageCount;
+    // } else {
+    var moreData = await apiClient.getActivities(
+        page: this.pageCount, typeId: activityType.id);
+    ActivityModel moreActivities = ActivityModel.fromJson(moreData);
+    print(moreData['data'].length);
+    hasMore = moreActivities.hasMore;
+    temp.addAll(moreActivities.data);
+    // }
 
     if (!mounted) return;
     setState(() {
