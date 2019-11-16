@@ -1,6 +1,7 @@
 import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/message_model.dart';
+import 'package:finder/plugin/course_table.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
 import 'package:finder/routers/application.dart';
@@ -94,6 +95,7 @@ class ProfileDrawer extends StatelessWidget {
                 Global.token = "";
                 await MessageModel().cancelTimer();
                 await MessageModel().reset();
+                Eamis().clear();
                 ApiClient.dio.options.headers['token'] = "";
                 var prefs = await SharedPreferences.getInstance();
                 prefs.clear();

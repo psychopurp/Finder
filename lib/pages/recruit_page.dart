@@ -161,7 +161,7 @@ class _RecruitPageState extends State<RecruitPage> {
   Widget get banner {
     return Container(
       padding: EdgeInsets.only(bottom: 15.0),
-      height: ScreenUtil().setHeight(392),
+      height: ScreenUtil.screenWidthDp * 0.6,
       width: double.infinity,
       color: Colors.white,
       child: Swiper(
@@ -191,7 +191,7 @@ class _RecruitPageState extends State<RecruitPage> {
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 image: DecorationImage(
                   image: imageProvider,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.cover ,
                 ),
               ),
             ),

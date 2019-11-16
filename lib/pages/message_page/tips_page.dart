@@ -45,15 +45,24 @@ class _TipsPageState extends State<TipsPage> {
         elevation: 0,
         centerTitle: true,
         actions: <Widget>[
-          MaterialButton(
-            minWidth: 10,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Icon(IconData(0xe609, fontFamily: 'clear'),
-                color: Colors.white),
-            onPressed: () {
-              data.readTips();
-            },
+          Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: InkWell(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              child: Icon(IconData(0xe609, fontFamily: 'clear'),
+                  color: Colors.white),
+              onTap: () {
+                data.readTips();
+              },
+              onLongPress: () {
+                setState(() {
+                  data.tips = [];
+                  data.updateTipsCount();
+                  data.save();
+                });
+              },
+            ),
           )
         ],
       ),

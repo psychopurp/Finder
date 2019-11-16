@@ -59,9 +59,9 @@ class FollowerModelData {
     nickname = json['nickname'];
     avatar = Avatar.getImageUrl(json['avatar']);
     introduction = (json['introduction'] != null) ? json['introduction'] : "";
-    isBothFollowed = json['is_both_followed'];
+    isBothFollowed = json['is_both_followed'] ?? false;
     // print(json['isFollowed']);
-    isFollowed = json['is_followed'];
+    isFollowed = json['is_followed'] ?? false;
 
     // print(isFollowed);
     if (isBothFollowed != null) {

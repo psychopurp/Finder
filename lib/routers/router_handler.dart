@@ -17,6 +17,7 @@ import 'package:finder/pages/recruit_page/engage_page.dart';
 import 'package:finder/pages/recruit_page/publish_page.dart';
 import 'package:finder/pages/recruit_page/recommend_recruit_detail_page.dart';
 import 'package:finder/pages/recruit_page/recruit_detail_page.dart';
+import 'package:finder/pages/serve_page/course_table_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/lead_say_detail_page.dart';
 import 'package:finder/pages/serve_page/he_says_page/publish_say_to_he_only_page.dart';
 import 'package:finder/pages/serve_page/internship_page.dart';
@@ -280,6 +281,11 @@ var changeUserProfilePageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ChangeProfilePage();
 });
+
+var courseTablePageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return CourseTablePage();
+    });
 //条款
 var privacyHandle = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {

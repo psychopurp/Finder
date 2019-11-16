@@ -137,7 +137,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                     width: ScreenUtil().setWidth(375),
                     // alignment: Alignment.centerRight,
                     // margin: EdgeInsets.only(left: 50, right: 50),
-                    child: (topicComment.isLike)
+                    child: (topicComment.isLike ?? false)
                         ? Tab(
                             // text: ' ' + this.topicComment.likes.toString(),
                             icon: Row(

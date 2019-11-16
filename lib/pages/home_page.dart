@@ -2,6 +2,7 @@ import 'package:finder/pages/home_page/home_page_banner.dart';
 import 'package:finder/pages/home_page/home_page_topics.dart';
 import 'package:finder/pages/home_page/home_page_activity.dart';
 import 'package:finder/plugin/callback.dart';
+import 'package:finder/routers/routes.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finder/config/api_client.dart';
@@ -22,43 +23,109 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static var formData;
   bool atHear = true;
+  Offset first;
+  Offset last;
+  bool down;
+  bool hold;
+  DateTime holdTime;
+  ScrollController _controller;
 
   @override
   void initState() {
     print('homepage setstate');
     _getHomePageData();
+    _controller = ScrollController();
     super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     // final user = Provider.of<UserProvider>(context);
     return Scaffold(
-        appBar: AppBar(
-          leading: MaterialButton(
-            padding: EdgeInsets.all(0),
-            // color: Colors.yellow,
-            shape: CircleBorder(),
-            child: Icon(
-              Icons.menu,
-              color: Colors.white,
-              size: 30,
-            ),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+      appBar: AppBar(
+        leading: MaterialButton(
+          padding: EdgeInsets.all(0),
+          // color: Colors.yellow,
+          shape: CircleBorder(),
+          child: Icon(
+            Icons.menu,
+            color: Colors.white,
+            size: 30,
           ),
-          title: Text(
-            'Finders',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 19,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          centerTitle: true,
+          onPressed: () => Scaffold.of(context).openDrawer(),
         ),
-        backgroundColor: Colors.white,
-        // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
-        body: body);
+        title: Text(
+          'Finders',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 19,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.white,
+      // backgroundColor: Color.fromRGBO(0, 0, 0, 0.03),
+      body: Stack(
+        children: <Widget>[
+          body,
+          Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (detail) {
+              if(_controller.offset < 10){
+                first = detail.position;
+              }
+            },
+            onPointerMove: (detail) {
+              if (down == null && first != null) {
+                Offset diff = detail.position - first;
+                down = diff.dx.abs() < diff.dy.abs() && diff.dy > 0;
+                last = detail.position;
+              } else {
+                if (down == null) {
+                } else if (down) {
+                  Offset diff = detail.position - last;
+                  if ((diff.dy < -1)) {
+                    holdTime = null;
+                    down = null;
+                    first = null;
+                  } else if ((detail.position - last).distance < 5) {
+                    if (holdTime == null) {
+                      holdTime = DateTime.now();
+                    }else{
+                      DateTime now = DateTime.now();
+                      if(now.difference(holdTime).inMilliseconds > 300){
+                        Navigator.pushNamed(context, Routes.courseTablePage);
+                        holdTime = null;
+                        down = null;
+                        first = null;
+                      }
+                    }
+                  } else {
+                    holdTime = null;
+                  }
+                  last = detail.position;
+                }
+              }
+            },
+            onPointerUp: (detail) {
+              down = null;
+            },
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget get body {
@@ -73,6 +140,7 @@ class _HomePageState extends State<HomePage> {
       child = EasyRefresh(
         header: MaterialHeader(),
         child: ListView(
+          controller: _controller,
           children: <Widget>[
             HomePageBanner(formData['banner']),
             Padding(
