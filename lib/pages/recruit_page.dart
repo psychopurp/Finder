@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/config/global.dart';
 import 'package:finder/models/topic_comments_model.dart';
+import 'package:finder/plugin/drop_down_selector.dart';
 import 'package:finder/plugin/drop_down_text.dart';
 import 'package:finder/plugin/list_builder.dart';
 import 'package:finder/models/recruit_model.dart';
@@ -105,7 +106,11 @@ class _RecruitPageState extends State<RecruitPage> {
       if (_bannerData.length != 0) {
         preItems.add(banner);
       }
-      preItems.add(Filter(onChange: changeType));
+      preItems.add(DropDownSelector<RecruitTypesModelData>(
+        onChange: changeType,
+        nowType: _nowType,
+        types: _types,
+      ));
       if (_data.length == 0) {
         preItems.add(Center(
           child: Container(
@@ -192,7 +197,7 @@ class _RecruitPageState extends State<RecruitPage> {
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 image: DecorationImage(
                   image: imageProvider,
-                  fit: BoxFit.cover ,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -373,7 +378,7 @@ class _RecruitPageState extends State<RecruitPage> {
     );
   }
 
-  Future<void> changeType(RecruitTypesModelData type) async {
+  Future<void> changeType(DropDownItem type) async {
     setState(() {
       _data = [];
       this._nowPage = 1;
@@ -392,7 +397,7 @@ class _RecruitPageState extends State<RecruitPage> {
     data = await apiClient.getRecruits(query);
     RecruitModel recruits = RecruitModel.fromJson(data);
     if (recruits.status) {
-      if(refresh){
+      if (refresh) {
         _data = [];
       }
       _nowPage += 1;
@@ -413,7 +418,7 @@ class _RecruitPageState extends State<RecruitPage> {
       Response response = await dio.get(url);
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
-        if(refresh){
+        if (refresh) {
           _bannerData = [];
         }
         setState(() {
@@ -609,213 +614,3 @@ String getTimeString(DateTime time) {
 }
 
 String _addZero(int value) => value < 10 ? "0$value" : "$value";
-
-typedef FilterChangeCallBack = void Function(RecruitTypesModelData);
-
-class Filter extends StatefulWidget {
-  Filter({this.onChange});
-
-  final FilterChangeCallBack onChange;
-
-  @override
-  _FilterState createState() => _FilterState();
-}
-
-class _FilterState extends State<Filter> with TickerProviderStateMixin {
-  bool isOpen = false;
-
-  List<RecruitTypesModelData> get _types => _RecruitPageState._types;
-
-  RecruitTypesModelData get _nowType => _RecruitPageState._nowType;
-
-  RecruitTypesModelData _tempType;
-  AnimationController _animationController;
-  AnimationController _rotateController;
-  Animation _rotateAnimation;
-  Animation _animation;
-  Animation _curve;
-
-  double _oldHeight = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _tempType = _nowType;
-    const Duration duration = Duration(milliseconds: 300);
-    _animationController = AnimationController(vsync: this, duration: duration);
-    _rotateController = AnimationController(vsync: this, duration: duration);
-    _animationController.addListener(() {
-      setState(() {});
-    });
-    _curve =
-        CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
-    _animation = Tween<double>(begin: 0, end: 1).animate(_curve);
-    _rotateAnimation = Tween<double>(begin: 0, end: pi / 2).animate(
-        CurvedAnimation(curve: Curves.easeInOut, parent: _rotateController));
-  }
-
-  Future<void> changeHeightTo(height) async {
-    double oldHeight = _oldHeight;
-    _animationController.reset();
-    _animation = Tween<double>(begin: oldHeight, end: height).animate(_curve);
-    await _animationController.forward();
-    _oldHeight = height;
-  }
-
-  Future<void> changeHeight() async {
-    int length = _types.length; // 获取较大的列表长度
-    double height = (length / 3).ceil() * 65.0 + 31;
-    await changeHeightTo(height);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _animationController.dispose();
-    _rotateController.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget child;
-    child = Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      margin: EdgeInsets.symmetric(vertical: 5),
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              getTag(_nowType.name),
-              Expanded(
-                flex: 1,
-                child: Container(),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  if (!isOpen) {
-                    open();
-                  } else {
-                    close();
-                  }
-                },
-                minWidth: 10,
-                padding: EdgeInsets.symmetric(horizontal: 13),
-                child: Row(
-                  children: <Widget>[
-                    BetterText(
-                      "修改分类",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Color(0xff444444),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(3),
-                    ),
-                    Transform.rotate(
-                      angle: _rotateAnimation.value,
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 11,
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-          Container(
-            height: _animation.value,
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
-              child: Column(
-                children: <Widget>[
-                  Wrap(
-                    children: List<Widget>.generate(
-                        _types.length,
-                        (index) => GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _tempType = _types[index];
-                                });
-                              },
-                              child: getTag(_types[index].name,
-                                  select: _types[index].id == _tempType.id),
-                            )),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      MaterialButton(
-                        onPressed: () {
-                          close();
-                        },
-                        child: BetterText(
-                          "取消",
-                          style: TextStyle(color: Color(0xff999999)),
-                        ),
-                        minWidth: 10,
-                      ),
-                      MaterialButton(
-                        textColor: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          (widget.onChange ?? (b) {})(_tempType);
-                          close();
-                        },
-                        child: BetterText(
-                          "确定",
-                        ),
-                        minWidth: 10,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-    return child;
-  }
-
-  Future<void> close() async {
-    _rotateController.reverse();
-    await changeHeightTo(0.0);
-    _tempType = _nowType;
-    isOpen = false;
-    setState(() {});
-  }
-
-  Future<void> open() async {
-    _tempType = _nowType;
-    _rotateController.forward();
-    await changeHeight();
-    isOpen = true;
-  }
-
-  Widget getTag(String tag, {bool select = true}) {
-    return Builder(
-      builder: (context) {
-        return Container(
-          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-          decoration: BoxDecoration(
-              color: !select
-                  ? Color.fromARGB(255, 204, 204, 204)
-                  : Theme.of(context).accentColor,
-              borderRadius: BorderRadius.circular(15)),
-          child: BetterText(
-            tag,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}

@@ -2,6 +2,7 @@ import 'package:finder/models/message_model.dart';
 import 'package:finder/models/tag_model.dart';
 import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/plugin/drop_down_selector.dart';
 
 class RecruitModel {
   List<RecruitModelData> data;
@@ -145,7 +146,7 @@ class RecruitTypesModel {
   }
 }
 
-class RecruitTypesModelData {
+class RecruitTypesModelData extends DropDownItem {
   int id;
   String name;
 

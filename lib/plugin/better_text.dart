@@ -107,6 +107,17 @@ class _BetterTextState extends State<BetterText> {
       },
     );
   }
+
+  @override
+  void didUpdateWidget(BetterText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(oldWidget.text != widget.text){
+      texts = [];
+      splitText(widget.text);
+    }
+  }
+
+
 }
 
 class _TextItem {
