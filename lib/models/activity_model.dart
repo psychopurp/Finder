@@ -50,10 +50,16 @@ class ActivityModelData {
   List<ActivityTypesModelData> types;
   List<TagModel> tags;
 
+  ///上传用的属性
+  List<String> tagsString;
+  List<int> typeId;
+
   ActivityModelData(
       {this.id,
       this.isCollected,
       this.title,
+      this.tagsString,
+      this.typeId,
       this.senderId,
       this.sponsor,
       this.startTime,
@@ -76,7 +82,6 @@ class ActivityModelData {
     startTime = json['start_time'] != null
         ? timestampToDateTime(json["start_time"])
         : null;
-
     endTime =
         json['end_time'] != null ? timestampToDateTime(json["end_time"]) : null;
 
@@ -125,6 +130,23 @@ class ActivityModelData {
     }
     if (this.tags != null) {
       data['tags'] = this.tags.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+
+  Map<String, dynamic> toUpLoadJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['title'] = this.title;
+    data['sponsor'] = this.sponsor;
+    data['start_time'] = getTime(dateTime: this.startTime);
+    data['end_time'] = getTime(dateTime: this.endTime);
+    data['place'] = this.place;
+    data['poster'] = this.poster;
+    data['description'] = this.description;
+    data['sign_up_location'] = this.signUpLocation;
+    data['type_ids'] = this.typeId;
+    if (this.tagsString != null) {
+      data['tags'] = this.tagsString;
     }
     return data;
   }

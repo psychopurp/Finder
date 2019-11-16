@@ -85,32 +85,6 @@ class UserProvider with ChangeNotifier {
     return data;
   }
 
-  ///用户发布活动
-  Future addActivity(
-      {String sponsor,
-      String title,
-      String place,
-      String poster,
-      List<String> tags,
-      String startTime,
-      String endTime,
-      String description,
-      List<int> typeId,
-      int associationId}) async {
-    var data = await apiClient.addActivity(
-        sponsor: sponsor,
-        title: title,
-        place: place,
-        poster: poster,
-        tags: tags,
-        typeId: typeId,
-        associationId: associationId,
-        startTime: startTime,
-        endTime: endTime,
-        description: description);
-    return data;
-  }
-
   ///关注
   Future addFollower({int userId}) async {
     var data = await apiClient.addFollowUser(userId: userId);

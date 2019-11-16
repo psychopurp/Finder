@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:finder/config/global.dart';
+import 'package:finder/models/activity_model.dart';
 import 'package:finder/models/user_model.dart';
 
 class ApiClient {
@@ -300,17 +301,7 @@ class ApiClient {
   }
 
   ///用户发布活动
-  Future addActivity(
-      {String sponsor,
-      String title,
-      String place,
-      String poster,
-      List<String> tags,
-      String startTime,
-      String endTime,
-      List<int> typeId,
-      String description,
-      int associationId}) async {
+  Future addActivity({ActivityModelData activity}) async {
     /**
     sponsor: str
     association_id可以不给 给了是社团活动
@@ -324,24 +315,10 @@ class ApiClient {
     type:int 是活动类型
          */
 
-    var formData = {
-      'title': title,
-      'place': place,
-      'poster': poster,
-      'start_time': startTime,
-      'end_time': endTime,
-      'description': description,
-      'tags': tags,
-      'type_ids': typeId,
-      'sponsor': sponsor
-    };
-    if (associationId != null) {
-      formData.addAll({'association_id': associationId});
-    }
-    print(jsonEncode(formData));
+    var formData = activity.toUpLoadJson();
+    print(formData);
     try {
-      Response response =
-          await dio.post('add_activity/', data: jsonEncode(formData));
+      Response response = await dio.post('add_activity/', data: formData);
       print('发布活动成功==========>${response.data}');
       return response.data;
     } catch (e) {

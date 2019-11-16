@@ -1,26 +1,26 @@
 import 'package:bot_toast/bot_toast.dart';
-import 'package:clipboard_manager/clipboard_manager.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:clipboard_manager/clipboard_manager.dart';
 
 class BetterText extends StatefulWidget {
   BetterText(
-      this.text, {
-        Key key,
-        this.urlStyle,
-        this.style,
-        this.strutStyle,
-        this.textAlign,
-        this.textDirection,
-        this.locale,
-        this.softWrap,
-        this.overflow,
-        this.textScaleFactor,
-        this.maxLines,
-        this.semanticsLabel,
-        this.textWidthBasis,
-      }) : super(key: key);
+    this.text, {
+    Key key,
+    this.urlStyle,
+    this.style,
+    this.strutStyle,
+    this.textAlign,
+    this.textDirection,
+    this.locale,
+    this.softWrap,
+    this.overflow,
+    this.textScaleFactor,
+    this.maxLines,
+    this.semanticsLabel,
+    this.textWidthBasis,
+  }) : super(key: key);
   final TextStyle style;
   final StrutStyle strutStyle;
   final TextAlign textAlign;
@@ -41,7 +41,7 @@ class BetterText extends StatefulWidget {
 
 class _BetterTextState extends State<BetterText> {
   static final RegExp urlReg =
-  RegExp(r"https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
+      RegExp(r"https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
   List<_TextItem> texts = [];
 
   @override
@@ -71,18 +71,18 @@ class _BetterTextState extends State<BetterText> {
         TextSpan(
             children: List<InlineSpan>.generate(
                 texts.length,
-                    (index) => !texts[index].type
+                (index) => !texts[index].type
                     ? TextSpan(text: texts[index].text)
                     : TextSpan(
-                    text: texts[index].text,
-                    style: widget.urlStyle ??
-                        const TextStyle(color: Colors.blue),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () async {
-                        if (await canLaunch(texts[index].text)) {
-                          launch(texts[index].text);
-                        }
-                      }))),
+                        text: texts[index].text,
+                        style: widget.urlStyle ??
+                            const TextStyle(color: Colors.blue),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () async {
+                            if (await canLaunch(texts[index].text)) {
+                              launch(texts[index].text);
+                            }
+                          }))),
         style: widget.style,
         textAlign: widget.textAlign,
         maxLines: widget.maxLines,

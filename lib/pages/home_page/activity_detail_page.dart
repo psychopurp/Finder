@@ -412,11 +412,18 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       color: Theme.of(context).primaryColor, fontSize: 18),
                   textAlign: TextAlign.left,
                 ),
-                Padding(padding: EdgeInsets.all(20),),
-                BetterText(activity.description)
+                Padding(
+                  padding: EdgeInsets.all(20),
+                ),
+                BetterText(activity.description),
+                (activity.signUpLocation.length > 5)
+                    ? Container(
+                        padding: EdgeInsets.only(top: 20),
+                        child: BetterText(activity.signUpLocation),
+                      )
+                    : Container()
               ],
-            )
-            ),
+            )),
       ),
     );
 

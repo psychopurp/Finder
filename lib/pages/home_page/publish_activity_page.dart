@@ -667,28 +667,27 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
       errorHint = "请输入活动地点";
       return false;
     }
+
+    String signUpLocation = _linkInputController.text;
+
     String description = _descriptionInputController.text;
     if (description == null || description == "") {
       errorHint = "请输入活动详情";
       return false;
     }
-
-    var data = await user.addActivity(
+    ActivityModelData activity = ActivityModelData(
         title: title,
         place: place,
-        poster: imagePath.split('/')[2],
+        poster: imagePath,
         description: description,
         typeId: [this.selectedActivityTypeValue],
-        startTime: getTime(
-            month: startDateTime.month,
-            day: startDateTime.day,
-            year: startDateTime.year),
-        endTime: getTime(
-            month: endDateTime.month,
-            day: endDateTime.day,
-            year: endDateTime.year),
-        tags: tags,
-        sponsor: sponsor);
+        startTime: this.startDateTime,
+        endTime: this.endDateTime,
+        tagsString: this.tags,
+        sponsor: sponsor,
+        signUpLocation: signUpLocation);
+
+    var data = await apiClient.addActivity(activity: activity);
 
     if (!data["status"]) {
       errorHint = '接口错误：' + data["error"];
