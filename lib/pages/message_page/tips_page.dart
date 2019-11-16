@@ -50,11 +50,12 @@ class _TipsPageState extends State<TipsPage> {
             child: InkWell(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              child: Icon(IconData(0xe609, fontFamily: 'clear'), color: Colors.white),
+              child: Icon(IconData(0xe609, fontFamily: 'clear'),
+                  color: Colors.white),
               onTap: () {
                 data.readTips();
               },
-              onLongPress: (){
+              onLongPress: () {
                 setState(() {
                   data.tips = [];
                   data.updateTipsCount();
@@ -219,19 +220,17 @@ class _TipsPageState extends State<TipsPage> {
         break;
       case "topic":
         var item = await getTopic(id);
+        print(
+            "topic  ${item.title}  ============================================");
         if (item != null) {
           Application.router.navigateTo(context,
               '/home/topicDetail?id=${item.id.toString()}&title=${Uri.encodeComponent(item.title)}&image=${Uri.encodeComponent(item.image)}');
         }
         break;
       case "topic_comment":
-        var item  = await getTopicCommentData(id);
-        var formData = {
-          'item': item,
-          'topicId': item.topicId,
-          'topicTitle': item.topicTitle
-        };
-        print("formData $formData ============================================");
+        var item = await getTopicCommentData(id);
+
+        print("formData ${item} ============================================");
         Navigator.pushNamed(context, Routes.topicCommentDetail,
             arguments: item);
         break;
@@ -245,17 +244,18 @@ class _TipsPageState extends State<TipsPage> {
         Navigator.of(context).pushNamed(Routes.heSays);
         break;
       case "user":
-        Application.router.navigateTo(context,
-            "${Routes.userProfile}?senderId=$id&heroTag=user:$id");
+        Application.router.navigateTo(
+            context, "${Routes.userProfile}?senderId=$id&heroTag=user:$id");
     }
   }
 
   Future<TopicCommentsModelData> getTopicCommentData(int id) async {
     try {
       Dio dio = ApiClient.dio;
-      Response response =
-      await dio.get('get_topic_comment/', queryParameters: {"comment_id": id});
+      Response response = await dio
+          .get('get_topic_comment/', queryParameters: {"comment_id": id});
       Map<String, dynamic> result = response.data;
+      print(result['data']);
       if (result["status"]) {
         return TopicCommentsModelData.fromJson(result["data"]);
       }
@@ -282,6 +282,7 @@ class _TipsPageState extends State<TipsPage> {
       Response response =
           await dio.get('get_lead_he_she_say/', queryParameters: {"id": id});
       Map<String, dynamic> result = response.data;
+
       if (result["status"]) {
         return HeSheSayItem.fromJson(result["data"][0]);
       }
@@ -290,6 +291,7 @@ class _TipsPageState extends State<TipsPage> {
     }
     return null;
   }
+
   Future<TopicModelData> getTopic(int id) async {
     try {
       Dio dio = ApiClient.dio;
