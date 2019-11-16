@@ -8,11 +8,11 @@ class FollowerModel {
 
   FollowerModel({this.data, this.totalPage, this.status, this.hasMore});
 
-  FollowerModel.fromJson(Map<String, dynamic> json, bool isFollow) {
+  FollowerModel.fromJson(Map<String, dynamic> json, bool isFan) {
     if (json['data'] != null) {
       data = new List<FollowerModelData>();
       json['data'].forEach((v) {
-        data.add(new FollowerModelData.fromJson(v, isFollow));
+        data.add(new FollowerModelData.fromJson(v, isFan));
       });
     }
     totalPage = json['total_page'];
@@ -41,6 +41,7 @@ class FollowerModelData {
   String avatar;
   String introduction;
   bool isBothFollowed;
+  bool isFollowed;
 
   int status;
 
@@ -50,28 +51,43 @@ class FollowerModelData {
       this.avatar,
       this.status,
       this.introduction,
+      this.isFollowed,
       this.isBothFollowed});
 
-  FollowerModelData.fromJson(Map<String, dynamic> json, bool isFollow) {
+  FollowerModelData.fromJson(Map<String, dynamic> json, bool isFan) {
     id = json['id'];
     nickname = json['nickname'];
     avatar = Avatar.getImageUrl(json['avatar']);
-    introduction = json['introduction'];
-    isBothFollowed = json['is_both_followed'];
+    introduction = (json['introduction'] != null) ? json['introduction'] : "";
+    isBothFollowed = json['is_both_followed'] ?? false;
+    // print(json['isFollowed']);
+    isFollowed = json['is_followed'] ?? false;
 
-    if (isFollow) {
+    // print(isFollowed);
+    if (isBothFollowed != null) {
       if (isBothFollowed) {
         status = BOTHFOLLOW;
-      } else {
+      } else if (isFollowed) {
         status = FOLLOWED;
-      }
-    } else {
-      if (isBothFollowed) {
-        this.status = BOTHFOLLOW;
       } else {
-        this.status = FOLLOW;
+        status = FOLLOW;
       }
     }
+    // if (isFan) {
+    //   ///粉丝页
+    //   if (isBothFollowed) {
+    //     status = BOTHFOLLOW;
+    //   } else {
+    //     status = FOLLOW;
+    //   }
+    // } else {
+    //   ///关注页
+    //   if (isBothFollowed) {
+    //     this.status = BOTHFOLLOW;
+    //   } else {
+    //     this.status = FOLLOWED;
+    //   }
+    // }
   }
 
   Map<String, dynamic> toJson() {
@@ -81,6 +97,7 @@ class FollowerModelData {
     data['avatar'] = this.avatar;
     data['introduction'] = this.introduction;
     data['is_both_followed'] = this.isBothFollowed;
+    data['isFollowed'] = this.isFollowed;
     return data;
   }
 }

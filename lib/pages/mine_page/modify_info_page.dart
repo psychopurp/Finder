@@ -138,7 +138,7 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
     _realNameController = TextEditingController();
     _studentIdController = TextEditingController();
     _introductionController = TextEditingController();
-    Future.delayed(Duration(milliseconds: 400), (){
+    Future.delayed(Duration(milliseconds: 400), () {
       UserModel user = Provider.of<UserProvider>(context).userInfo;
       _nicknameController.text = user.nickname;
       _realNameController.text = user.realName;
@@ -396,7 +396,9 @@ class Selector extends StatefulWidget {
 class _SelectorState extends State<Selector> with TickerProviderStateMixin {
   bool isOpen = false;
 
-  List<School> get _schools => widget.schools;
+  List<School> get _allSchools => widget.schools;
+
+  List<School> _schools = [];
 
   School get _selected => widget.selected;
 
@@ -406,6 +408,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
   Animation _rotateAnimation;
   Animation _animation;
   Animation _curve;
+  TextEditingController _filter;
 
   double _oldHeight = 0;
 
@@ -424,6 +427,10 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
     _animation = Tween<double>(begin: 0, end: 1).animate(_curve);
     _rotateAnimation = Tween<double>(begin: 0, end: pi / 2).animate(
         CurvedAnimation(curve: Curves.easeInOut, parent: _rotateController));
+    _allSchools.forEach((e) {
+      _schools.add(e);
+    });
+    _filter = TextEditingController();
   }
 
   Future<void> changeHeightTo(height) async {
@@ -436,7 +443,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
 
   Future<void> changeHeight() async {
     int length = _schools.length; // 获取较大的列表长度
-    double height = (length / 2).ceil() * 65.0 + 31;
+    double height = (length / 2).ceil() * 65.0 + 130;
     await changeHeightTo(height);
   }
 
@@ -445,6 +452,7 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
     super.dispose();
     _animationController.dispose();
     _rotateController.dispose();
+    _filter.dispose();
   }
 
   @override
@@ -504,6 +512,35 @@ class _SelectorState extends State<Selector> with TickerProviderStateMixin {
               physics: NeverScrollableScrollPhysics(),
               child: Column(
                 children: <Widget>[
+                  Container(
+                    height: 50,
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    child: TextField(
+                      expands: false,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Theme.of(context).primaryColor,
+                      controller: _filter,
+                      onChanged: (value) {
+                        _schools = [];
+                        _allSchools.forEach((e) {
+                          if (e.name.contains(value)) {
+                            _schools.add(e);
+                          }
+                        });
+                        changeHeight();
+                      },
+                      decoration: InputDecoration(
+                        labelText: "筛选",
+                        filled: true,
+                        hintText: "输入文字, 搜索搜索!",
+                        fillColor: Color.fromARGB(255, 245, 241, 241),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
                   Wrap(
                     children: List<Widget>.generate(
                         _schools.length,

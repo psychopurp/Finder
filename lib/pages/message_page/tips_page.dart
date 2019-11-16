@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
+import 'package:finder/models/collections_model.dart';
 import 'package:finder/models/he_says_item.dart';
 import 'package:finder/models/recruit_model.dart';
+import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/routers/application.dart';
 import 'package:finder/routers/routes.dart';
@@ -43,14 +45,23 @@ class _TipsPageState extends State<TipsPage> {
         elevation: 0,
         centerTitle: true,
         actions: <Widget>[
-          MaterialButton(
-            minWidth: 10,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Icon(IconData(0xe609, fontFamily: 'clear'), color: Colors.white),
-            onPressed: () {
-              data.readTips();
-            },
+          Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: InkWell(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              child: Icon(IconData(0xe609, fontFamily: 'clear'), color: Colors.white),
+              onTap: () {
+                data.readTips();
+              },
+              onLongPress: (){
+                setState(() {
+                  data.tips = [];
+                  data.updateTipsCount();
+                  data.save();
+                });
+              },
+            ),
           )
         ],
       ),
@@ -214,8 +225,15 @@ class _TipsPageState extends State<TipsPage> {
         }
         break;
       case "topic_comment":
-        Application.router.navigateTo(context,
-            "${Routes.commentPage}?topicCommentId=$id&topicId=${jumpPara[2]}");
+        var item  = await getTopicCommentData(id);
+        var formData = {
+          'item': item,
+          'topicId': item.topicId,
+          'topicTitle': item.topicTitle
+        };
+        print("formData $formData ============================================");
+        Navigator.pushNamed(context, Routes.topicCommentDetail,
+            arguments: item);
         break;
       case "lead_say":
         var data = await getLeadHeSheSays(id);
@@ -230,6 +248,21 @@ class _TipsPageState extends State<TipsPage> {
         Application.router.navigateTo(context,
             "${Routes.userProfile}?senderId=$id&heroTag=user:$id");
     }
+  }
+
+  Future<TopicCommentsModelData> getTopicCommentData(int id) async {
+    try {
+      Dio dio = ApiClient.dio;
+      Response response =
+      await dio.get('get_topic_comment/', queryParameters: {"comment_id": id});
+      Map<String, dynamic> result = response.data;
+      if (result["status"]) {
+        return TopicCommentsModelData.fromJson(result["data"]);
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   Future<RecruitModelData> getRecruitData(int id) async {

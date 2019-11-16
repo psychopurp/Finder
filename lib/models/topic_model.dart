@@ -1,5 +1,5 @@
-import 'package:finder/config/api_client.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/public.dart';
 
 class TopicModel {
   List<TopicModelData> data;
@@ -37,7 +37,7 @@ class TopicModelData {
   int id;
   String title;
   String image;
-  double time;
+  DateTime time;
   School school;
 
   TopicModelData({this.id, this.title, this.image, this.time, this.school});
@@ -50,8 +50,8 @@ class TopicModelData {
     }
 
     image = Avatar.getImageUrl(json['image']);
+    time = json['time'] != null ? timestampToDateTime(json["time"]) : null;
 
-    time = json['time'];
     school =
         json['school'] != null ? new School.fromJson(json['school']) : null;
   }
@@ -61,7 +61,7 @@ class TopicModelData {
     data['id'] = this.id;
     data['title'] = this.title;
     data['image'] = this.image;
-    data['time'] = this.time;
+    data["time"] = getTime(dateTime: this.time);
     if (this.school != null) {
       data['school'] = this.school.toJson();
     }

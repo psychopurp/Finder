@@ -5,7 +5,6 @@ import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/public.dart';
 import 'package:finder/provider/user_provider.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -165,9 +164,15 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
                   ),
                 ),
               ),
-              Expanded(flex: 1,child: Container(),),
+              Expanded(
+                flex: 1,
+                child: Container(),
+              ),
               IconButton(
-                icon: Icon(Icons.add, size: 30,),
+                icon: Icon(
+                  Icons.add,
+                  size: 30,
+                ),
                 onPressed: () {
                   _tag = _tagController.text.toString();
                   setState(() {
@@ -382,7 +387,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
       errorHint = "图片上传失败, 请重试";
       return false;
     }
-    if(this.onlyInSchool && user.userInfo.school == null){
+    if (this.onlyInSchool && user.userInfo.school == null) {
       if (imagePath == null) {
         errorHint = "家里蹲大学不能发布校内话题哟~ \n请尝试考个大学吧! ";
         return false;

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:finder/plugin/callback.dart';
 import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +101,7 @@ class HomePageActivities extends StatelessWidget {
 
   Widget _activityPart() {
     return Container(
-      height: mainHeight - titleHeight,
+      height: mainHeight - 20,
       width: ScreenUtil().setWidth(750),
       padding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
       // color: Colors.green,
@@ -120,6 +118,7 @@ class HomePageActivities extends StatelessWidget {
   _singleItem(BuildContext context, ActivityModelData item, int index) {
     // bool isLastItem = (index == this.activities.data.length - 1);
     double picWidth = ScreenUtil().setWidth(230);
+    String heroTag = item.id.toString() + 'home' + item.title;
 
     ///宽高比 1/1.4
     double picHeight = picWidth * 1.4;
@@ -129,8 +128,9 @@ class HomePageActivities extends StatelessWidget {
       imageBuilder: (context, imageProvider) => GestureDetector(
         onTap: () {
           push(() async {
-            Application.router.navigateTo(
-                context, "${Routes.activityDetail}?activityId=${item.id}");
+            var formData = {'item': item, 'heroTag': heroTag};
+            Navigator.pushNamed(context, Routes.activityDetail,
+                arguments: formData);
           });
         },
         child: Align(
@@ -144,16 +144,19 @@ class HomePageActivities extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  height: picHeight,
-                  width: picWidth,
-                  decoration: BoxDecoration(
-                    // color: Colors.green,
-                    borderRadius: BorderRadius.circular(10),
-                    // border: Border.all(color: Colors.black, width: 2),
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
+                Hero(
+                  tag: heroTag,
+                  child: Container(
+                    height: picHeight,
+                    width: picWidth,
+                    decoration: BoxDecoration(
+                      // color: Colors.green,
+                      borderRadius: BorderRadius.circular(10),
+                      // border: Border.all(color: Colors.black, width: 2),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),

@@ -8,7 +8,6 @@ import 'package:finder/routers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 
 class PublishActivityPage extends StatefulWidget {

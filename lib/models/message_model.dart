@@ -289,7 +289,7 @@ class MessageModel implements Listenable {
       throw DioError(
           request: response.request,
           response: response,
-          message: data["error"],
+//          message: data["error"],
           type: DioErrorType.RESPONSE);
     } else {
       if (data['data'].length == 0) {
@@ -324,7 +324,7 @@ class MessageModel implements Listenable {
       throw DioError(
           request: response.request,
           response: response,
-          message: data["error"],
+//          message: data["error"],
           type: DioErrorType.RESPONSE);
     } else {
       if (data['data'].length == 0) {
@@ -359,7 +359,7 @@ class MessageModel implements Listenable {
       throw DioError(
           request: response.request,
           response: response,
-          message: data["error"],
+//          message: data["error"],
           type: DioErrorType.RESPONSE);
     } else {
       if (data['data'].length == 0) {

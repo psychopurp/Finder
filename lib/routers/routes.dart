@@ -9,6 +9,7 @@ class Routes {
   static String login = '/login';
   static String checkCodeLogin = '/checkCodeLogin';
   static String settings = '/settings'; //设置
+  static String webViewPage = '/webViewPage';
 
   //首页
   static String publishTopic = '/publishTopic'; //首页-- 发布话题
@@ -19,6 +20,7 @@ class Routes {
   static String moreActivities = '/home/moreActivities'; //首页 -- 更多活动
   static String topicDetail = '/home/topicDetail'; //首页 -- 话题详情
   static String activityDetail = '/home/activityDetail'; //首页 -- 活动详情
+  static String topicCommentDetail = '/home/topicCommentDetail'; //首页 -- 活动详情
   //招募页
   static String recruitDetail = '/home/recruitDetail'; //首页 -- 活动详情
   static String recommendRecruitDetail =
@@ -45,6 +47,8 @@ class Routes {
   static String internshipDetail = "/serve/internship/detail"; //服务页面 -- 实习 公司
   static String recommendInternshipDetail =
       "/serve/internship/recommend"; //服务页面 -- 实习 公司
+  static String courseTablePage =
+      "/serve/courseTablePage"; //服务页面 -- 实习 公司
   //用户页
   static String userProfile = "/userProfile"; //个人详情页
   static String minePage = "/minePage"; //我的 页
@@ -98,6 +102,9 @@ class Routes {
         handler: acitvityDetailsHandler, transitionType: TransitionType.fadeIn);
     router.define(commentPage,
         handler: commentPageHandler, transitionType: TransitionType.cupertino);
+    router.define(topicCommentDetail,
+        handler: topicCommentDetailHandler,
+        transitionType: TransitionType.cupertino);
 
     //招募页 --导航
     router.define(recruitDetail,
@@ -141,6 +148,9 @@ class Routes {
     router.define(recommendInternshipDetail,
         handler: recommendInternshipDetailHandler,
         transitionType: TransitionType.cupertino);
+    router.define(courseTablePage,
+        handler: courseTablePageHandler,
+        transitionType: TransitionType.cupertino);
 
     //我的页
     router.define(userProfile,
@@ -174,5 +184,10 @@ class Routes {
         handler: privacyHandle, transitionType: TransitionType.cupertino);
     router.define(serveProtocol,
         handler: serveProtocolHandle, transitionType: TransitionType.cupertino);
+
+    //webview
+
+    router.define(webViewPage,
+        handler: webViewPageHandler, transitionType: TransitionType.cupertino);
   }
 }

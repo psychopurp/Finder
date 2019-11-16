@@ -5,8 +5,8 @@ import 'package:finder/config/global.dart';
 import 'package:finder/models/user_model.dart';
 
 class ApiClient {
-//  static const host = "http://47.94.247.8";
-//  static const baseURL = "http://47.94.247.8/api/";
+  // static const host = "http://47.94.247.8";
+  // static const baseURL = "http://47.94.247.8/api/";
   static const host = "https://www.finder-nk.com";
   static const baseURL = "https://www.finder-nk.com/api/";
 
@@ -78,9 +78,9 @@ class ApiClient {
     String path = image.path;
     var name = path.substring(path.lastIndexOf('/') + 1);
     print('图片名===========>$name');
-    var formData = new FormData.from({
-      'image': new UploadFileInfo(image, name,
-          contentType: ContentType.parse('multipart/form-data'))
+    print(path);
+    var formData = new FormData.fromMap({
+      'image': MultipartFile.fromBytes(image.readAsBytesSync(), filename: name)
     });
     try {
       Response response = await dio.post('upload_image/', data: formData,
@@ -141,8 +141,11 @@ class ApiClient {
   }
 
   //获取话题
-  Future getTopics({String query = "", int page = 1}) async {
+  Future getTopics({String query = "", int page = 1, int topicId}) async {
     var formData = {'query': query, 'page': page};
+    if (topicId != null) {
+      formData = {'topic_id': topicId};
+    }
 
     try {
       Response response = await dio.get(
@@ -183,9 +186,11 @@ class ApiClient {
 
   //获取活动
   Future getActivities(
-      {String query = "", int page = 1, int activityId}) async {
+      {String query = "", int page = 1, int activityId, int typeId}) async {
     var formData = {'query': query, 'page': page};
+    if (typeId != null) formData.addAll({'type_id': typeId});
     if (activityId != null) formData = {'activity_id': activityId};
+    // print(formData);
     try {
       Response response = await dio.get(
         'get_activities/',
@@ -273,10 +278,11 @@ class ApiClient {
     try {
       Response response =
           await dio.post('like_topic_comment/', data: jsonEncode(formData));
-      // print('点赞话题评论成功....${response.data}');
+      print('点赞话题评论成功....${response.data}');
       return response.data;
     } catch (e) {
       print('点赞话题评论错误==========>$e');
+      return {'status': false, 'data': e};
     }
   }
 
@@ -348,7 +354,7 @@ class ApiClient {
     var formData = {'activity_id': activityId};
     try {
       Response response =
-          await dio.get('delete_activity/', queryParameters: formData);
+          await dio.post('delete_activity/', data: jsonEncode(formData));
       print(response.data);
       return response.data;
     } catch (e) {
@@ -464,6 +470,88 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('用户删除收藏错误==========>$e');
+    }
+  }
+
+  ///获取评论点赞列表
+  Future getTopicCommentLikeUsers({int topicCommentId, int page = 1}) async {
+    var formData = {'topic_comment_id': topicCommentId, "page": page};
+    try {
+      Response response = await dio.get('get_topic_comment_like_users/',
+          queryParameters: formData);
+      print('获取用户点赞成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取用户点赞错误==========>$e');
+    }
+  }
+
+  ///获取参与的话题
+  Future getEngageTopics({int page = 1}) async {
+    var formData = {"page": page};
+    try {
+      Response response =
+          await dio.get('get_engage_topics/', queryParameters: formData);
+      // print(dio.options.headers['token']);
+      // print('获取参与的话题成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取参与的话题错误==========>$e');
+    }
+  }
+
+  ///获取用户参与话题
+  Future getUserTopics({int page = 1, int userId}) async {
+    var formData = {"page": page, "user_id": userId};
+    try {
+      Response response =
+          await dio.get('get_user_topics/', queryParameters: formData);
+      // print(dio.options.headers['token']);
+      // print('获取参与的话题成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取参与的话题错误==========>$e');
+    }
+  }
+
+  ///获取用户参与话题评论
+  Future getUserTopicComments({int page = 1, int userId}) async {
+    var formData = {"page": page, "user_id": userId};
+    try {
+      Response response =
+          await dio.get('get_user_topic_comments/', queryParameters: formData);
+      // print(dio.options.headers['token']);
+      // print('获取参与的话题成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取参与的话题评论错误==========>$e');
+    }
+  }
+
+  ///获取用户参与活动
+  Future getUserActivities({int page = 1, int userId}) async {
+    var formData = {"page": page, "user_id": userId};
+    try {
+      Response response =
+          await dio.get('get_user_activities/', queryParameters: formData);
+      // print(dio.options.headers['token']);
+      // print('获取参与的话题成功==========>${response.data}');
+      return response.data;
+    } catch (e) {
+      print('获取参与的活动错误==========>$e');
+    }
+  }
+
+  ///删除用户活动
+  Future deleteTopic({int topicId}) async {
+    var formData = {'topic_id': topicId};
+    try {
+      Response response =
+          await dio.post('delete_topic/', data: jsonEncode(formData));
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      print('删除话题错误==========>$e');
     }
   }
 

@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:finder/models/topic_model.dart';
 import 'package:finder/public.dart';
-import "package:system_info/system_info.dart";
 
 class HomePageTopics extends StatelessWidget {
   final TopicModel topics;
@@ -135,9 +134,9 @@ class TopicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int maxSize;
-    if(Global.totalMemory == null){
+    if (Global.totalMemory == null) {
       maxSize = 7;
-    }else if (Global.totalMemory < 3 * 1024) {
+    } else if (Global.totalMemory < 3 * 1024) {
       maxSize = 5;
     } else if (Global.totalMemory < 4 * 1024) {
       maxSize = 7;
@@ -198,6 +197,7 @@ class ImageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print(topicHeight);
     return InkWell(
       onTap: onTap,
       child: Align(

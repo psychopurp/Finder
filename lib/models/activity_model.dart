@@ -1,4 +1,3 @@
-import 'package:finder/config/api_client.dart';
 import 'package:finder/models/tag_model.dart';
 import 'package:finder/public.dart';
 
@@ -39,15 +38,15 @@ class ActivityModelData {
   String title;
   int senderId;
   String sponsor;
-  String startTime;
-  String endTime;
+  DateTime startTime;
+  DateTime endTime;
   String place;
   String poster;
   String description;
   String signUpLocation;
   bool isCollected;
 
-  String position;
+  int position;
   List<ActivityTypesModelData> types;
   List<TagModel> tags;
 
@@ -73,15 +72,13 @@ class ActivityModelData {
     title = json['title'];
     senderId = json['sender_id'];
     sponsor = json['sponsor'];
-    if (json['start_time'].runtimeType == String) {
-      startTime = json['start_time'];
-      endTime = json['end_time'];
-    } else {
-      num time = json['start_time'];
-      startTime = timestampToDateTime(time).toString();
-      time = json['end_time'];
-      endTime = timestampToDateTime(time).toString();
-    }
+
+    startTime = json['start_time'] != null
+        ? timestampToDateTime(json["start_time"])
+        : null;
+
+    endTime =
+        json['end_time'] != null ? timestampToDateTime(json["end_time"]) : null;
 
     place = json['place'];
 
@@ -89,18 +86,27 @@ class ActivityModelData {
     description = json['description'];
     signUpLocation = json['sign_up_location'];
     position = json['position'];
+    print("$title ======================= ${json['types']}");
     if (json['types'] != null) {
       types = new List<ActivityTypesModelData>();
       json['types'].forEach((v) {
         types.add(new ActivityTypesModelData.fromJson(v));
       });
-    }
+    }else
+      types = [];
     if (json['tags'] != null) {
       tags = new List<TagModel>();
       json['tags'].forEach((v) {
         tags.add(new TagModel.fromJson(v));
       });
     }
+
+
+  }
+
+  @override
+  String toString() {
+    return "$title ===== $types";
   }
 
   Map<String, dynamic> toJson() {
@@ -109,8 +115,8 @@ class ActivityModelData {
     data['title'] = this.title;
     data['sender_id'] = this.senderId;
     data['sponsor'] = this.sponsor;
-    data['start_time'] = this.startTime;
-    data['end_time'] = this.endTime;
+    data['start_time'] = getTime(dateTime: this.startTime);
+    data['end_time'] = getTime(dateTime: this.endTime);
     data['place'] = this.place;
     data['poster'] = this.poster;
     data['description'] = this.description;
@@ -178,4 +184,11 @@ class ActivityTypesModelData {
     data['name'] = this.name;
     return data;
   }
+
+  @override
+  String toString() {
+    return "$name";
+  }
+
+
 }
