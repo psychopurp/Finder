@@ -18,9 +18,14 @@ class CommentPage extends StatefulWidget {
   final int topicCommentId;
   final BoolCallback onDelete;
   final BoolCallback onComment;
+  final ScrollController parentController;
 
   CommentPage(
-      {this.topicCommentId, this.topicId, this.onDelete, this.onComment});
+      {this.topicCommentId,
+      this.topicId,
+      this.onDelete,
+      this.onComment,
+      this.parentController});
 
   @override
   _CommentPageState createState() => _CommentPageState();
@@ -29,7 +34,6 @@ class CommentPage extends StatefulWidget {
 class _CommentPageState extends State<CommentPage> {
   TopicCommentsModel comment;
   TextEditingController _commentController;
-  EasyRefreshController _refreshController;
   ScrollController _controller;
   FocusNode _commentFocusNode;
   int currentComment;
@@ -37,6 +41,10 @@ class _CommentPageState extends State<CommentPage> {
   String hintText = '喜欢就评论告诉Ta';
   int pageCount = 2;
   bool hasMore = true;
+  List<TopicCommentsModelData> comments = [];
+  UserProvider userProvider;
+  bool isLoading = true;
+  bool canScroll = false;
 
   @override
   void initState() {
@@ -58,81 +66,66 @@ class _CommentPageState extends State<CommentPage> {
     _controller = ScrollController()
       ..addListener(() {
         _commentFocusNode.unfocus();
+      })
+      ..addListener(() {
+        // print(_controller.position);
+        if (_controller.position.pixels ==
+            _controller.position.minScrollExtent) {
+          print('to the top....');
+          setState(() {
+            this.canScroll = false;
+          });
+        } else if (_controller.position.pixels ==
+            _controller.position.maxScrollExtent) {
+          print('loadmore');
+          if (this.hasMore) {
+            getMore(this.pageCount);
+          }
+        }
       });
-    _refreshController = EasyRefreshController();
+
+    widget.parentController..addListener(this.myListener);
     super.initState();
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _refreshController.dispose();
     _commentController.dispose();
     _commentFocusNode.dispose();
+    widget.parentController.removeListener(myListener);
     super.dispose();
+  }
+
+  void myListener() {
+    if (widget.parentController.position.pixels ==
+        widget.parentController.position.maxScrollExtent) {
+      print("to the end....");
+      setState(() {
+        this.canScroll = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: BetterText("评论"),
-      //   textTheme: TextTheme(
-      //       title: Theme.of(context)
-      //           .appBarTheme
-      //           .textTheme
-      //           .title
-      //           .copyWith(color: Colors.black)),
-      //   iconTheme: IconThemeData(color: Colors.black),
-      //   backgroundColor: Colors.white,
-      //   centerTitle: true,
-      // ),
       body: Padding(
         padding: EdgeInsets.only(top: 0),
         child: Stack(
           children: <Widget>[
             GestureDetector(
-              onTap: () {
-                _commentFocusNode.unfocus();
-              },
-              child: EasyRefresh(
-                enableControlFinishLoad: true,
-                bottomBouncing: false,
-                topBouncing: false,
-                header: MaterialHeader(),
-                footer: MaterialFooter(),
-                controller: _refreshController,
-                onRefresh: () async {
-                  await getReplies();
-                  _refreshController.resetLoadState();
+                onTap: () {
+                  _commentFocusNode.unfocus();
                 },
-                onLoad: () async {
-                  await getMore(this.pageCount);
-
-                  await Future.delayed(Duration(milliseconds: 500), () {
-                    _refreshController.finishLoad(
-                        success: true, noMore: (!this.hasMore));
-                  });
-                },
-                child: (this.comment != null)
-                    ? ListView(
-                        controller: _controller,
-                        padding: EdgeInsets.only(
-                            bottom: 20, top: kToolbarHeight / 2),
-                        children: buildContent(user))
-                    : Container(
-                        height: 400,
-                        child: CupertinoActivityIndicator(),
-                      ),
-              ),
-            ),
+                child: body),
             Positioned(
-              bottom: 0,
+              bottom: 10,
               left: 0,
               right: 0,
-              child: commentBar(user),
+              child: commentBar(),
             )
           ],
         ),
@@ -140,7 +133,38 @@ class _CommentPageState extends State<CommentPage> {
     );
   }
 
-  List<Widget> buildContent(UserProvider user) {
+  Widget get body {
+    Widget child;
+    if (this.isLoading) {
+      child = Container(
+        height: double.infinity,
+        alignment: Alignment.center,
+        child: CupertinoActivityIndicator(),
+      );
+    } else {
+      child = ListView.builder(
+          controller: _controller,
+          // shrinkWrap: true,
+          physics:
+              this.canScroll ? ScrollPhysics() : NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.only(bottom: 70, top: kToolbarHeight / 2),
+          itemCount: this.comments.length,
+          itemBuilder: (context, index) {
+            if (this.hasMore) {
+              if (index == this.comments.length - 1) {
+                return Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: new Center(child: new CircularProgressIndicator()),
+                );
+              }
+            }
+            return buildContent(this.comments[index]);
+          });
+    }
+    return child;
+  }
+
+  buildContent(TopicCommentsModelData item) {
     String getTimeString(DateTime time) {
       DateTime now = DateTime.now();
 
@@ -161,90 +185,85 @@ class _CommentPageState extends State<CommentPage> {
       return time.month.toString() + '月' + time.day.toString() + '日';
     }
 
-    List<Widget> content = [];
-    this.comment.topicReplies.forEach((item) {
-      Widget singleItem = InkWell(
-          onLongPress: () => handleDelete(user, item),
-          onTap: () {
-            setState(() {
-              this.hintText = "@" + item.sender.nickname;
-              this.currentComment = item.id;
-            });
-            FocusScope.of(context).requestFocus(_commentFocusNode);
-          },
-          child: Container(
-            padding: EdgeInsets.only(top: 10.0, left: 15.0, bottom: 20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                InkWell(
-                  onTap: () {
-                    Application.router.navigateTo(context,
-                        "${Routes.userProfile}?senderId=${item.sender.id.toString()}&heroTag=${item.id.toString() + item.sender.id.toString() + 'comment'}");
-                  },
-                  child: Hero(
-                    tag: item.id.toString() +
-                        item.sender.id.toString() +
-                        'comment',
-                    child: Avatar(
-                      url: item.sender.avatar,
-                      avatarHeight: 40,
+    Widget singleItem = InkWell(
+        onLongPress: () => handleDelete(item),
+        onTap: () {
+          setState(() {
+            this.hintText = "@" + item.sender.nickname;
+            this.currentComment = item.id;
+          });
+          FocusScope.of(context).requestFocus(_commentFocusNode);
+        },
+        child: Container(
+          padding: EdgeInsets.only(top: 10.0, left: 15.0, bottom: 20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              InkWell(
+                onTap: () {
+                  Application.router.navigateTo(context,
+                      "${Routes.userProfile}?senderId=${item.sender.id.toString()}&heroTag=${item.id.toString() + item.sender.id.toString() + 'comment'}");
+                },
+                child: Hero(
+                  tag: item.id.toString() +
+                      item.sender.id.toString() +
+                      'comment',
+                  child: Avatar(
+                    url: item.sender.avatar,
+                    avatarHeight: 40,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: BetterText(
+                        item.sender.nickname,
+                        style: Theme.of(context)
+                            .textTheme
+                            .body1
+                            .copyWith(fontSize: 15),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 10.0, top: 5.0),
+                      child: (item.replyTo.id != widget.topicCommentId)
+                          ? Text.rich(TextSpan(children: [
+                              TextSpan(
+                                  text: " @" + item.replyTo.sender.nickname,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .body2
+                                      .copyWith(
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                              TextSpan(text: " : " + item.content)
+                            ]))
+                          : Text(
+                              item.content,
+                              style: Theme.of(context).textTheme.body2,
+                            ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: BetterText(
-                          item.sender.nickname,
-                          style: Theme.of(context)
-                              .textTheme
-                              .body1
-                              .copyWith(fontSize: 15),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 10.0, top: 5.0),
-                        child: (item.replyTo.id != widget.topicCommentId)
-                            ? Text.rich(TextSpan(children: [
-                                TextSpan(
-                                    text: " @" + item.replyTo.sender.nickname,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .body2
-                                        .copyWith(
-                                            color: Theme.of(context)
-                                                .primaryColor)),
-                                TextSpan(text: " : " + item.content)
-                              ]))
-                            : BetterText(
-                                item.content,
-                                style: Theme.of(context).textTheme.body2,
-                              ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(right: 15.0),
-                  child: BetterText(getTimeString(item.time),
-                      style: Theme.of(context).textTheme.body1),
-                )
-              ],
-            ),
-          ));
+              ),
+              Padding(
+                padding: EdgeInsets.only(right: 15.0),
+                child: BetterText(getTimeString(item.time),
+                    style: Theme.of(context).textTheme.body1),
+              )
+            ],
+          ),
+        ));
 
-      content.add(singleItem);
-    });
-
-    return content;
+    return singleItem;
   }
 
-  commentBar(UserProvider user) {
+  commentBar() {
     return Container(
       // color: Colors.white,
       padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
@@ -285,7 +304,7 @@ class _CommentPageState extends State<CommentPage> {
             disabledColor: Colors.black26,
             onPressed: (_commentController.text != null &&
                     _commentController.text != "")
-                ? () => commentHandle(user)
+                ? () => commentHandle()
                 : null,
             color: Theme.of(context).primaryColor,
             minWidth: ScreenUtil().setWidth(100),
@@ -301,9 +320,9 @@ class _CommentPageState extends State<CommentPage> {
     );
   }
 
-  handleDelete(UserProvider user, TopicCommentsModelData item) async {
-    if (user.isLogIn) {
-      if (user.userInfo.id == item.sender.id) {
+  handleDelete(TopicCommentsModelData item) async {
+    if (userProvider.isLogIn) {
+      if (userProvider.userInfo.id == item.sender.id) {
         showDialog(
           context: context,
           builder: (_) {
@@ -322,8 +341,13 @@ class _CommentPageState extends State<CommentPage> {
                       var data = await apiClient.deleteTopicComment(
                           commentId: item.id);
                       widget.onDelete(data['status']);
+                      if (data['status']) {
+                        await getReplies();
+                        _controller.animateTo(0,
+                            duration: Duration(microseconds: 300),
+                            curve: Curves.easeInOut);
+                      }
                       Navigator.pop(context);
-                      _refreshController.callRefresh();
                     }),
               ],
             );
@@ -333,9 +357,9 @@ class _CommentPageState extends State<CommentPage> {
     }
   }
 
-  Future commentHandle(UserProvider user) async {
+  Future commentHandle() async {
     String msg = "";
-    if (user.isLogIn) {
+    if (userProvider.isLogIn) {
       String content = _commentController.text;
       _commentController.clear();
       var data = await apiClient.addTopicComment(
@@ -347,7 +371,11 @@ class _CommentPageState extends State<CommentPage> {
       // _commentController.clear();
       _commentFocusNode.unfocus();
       widget.onComment(data['status']);
-      _refreshController.callRefresh();
+      if (data['status'] == true) {
+        await getReplies();
+        _controller.animateTo(0,
+            duration: Duration(microseconds: 300), curve: Curves.easeInOut);
+      }
 
       msg = (data['status']) ? "评论成功" : "评论失败";
     } else {
@@ -363,15 +391,17 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   Future getReplies() async {
+    this.comments = [];
     var data = await apiClient.getTopicComments(
         topicId: widget.topicId, page: 1, rootId: widget.topicCommentId);
     TopicCommentsModel topicComment = TopicCommentsModel.fromJson(data);
     // print("reply ==== $data");
     if (!mounted) return;
     setState(() {
-      this.comment = topicComment;
+      this.comments.addAll(topicComment.topicReplies);
       this.pageCount = 2;
       this.hasMore = topicComment.hasMore;
+      this.isLoading = false;
     });
   }
 
@@ -383,10 +413,10 @@ class _CommentPageState extends State<CommentPage> {
     TopicCommentsModel topicComment = TopicCommentsModel.fromJson(data);
 
     setState(() {
-      this.comment.data.addAll(topicComment.data);
+      this.comments.addAll(topicComment.topicReplies);
       this.pageCount++;
       this.hasMore = topicComment.hasMore;
+      this.isLoading = false;
     });
-    return topicComment.data;
   }
 }

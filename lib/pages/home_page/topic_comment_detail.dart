@@ -6,6 +6,7 @@ import 'package:finder/models/topic_comments_model.dart';
 import 'package:finder/pages/home_page/comment_page.dart';
 import 'package:finder/pages/serve_page/he_says_page.dart';
 import 'package:finder/plugin/avatar.dart';
+import 'package:finder/plugin/callback.dart';
 import 'package:finder/plugin/pics_swiper.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:finder/public.dart';
@@ -28,11 +29,13 @@ class TopicCommentDetailPage extends StatefulWidget {
 class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
     with TickerProviderStateMixin {
   TopicCommentsModelData topicComment;
+  ScrollController _controller;
   // int topicId;
   // String topicTitle;
   UserProvider userProvider;
   TabController tabController;
   List<FollowerModelData> liker = [];
+  bool canScroll = false;
   var bottomBar;
 
   @override
@@ -43,12 +46,15 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
       "delete": {"name": "删除", "handler": handleDelete},
     };
     tabController = TabController(vsync: this, length: 2);
+    _controller = ScrollController();
+
     super.initState();
   }
 
   @override
   void dispose() {
     tabController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -78,7 +84,8 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
 
                   bottomBar.forEach((item, object) {
                     button.add(ListTile(
-                        title: BetterText(object['name']), onTap: object['handler']));
+                        title: BetterText(object['name']),
+                        onTap: object['handler']));
                   });
 
                   ///如果是自己的话题 有删除栏
@@ -115,6 +122,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
         : this.topicComment.likes.toString();
     Widget child;
     child = CustomScrollView(
+      controller: _controller,
       slivers: <Widget>[
         SliverToBoxAdapter(child: buildTopContent()),
         SliverPersistentHeader(
@@ -165,6 +173,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
               controller: this.tabController,
               children: <Widget>[
                 CommentPage(
+                    parentController: this._controller,
                     topicId: this.topicComment.topicId,
                     topicCommentId: this.topicComment.id,
                     onDelete: (isDelete) {
@@ -180,26 +189,24 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                         });
                       }
                     }),
-                Padding(
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: UserLikeWidget(
-                    topicCommentId: this.topicComment.id,
-                    isLike: () async {
-                      var data = await apiClient.likeTopicComment(
-                          topicCommentId: topicComment.id);
-                      if (data['status']) {
-                        if (topicComment.isLike) {
-                          topicComment.isLike = false;
-                          topicComment.likes--;
-                        } else {
-                          topicComment.isLike = true;
-                          topicComment.likes++;
-                        }
-                        setState(() {});
+                UserLikeWidget(
+                  parentController: this._controller,
+                  topicCommentId: this.topicComment.id,
+                  isLike: () async {
+                    var data = await apiClient.likeTopicComment(
+                        topicCommentId: topicComment.id);
+                    if (data['status']) {
+                      if (topicComment.isLike) {
+                        topicComment.isLike = false;
+                        topicComment.likes--;
+                      } else {
+                        topicComment.isLike = true;
+                        topicComment.likes++;
                       }
-                    },
-                  ),
-                )
+                      setState(() {});
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -529,36 +536,64 @@ class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
 
 class UserLikeWidget extends StatefulWidget {
   final int topicCommentId;
-  final VoidCallback isLike;
-  UserLikeWidget({this.topicCommentId, this.isLike});
+  final FutureCallback isLike;
+  final ScrollController parentController;
+  UserLikeWidget({this.topicCommentId, this.isLike, this.parentController});
   @override
   _UserLikeWidgetState createState() => _UserLikeWidgetState();
 }
 
 class _UserLikeWidgetState extends State<UserLikeWidget> {
-  EasyRefreshController _refreshController;
-  // ScrollController _controller;
+  ScrollController _controller;
   UserProvider userProvider;
   List<FollowerModelData> likers = [];
   bool isLoading = true;
 
   bool hasMore = true;
+  bool canScroll = false;
 
   int pageCount = 1;
 
   @override
   void initState() {
-    // _controller = ScrollController();
-    _refreshController = EasyRefreshController();
+    _controller = ScrollController()
+      ..addListener(() {
+        if (_controller.position.pixels ==
+            _controller.position.minScrollExtent) {
+          print('to the top....');
+          setState(() {
+            this.canScroll = false;
+          });
+        } else if (_controller.position.pixels ==
+            _controller.position.maxScrollExtent) {
+          print('loadmore');
+          if (this.hasMore) {
+            getData();
+          }
+        }
+      });
     getData(pageCount: pageCount);
+
+    widget.parentController..addListener(this.myListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    // _controller.dispose();
-    _refreshController.dispose();
+    _controller.dispose();
+
+    widget.parentController.removeListener(myListener);
     super.dispose();
+  }
+
+  void myListener() {
+    if (widget.parentController.position.pixels ==
+        widget.parentController.position.maxScrollExtent) {
+      print("to the end....");
+      setState(() {
+        this.canScroll = true;
+      });
+    }
   }
 
   @override
@@ -576,25 +611,24 @@ class _UserLikeWidgetState extends State<UserLikeWidget> {
           height: double.infinity,
           child: CupertinoActivityIndicator());
     } else {
-      child = EasyRefresh.custom(
-        enableControlFinishLoad: true,
-        primary: true,
-        footer: MaterialFooter(),
-        controller: _refreshController,
-        slivers: <Widget>[
-          SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-            // index = index % this.follower.data.length;
+      child = ListView.builder(
+          controller: _controller,
+          // shrinkWrap: true,
+          physics:
+              this.canScroll ? ScrollPhysics() : NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.only(bottom: 70, top: kToolbarHeight / 2),
+          itemCount: this.likers.length,
+          itemBuilder: (context, index) {
+            if (this.hasMore) {
+              if (index == this.likers.length - 1) {
+                return Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: new Center(child: new CircularProgressIndicator()),
+                );
+              }
+            }
             return buildUserRow(this.likers[index]);
-          }, childCount: this.likers.length)),
-        ],
-        onLoad: () async {
-          await Future.delayed(Duration(milliseconds: 500), () {
-            getData(pageCount: this.pageCount);
           });
-          _refreshController.finishLoad(success: true, noMore: (!this.hasMore));
-        },
-      );
       child = Stack(children: <Widget>[
         child,
         Positioned(
@@ -615,7 +649,10 @@ class _UserLikeWidgetState extends State<UserLikeWidget> {
                     ),
                   );
                 });
-                this.widget.isLike();
+                await this.widget.isLike();
+                this.likers = [];
+                setState(() {});
+                getData(pageCount: this.pageCount - 1);
               },
               shape: CircleBorder(),
               child: Icon(
