@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BetterText extends StatefulWidget {
   BetterText(
@@ -46,8 +47,9 @@ class BetterText extends StatefulWidget {
 }
 
 class _BetterTextState extends State<BetterText> {
-  static final RegExp urlReg =
-      RegExp(r"https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
+  static final RegExp urlReg = RegExp(
+      r"(https?://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])|(1[356789]\d{9})|(0\d{2,3}-\d{6,8})|([a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+)");
+
   List<_TextItem> texts = [];
 
   @override
@@ -58,19 +60,27 @@ class _BetterTextState extends State<BetterText> {
 
   void splitText(String text) {
     if (text.length == 1) {
-      texts.add(_TextItem(text, false));
+      texts.add(_TextItem(text, 0));
       return;
     }
     var matches = urlReg.allMatches(text);
     int start = 0;
     for (var match in matches) {
       int matchStart = match.start;
-      texts.add(_TextItem(text.substring(start, matchStart), false));
-      texts.add(_TextItem(match.group(0), true));
+      texts.add(_TextItem(text.substring(start, matchStart), 0));
+      int type;
+      if (match.group(1) != null) {
+        type = _TextItem.web;
+      } else if (match.group(2) != null || match.group(3) != null) {
+        type = _TextItem.phone;
+      } else if (match.group(4) != null) {
+        type = _TextItem.mail;
+      }
+      texts.add(_TextItem(match.group(0), type));
       start = match.end;
     }
     if (start != text.length - 1)
-      texts.add(_TextItem(text.substring(start), false));
+      texts.add(_TextItem(text.substring(start), 0));
   }
 
   @override
@@ -79,7 +89,7 @@ class _BetterTextState extends State<BetterText> {
       TextSpan(
           children: List<InlineSpan>.generate(
               texts.length,
-              (index) => !texts[index].type
+              (index) => texts[index].type == 0
                   ? TextSpan(text: texts[index].text)
                   : TextSpan(
                       text: texts[index].text,
@@ -87,10 +97,23 @@ class _BetterTextState extends State<BetterText> {
                           const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
-                          String url = texts[index].text;
-                          url = Uri.encodeComponent(url);
-                          Application.router.navigateTo(
-                              context, "${Routes.webViewPage}?url=$url");
+                          switch (texts[index].type) {
+                            case 1:
+                              String url = texts[index].text;
+                              url = Uri.encodeComponent(url);
+                              Application.router.navigateTo(
+                                  context, "${Routes.webViewPage}?url=$url");
+                              break;
+                            case 2:
+                              String url = "tel:${texts[index].text}";
+                              if (await canLaunch(url)) launch(url);
+                              break;
+                            case 3:
+                              String url = "mailto:${texts[index].text}";
+                              if (await canLaunch(url)) launch(url);
+                              break;
+                          }
+
 //                          if (await canLaunch(texts[index].text)) {
 //                            launch(texts[index].text);
 //                          }
@@ -126,7 +149,17 @@ class _TextItem {
   _TextItem(this.text, this.type);
 
   final String text;
-  final bool type;
+  final int type;
+
+  static final int normal = 0;
+  static final int web = 1;
+  static final int phone = 2;
+  static final int mail = 3;
+
+  @override
+  String toString() {
+    return "$type: $text";
+  }
 }
 
 const double _kToolbarScreenPadding = 8.0;

@@ -35,11 +35,11 @@ class _WebViewPageState extends State<WebViewPage> {
         webController.goBack();
         return;
       }
-      if (url == nowUrl || !url.startsWith("https")) {
-        setState(() {
-          error = true;
-        });
-      }
+//      if (url == nowUrl || !url.startsWith("http")) {
+//        setState(() {
+//          error = true;
+//        });
+//      }
     });
     webController.onUrlChanged.listen((url) async {
       nowUrl = url;
