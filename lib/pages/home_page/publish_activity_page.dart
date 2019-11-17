@@ -69,7 +69,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
         time.month.toString() +
         '—' +
         time.day.toString() +
-        '▼';
+        ' ▼';
     endTime = "请选择活动结束时间";
     super.initState();
   }
@@ -177,7 +177,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
 
   topPart() => Container(
         // height: ScreenUtil().setHeight(600),
-        width: ScreenUtil().setWidth(220),
+        // width: ScreenUtil().setWidth(220),
         margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(20)),
         // color: Colors.amber,
         child: Row(
@@ -185,95 +185,95 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             uploadImage(),
-            Container(
-              // color: Colors.amber,
-              padding: EdgeInsets.only(left: ScreenUtil().setWidth(30)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  ///活动名称
-                  Container(
-                    width: ScreenUtil().setWidth(420),
-                    padding: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
-                    // color: Colors.amber,
-                    child: TextField(
-                      maxLines: 1,
-                      // maxLength: 20,
-                      minLines: 1,
-                      focusNode: titleNode,
-                      onEditingComplete: () {
-                        FocusScope.of(context).requestFocus(sponsorNode);
-                      },
-                      cursorColor: Theme.of(context).primaryColor,
-                      controller: _titleInputController,
-                      decoration: InputDecoration(
-                        labelText: '活动名称',
-                        filled: true,
-                        hintText: '请输入活动名称',
-                        fillColor: Color.fromARGB(255, 245, 241, 241),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: EdgeInsets.all(12),
-                      ),
-                    ),
-                  ),
-
-                  ///主办方
-                  Container(
-                    width: ScreenUtil().setWidth(420),
-                    padding: EdgeInsets.only(top: 20),
-                    // color: Colors.amber,
-                    child: TextField(
-                      maxLines: 1,
-                      // maxLength: 30,
-                      minLines: 1,
-                      focusNode: sponsorNode,
-                      cursorColor: Theme.of(context).primaryColor,
-                      controller: _sponsorInputController,
-                      decoration: InputDecoration(
-                        labelText: '主办方',
-                        filled: true,
-                        hintText: '请输入主办方',
-                        fillColor: Color.fromARGB(255, 245, 241, 241),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: EdgeInsets.all(12),
-                      ),
-                    ),
-                  ),
-
-                  ///选择活动类型
-                  Container(
-                      height: ScreenUtil().setHeight(70),
-                      width: ScreenUtil().setWidth(420),
-                      margin: EdgeInsets.only(top: 20),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 245, 241, 241),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: DropdownButton(
-                        hint: BetterText('请选择活动类型'),
-                        items: activityTypes.map((item) {
-                          return DropdownMenuItem(
-                            value: item.id,
-                            child: BetterText(item.name),
-                          );
-                        }).toList(),
-                        value: this.selectedActivityTypeValue,
-                        isExpanded: true,
-                        underline: BetterText(''),
-                        onChanged: (t) {
-                          setState(() {
-                            this.selectedActivityTypeValue = t;
-                          });
+            Expanded(
+              child: Container(
+                // color: Colors.amber,
+                padding: EdgeInsets.only(left: ScreenUtil().setWidth(30)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    ///活动名称
+                    Container(
+                      // width: ScreenUtil().setWidth(420),
+                      padding: EdgeInsets.only(top: 10),
+                      // color: Colors.amber,
+                      child: TextField(
+                        maxLines: 1,
+                        // maxLength: 20,
+                        minLines: 1,
+                        focusNode: titleNode,
+                        onEditingComplete: () {
+                          FocusScope.of(context).requestFocus(sponsorNode);
                         },
-                      )),
-                ],
+                        cursorColor: Theme.of(context).primaryColor,
+                        controller: _titleInputController,
+                        decoration: InputDecoration(
+                          labelText: '活动名称',
+                          filled: true,
+                          hintText: '请输入活动名称',
+                          fillColor: Color.fromARGB(255, 245, 241, 241),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.all(12),
+                        ),
+                      ),
+                    ),
+
+                    ///主办方
+                    Container(
+                      padding: EdgeInsets.only(top: 10),
+                      // color: Colors.amber,
+                      child: TextField(
+                        maxLines: 1,
+                        // maxLength: 30,
+                        minLines: 1,
+                        focusNode: sponsorNode,
+                        cursorColor: Theme.of(context).primaryColor,
+                        controller: _sponsorInputController,
+                        decoration: InputDecoration(
+                          labelText: '主办方',
+                          filled: true,
+                          hintText: '请输入主办方',
+                          fillColor: Color.fromARGB(255, 245, 241, 241),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.all(12),
+                        ),
+                      ),
+                    ),
+
+                    ///选择活动类型
+                    Container(
+                        height: ScreenUtil().setHeight(70),
+                        margin: EdgeInsets.only(top: 20),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            color: Color.fromARGB(255, 245, 241, 241),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: DropdownButton(
+                          hint: BetterText('请选择活动类型'),
+                          items: activityTypes.map((item) {
+                            return DropdownMenuItem(
+                              value: item.id,
+                              child: BetterText(item.name),
+                            );
+                          }).toList(),
+                          value: this.selectedActivityTypeValue,
+                          isExpanded: true,
+                          underline: BetterText(''),
+                          onChanged: (t) {
+                            setState(() {
+                              this.selectedActivityTypeValue = t;
+                            });
+                          },
+                        )),
+                  ],
+                ),
               ),
             ),
           ],
@@ -291,12 +291,14 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                BetterText(
-                  "活动时间",
-                  style: TextStyle(fontSize: ScreenUtil().setSp(30)),
+                Text(
+                  "活动时间：",
+                  style: TextStyle(
+                      fontSize: ScreenUtil().setSp(30),
+                      color: Theme.of(context).primaryColor),
                 ),
                 Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    // padding: EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                         color: inputColor,
                         borderRadius: BorderRadius.circular(15)),
@@ -321,13 +323,13 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                                     time.month.toString() +
                                     '—' +
                                     time.day.toString() +
-                                    '▼';
+                                    ' ▼';
                               });
                             });
                           },
                           child: Container(
                             padding: EdgeInsets.all(5),
-                            child: BetterText(startTime),
+                            child: Text(startTime),
                           ),
                         ),
                         InkWell(
@@ -348,13 +350,13 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
                                     time.month.toString() +
                                     '—' +
                                     time.day.toString() +
-                                    '▼';
+                                    ' ▼';
                               });
                             });
                           },
                           child: Container(
                             padding: EdgeInsets.all(5),
-                            child: BetterText(endTime),
+                            child: Text(endTime),
                           ),
                         ),
                       ],
@@ -717,6 +719,7 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
       var response = await ApiClient.dio.get('get_activity_types/');
       ActivityTypesModel activityTypes =
           ActivityTypesModel.fromJson(response.data);
+      activityTypes.data.removeWhere((test) => test.name == '推荐');
       setState(() {
         this.activityTypes = activityTypes.data;
       });
