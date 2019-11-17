@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:finder/plugin/better_text.dart';
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
@@ -340,6 +338,7 @@ class _RecruitPageState extends State<RecruitPage> {
                     width: ScreenUtil.screenWidthDp,
                     child: DropDownTextWidget(
                       content: item.introduction,
+                      domain: "RecruitPage",
                     )),
               ],
             ),

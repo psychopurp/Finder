@@ -17,7 +17,9 @@ class DropDownSelector<T extends DropDownItem> extends StatefulWidget {
       this.types,
       this.changeOnSelect = false,
       this.search = false,
-      this.verbose = "修改分类"});
+      this.verbose = "修改分类",
+      Key key})
+      : super(key: key);
 
   final DropDownSelectorCallBack onChange;
   final List<T> types;
@@ -129,159 +131,168 @@ class _DropDownSelectorState extends State<DropDownSelector>
     Widget child;
     child = Container(
       color: Colors.white,
+      height: init ? null : 48,
       padding: EdgeInsets.symmetric(horizontal: 20),
       margin: EdgeInsets.symmetric(vertical: 5),
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              getTag(_nowType.name),
-              Expanded(
-                flex: 1,
-                child: Container(),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  if (!isOpen) {
-                    open();
-                  } else {
-                    close();
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                getTag(_nowType.name),
+                Expanded(
+                  flex: 1,
+                  child: Container(),
+                ),
+                MaterialButton(
+                  onPressed: () {
+                    if (!isOpen) {
+                      open();
+                    } else {
+                      close();
+                    }
+                  },
+                  minWidth: 10,
+                  padding: EdgeInsets.symmetric(horizontal: 13),
+                  child: Row(
+                    children: <Widget>[
+                      BetterText(
+                        widget.verbose,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xff444444),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(3),
+                      ),
+                      Transform.rotate(
+                        angle: _rotateAnimation.value,
+                        child: Icon(
+                          Icons.arrow_forward_ios,
+                          size: 11,
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+            Builder(builder: (context) {
+              if (!init) {
+                widgetsBinding.addPostFrameCallback((outContext) {
+                  if (!init) {
+                    try{
+                      _totalHeight = context.size.height;
+                      setState(() {
+                        init = true;
+                      });
+                    }on Exception catch(e){
+                      print("DropDownSelector");
+                      print(e);
+                    }
                   }
-                },
-                minWidth: 10,
-                padding: EdgeInsets.symmetric(horizontal: 13),
-                child: Row(
+                });
+              }
+              if (onSearch) {
+                Future.delayed(Duration(milliseconds: 50), () {
+                  _totalHeight = context.size.height;
+                });
+              }
+              List<Widget> children = <Widget>[
+                Wrap(
+                  children: List<Widget>.generate(
+                      _types.length,
+                      (index) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _tempType = _types[index];
+                                if (widget.changeOnSelect) {
+                                  (widget.onChange ?? (b) {})(_tempType);
+                                }
+                              });
+                            },
+                            child: getTag(_types[index].name,
+                                select: _types[index].id == _tempType.id),
+                          )),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    BetterText(
-                      widget.verbose,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Color(0xff444444),
+                    MaterialButton(
+                      onPressed: () {
+                        close();
+                      },
+                      child: BetterText(
+                        "取消",
+                        style: TextStyle(color: Color(0xff999999)),
                       ),
+                      minWidth: 10,
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(3),
-                    ),
-                    Transform.rotate(
-                      angle: _rotateAnimation.value,
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 11,
+                    MaterialButton(
+                      textColor: Theme.of(context).primaryColor,
+                      onPressed: () {
+                        (widget.onChange ?? (b) {})(_tempType);
+                        close();
+                      },
+                      child: BetterText(
+                        "确定",
                       ),
-                    )
+                      minWidth: 10,
+                    ),
                   ],
                 ),
-              )
-            ],
-          ),
-          Builder(builder: (context) {
-            if (!init) {
-              widgetsBinding.addPostFrameCallback((outContext) {
-                if (!init) {
-                  _totalHeight = context.size.height;
-                  setState(() {
-                    init = true;
-                  });
-                }
-              });
-            }
-            if (onSearch) {
-              Future.delayed(Duration(milliseconds: 50), () {
-                _totalHeight = context.size.height;
-              });
-            }
-            List<Widget> children = <Widget>[
-              Wrap(
-                children: List<Widget>.generate(
-                    _types.length,
-                    (index) => GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _tempType = _types[index];
-                              if (widget.changeOnSelect) {
-                                (widget.onChange ?? (b) {})(_tempType);
-                              }
-                            });
-                          },
-                          child: getTag(_types[index].name,
-                              select: _types[index].id == _tempType.id),
-                        )),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  MaterialButton(
-                    onPressed: () {
-                      close();
-                    },
-                    child: BetterText(
-                      "取消",
-                      style: TextStyle(color: Color(0xff999999)),
-                    ),
-                    minWidth: 10,
-                  ),
-                  MaterialButton(
-                    textColor: Theme.of(context).primaryColor,
-                    onPressed: () {
-                      (widget.onChange ?? (b) {})(_tempType);
-                      close();
-                    },
-                    child: BetterText(
-                      "确定",
-                    ),
-                    minWidth: 10,
-                  ),
-                ],
-              ),
-            ];
-            if (widget.search)
-              children.insert(
-                0,
-                Container(
-                  height: 50,
-                  margin: EdgeInsets.symmetric(vertical: 5),
-                  child: TextField(
-                    focusNode: _focusNode,
-                    expands: false,
-                    keyboardType: TextInputType.text,
-                    cursorColor: Theme.of(context).primaryColor,
-                    controller: _searchController,
-                    onEditingComplete: () {
-                      _focusNode.unfocus();
-                    },
-                    onChanged: (value) {
-                      setState(() {
-                        _types = [];
-                        _allTypes.forEach((e) {
-                          if (e.name.contains(value)) {
-                            _types.add(e);
-                          }
+              ];
+              if (widget.search)
+                children.insert(
+                  0,
+                  Container(
+                    height: 50,
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    child: TextField(
+                      focusNode: _focusNode,
+                      expands: false,
+                      keyboardType: TextInputType.text,
+                      cursorColor: Theme.of(context).primaryColor,
+                      controller: _searchController,
+                      onEditingComplete: () {
+                        _focusNode.unfocus();
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          _types = [];
+                          _allTypes.forEach((e) {
+                            if (e.name.contains(value)) {
+                              _types.add(e);
+                            }
+                          });
                         });
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: "筛选",
-                      filled: true,
-                      hintText: "输入文字, 搜索搜索!",
-                      fillColor: Color.fromARGB(255, 245, 241, 241),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
+                      },
+                      decoration: InputDecoration(
+                        labelText: "筛选",
+                        filled: true,
+                        hintText: "输入文字, 搜索搜索!",
+                        fillColor: Color.fromARGB(255, 245, 241, 241),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
+                );
+              return Container(
+                height: !init || onSearch ? null : _animation.value,
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: SingleChildScrollView(
+                  physics: NeverScrollableScrollPhysics(),
+                  child: Column(children: children),
                 ),
               );
-            return Container(
-              height: !init || onSearch ? null : _animation.value,
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: SingleChildScrollView(
-                physics: NeverScrollableScrollPhysics(),
-                child: Column(children: children),
-              ),
-            );
-          }),
-        ],
+            }),
+          ],
+        ),
+        physics: NeverScrollableScrollPhysics(),
       ),
     );
     return child;
