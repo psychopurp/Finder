@@ -320,6 +320,7 @@ class _InternshipPageState extends State<InternshipPage> {
                 padding: EdgeInsets.only(right: 10),
                 child: BetterText(
                   getTimeString(item.time),
+                  enableSelection: true,
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 14,

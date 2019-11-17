@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:finder/config/api_client.dart';
 import 'package:finder/models/user_model.dart';
 import 'package:finder/plugin/avatar.dart';
 import 'package:finder/plugin/dialog.dart';
+import 'package:finder/plugin/drop_down_selector.dart';
 import 'package:finder/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -41,9 +41,10 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
-          schools = [notSelect]..addAll(List<School>.generate(
-              result["data"].length,
-              (index) => School.fromJson(result["data"][index])));
+          schools = [notSelect]
+            ..addAll(List<School>.generate(
+                result["data"].length,
+                    (index) => School.fromJson(result["data"][index])));
         });
       }
     } on DioError catch (e) {
@@ -65,9 +66,10 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
       Map<String, dynamic> result = response.data;
       if (result["status"]) {
         setState(() {
-          majors = [notSelect]..addAll(List<School>.generate(
-              result["data"].length,
-              (index) => School.fromJson(result["data"][index])));
+          majors = [notSelect]
+            ..addAll(List<School>.generate(
+                result["data"].length,
+                    (index) => School.fromJson(result["data"][index])));
         });
       }
     } on DioError catch (e) {
@@ -140,7 +142,9 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
     _studentIdController = TextEditingController();
     _introductionController = TextEditingController();
     Future.delayed(Duration(milliseconds: 400), () {
-      UserModel user = Provider.of<UserProvider>(context).userInfo;
+      UserModel user = Provider
+          .of<UserProvider>(context)
+          .userInfo;
       _nicknameController.text = user.nickname;
       _realNameController.text = user.realName;
       _studentIdController.text = user.studentId;
@@ -164,7 +168,8 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
 //    showErrorHint(context, "由于本软件属于校园社交软件, 需要实名认证信息, 请务必保证信息的准确性.");
   }
 
-  Widget get avatar => Padding(
+  Widget get avatar =>
+      Padding(
         padding: EdgeInsets.only(top: 18.0),
         child: MaterialButton(
           onPressed: () async {
@@ -202,7 +207,9 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
                   androidUiSettings: AndroidUiSettings(
                       showCropGrid: false,
                       toolbarTitle: '图片剪切',
-                      toolbarColor: Theme.of(context).primaryColor,
+                      toolbarColor: Theme
+                          .of(context)
+                          .primaryColor,
                       toolbarWidgetColor: Colors.white,
                       initAspectRatio: CropAspectRatioPreset.original,
                       lockAspectRatio: true),
@@ -218,7 +225,9 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
           highlightColor: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
+              color: Theme
+                  .of(context)
+                  .primaryColor,
               borderRadius: BorderRadius.circular(60),
             ),
             width: 120,
@@ -233,13 +242,15 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
                 height: 118,
                 child: avatarRealUrl != ""
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(59),
-                        child: Image.network(avatarRealUrl))
+                    borderRadius: BorderRadius.circular(59),
+                    child: Image.network(avatarRealUrl))
                     : Icon(
-                        Icons.add,
-                        size: 40,
-                        color: Theme.of(context).primaryColor,
-                      ),
+                  Icons.add,
+                  size: 40,
+                  color: Theme
+                      .of(context)
+                      .primaryColor,
+                ),
               ),
             ),
           ),
@@ -321,23 +332,27 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
                   maxLine: null,
                   minLine: null,
                   expand: true),
-              Selector(
+              DropDownSelector(
                   onChange: (school) {
                     setState(() {
                       selectedSchool = school;
                     });
                   },
-                  schools: schools,
-                  selected: selectedSchool,
+                  types: schools,
+                  nowType: selectedSchool,
+                  search: true,
+                  changeOnSelect: true,
                   verbose: "选择学校"),
-              Selector(
+              DropDownSelector(
                   onChange: (major) {
                     setState(() {
                       selectedMajor = major;
                     });
                   },
-                  schools: majors,
-                  selected: selectedMajor,
+                  changeOnSelect: true,
+                  search: true,
+                  types: majors,
+                  nowType: selectedMajor,
                   verbose: "选择专业"),
             ],
           ),
@@ -346,15 +361,14 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
     );
   }
 
-  Widget singleLineTestField(
-      {TextEditingController controller,
-      String label,
-      String hint,
-      bool obscureText = false,
-      TextInputType inputType = TextInputType.text,
-      int maxLine = 1,
-      int minLine = 1,
-      bool expand = false}) {
+  Widget singleLineTestField({TextEditingController controller,
+    String label,
+    String hint,
+    bool obscureText = false,
+    TextInputType inputType = TextInputType.text,
+    int maxLine = 1,
+    int minLine = 1,
+    bool expand = false}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: TextField(
@@ -363,7 +377,9 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
         expands: false,
         obscureText: obscureText,
         keyboardType: inputType,
-        cursorColor: Theme.of(context).primaryColor,
+        cursorColor: Theme
+            .of(context)
+            .primaryColor,
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
@@ -376,258 +392,6 @@ class _ModifyInfoPageState extends State<ModifyInfoPage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-typedef FilterChangeCallBack = void Function(School);
-
-class Selector extends StatefulWidget {
-  Selector({this.onChange, this.schools, this.selected, this.verbose});
-
-  final FilterChangeCallBack onChange;
-  final List<School> schools;
-  final School selected;
-  final String verbose;
-
-  @override
-  _SelectorState createState() => _SelectorState();
-}
-
-class _SelectorState extends State<Selector> with TickerProviderStateMixin {
-  bool isOpen = false;
-
-  List<School> get _allSchools => widget.schools;
-
-  List<School> _schools = [];
-
-  School get _selected => widget.selected;
-
-  School _tempSelected;
-  AnimationController _animationController;
-  AnimationController _rotateController;
-  Animation _rotateAnimation;
-  Animation _animation;
-  Animation _curve;
-  TextEditingController _filter;
-
-  double _oldHeight = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _tempSelected = _selected;
-    const Duration duration = Duration(milliseconds: 300);
-    _animationController = AnimationController(vsync: this, duration: duration);
-    _rotateController = AnimationController(vsync: this, duration: duration);
-    _animationController.addListener(() {
-      setState(() {});
-    });
-    _curve =
-        CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
-    _animation = Tween<double>(begin: 0, end: 1).animate(_curve);
-    _rotateAnimation = Tween<double>(begin: 0, end: pi / 2).animate(
-        CurvedAnimation(curve: Curves.easeInOut, parent: _rotateController));
-    _allSchools.forEach((e) {
-      _schools.add(e);
-    });
-    _filter = TextEditingController();
-  }
-
-  Future<void> changeHeightTo(height) async {
-    double oldHeight = _oldHeight;
-    _animationController.reset();
-    _animation = Tween<double>(begin: oldHeight, end: height).animate(_curve);
-    await _animationController.forward();
-    _oldHeight = height;
-  }
-
-  Future<void> changeHeight() async {
-    int length = _schools.length; // 获取较大的列表长度
-    double height = (length / 2).ceil() * 65.0 + 130;
-    await changeHeightTo(height);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _animationController.dispose();
-    _rotateController.dispose();
-    _filter.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget child;
-    child = Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      margin: EdgeInsets.symmetric(vertical: 5),
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              getTag(_selected.name),
-              Expanded(
-                flex: 1,
-                child: Container(),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  if (!isOpen) {
-                    open();
-                  } else {
-                    close();
-                  }
-                },
-                minWidth: 10,
-                padding: EdgeInsets.symmetric(horizontal: 13),
-                child: Row(
-                  children: <Widget>[
-                    BetterText(
-                      widget.verbose,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Color(0xff444444),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(3),
-                    ),
-                    Transform.rotate(
-                      angle: _rotateAnimation.value,
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 11,
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-          Container(
-            height: _animation.value,
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    height: 50,
-                    margin: EdgeInsets.symmetric(vertical: 5),
-                    child: TextField(
-                      expands: false,
-                      keyboardType: TextInputType.text,
-                      cursorColor: Theme.of(context).primaryColor,
-                      controller: _filter,
-                      onChanged: (value) {
-                        _schools = [];
-                        _allSchools.forEach((e) {
-                          if (e.name.contains(value)) {
-                            _schools.add(e);
-                          }
-                        });
-                        changeHeight();
-                      },
-                      decoration: InputDecoration(
-                        labelText: "筛选",
-                        filled: true,
-                        hintText: "输入文字, 搜索搜索!",
-                        fillColor: Color.fromARGB(255, 245, 241, 241),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Wrap(
-                    children: List<Widget>.generate(
-                        _schools.length,
-                        (index) => GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _tempSelected = _schools[index];
-                                  (widget.onChange ?? (b) {})(_tempSelected);
-                                });
-                              },
-                              child: getTag(_schools[index].name,
-                                  select:
-                                      _schools[index].id == _tempSelected.id),
-                            )),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      MaterialButton(
-                        onPressed: () {
-                          close();
-                        },
-                        child: BetterText(
-                          "取消",
-                          style: TextStyle(color: Color(0xff999999)),
-                        ),
-                        minWidth: 10,
-                      ),
-                      MaterialButton(
-                        textColor: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          (widget.onChange ?? (b) {})(_tempSelected);
-                          close();
-                        },
-                        child: BetterText(
-                          "确定",
-                        ),
-                        minWidth: 10,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-    return child;
-  }
-
-  Future<void> close() async {
-    _rotateController.reverse();
-    await changeHeightTo(0.0);
-    _tempSelected = _selected;
-    isOpen = false;
-    setState(() {});
-  }
-
-  Future<void> open() async {
-    _tempSelected = _selected;
-    _rotateController.forward();
-    await changeHeight();
-    isOpen = true;
-  }
-
-  Widget getTag(String tag, {bool select = true}) {
-    return Builder(
-      builder: (context) {
-        return Container(
-          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-          decoration: BoxDecoration(
-              color: !select
-                  ? Color.fromARGB(255, 204, 204, 204)
-                  : Theme.of(context).accentColor,
-              borderRadius: BorderRadius.circular(15)),
-          child: BetterText(
-            tag,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-            ),
-          ),
-        );
-      },
     );
   }
 }

@@ -24,7 +24,7 @@ class SayToHeChatRoute extends StatelessWidget {
     String sessionId = args["sessionId"];
     return Scaffold(
       appBar: AppBar(
-        title: BetterText(other.nickname),
+        title: BetterText(other.nickname, enableSelection: true,),
       ),
       backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       body: SayToHeChatPage(sessionId, other),
@@ -564,6 +564,7 @@ class Bubble extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: bubbleWidth),
           child: BetterText(
             text,
+            enableSelection: true,
             style: style,
           ),
         )

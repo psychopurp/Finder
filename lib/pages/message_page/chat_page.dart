@@ -584,6 +584,7 @@ class Bubble extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: bubbleWidth),
           child: BetterText(
             text,
+            enableSelection: true,
             style: style,
           ),
         )

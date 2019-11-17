@@ -430,7 +430,7 @@ class _HeSaysPageState extends State<HeSaysPage> {
                   ],
                 ),
               ),
-              DropDownTextWidget(content: item.content),
+              DropDownTextWidget(content: item.content, enableSelection: true,),
             ],
           ),
           Container(

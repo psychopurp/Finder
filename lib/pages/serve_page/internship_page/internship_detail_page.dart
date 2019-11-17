@@ -61,6 +61,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
         backgroundColor: Colors.white,
         title: BetterText(
           item.title,
+          enableSelection: true,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(color: appBarColor, fontSize: 22),
@@ -123,8 +124,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
                     children: <Widget>[
                       BetterText(
                         item.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        enableSelection: true,
                         style: TextStyle(
                           fontSize: 24,
                           letterSpacing: 2,
@@ -135,6 +135,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
                       ),
                       BetterText(
                         getTimeString(item.time),
+                        enableSelection: true,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -234,6 +235,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
             width: ScreenUtil.screenWidthDp,
             child: BetterText(
               item.salaryRange,
+              enableSelection: true,
               style: TextStyle(
                 color: Color(0xff777777),
                 fontSize: 14,
@@ -260,6 +262,7 @@ class _InternshipDetailPageState extends State<InternshipDetailPage> {
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: BetterText(
               item.introduction,
+              enableSelection: true,
               style: TextStyle(fontSize: 16),
             ),
           ),

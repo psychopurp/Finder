@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:finder/plugin/drop_down_selector.dart';
 import 'package:finder/public.dart';
 import 'package:flutter/material.dart';
 
@@ -84,7 +85,7 @@ class UserModel {
   }
 }
 
-class School {
+class School extends DropDownItem{
   int id;
   String name;
 

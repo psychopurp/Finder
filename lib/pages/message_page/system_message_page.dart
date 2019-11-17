@@ -228,7 +228,7 @@ class _SystemMessagePageState extends State<SystemMessagePage> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: BetterText("系统消息"),
+        title: BetterText("系统消息", enableSelection: true,),
       ),
       backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       body: Column(
@@ -533,6 +533,7 @@ class Bubble extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: bubbleWidth),
           child: BetterText(
             text,
+            enableSelection: true,
             style: style,
           ),
         )

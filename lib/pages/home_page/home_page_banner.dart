@@ -28,9 +28,9 @@ class HomePageBanner extends StatelessWidget {
           url = Uri.encodeComponent(url);
           Application.router
               .navigateTo(context, "${Routes.webViewPage}?url=$url");
-          if (await canLaunch(url)) {
-            await launch(url);
-          }
+//          if (await canLaunch(url)) {
+//            await launch(url);
+//          }
         },
         viewportFraction: 0.9,
         scale: 0.1,

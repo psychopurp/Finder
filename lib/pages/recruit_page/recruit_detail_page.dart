@@ -63,6 +63,7 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
         backgroundColor: Colors.white,
         title: BetterText(
           item.title,
+          enableSelection: true,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(color: appBarColor, fontSize: 22),
@@ -134,6 +135,7 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
                     children: <Widget>[
                       BetterText(
                         item.title,
+                        enableSelection: true,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -146,6 +148,7 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
                       ),
                       BetterText(
                         getTimeString(item.time),
+                        enableSelection: true,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -243,6 +246,7 @@ class _RecruitDetailPageState extends State<RecruitDetailPage> {
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: BetterText(
               item.introduction,
+              enableSelection: true,
               style: TextStyle(fontSize: 16),
             ),
           ),

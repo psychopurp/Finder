@@ -195,6 +195,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                     children: <Widget>[
                       BetterText(
                         item.title,
+                        enableSelection: true,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -207,6 +208,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
                       ),
                       BetterText(
                         getTimeString(item.time),
+                        enableSelection: true,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -328,6 +330,7 @@ class _HeSaysDetailState extends State<HeSaysDetail> {
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: BetterText(
               item.content,
+              enableSelection: true,
               style: TextStyle(fontSize: 16),
             ),
           )

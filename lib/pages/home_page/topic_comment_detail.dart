@@ -65,7 +65,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: BetterText(topicComment.topicTitle),
+        title: BetterText(topicComment.topicTitle, enableSelection: true,),
         elevation: 1,
         textTheme: TextTheme(
             title: Theme.of(context)
@@ -293,6 +293,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
                               SizedBox(height: 4),
                               BetterText(
                                 getTimeString(topicComment.time),
+                                enableSelection: true,
                                 style: TextStyle(
                                     color: Colors.grey,
                                     fontFamily: 'normal',
@@ -450,6 +451,7 @@ class _TopicCommentDetailPageState extends State<TopicCommentDetailPage>
             text,
             // maxLines: 5,
             // overflow: TextOverflow.ellipsis,
+            enableSelection: true,
             style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontFamily: 'normal',
