@@ -350,7 +350,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  BetterText((user.school != null) ? user.school.name : "家里蹲大学"),
+                  BetterText(
+                      (user.school != null) ? user.school.name : "家里蹲大学"),
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 5),
                     height: 14,
@@ -363,9 +364,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
               Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: BetterText((user.introduction != null)
-                      ? "简介：" + user.introduction
-                      : "简介：")),
+                  child: BetterText(
+                    (user.introduction != null)
+                        ? "简介：" + user.introduction
+                        : "简介：",
+                    enableSelection: true,
+                  )),
 
               ///关注
               Container(

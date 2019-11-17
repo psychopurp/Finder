@@ -489,6 +489,7 @@ class _CompanyPageState extends State<CompanyPage>
             ),
             BetterText(
               info,
+              enableSelection: true,
               style: TextStyle(color: Color(0xff444444)),
             ),
             Padding(
@@ -699,6 +700,7 @@ class CompanyPageHeader extends StatelessWidget {
                 width: nameWidth,
                 child: BetterText(
                   companyMainInfo.name,
+                  enableSelection: true,
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white,
@@ -707,6 +709,7 @@ class CompanyPageHeader extends StatelessWidget {
               ),
               BetterText(
                 company == null ? "" : "${company.type} / ${company.size}人",
+                enableSelection: true,
                 style: TextStyle(
                     color: Color(0xffeeeeee).withOpacity(avatarOpacity),
                     fontSize: 12),

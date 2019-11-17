@@ -227,6 +227,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
                       padding: EdgeInsets.only(right: 10),
                       child: BetterText(
                         getTimeString(item.time),
+                        enableSelection: true,
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           fontSize: 14,
@@ -244,7 +245,7 @@ class _CandidatesPageState extends State<CandidatesPage> {
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                  child: BetterText(item.information),
+                  child: BetterText(item.information, enableSelection: true,),
                 ),
                 status,
                 Container(

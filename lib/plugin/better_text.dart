@@ -5,12 +5,13 @@ import 'package:flutter/rendering.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class BetterText extends StatefulWidget {
   BetterText(
     this.text, {
     Key key,
+    this.onTap,
+    this.enableSelection = false,
     this.urlStyle,
     this.style,
     this.strutStyle,
@@ -37,6 +38,8 @@ class BetterText extends StatefulWidget {
   final TextWidthBasis textWidthBasis;
   final TextStyle urlStyle;
   final String text;
+  final VoidCallback onTap;
+  final bool enableSelection;
 
   @override
   _BetterTextState createState() => _BetterTextState();
@@ -86,14 +89,15 @@ class _BetterTextState extends State<BetterText> {
                         ..onTap = () async {
                           String url = texts[index].text;
                           url = Uri.encodeComponent(url);
-                          Application.router
-                              .navigateTo(context, "${Routes.webViewPage}?url=$url");
+                          Application.router.navigateTo(
+                              context, "${Routes.webViewPage}?url=$url");
 //                          if (await canLaunch(texts[index].text)) {
 //                            launch(texts[index].text);
 //                          }
                         }))),
+      onTap: widget.onTap,
       textSelectionControls: MyExtendedMaterialTextSelectionControls(),
-      selectionEnabled: true,
+      selectionEnabled: widget.enableSelection,
       style: widget.style,
       textAlign: widget.textAlign,
       maxLines: widget.maxLines,

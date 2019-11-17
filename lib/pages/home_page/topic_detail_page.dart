@@ -125,6 +125,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         // ],
         title: BetterText(
           this.widget.topicTitle,
+          enableSelection: true,
           style: TextStyle(
               fontSize: ScreenUtil().setSp(30),
               color: Colors.black.withOpacity(titleOpacity)),
@@ -149,6 +150,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
               // color: Colors.amber,
               child: BetterText(
                 this.widget.topicTitle,
+                enableSelection: true,
                 softWrap: true,
                 maxLines: 2,
                 style: TextStyle(
@@ -210,6 +212,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: BetterText(
                   this.widget.topicTitle,
+                  enableSelection: true,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -677,6 +680,7 @@ class _TopicCommentsState extends State<TopicComments> {
                           SizedBox(height: 4),
                           BetterText(
                             getTimeString(item.time),
+                            enableSelection: true,
                             style: TextStyle(
                                 color: Colors.grey,
                                 fontFamily: 'normal',

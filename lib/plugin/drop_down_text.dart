@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:finder/plugin/better_text.dart';
 
 class DropDownTextWidget extends StatefulWidget {
-  DropDownTextWidget({@required this.content, this.domain});
+  DropDownTextWidget(
+      {@required this.content, this.domain, this.enableSelection = false});
 
   final String content;
   final String domain;
+  final bool enableSelection;
 
   @override
   _DropDownTextWidgetState createState() => _DropDownTextWidgetState();
@@ -113,6 +115,7 @@ class _DropDownTextWidgetState extends State<DropDownTextWidget>
                 }
                 return BetterText(
                   widget.content,
+                  enableSelection: widget.enableSelection,
                   textAlign: TextAlign.left,
                   overflow: TextOverflow.ellipsis,
                   maxLines: init ? isMoreText ? 1000 : 5 : 1000,

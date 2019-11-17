@@ -223,6 +223,7 @@ class _CommentPageState extends State<CommentPage> {
                               ]))
                             : BetterText(
                                 item.content,
+                                enableSelection: true,
                                 style: Theme.of(context).textTheme.body2,
                               ),
                       ),

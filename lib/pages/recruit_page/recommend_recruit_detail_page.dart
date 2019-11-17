@@ -74,6 +74,7 @@ class _RecommendRecruitDetailPageState
         backgroundColor: Colors.white,
         title: BetterText(
           item.title,
+          enableSelection: true,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(color: appBarColor, fontSize: 22),
@@ -152,6 +153,7 @@ class _RecommendRecruitDetailPageState
                     children: <Widget>[
                       BetterText(
                         item.title,
+                        enableSelection: true,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -164,6 +166,7 @@ class _RecommendRecruitDetailPageState
                       ),
                       BetterText(
                         getTimeString(item.time),
+                        enableSelection: true,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -262,6 +265,7 @@ class _RecommendRecruitDetailPageState
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: BetterText(
               item.introduction ?? "暂时没有详情",
+              enableSelection: true,
               style: TextStyle(fontSize: 16),
             ),
           ),

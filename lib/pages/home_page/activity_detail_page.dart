@@ -161,6 +161,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       padding: EdgeInsets.symmetric(vertical: 0),
                       child: BetterText(
                         '#' + activity.title,
+                        enableSelection: true,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.left,
@@ -192,6 +193,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                       padding: EdgeInsets.only(bottom: 10, top: 5),
                       child: BetterText(
                         '开始时间：' + startTime + '\n' + '结束时间：' + endTime,
+                        enableSelection: true,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.left,
@@ -415,7 +417,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 Padding(
                   padding: EdgeInsets.all(20),
                 ),
-                BetterText(activity.description)
+                BetterText(activity.description, enableSelection: true,)
               ],
             )),
       ),

@@ -64,6 +64,7 @@ class _RecommendInternshipDetailPageState
         title: BetterText(
           item.title,
           maxLines: 1,
+          enableSelection: true,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(color: appBarColor, fontSize: 22),
         ),
@@ -141,8 +142,7 @@ class _RecommendInternshipDetailPageState
                     children: <Widget>[
                       BetterText(
                         item.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        enableSelection: true,
                         style: TextStyle(
                           fontSize: 24,
                           letterSpacing: 2,
@@ -153,6 +153,7 @@ class _RecommendInternshipDetailPageState
                       ),
                       BetterText(
                         getTimeString(item.time),
+                        enableSelection: true,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -252,6 +253,7 @@ class _RecommendInternshipDetailPageState
             width: ScreenUtil.screenWidthDp,
             child: BetterText(
               item.salaryRange,
+              enableSelection: true,
               style: TextStyle(
                 color: Color(0xff777777),
                 fontSize: 14,
@@ -278,6 +280,7 @@ class _RecommendInternshipDetailPageState
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: BetterText(
               item.introduction ?? "暂时没有详情",
+              enableSelection: true,
               style: TextStyle(fontSize: 16),
             ),
           ),
