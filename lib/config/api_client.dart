@@ -224,6 +224,7 @@ class ApiClient {
       return response.data;
     } catch (e) {
       print('发布话题错误==========>$e');
+      return {'status': null, 'data': '服务器出了点故障，请稍后重试...'};
     }
   }
 

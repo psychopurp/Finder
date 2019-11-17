@@ -24,6 +24,7 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
   List<Asset> images = [];
 
   bool onlyInSchool = false;
+  UserProvider userProvider;
 
   TextEditingController _titleController;
   TextEditingController _tagController;
@@ -44,7 +45,9 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
+    var appBarColor = Color.fromARGB(255, 95, 95, 95);
+    var appBarIconColor = Color.fromARGB(255, 155, 155, 155);
 
     //仅本校可见部分
     var onlySchool = Container(
@@ -66,59 +69,71 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
+        leading: MaterialButton(
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: appBarIconColor,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        // title: BetterText('Finders'),
         backgroundColor: Colors.white,
+        brightness: Brightness.light,
+        elevation: 0,
         title: BetterText(
-          '创建话题',
+          "创建话题",
           style: TextStyle(
-            color: Colors.black,
+            color: appBarColor,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        centerTitle: true,
+        centerTitle: true, // cente
         actions: <Widget>[
-          FlatButton(
-            highlightColor: Theme.of(context).primaryColor.withOpacity(0.1),
-            onPressed: () async {
-              showDialog(
-                context: context,
-                barrierDismissible: false, //点击遮罩不关闭对话框
-                builder: (context) {
-                  return AlertDialog(
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        CircularProgressIndicator(),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 26.0),
-                          child: BetterText("正在发布，请稍后..."),
-                        )
-                      ],
-                    ),
-                  );
-                },
-              );
-              // bool status = true;
-              bool status = await publishTopic(user);
-              // await Future.delayed(Duration(seconds: 3), () {});
-              // print(status);
-              Navigator.pop(context);
-              if (!status) {
-                handleError();
-              } else {
-                handleSuccess();
-              }
-            },
-            child: BetterText(
-              '发布',
-              style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontFamily: "Poppins",
-                  fontSize: ScreenUtil().setSp(30)),
-            ),
-          )
+          Padding(
+              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 7),
+              child: MaterialButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  minWidth: 30,
+                  padding: EdgeInsets.symmetric(horizontal: 18),
+                  color: Color(0xFFDB6B5C),
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false, //点击遮罩不关闭对话框
+                      builder: (context) {
+                        return AlertDialog(
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              CircularProgressIndicator(),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 26.0),
+                                child: BetterText("正在发布，请稍后..."),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    );
+
+                    bool status = await publishTopic(userProvider);
+                    Navigator.pop(context);
+                    if (!status) {
+                      handleError();
+                    } else {
+                      handleSuccess();
+                    }
+                  },
+                  child: BetterText(
+                    '发布',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  )))
         ],
         // title: BetterText('Finders'),
-        elevation: 0,
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(40)),
@@ -389,15 +404,16 @@ class _PublishTopicPageState extends State<PublishTopicPage> {
       return false;
     }
     if (this.onlyInSchool && user.userInfo.school == null) {
-      if (imagePath == null) {
-        errorHint = "家里蹲大学不能发布校内话题哟~ \n请尝试考个大学吧! ";
-        return false;
-      }
+      errorHint = "家里蹲大学不能发布校内话题哟~ \n请尝试考个大学吧! ";
+      return false;
     }
-    var data = await user.addTopic(title, this.tags, imagePath,
+    var data = await apiClient.addTopic(title, this.tags, imagePath,
         schoolId: this.onlyInSchool ? user.userInfo.school.id : null);
     print(data);
-    if (!data["status"]) {
+    if (data['status'] == null) {
+      errorHint = data['data'];
+      return false;
+    } else if (!data["status"]) {
       errorHint = '当前话题已存在！';
       return false;
     } else {

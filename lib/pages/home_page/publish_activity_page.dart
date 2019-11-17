@@ -99,59 +99,74 @@ class _PublishActivityPageState extends State<PublishActivityPage> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
+    var appBarColor = Color.fromARGB(255, 95, 95, 95);
+    var appBarIconColor = Color.fromARGB(255, 155, 155, 155);
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
+        leading: MaterialButton(
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: appBarIconColor,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        // title: BetterText('Finders'),
         backgroundColor: Colors.white,
+        brightness: Brightness.light,
+        elevation: 0,
         title: BetterText(
-          '创建活动',
+          "创建活动",
           style: TextStyle(
-            color: Colors.black,
+            color: appBarColor,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        centerTitle: true,
+        centerTitle: true, // cente
         actions: <Widget>[
-          FlatButton(
-            onPressed: () async {
-              showDialog(
-                context: context,
-                barrierDismissible: false, //点击遮罩不关闭对话框
-                builder: (context) {
-                  return AlertDialog(
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        CircularProgressIndicator(),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 26.0),
-                          child: BetterText("正在发布，请稍后..."),
-                        )
-                      ],
-                    ),
-                  );
-                },
-              );
-              // bool status = true;
-              bool status = await publishActivity(user);
-              // await Future.delayed(Duration(seconds: 3), () {});
+          Padding(
+              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 7),
+              child: MaterialButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  minWidth: 30,
+                  padding: EdgeInsets.symmetric(horizontal: 18),
+                  color: Color(0xFFDB6B5C),
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false, //点击遮罩不关闭对话框
+                      builder: (context) {
+                        return AlertDialog(
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              CircularProgressIndicator(),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 26.0),
+                                child: BetterText("正在发布，请稍后..."),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    );
 
-              Navigator.pop(context);
-              if (!status) {
-                handleError();
-              } else {
-                handleSuccess();
-              }
-            },
-            child: BetterText(
-              '发布',
-              style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontSize: ScreenUtil().setSp(30)),
-            ),
-          ),
+                    bool status = await publishActivity(user);
+                    Navigator.pop(context);
+                    if (!status) {
+                      handleError();
+                    } else {
+                      handleSuccess();
+                    }
+                  },
+                  child: BetterText(
+                    '发布',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  )))
         ],
-        // title: BetterText('Finders'),
-        elevation: 0,
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(40)),
